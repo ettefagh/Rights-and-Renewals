@@ -1,0 +1,7 @@
+# Internal agent scratch and render cache files
+.agents/
+.*.render_cache.json
+test_conversion.pptx
+__pycache__/
+*.pyc
+.DS_Store
