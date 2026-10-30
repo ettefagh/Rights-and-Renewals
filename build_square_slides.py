@@ -110,7 +110,7 @@ def draw_footer_bar(draw, slide_num, slide_title):
     draw.line([40, 1550, 1560, 1550], fill="#D8E2E0", width=1)
     f_foot = get_font(13, False)
     f_bold = get_font(13, True)
-    draw.text((40, 1562), "Warranty & Subscription Wallet (MCP/API-Enabled) · Team Alpha (Members A, B, C, D)", font=f_foot, fill=TEXT_MUTED)
+    draw.text((40, 1562), "Warranty & Subscription Wallet (MCP/API-Enabled) · Team 6 (Jeetkumar, AmirHossein, Prushti, Kyle, Mojtaba)", font=f_foot, fill=TEXT_MUTED)
     page_str = f"Slide {slide_num} of 4 · Block {slide_num}: {slide_title}"
     bbox = f_bold.getbbox(page_str)
     tw = bbox[2] - bbox[0]
@@ -301,42 +301,42 @@ def render_slide_2():
     
     stories = [
         # MUST
-        ("US-01 [MUST]", "Manual Entry & Photo Vault", "Member B & D", "5 pts",
-         "Manually log product/receipt in <15s with image attachment & tax tag for proof.",
-         "• Flow <15s (Name, Date, Category)\n• Image upload (<5MB) with thumbnail",
+        ("US-01 [MUST]", "Manual Entry (<15s Flow)", "Prushti (UX/UI)", "5 pts",
+         "Manually log product/receipt in <15s with brand presets & tax tag for proof.",
+         "• Flow <15s (Name, Date, Category)\n• Brand typeahead & Werbungskosten toggle",
          MUST_BG, MUST_FG),
-        ("US-02 [MUST]", "Dual Expiry Calculation Engine", "Member D", "3 pts",
-         "Automated calculation of statutory warranty (24mo BGB § 438) & sub renewals.",
-         "• Auto 24-mo statutory warranty\n• Dynamic color urgency countdown pills",
+        ("US-02 [MUST]", "Receipt Attachment Vault", "Mojtaba & Kyle", "5 pts",
+         "Offline receipt photo vault (<1.5MB compression) with GoBD SHA-256 hash.",
+         "• Client image compression (<1.5MB)\n• SHA-256 hash & offline pinch-to-zoom",
          MUST_BG, MUST_FG),
-        ("US-03 [MUST]", "Proactive 30/7/1-Day Alerts", "Member D & A", "5 pts",
+        ("US-03 [MUST]", "Proactive 30/7/1-Day Alerts", "Kyle (Dev Lead)", "5 pts",
          "Multi-stage push alerts before coverage expires or contracts auto-renew.",
-         "• Scheduled at T-30d, T-7d, T-1d\n• Email fallback + urgent in-app banner",
+         "• Scheduled at T-30d, T-7d, T-1d (09:00)\n• Dynamic DST recalibration + deep-links",
          MUST_BG, MUST_FG),
-        ("US-04 [MUST]", "1-Tap Statutory Claim & Cancel", "Member C & B", "5 pts",
+        ("US-04 [MUST]", "Unified Responsive Dashboard", "Prushti (UX/UI)", "3 pts",
+         "Unified chronological dashboard across 4–6 views with WCAG urgency badges.",
+         "• Red (<=7d), Amber (8-30d), Green (>30d)\n• Instant <50ms search & category filter",
+         MUST_BG, MUST_FG),
+        ("US-05 [MUST]", "1-Tap Statutory Claim & Cancel", "Mojtaba & AmirHossein", "5 pts",
          "1-tap generation of claim & cancel letters citing German law (BGB §§ 437/312k).",
-         "• Formal draft with legal citations\n• Receipt proof auto-attached to PDF/mail",
-         MUST_BG, MUST_FG),
-        ("US-05 [MUST]", "Unified Responsive Dashboard", "Member B", "3 pts",
-         "Single responsive dashboard with status badges & instantaneous search/filter.",
-         "• Mobile & desktop responsive screen\n• Filter by Hardware vs Sub vs Tax",
+         "• Formal PDF/text with BGB citations\n• Receipt proof embedded + RDG disclaimer",
          MUST_BG, MUST_FG),
         # SHOULD
-        ("US-06 [SHOULD]", "Top 20 Brand Policy Wiki", "Member C", "5 pts",
+        ("US-06 [SHOULD]", "Top 20 Brand Policy Wiki", "AmirHossein", "5 pts",
          "Verified cancellation windows, refund rules & RMA links for 20 student brands.",
-         "• Structured JSON for top 20 brands\n• Verified RMA links & notice cutoffs",
+         "• Structured JSON for top 20 brands\n• Verified RMA links & § 312k URLs",
          SHOULD_BG, SHOULD_FG),
-        ("US-07 [SHOULD]", "Open MCP Server & REST API", "Member D", "5 pts",
+        ("US-07 [SHOULD]", "Open MCP Server & REST API", "Kyle (Dev Lead)", "5 pts",
          "Query the Policy Wiki via JSON-RPC tools so AI agents assist without hallucinations.",
-         "• MCP JSON-RPC 2.0 query tools for AI\n• REST endpoints for policy lookups",
+         "• MCP JSON-RPC 2.0 query tools for AI\n• Zod schema validation (-32602 errors)",
          SHOULD_BG, SHOULD_FG),
         # COULD & WON'T
-        ("US-08 [COULD]", "German Tax (Werbungskosten) Export", "Member C & D", "3 pts",
+        ("US-08 [COULD]", "German Tax (Werbungskosten) Export", "AmirHossein & Mojtaba", "3 pts",
          "Export tax-tagged receipts formatted for German returns (BMF 100% write-off).",
-         "• CSV/ZIP export for WISO / Taxfix\n• Pre-flags BMF 100% digital asset rule",
+         "• CSV/PDF export for WISO / Taxfix\n• Pre-flags BMF 2022 1-yr write-off rule",
          COULD_BG, COULD_FG),
-        ("US-09 [WON'T]", "Camera OCR Scanning & Bank Sync", "Future Scope", "8 pts",
-         "On-device OCR receipt scanning & banking sync explicitly deferred post-MVP.",
+        ("US-09 [WON'T]", "Camera OCR Scanning (Deferred)", "Kyle & Mojtaba", "13 pts",
+         "Automated OCR receipt scanning explicitly excluded from MVP (42% failure rate).",
          "• Out of scope for MVP to prevent creep\n• Camera strictly serves as receipt vault",
          WONT_BG, WONT_FG),
     ]
@@ -405,38 +405,38 @@ def render_slide_2():
 
     # BOTTOM RIGHT: Team Sprint Workload Allocation (w=570, h=620, y=915 to 1535)
     draw_rounded_card(draw, [990, 915, 1560, 1535], radius=14)
-    draw_pill(draw, "SPRINT 1 WORKLOAD ALLOCATION (24H TOTAL / 6H PER MEMBER)", 1010, 932, get_font(12, True), bg=TEAL_TINT, fg=HEADER_TEAL)
+    draw_pill(draw, "TEAM 6 SPRINT WORKLOAD ALLOCATION (92H TOTAL / 5 MEMBERS)", 1010, 932, get_font(12, True), bg=TEAL_TINT, fg=HEADER_TEAL)
     
     roles = [
-        ("Member A · Project Manager & QA", "6 hrs / week",
-         "• Sprint backlog orchestration & Notion/GitHub tracker governance.\n"
-         "• Design Session 6 usability testing protocol with 5 SRH students.\n"
-         "• Enforce Definition of Done quality gates and PR sign-offs.",
+        ("Jeetkumar · Project Manager", "10 hrs (10.9%)",
+         "• Sprint backlog orchestration, 5-column Kanban & WIP <= 2 governance.\n"
+         "• Enforce 7-Gate Definition of Done & risk register tracking.",
          "#E8F1EF"),
-        ("Member B · UX/UI & Frontend Lead", "6 hrs / week",
-         "• Mobile-first responsive UI components in Tailwind / CSS.\n"
-         "• Design tokens (Teal #507873 / Coral #D96B4B) & component library.\n"
-         "• Build 4 core views: Dashboard, Add Modal, Detail Card, Claim View.",
+        ("AmirHossein · Product / Research Lead", "14 hrs (15.2%)",
+         "• Curate 20 student brand policies & draft BGB §§ 437/477/312k templates.\n"
+         "• German tax research brief (§ 9 EStG / BMF 2022 100% write-off).",
          "#E8F1EF"),
-        ("Member C · Product & Policy Research", "6 hrs / week",
-         "• Curate 20 top student brand warranty & cancellation policies.\n"
-         "• Draft legally verified claim templates citing BGB §§ 437/477/312k.\n"
-         "• Synthesize German tax guide (Werbungskosten / BMF 2022 write-off).",
+        ("Prushti · UX/UI Lead", "26 hrs (28.3%)",
+         "• Build Views 1–5 responsive UI, WCAG AA urgency badges & brand tokens.\n"
+         "• Lead US-01 (<15s manual entry flow) & US-04 (unified dashboard).",
          "#E8F1EF"),
-        ("Member D · Full-Stack Dev Lead", "6 hrs / week",
-         "• Core data store schema & local receipt image vault (<5MB).\n"
-         "• Build dual expiry calculation engine & push notification scheduler.\n"
-         "• Prototype open Model Context Protocol (MCP) JSON-RPC server.",
+        ("Kyle · Development Lead", "22 hrs (23.9%)",
+         "• Offline IndexedDB/SQLite vault (US-02) & 30/7/1-day DST alerts (US-03).\n"
+         "• Build Open Model Context Protocol (MCP) JSON-RPC 2.0 server (US-07).",
+         "#E8F1EF"),
+        ("Mojtaba · Quality / Media Lead", "20 hrs (21.7%)",
+         "• Media Format 1 (<1.5MB receipt compression + SHA-256 hash & zoom).\n"
+         "• Media Format 2 (1-tap PDF/text dossier generator) & >=75% test suite.",
          "#E8F1EF")
     ]
     
-    ry = 966
+    ry = 964
     for r_title, r_time, r_desc, r_bg in roles:
-        draw.rounded_rectangle([1010, ry, 1540, ry + 128], radius=8, fill=r_bg, outline="#CFDDD9", width=1)
-        draw.text((1025, ry + 10), r_title, font=get_font(12.5, True), fill=HEADER_TEAL)
-        draw_pill(draw, r_time, 1435, ry + 8, get_font(11, True), bg=HEADER_TEAL, fg="#FFFFFF", px=8, py=3)
-        draw_wrapped_text(draw, r_desc, 1025, ry + 36, 500, get_font(11, False), fill=TEXT_PRIMARY, line_spacing=2)
-        ry += 138
+        draw.rounded_rectangle([1010, ry, 1540, ry + 104], radius=8, fill=r_bg, outline="#CFDDD9", width=1)
+        draw.text((1025, ry + 8), r_title, font=get_font(12, True), fill=HEADER_TEAL)
+        draw_pill(draw, r_time, 1410, ry + 6, get_font(10.5, True), bg=HEADER_TEAL, fg="#FFFFFF", px=8, py=2)
+        draw_wrapped_text(draw, r_desc, 1025, ry + 32, 500, get_font(10.5, False), fill=TEXT_PRIMARY, line_spacing=2)
+        ry += 112
         
     draw_footer_bar(draw, 2, "Backlog & Acceptance Criteria · 25 min")
     img.save("square_block_2_backlog.png", "PNG")
@@ -516,26 +516,26 @@ def render_slide_3():
     draw_pill(draw, "5 PRIORITISED PROJECT RISKS & ACTIONABLE MITIGATIONS", 60, 742, get_font(12, True), bg=TEAL_TINT, fg=HEADER_TEAL)
     
     risks = [
-        ("Risk 1 · Scope Creep into Camera OCR Scanning", "HIGH SEVERITY", "#DC2626", "Owner: Member A (PM)",
-         "Impact: Attempting automated receipt scanning derails development & exhausts vision tokens.",
-         "Mitigation: Strict ban on camera OCR in MVP. Manual entry (<15s) guarantees 100% data integrity.",
-         "Early Trigger: Any pull request introducing client-side OCR without PM sign-off."),
-        ("Risk 2 · Legal Accuracy of Generated Claim Letters", "MEDIUM SEVERITY", "#D97706", "Owner: Member C (Research)",
-         "Impact: Claims rejected by retailers if German consumer law citations are inaccurate.",
-         "Mitigation: Pre-format templates citing BGB §§ 437, 477 (Beweislastumkehr) & § 312k + legal disclaimers.",
-         "Early Trigger: Ambiguity in claim rejection feedback during Session 6 user testing."),
-        ("Risk 3 · Push Notification Delivery Failure / Blocked", "HIGH SEVERITY", "#DC2626", "Owner: Member D (Dev Lead)",
-         "Impact: Users deny browser permissions, missing warranty expirations & renewals.",
-         "Mitigation: Triple redundancy: WebPush + Email fallback (Resend) + persistent in-app urgency banners.",
-         "Early Trigger: Permission opt-in rate <50% during Session 6 usability trials."),
-        ("Risk 4 · Team Workload & Solo Developer Bottleneck", "MEDIUM SEVERITY", "#D97706", "Owner: Member A (PM)",
-         "Impact: Development bottleneck falls solely on Member D, risking burnout and delayed sprints.",
-         "Mitigation: Strict 6h/wk timebox; pair programming (Member D pairs with B on UI components).",
-         "Early Trigger: Any backlog task exceeding 5 story points or remaining in WIP >4 days."),
-        ("Risk 5 · Policy Wiki Data Staleness & Dead Links", "LOW SEVERITY", "#059669", "Owner: Member C (Research)",
-         "Impact: Brand warranty terms, cancellation notice periods, or RMA support URLs become outdated.",
-         "Mitigation: Scope MVP strictly to top 20 verified student brands; schema with last_verified timestamp.",
-         "Early Trigger: 404 error returned on RMA link or changed cancellation terms.")
+        ("Risk 1 · OCR Vision Token Cost Trap & Churn", "CRITICAL", "#DC2626", "Owner: Kyle, Mojtaba & Prushti",
+         "Impact: Thermal receipts fail OCR (42% error); vision APIs burn $0.02–$0.15/scan.",
+         "Mitigation: Strict manual-first <15s entry + <1.5MB receipt photo vault (SHA-256).",
+         "Early Trigger: Manual entry stopwatch test exceeds 15.0s (Verified at 11.4s)."),
+        ("Risk 2 · Subscription Dark Patterns & Shifting Terms", "HIGH SEVERITY", "#D97706", "Owner: AmirHossein (Product/Research)",
+         "Impact: Merchants hide cancellation buttons & alter renewal notice windows.",
+         "Mitigation: Curated 20-brand Policy Wiki + BGB § 309 Nr. 9 & § 312k Abs. 6 notice.",
+         "Early Trigger: Merchants reject generated notice or portal URLs return HTTP 404."),
+        ("Risk 3 · Regulatory Liability (RDG §§ 2,3 & StBerG § 2)", "MEDIUM SEVERITY", "#D97706", "Owner: AmirHossein & Jeetkumar",
+         "Impact: Automated defect notices & tax tagging risk unauthorized legal/tax practice.",
+         "Mitigation: Schematic document assembly under BGH VIII ZR 285/18 + RDG/StBerG disclaimers.",
+         "Early Trigger: Missing disclaimer on exported PDF/text dossier or tax view."),
+        ("Risk 4 · MCP Agent Protocol Schema Hallucinations", "MEDIUM SEVERITY", "#2563EB", "Owner: Kyle & Mojtaba",
+         "Impact: External LLMs hallucinate parameters or misparse loose JSON responses.",
+         "Mitigation: Strict MCP JSON-RPC 2.0 Draft-07 schemas + Zod validation (-32602 error).",
+         "Early Trigger: Malformed agent tool call bypasses Zod schema validation."),
+        ("Risk 5 · Scope Creep Across Hardware, Subs & Tax", "CRITICAL", "#DC2626", "Owner: Jeetkumar (Project Manager)",
+         "Impact: Attempting PSD2 bank sync, ELSTER filing, or camera OCR derails Session 5.",
+         "Mitigation: Enforce MoSCoW boundaries & Kanban WIP limit <= 2 per member.",
+         "Early Trigger: Any member exceeds 2 active In-Progress tasks on GitHub board.")
     ]
     
     r_y = 776
@@ -578,36 +578,36 @@ def render_slide_4():
     draw_pill(draw, "PROJECT MANAGER & 5-COLUMN AGILE GOVERNANCE BOARD", 60, 212, get_font(12, True), bg=TEAL_TINT, fg=HEADER_TEAL)
     
     draw.text((60, 248), "Project Manager:", font=get_font(13.5, True), fill=HEADER_TEAL)
-    draw.text((185, 248), "Member A (Sprint Master & Quality Gatekeeper)", font=get_font(13, False), fill=TEXT_PRIMARY)
+    draw.text((185, 248), "Jeetkumar (Team 6 Sprint Master & Governance)", font=get_font(13, False), fill=TEXT_PRIMARY)
     
     draw.text((60, 276), "Tracker System:", font=get_font(13.5, True), fill=HEADER_TEAL)
-    draw.text((185, 276), "GitHub Projects & Notion Kanban Board", font=get_font(13, False), fill=TEXT_PRIMARY)
+    draw.text((185, 276), "GitHub Projects & Issues (ettefagh/CM-LAB)", font=get_font(13, False), fill=TEXT_PRIMARY)
     
     # 5-Column Visual Board
     draw.text((60, 312), "5-Column Board Structure & WIP Limits:", font=get_font(12.5, True), fill=HEADER_TEAL)
     
     columns = [
-        ("1. Backlog", "All prioritized MoSCoW user stories (US-01 to US-09).", "#F1F5F9", "No limit"),
-        ("2. Next (Sprint 1)", "Active 2-week sprint backlog items committed.", "#E0F2FE", "Max 6"),
-        ("3. In Progress", "Active implementation & coding.", "#FEF3C7", "Max 4 (WIP)"),
-        ("4. In Review / QA", "Peer review, visual UI check & DoD validation.", "#EDE9FE", "Max 3"),
-        ("5. Done", "100% meets Definition of Done; merged to main.", "#DCFCE7", "Closed")
+        ("1. Backlog", "All prioritized MoSCoW user stories (US-06 to US-09).", "#F1F5F9", "No limit"),
+        ("2. Ready (Sprint 1)", "Active Session 5 sprint backlog items committed.", "#E0F2FE", "Max 6"),
+        ("3. In Progress", "Active implementation & coding.", "#FEF3C7", "WIP <= 2/mem"),
+        ("4. In Review / QA", "Peer review, Mojtaba QA check & DoD validation.", "#EDE9FE", "Max 5"),
+        ("5. Done", "100% meets 7-Gate Definition of Done; verified.", "#DCFCE7", "Closed")
     ]
     
     b_y = 338
     for c_title, c_desc, c_bg, c_wip in columns:
         draw.rounded_rectangle([60, b_y, 755, b_y + 46], radius=6, fill=c_bg, outline="#CFDDD9", width=1)
         draw.text((75, b_y + 13), c_title, font=get_font(12, True), fill=HEADER_TEAL)
-        draw_pill(draw, c_wip, 665, b_y + 10, get_font(10, True), bg=HEADER_TEAL, fg="#FFFFFF", px=6, py=2)
+        draw_pill(draw, c_wip, 645, b_y + 10, get_font(10, True), bg=HEADER_TEAL, fg="#FFFFFF", px=6, py=2)
         draw.text((220, b_y + 15), c_desc, font=get_font(11, False), fill=TEXT_PRIMARY)
         b_y += 52
         
-    draw.text((60, 620), "Team Cadence & Rituals:", font=get_font(12.5, True), fill=HEADER_TEAL)
+    draw.text((60, 620), "Team 6 Cross-Functional Roster:", font=get_font(12.5, True), fill=HEADER_TEAL)
     c_cadence = (
-        "• Weekly Async Standup: Discord/Slack check-in every Tuesday 18:00.\n"
-        "• Pre-Lab Sync: 30-minute alignment every Friday at 09:30 before SRH lab.\n"
-        "• Pair Programming: Developer (Member D) pairs with UI Lead (Member B).\n"
-        "• Bi-Weekly Retro: Held after Friday lab sessions to refine backlog."
+        "• Project Manager: Jeetkumar   |   Product / Research Lead: AmirHossein\n"
+        "• UX/UI Lead: Prushti          |   Development Lead: Kyle\n"
+        "• Quality / Media Lead: Mojtaba\n"
+        "• Pre-Lab Sync & QA Gate: Weekly review led by Jeetkumar & Mojtaba."
     )
     draw_wrapped_text(draw, c_cadence, 60, 648, 695, get_font(12, False), fill=TEXT_PRIMARY, line_spacing=4)
 
@@ -616,18 +616,18 @@ def render_slide_4():
     draw_pill(draw, "NEXT RESULTS: IMMEDIATE SESSION 5 DELIVERABLES (OCT 31)", 835, 212, get_font(12, True), bg=TEAL_TINT, fg=HEADER_TEAL)
     
     deliverables = [
-        ("Deliverable 1 · Manual Entry & Photo Upload Modal", "SESSION 5 (OCT 31)",
-         "Owners: Member B (UI) & Member D (Dev)",
-         "Interactive 3-field modal (Name, Date, Category) with receipt image upload (<5MB), instant preview thumbnail, and German tax toggle (<15s flow)."),
-        ("Deliverable 2 · Curated 20-Brand Policy Wiki Dataset", "SESSION 5 (OCT 31)",
-         "Owner: Member C (Product & Research Lead)",
-         "Structured JSON repository covering 20 student brands (Apple, Spotify, Amazon, etc.) with verified warranty windows, cancellation cutoffs, and RMA URLs."),
-        ("Deliverable 3 · Usability Testing Protocol & Task Guide", "SESSION 5 (OCT 31)",
-         "Owner: Member A (Project Manager)",
-         "5-step task-based test protocol for Session 6: logging speed check, receipt upload clarity, notification trigger check, and claim letter review."),
-        ("Deliverable 4 · Open MCP Server Protocol Prototype", "SESSION 5 (OCT 31)",
-         "Owner: Member D (Development Lead)",
-         "Basic JSON-RPC 2.0 tool schema allowing autonomous AI agents to query the Policy Wiki, returning structured cancellation windows & warranty terms.")
+        ("Deliverable D-1 · Working Core User Journey (Views 1–6)", "SESSION 5 (OCT 31)",
+         "Owners: Kyle (Development Lead) & Prushti (UX/UI Lead)",
+         "End-to-end Capture -> Store -> Alert -> Claim pipeline across Views 1–5 + View 6 Policy Wiki & MCP Explorer (<15s manual entry verified at 11.4s)."),
+        ("Deliverable D-2 · Dual Purposeful Media Formats", "SESSION 5 (OCT 31)",
+         "Owners: Mojtaba (Quality / Media Lead) & AmirHossein (Product/Research)",
+         "Media 1: <1.5MB compressed receipt photo vault + SHA-256 hash & zoom. Media 2: 1-tap statutory BGB PDF/text dossier generator + clipboard fallback."),
+        ("Deliverable D-3 · Policy Wiki v1 Seed & Open MCP Spec", "SESSION 5 (OCT 31)",
+         "Owners: AmirHossein (Product/Research) & Kyle (Development Lead)",
+         "Curated JSON repository of top student brands + Model Context Protocol (MCP) JSON-RPC 2.0 tool schemas (policy_lookup, claim_dossier_generate)."),
+        ("Deliverable D-4 · German Tax Brief & Werbungskosten Schema", "COMPLETED (DONE)",
+         "Owners: AmirHossein (Product/Research) & Jeetkumar (Project Manager)",
+         "Legal & tax research brief covering § 9 EStG, BMF 22.02.2022 100% digital write-off (Sofortabschreibung), and GoBD Rn. 108–110 SHA-256 immutability.")
     ]
     
     d_y = 250

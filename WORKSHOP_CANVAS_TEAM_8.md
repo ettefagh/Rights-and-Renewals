@@ -1,31 +1,32 @@
-# Workshop Canvas: Team 8 — Warranty, Subscription & Tax-Ready Wallet
+# Workshop Canvas: Team 6 — Warranty, Subscription & Tax-Ready Wallet
 **Academic Course:** *Computer & Media Lab* (Wintersemester 2026)  
 **Institution:** SRH University of Applied Sciences (*SRH Hochschule*)  
 **Instructor:** Prof. Franziska Schwarz  
-**Working Team:** Team 8 (Collaborating & Testing with Peer Team 7)  
+**Working Team:** Team 6 (Collaborating & Testing with Peer Team 7)  
 **Project Title:** Warranty & Subscription Wallet + Policy Wiki (MCP/API-Enabled)  
 **Active Milestone:** Session 5 (MVP Scope Control & Core Journey Gate)  
 **Deliverable Status:** Official Final Workshop Board Document (Panels A, B, C, D)  
-**Publication Date:** October 29, 2026  
+**Publication Date:** October 30, 2026  
 
 ---
 
 ## Executive Summary & Academic Governance
 
-This official course workshop canvas synthesizes the complete product architecture, user research, backlog governance, paper prototype lab observations, and cross-functional commitments for **Team 8** in the SRH University *Computer & Media Lab*.
+This official course workshop canvas synthesizes the complete product architecture, user research, backlog governance, paper prototype lab observations, and cross-functional commitments for **Team 6** in the SRH University *Computer & Media Lab*.
 
 The product addresses the acute consumer pain point where university students and young households forfeit hundreds of euros annually due to faded paper receipts, lost invoices, missed statutory defect claim windows, and recurring subscription auto-renewal traps. By executing a **4-stage lifecycle engine (Capture $\rightarrow$ Store $\rightarrow$ Alert $\rightarrow$ Act)**, Warranty Wallet bridges the gap between passive document storage and assertive legal action under German and EU consumer protection law.
 
-### Team Role Distribution & Sprint Commitment
-In strict compliance with SRH Course Governance (Slide 28), the team distributes 23 Must-Have Story Points across four cross-functional disciplines, totaling **76 direct implementation hours** and **16 sprint governance/overhead hours (92 Total Team Sprint Hours)**:
+### Team 6 Role Distribution & Sprint Commitment (5 Members)
+In strict compliance with SRH Course Governance (Slide 28), **Team 6** distributes 23 Must-Have Story Points across five named cross-functional leads, totaling **76 direct implementation hours** and **16 sprint governance/overhead hours (92 Total Team Sprint Hours)**:
 
-| Role Identifier & Title | Student Owner | Core Discipline & Course Responsibilities | Direct User Story Implementation | Sprint Overhead & Governance | Total Allocated Capacity & Share |
-| :--- | :--- | :--- | :---: | :---: | :---: |
-| **Member A**<br>*(Project Manager / QA)* | Team Member A | Agile sprint planning, MoSCoW backlog governance, SRH 5-column Kanban board tracking, WIP limit enforcement ($\le 2$), Acceptance Criteria & Definition of Done verification, user walkthrough coordination. | 0h direct user story build | 10h sprint governance | **10h** (10.9%) |
-| **Member B**<br>*(UX / UI Lead)* | Team Member B | Mobile interaction design, Figma UI wireframes, design system tokens, WCAG 2.1 AA accessibility ($\ge 48\times 48$px touch targets, $\ge 4.5:1$ contrast), paper prototype specification (4–6 views tested with Team 7 in Panel C), user journey flow mapping. | 26h (Story 1: 16h manual entry UI; Story 4: 10h dashboard & status badges) | 0h | **26h** (28.3%) |
-| **Member C**<br>*(Policy / Legal & Research Lead)* | Team Member C | German Civil Code (BGB) consumer law research (§§ 437, 438, 477 Abs. 1, 475e), subscription regulations (§§ 309 Nr. 9, 312k, 312k Abs. 6), German tax organization (§ 9 EStG *Werbungskosten*, BMF Guidance 22.02.2022 1-year *Sofortabschreibung*, GoBD SHA-256 hash compliance), Policy Wiki knowledge graph curation, regulatory disclaimers (BGH VIII ZR 285/18, RDG §§ 2, 3, StBerG § 2). | 8h (Story 5: statutory claim and cancellation notice templates) | 6h (brand policy curation & German tax research brief) | **14h** (15.2%) |
-| **Member D**<br>*(Full-Stack Dev & Quality/Media Lead)* | Team Member D | Offline-first software architecture, sandboxed SQLite / IndexedDB client storage, rapid 3-field manual entry engine (<15s flow), encrypted receipt photo vault (<1.5MB compression, client SHA-256 hashing, zero OCR blocking), proactive 30/7/1-day push alert scheduler with DST dynamic wall-clock recalibration, client-side PDF/text legal claim generator with transient user activation handling, Model Context Protocol (MCP) JSON-RPC 2.0 server (`policy_lookup`, `claim_dossier_generate`), automated testing ($\ge 75\%$ coverage). | 42h (Story 2: 16h receipt vault; Story 3: 16h notification alarm scheduler; Story 5: 10h client-side PDF/text generator) | 0h | **42h** (45.7%) |
-| **Total Team 8 Capacity** | **Full Team** | **Active Milestone 1 / Session 5 Commitment** | **76h** | **16h** | **92h** (100.0%) |
+| Team | Role Title | Named Owner | Core Discipline & Course Responsibilities | Direct User Story Implementation | Sprint Overhead & Governance | Total Allocated Capacity & Share |
+| :---: | :--- | :--- | :--- | :---: | :---: | :---: |
+| **Team 6** | **Project Manager** | **Jeetkumar** | Agile sprint planning, MoSCoW backlog governance, SRH 5-column Kanban board tracking, WIP limit enforcement ($\le 2$), Acceptance Criteria & Definition of Done verification, risk governance. | 0h direct user story build | 10h sprint governance | **10h** (10.9%) |
+| **Team 6** | **Product / Research Lead** | **AmirHossein** (`@ettefagh`) | German Civil Code (BGB) consumer law research (§§ 437, 438, 477 Abs. 1, 475e), subscription regulations (§§ 309 Nr. 9, 312k, 312k Abs. 6), German tax organization (§ 9 EStG *Werbungskosten*, BMF Guidance 22.02.2022 1-year *Sofortabschreibung*, GoBD SHA-256 hash compliance), Policy Wiki knowledge graph curation, regulatory disclaimers (BGH VIII ZR 285/18, RDG §§ 2, 3, StBerG § 2). | 8h (Story 5: statutory claim and cancellation notice templates) | 6h (brand policy curation & German tax research brief) | **14h** (15.2%) |
+| **Team 6** | **UX/UI Lead** | **Prushti** | Mobile interaction design, Figma UI wireframes, design system tokens, WCAG 2.1 AA accessibility ($\ge 48\times 48$px touch targets, $\ge 4.5:1$ contrast), paper prototype specification (4–6 views tested with Team 7 in Panel C), user journey flow mapping. | 26h (Story 1: 16h manual entry UI; Story 4: 10h dashboard & status badges) | 0h | **26h** (28.3%) |
+| **Team 6** | **Development Lead** | **Kyle** | Offline-first software architecture, sandboxed SQLite / IndexedDB client storage, rapid 3-field manual entry persistence (<15s flow), proactive 30/7/1-day push alert scheduler with DST dynamic wall-clock recalibration, Model Context Protocol (MCP) JSON-RPC 2.0 server (`policy_lookup`, `claim_dossier_generate`). | 22h (Story 2: 6h offline IndexedDB/SQLite vault; Story 3: 16h notification alarm scheduler & DST recalibration) | 0h | **22h** (23.9%) |
+| **Team 6** | **Quality / Media Lead** | **Mojtaba** | Two purposeful media formats: **Media Format 1** (<1.5MB client receipt photo compression, client SHA-256 hashing & offline pinch-to-zoom viewer with zero OCR blocking) and **Media Format 2** (client-side PDF/text legal claim & cancellation dossier generator with transient user activation clipboard fallback), plus automated test suite ($\ge 75\%$ coverage). | 20h (Story 2: 10h receipt photo compression, SHA-256 & zoom viewer; Story 5: 10h client-side PDF/text dossier generator) | 0h | **20h** (21.7%) |
+| **Total** | **5 Cross-Functional Leads** | **Team 6 Roster** | **Active Milestone 1 / Session 5 Commitment** | **76h** | **16h** | **92h** (100.0%) |
 
 ---
 
