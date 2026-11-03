@@ -8,6 +8,20 @@
 
 ---
 
+## 📚 Development Lead Engineering Specification Suite
+
+All technical specifications in this directory are strictly scoped to **Development Lead (Kyle — Member D)** responsibilities, cleanly separated from Quality/Media Lead (**Mojtaba**) domains:
+
+| Spec ID | Engineering Document | Primary Engineering Scope & Deliverables | Mapped Issues / ADRs |
+| :---: | :--- | :--- | :--- |
+| **`DEV-00`** | [**`00_Development_Lead_Role_and_Deliverables_Matrix.md`**](./00_Development_Lead_Role_and_Deliverables_Matrix.md) | Pure Development Lead Role Charter, Cross-Team Boundary Separation Matrix (excluding Quality/Media Lead domains), 22h Sprint Capacity Reconciliation (`6h US-02` + `16h US-03`), Causal `ADR-01` & `ADR-03`, and Walkthrough A (`#25`, Participant Alpha) Telemetry Log. | `#1`, `#2`, `#5`, `#6`, `#10`, `#12`, `#13`, `#16`, `#18`, `#20`, `#25`, `#27`, `#29` |
+| **`DEV-01`** | [**`01_Frontend_Architecture_and_Reactive_State_Engine.md`**](./01_Frontend_Architecture_and_Reactive_State_Engine.md) | React 19 + TypeScript 5.x + Vite 6 Component Architecture across Views 1–6, Zustand v5 Reactive State Engine (`<50ms` search/filter), Sub-15s Manual Entry Engine (`11.4s` verified, `<10ms` Prefix-Trie brand typeahead, zero OCR), and Proactive 30/7/1-Day Push Alert Scheduler with Dynamic CEST/CET DST Recalibration ($0\text{h}$ drift). | `US-01` (`#4`), `US-03` (`#2`, `#6`), `D-1` (`#18`), `R-1` (`#13`), `ADR-01` (`#27`) |
+| **`DEV-02`** | [**`02_Offline_First_Local_Database_Architecture.md`**](./02_Offline_First_Local_Database_Architecture.md) | Dexie.js v4 / IndexedDB Schema (`items`, `receipt_blobs`, `alarm_schedules`, `policy_wiki`, `dispute_history`), `<200ms` Atomic Multi-Store RW Transactions, Orphan Blob Garbage Collection, Web Crypto `AES-GCM-256` Zero-Knowledge Storage, and `GoBD Rn. 108–110` `SHA-256` Immutability Verification. | `US-01` (`#1`), `US-02` (`#5` 6h Vault DB), `D-1` (`#18`), `ADR-01` (`#27`) |
+| **`DEV-03`** | [**`03_MCP_Server_and_JSON_RPC_Integration_Spec.md`**](./03_MCP_Server_and_JSON_RPC_Integration_Spec.md) | Open Model Context Protocol (MCP) JSON-RPC 2.0 Server over `stdio` & HTTP `SSE` (`<200ms` latency), `policy_lookup` & `claim_dossier_generate` Tool Schemas (Draft-07 & Zod), Deterministic `-32602` Error Handling, Top 20 Student Brand Policy Wiki Seed, and View 6 Explorer Bridge. | `US-07` (`#10`), `D-3` (`#20`), `R-4` (`#16`), `ADR-03` (`#29`), `Gate 4 DoD` (`#30`) |
+| **`DEV-04`** | [**`04_Production_Engineering_Build_Pipelines_and_Security_Posture.md`**](./04_Production_Engineering_Build_Pipelines_and_Security_Posture.md) | Strict TypeScript/Vite 6 Offline PWA Build Pipeline (`<150KB` gzipped), GitHub Actions CI/CD Enforcing the 7-Gate Definition of Done (`#30`), `connect-src 'self'` CSP Zero-Network/Zero-OCR Guardrail, W3C Transient User Activation Clipboard & HTML5 Camera Fallbacks, and STRIDE Threat Model. | `R-1` (`#13`), `R-3` (`#15`), `R-5` (`#17`), `DoD` (`#30`) |
+
+---
+
 ## 🎯 Role Objectives & Engineering Mandate
 
 As **Development Lead**, **Kyle** is responsible for the offline-first client architecture, sandboxed local database storage, notification alarm scheduling, and the implementation of the open Model Context Protocol (MCP) server:
