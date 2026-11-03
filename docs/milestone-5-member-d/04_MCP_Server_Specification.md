@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Project** | Warranty & Subscription Wallet (SRH University — Computer & Media Lab) |
 | **Milestone** | Milestone 5 — Development, Media Pipeline, Quality Assurance & AI Integration |
-| **Owner / Role** | Member D — Development & Quality/Media Lead (AI & MCP Server Lead) |
+| **Owner / Role** | Member D — Development Lead (AI & MCP Server Lead) |
 | **Protocol Version** | Model Context Protocol `2025-03-26` (Backward-compatible with `2024-11-05`) |
 | **Transport Layer** | JSON-RPC 2.0 over Local `stdio` & Remote Streamable HTTP / SSE (OAuth 2.1 + PKCE) |
 | **Package Identifier** | `@warranty-wallet/mcp-server` (`v1.0.0`) |

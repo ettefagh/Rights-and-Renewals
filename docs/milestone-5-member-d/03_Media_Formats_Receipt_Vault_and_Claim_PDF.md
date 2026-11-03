@@ -1,9 +1,9 @@
-# Milestone 5 — Member D (Development & Quality / Media Lead)
+# Milestone 5 — Member D (Development Lead)
 # 03: Media Formats, Receipt Vault Ingestion Pipeline & Warranty Claim PDF Synthesis Engine
 
 **Course / Lab:** SRH University — Computer & Media Lab  
 **Project:** Warranty & Subscription Wallet  
-**Role:** Member D — Development & Quality / Media Lead  
+**Role:** Member D — Development Lead  
 **Document Version:** 1.0.0 (Production Specification)  
 **Status:** Approved for Implementation  
 

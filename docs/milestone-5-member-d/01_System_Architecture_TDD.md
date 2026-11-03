@@ -2,7 +2,7 @@
 
 **Project:** Warranty & Subscription Wallet  
 **Institution:** SRH University — Computer & Media Lab (Milestone 5)  
-**Author:** Member D — *Development & Quality/Media Lead* (in collaboration with Members A, B, C)  
+**Author:** Member D — *Development Lead* (in collaboration with Members A, B, C)  
 **Document Version:** 1.0.0  
 **Status:** Production Baseline  
 **Target Environment:** EU-Central (Frankfurt `eu-central-1`), Kubernetes / Cloud Run, PostgreSQL 16, S3/MinIO Encrypted Vault  

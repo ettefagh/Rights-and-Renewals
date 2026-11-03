@@ -1,9 +1,9 @@
-# Member D Role & Deliverables Matrix: Development & Quality/Media Lead
+# Member D Role & Deliverables Matrix: Development Lead
 
 **Project:** Warranty & Subscription Wallet  
 **Course / Module:** SRH University — Computer & Media Lab  
 **Milestone:** Milestone 5 (Final Engineering Implementation, QA Verification, Media Pipeline & Technical Handover)  
-**Role Owner:** Member D — *Development & Quality/Media Lead*  
+**Role Owner:** Member D — *Development Lead*  
 **Document Version:** 1.0.0  
 **Status:** Approved / Production Baseline  
 
@@ -11,7 +11,7 @@
 
 ## 1. Executive Role Audit & Charter
 
-Within the four-person engineering team structure for the **Warranty & Subscription Wallet** project at SRH University Computer & Media Lab, **Member D (Development & Quality/Media Lead)** serves as the technical linchpin bridging **core full-stack implementation**, **computer-vision/media asset pipelines**, **automated quality assurance (BDD/E2E/Performance)**, and **AI Agent / Model Context Protocol (MCP) extensibility**.
+Within the four-person engineering team structure for the **Warranty & Subscription Wallet** project at SRH University Computer & Media Lab, **Member D (Development Lead)** serves as the technical linchpin bridging **core full-stack implementation**, **computer-vision/media asset pipelines**, **automated quality assurance (BDD/E2E/Performance)**, and **AI Agent / Model Context Protocol (MCP) extensibility**.
 
 ### 1.1 Why Member D is Critical to Milestone 5
 While Milestone 1–4 established product discovery, UX prototypes, and foundational CRUD scaffolds, **Milestone 5** evaluates whether the system functions as a resilient, secure, media-capable software product ready for real-world deployment. Member D owns the three highest-risk technical domains in a consumer financial & document wallet:
@@ -44,7 +44,7 @@ To ensure zero ambiguity during the Milestone 5 sprint and oral defense at SRH U
 - **Member A:** *Product, Project Management & Domain/FinTech Lead* (Business logic, subscription financial analytics, agile governance, stakeholder presentation)
 - **Member B:** *UX/UI Design & Frontend Experience Lead* (Design system, responsive PWA views, accessibility WCAG 2.1 AA, interactive client state)
 - **Member C:** *Core Backend, Database & Cloud Infrastructure Lead* (Auth/IAM, core CRUD APIs, database migrations, Docker/Kubernetes deployment, notification scheduler)
-- **Member D:** *Development & Quality/Media Lead* (System TDD orchestration, Receipt Vault media pipeline, OCR/VLM extraction, Claim PDF generator, QA/BDD automation, MCP Server integration)
+- **Member D:** *Development Lead* (System TDD orchestration, Receipt Vault media pipeline, OCR/VLM extraction, Claim PDF generator, QA/BDD automation, MCP Server integration)
 
 ### 3.1 RACI Definitions
 - **R (Responsible):** Engineers who execute the work and write the code/specification.

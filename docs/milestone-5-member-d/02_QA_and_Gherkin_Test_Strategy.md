@@ -2,7 +2,7 @@
 
 **Project:** Warranty & Subscription Wallet  
 **Course:** SRH University — Computer & Media Lab (Milestone 5)  
-**Owner:** Member D (Development & Quality/Media Lead)  
+**Owner:** Member D (Development Lead)  
 **Document ID:** `WSW-M5-QA-002`  
 **Version:** `1.0.0-rc1`  
 **Status:** Production Quality Gate Specification  
