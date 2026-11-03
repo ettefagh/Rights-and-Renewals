@@ -2,6 +2,9 @@
 .agents/
 .*.render_cache.json
 test_conversion.pptx
+*.tmp
 __pycache__/
 *.pyc
+*.pyo
 .DS_Store
+Thumbs.db

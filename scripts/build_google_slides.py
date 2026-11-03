@@ -11,8 +11,8 @@ import google.auth
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-WORKSPACE = Path(r"c:\Users\admin\Documents\antigravity\optimistic-bardeen")
-ASSETS_DIR = WORKSPACE / "pitch_assets"
+WORKSPACE = Path(__file__).resolve().parent.parent
+ASSETS_DIR = WORKSPACE / "pitch-deck" / "assets"
 ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Exact color palette
@@ -548,6 +548,6 @@ def upload_to_google_slides(pptx_path: Path, title: str):
 
 
 if __name__ == "__main__":
-    out_pptx = WORKSPACE / "Warranty_Wallet_Pitch_Deck_GoogleSlides.pptx"
+    out_pptx = WORKSPACE / "pitch-deck" / "Warranty_Wallet_Pitch_Deck_GoogleSlides.pptx"
     build_full_pitch_deck(out_pptx)
     upload_to_google_slides(out_pptx, "Warranty & Subscription Wallet - Pitch Deck")

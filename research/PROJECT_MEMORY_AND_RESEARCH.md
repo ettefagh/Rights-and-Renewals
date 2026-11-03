@@ -32,12 +32,11 @@ Consumers routinely forfeit hundreds of dollars in valid warranty claims and unc
 | Asset Name | Canonical Location / URI | Purpose & Status |
 | :--- | :--- | :--- |
 | **Google Slides Deck** | [Google Slides Live Presentation](https://docs.google.com/presentation/d/152nLrrfXt9FgDuTi3W5siGW7zZGjtU2nYvfdToobWGA/edit?usp=drivesdk) | 6-slide widescreen investor deck published live to Google Drive. |
-| **Local Master PPTX** | `c:\Users\admin\Documents\antigravity\optimistic-bardeen\Warranty_Wallet_Pitch_Deck_GoogleSlides.pptx` | Native 16:9 PowerPoint pitch deck with embedded vector assets. |
+| **Local Master PPTX** | `pitch-deck/Warranty_Wallet_Pitch_Deck_GoogleSlides.pptx` | Native 16:9 PowerPoint pitch deck with embedded vector assets. |
+| **Local Print PDF** | `pitch-deck/Warranty_Wallet_Pitch_Deck_Rebuilt.pdf` | Formatted 6-slide investor deck export. |
 | **Cloud Sync PPTX** | `C:\Users\admin\My Drive\Warranty_Wallet_Pitch_Deck_GoogleSlides.pptx` | Real-time mirror synced to Google Drive root folder. |
-| **Automated Deck Builder** | `c:\Users\admin\Documents\antigravity\optimistic-bardeen\build_google_slides.py` | Python script generating slides via `python-pptx` and syncing via Drive API. |
-| **Vector Graphic Generator**| `c:\Users\admin\Documents\antigravity\optimistic-bardeen\pitch_assets\` | High-DPI rendered chevrons (`slide3_chevrons.png`) and milestones (`slide5_timeline.png`). |
-| **Enrichment Specification**| `c:\Users\admin\Documents\antigravity\optimistic-bardeen\pitch_enrichment_spec.json` | Detailed alignment mapping from Oct 16 team meeting transcript to slides. |
-| **Executive Print Dossier** | `c:\Users\admin\Documents\antigravity\optimistic-bardeen\Warranty_Wallet_Pitch_Enrichment_Guide.pdf` | Formatted executive briefing report with full table alignments. |
+| **Automated Deck Builder** | `scripts/build_google_slides.py` | Python script generating slides via `python-pptx` and syncing via Drive API. |
+| **Vector Graphics Assets** | `pitch-deck/assets/` | High-DPI rendered chevrons (`slide3_chevrons.png`) and milestones (`slide5_timeline.png`). |
 
 ---
 

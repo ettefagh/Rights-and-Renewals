@@ -35,7 +35,7 @@ In strict compliance with SRH Course Governance (Slide 28), **Team 6** distribut
 
 ```
 +----------------------------------------------------------------------------------------------------+
-| PANEL A: REQUIREMENTS CLINIC                                                                TEAM 8 |
+| PANEL A: REQUIREMENTS CLINIC                                                                TEAM 6 |
 +----------------------------------------------------------------------------------------------------+
 | TARGET USER:                                    | MAIN GOAL:                                       |
 | Tech-active students, Werkstudenten, and young  | Rapid <15s manual logging, encrypted receipt     |
@@ -173,7 +173,7 @@ In strict compliance with SRH Course Governance (Slide 28), **Team 6** distribut
 
 ```
 +----------------------------------------------------------------------------------------------------+
-| PANEL B: CORE USER JOURNEY                                                                  TEAM 8 |
+| PANEL B: CORE USER JOURNEY                                                                  TEAM 6 |
 +----------------------------------------------------------------------------------------------------+
 | START / TRIGGER:                                | SUCCESSFUL OUTCOME:                              |
 | User purchases tech/study hardware (e.g. Sony   | User asserts statutory warranty rights (or       |
@@ -260,7 +260,7 @@ In strict compliance with SRH Course Governance (Slide 28), **Team 6** distribut
 
 ```
 +----------------------------------------------------------------------------------------------------+
-| PANEL C: PROTOTYPE & PEER LAB                                                               TEAM 8 |
+| PANEL C: PROTOTYPE & PEER LAB                                                               TEAM 6 |
 +----------------------------------------------------------------------------------------------------+
 | PAPER PROTOTYPE SPECIFICATION: 6 KEY VIEWS (Tested in two 15-minute rounds with Team 7)            |
 | View 1: Unified Wallet Dashboard (Timeline View with Red/Amber/Green urgency badges & search).     |
@@ -294,7 +294,7 @@ In strict compliance with SRH Course Governance (Slide 28), **Team 6** distribut
 ```
 
 ### C.1 Paper Prototype Specification (4–6 Meaningful Views)
-Adhering to the course curriculum, Team 8 designed low-fidelity paper prototypes encompassing **5 core user views** and **1 platform tool view**, incorporating normal interaction paths and 5 discrete feedback states:
+Adhering to the course curriculum, Team 6 designed low-fidelity paper prototypes encompassing **5 core user views** and **1 platform tool view**, incorporating normal interaction paths and 5 discrete feedback states:
 
 #### View 1: Unified Wallet Dashboard (Timeline View)
 * **Screen Description:** Central home screen displaying active hardware warranties and digital subscriptions in a single chronological feed sorted by nearest expiration/renewal deadline.
@@ -516,7 +516,7 @@ Adhering to the course curriculum, Team 8 designed low-fidelity paper prototypes
 
 ```
 +----------------------------------------------------------------------------------------------------+
-| PANEL D: HOMEWORK LAUNCHPAD                                                                 TEAM 8 |
+| PANEL D: HOMEWORK LAUNCHPAD                                                                 TEAM 6 |
 +----------------------------------------------------------------------------------------------------+
 | PREPARE TODAY. COMPLETE BEFORE SESSION 4: TWO INDEPENDENT TARGET-USER WALKTHROUGHS                 |
 | Walkthrough A (Participant Alpha): Master's student & Werkstudentin, age 24. Task: Log external    |
@@ -609,14 +609,14 @@ Adhering to the course curriculum, Team 8 designed low-fidelity paper prototypes
 * **Team Code Repository & Portfolio:**  
   `https://github.com/ettefagh/CM-LAB`
 * **Local Master Presentation Asset:**  
-  `c:\Users\admin\Documents\antigravity\optimistic-bardeen\Warranty_Wallet_Pitch_Deck_GoogleSlides.pptx`
+  `c:\Users\admin\Documents\antigravity\optimistic-bardeen\pitch-deck\Warranty_Wallet_Pitch_Deck_GoogleSlides.pptx`
 
 ---
 
 ### D.5 Session 4 Status Report: What Changed After Testing, and Why?
 
 #### Executive Summary of Session 4 Iterations
-Following wireframe reviews and paper prototype peer testing with Team 7, Team 8 conducted a comprehensive iteration of the core user journey, transforming the product from a passive document storage utility into an assertive, automated consumer protection engine.
+Following wireframe reviews and paper prototype peer testing with Team 7, Team 6 conducted a comprehensive iteration of the core user journey, transforming the product from a passive document storage utility into an assertive, automated consumer protection engine.
 
 #### 1. What Changed
 1. **Input Architecture (Open Text $\rightarrow$ 3-Field Brand Autocomplete):**  

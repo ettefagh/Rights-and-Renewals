@@ -29,10 +29,10 @@
 | Document / Asset | Purpose & Contents | Format |
 | :--- | :--- | :--- |
 | [**`development-documents/`**](./development-documents/) | **Team 6 Development Documents Hub:** Individual role specifications, architectures, sprint logs & DoD checklists for [Jeetkumar](./development-documents/project-manager/), [AmirHossein](./development-documents/product-research-lead/), [Prushti](./development-documents/ux-ui-lead/), [Kyle](./development-documents/development-lead/), and [Mojtaba](./development-documents/quality-media-lead/) | Directory (5 Roles) |
-| [**`WORKSHOP_CANVAS_TEAM_8.md`**](./WORKSHOP_CANVAS_TEAM_8.md) | **Official 4-Panel Team 6 Workshop Canvas:** Panel A (Requirements Clinic `US1–US3`), Panel B (6-Step Core User Journey + 2 Exception Flows), Panel C (6 Paper Prototype Views & Team 7 Peer Lab Results), Panel D (Homework Launchpad, Walkthroughs A & B, 3 Causal Decisions, Session 4 Status Report) | Markdown (67 KB) |
-| [**`WORKSHOP_BOARD_RECOMMENDATIONS.md`**](./WORKSHOP_BOARD_RECOMMENDATIONS.md) | **Master 4-Block Workshop Board Specification:** Block 1 (Sharpen the Idea), Block 2 (9 MoSCoW User Stories & Full Gherkin Criteria), Block 3 (Milestones `S1–S10` & 5 Prioritized Risks), Block 4 (Commit, 5-Column Kanban Board, 92h Role Capacity, 7-Gate DoD) | Markdown (73 KB) |
-| [**`PROJECT_MEMORY_AND_RESEARCH.md`**](./PROJECT_MEMORY_AND_RESEARCH.md) | **Comprehensive Research Dossier:** Empirical user interviews (Persons 1–4), German Civil Code (`BGB §§ 437, 438, 477 Abs. 1, 475e, 309 Nr. 9, 312k Abs. 6`), German Tax Law (`§ 9 EStG`, `BMF 22.02.2022` 100% digital depreciation, `GoBD` SHA-256 hashing), and MCP JSON-RPC 2.0 specification | Markdown (41 KB) |
-| [**`Warranty_Wallet_Pitch_Deck_Rebuilt.pdf`**](./Warranty_Wallet_Pitch_Deck_Rebuilt.pdf) | **Rebuilt 6-Slide Widescreen (16:9) Investor Pitch Deck** ([Google Slides Live Link](https://docs.google.com/presentation/d/152nLrrfXt9FgDuTi3W5siGW7zZGjtU2nYvfdToobWGA/edit?usp=drivesdk)) | PDF / PPTX / DOCX |
+| [**`workshop-materials/`**](./workshop-materials/) | **Team 6 Workshop Materials & Canvas:** [4-Panel Workshop Canvas (`WORKSHOP_CANVAS_TEAM_6.md`)](./workshop-materials/WORKSHOP_CANVAS_TEAM_6.md), [4-Block Board Recommendations (`WORKSHOP_BOARD_RECOMMENDATIONS.md`)](./workshop-materials/WORKSHOP_BOARD_RECOMMENDATIONS.md), and [Square Slide Visuals](./workshop-materials/slides/) | Markdown & PNGs |
+| [**`pitch-deck/`**](./pitch-deck/) | **Investor Pitch Deck Package:** [Widescreen PDF](./pitch-deck/Warranty_Wallet_Pitch_Deck_Rebuilt.pdf), [Word Docx](./pitch-deck/Warranty_Wallet_Pitch_Deck_Rebuilt.docx), [PowerPoint PPTX](./pitch-deck/Warranty_Wallet_Pitch_Deck_GoogleSlides.pptx), and [Slide Previews](./pitch-deck/slides/) ([Google Slides Live Link](https://docs.google.com/presentation/d/152nLrrfXt9FgDuTi3W5siGW7zZGjtU2nYvfdToobWGA/edit?usp=drivesdk)) | PDF / PPTX / DOCX |
+| [**`research/`**](./research/) | **Comprehensive Research Dossier (`PROJECT_MEMORY_AND_RESEARCH.md`):** User interviews (Persons 1–4), German Civil Code (`BGB §§ 437, 438, 477 Abs. 1, 475e, 309 Nr. 9, 312k Abs. 6`), German Tax Law (`§ 9 EStG`, `BMF 22.02.2022` 100% digital write-off), and MCP JSON-RPC 2.0 specification | Markdown (41 KB) |
+| [**`scripts/`**](./scripts/) | **Automation & Build Scripts:** GitHub repo & project population ([`populate_github_repo.py`](./scripts/populate_github_repo.py), [`setup_github_project_v2.py`](./scripts/setup_github_project_v2.py)), slide builders ([`build_square_slides.py`](./scripts/build_square_slides.py), [`build_google_slides.py`](./scripts/build_google_slides.py), [`build_pitch_deck.py`](./scripts/build_pitch_deck.py)) | Python |
 | [**GitHub Issues (`#1`–`#30`)**](https://github.com/ettefagh/CM-LAB/issues) | **Live Issue Tracker:** All 3 Panel A Core Stories, 9 Granular MoSCoW Stories (`US-01`–`US-09`), 5 Risks (`R-1`–`R-5`), 4 Session 5 Deliverables (`D-1`–`D-4`), 3 Peer Lab Iterations (`C-1`–`C-3`), 2 Walkthroughs (`A` & `B`), 3 ADRs, and DoD Governance | GitHub Issues |
 | [**Course Milestones (`S1`–`S10`)**](https://github.com/ettefagh/CM-LAB/milestones) | **Full Semester Route:** Completed `S1–S4`, Active `S5` (Oct 31, 2026), Upcoming `S6–S10` (through Final Viva Exam Jan 16, 2027) | GitHub Milestones |
 
@@ -42,9 +42,9 @@
 
 | Block 1: Sharpen the Idea (20 min) | Block 2: Backlog & Criteria (25 min) |
 | :---: | :---: |
-| ![Block 1](./square_block_1_sharpen_the_idea.png) | ![Block 2](./square_block_2_backlog.png) |
+| ![Block 1](./workshop-materials/slides/square_block_1_sharpen_the_idea.png) | ![Block 2](./workshop-materials/slides/square_block_2_backlog.png) |
 | **Block 3: Route + Risks (20 min)** | **Block 4: Commit & Governance (10 min)** |
-| ![Block 3](./square_block_3_route_and_risks.png) | ![Block 4](./square_block_4_commit.png) |
+| ![Block 3](./workshop-materials/slides/square_block_3_route_and_risks.png) | ![Block 4](./workshop-materials/slides/square_block_4_commit.png) |
 
 ---
 
@@ -75,9 +75,9 @@ In strict compliance with SRH Course Governance (Slide 29), **Team 6** enforces 
 
 | Slide 1: Hook & Core Problem | Slide 2: User Discovery Insights | Slide 3: Solution & 4-Stage Engine |
 | :---: | :---: | :---: |
-| ![Slide 1](./Warranty_Wallet_Pitch_Deck_Rebuilt-page-1.png) | ![Slide 2](./Warranty_Wallet_Pitch_Deck_Rebuilt-page-2.png) | ![Slide 3](./Warranty_Wallet_Pitch_Deck_Rebuilt-page-3.png) |
+| ![Slide 1](./pitch-deck/slides/Warranty_Wallet_Pitch_Deck_Rebuilt-page-1.png) | ![Slide 2](./pitch-deck/slides/Warranty_Wallet_Pitch_Deck_Rebuilt-page-2.png) | ![Slide 3](./pitch-deck/slides/Warranty_Wallet_Pitch_Deck_Rebuilt-page-3.png) |
 | **Slide 4: Core MVP & Policy Wiki (MCP)** | **Slide 5: Market Validation & Wedge** | **Slide 6: Roadmap & Team 6** |
-| ![Slide 4](./Warranty_Wallet_Pitch_Deck_Rebuilt-page-4.png) | ![Slide 5](./Warranty_Wallet_Pitch_Deck_Rebuilt-page-5.png) | ![Slide 6](./Warranty_Wallet_Pitch_Deck_Rebuilt-page-6.png) |
+| ![Slide 4](./pitch-deck/slides/Warranty_Wallet_Pitch_Deck_Rebuilt-page-4.png) | ![Slide 5](./pitch-deck/slides/Warranty_Wallet_Pitch_Deck_Rebuilt-page-5.png) | ![Slide 6](./pitch-deck/slides/Warranty_Wallet_Pitch_Deck_Rebuilt-page-6.png) |
 
 ---
 
@@ -90,5 +90,5 @@ All 30 issues, 10 milestones, and 27 labels (including `column: 1-backlog` throu
 gh auth refresh -h github.com -s project,read:project
 
 # 2. Run the automated Team 6 Projects v2 setup & population script:
-python setup_github_project_v2.py
+python scripts/setup_github_project_v2.py
 ```

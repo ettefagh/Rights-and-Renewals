@@ -9,7 +9,12 @@ with Concise, Summarized, High-Impact Bullet Points for the SRH Workshop Board:
 
 import os
 import shutil
+from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+SLIDES_DIR = REPO_ROOT / "workshop-materials" / "slides"
+SLIDES_DIR.mkdir(parents=True, exist_ok=True)
 
 # Dimensions
 WIDTH = 1600
@@ -278,8 +283,8 @@ def render_slide_1():
             iy += 10
             
     draw_footer_bar(draw, 1, "Sharpen the Idea · 20 min")
-    img.save("square_block_1_sharpen_the_idea.png", "PNG")
-    print("Rendered concise: square_block_1_sharpen_the_idea.png")
+    img.save(SLIDES_DIR / "square_block_1_sharpen_the_idea.png", "PNG")
+    print(f"Rendered concise: {SLIDES_DIR / 'square_block_1_sharpen_the_idea.png'}")
 
 
 # ==============================================================================
@@ -439,8 +444,8 @@ def render_slide_2():
         ry += 112
         
     draw_footer_bar(draw, 2, "Backlog & Acceptance Criteria · 25 min")
-    img.save("square_block_2_backlog.png", "PNG")
-    print("Rendered concise: square_block_2_backlog.png")
+    img.save(SLIDES_DIR / "square_block_2_backlog.png", "PNG")
+    print(f"Rendered concise: {SLIDES_DIR / 'square_block_2_backlog.png'}")
 
 
 # ==============================================================================
@@ -556,8 +561,8 @@ def render_slide_3():
         r_y += r_h + 10
         
     draw_footer_bar(draw, 3, "Route + risks · 20 min")
-    img.save("square_block_3_route_and_risks.png", "PNG")
-    print("Rendered concise: square_block_3_route_and_risks.png")
+    img.save(SLIDES_DIR / "square_block_3_route_and_risks.png", "PNG")
+    print(f"Rendered concise: {SLIDES_DIR / 'square_block_3_route_and_risks.png'}")
 
 
 # ==============================================================================
@@ -697,8 +702,8 @@ def render_slide_4():
         dod_y += 18
         
     draw_footer_bar(draw, 4, "Commit · 10 min")
-    img.save("square_block_4_commit.png", "PNG")
-    print("Rendered concise: square_block_4_commit.png")
+    img.save(SLIDES_DIR / "square_block_4_commit.png", "PNG")
+    print(f"Rendered concise: {SLIDES_DIR / 'square_block_4_commit.png'}")
 
 if __name__ == "__main__":
     render_slide_1()

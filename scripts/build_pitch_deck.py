@@ -9,8 +9,8 @@ from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
 from docx.shared import Inches, Pt, RGBColor
 
-WORKSPACE = Path(r"c:\Users\admin\Documents\antigravity\optimistic-bardeen")
-ASSETS_DIR = WORKSPACE / "pitch_assets"
+WORKSPACE = Path(__file__).resolve().parent.parent
+ASSETS_DIR = WORKSPACE / "pitch-deck" / "assets"
 ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Exact color palette from the original PDF pitch deck
@@ -696,5 +696,5 @@ def build_pitch_docx(out_docx: Path) -> None:
 
 
 if __name__ == "__main__":
-    out_file = WORKSPACE / "Warranty_Wallet_Pitch_Deck_Rebuilt.docx"
+    out_file = WORKSPACE / "pitch-deck" / "Warranty_Wallet_Pitch_Deck_Rebuilt.docx"
     build_pitch_docx(out_file)
