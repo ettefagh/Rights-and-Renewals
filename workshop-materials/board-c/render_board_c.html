@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team 6 / C. Prototype & Peer Lab — Workshop Canvas</title>
+  <style>
+    /* Reset & Base Setup */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.45;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    /* Master Workshop Canvas Container (Replicating 16:9 Presentation Board) */
+    .board-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 1440px;
+      min-height: 860px;
+      padding: 36px 44px 28px 44px;
+      border-radius: 4px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* Header Section */
+    header {
+      margin-bottom: 24px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 14px;
+    }
+
+    .board-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .board-title span.team-tag {
+      background: #e2e8f0;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #334155;
+    }
+
+    .board-subtitle {
+      font-size: 14px;
+      color: #475569;
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* Main Two-Column Canvas Layout */
+    .canvas-body {
+      display: grid;
+      grid-template-columns: 1.42fr 1fr;
+      gap: 36px;
+      flex: 1;
+    }
+
+    /* Left Column: Six Prototype Views */
+    .left-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-header-group {
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .section-desc {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* 3x2 Grid for the 6 Mobile Wireframes */
+    .wireframes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 6px;
+      flex: 1;
+    }
+
+    /* Prototype Card Style (Matching Course Template Green Cards) */
+    .proto-card {
+      background-color: #d1fae5; /* mint pastel */
+      border: 1px solid #86efac;
+      border-radius: 6px;
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 275px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+    }
+
+    .proto-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px -2px rgba(16, 185, 129, 0.15);
+    }
+
+    .card-top {
+      flex: 1;
+    }
+
+    .card-header-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #064e3b;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-bottom: 1px dashed #6ee7b7;
+      padding-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-content {
+      font-size: 11px;
+      color: #064e3b;
+      line-height: 1.35;
+    }
+
+    .card-content p {
+      margin-bottom: 5px;
+    }
+
+    .card-content strong {
+      color: #022c22;
+    }
+
+    /* Badges & Inline Elements */
+    .tag {
+      display: inline-block;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+
+    .tag-red {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
+    }
+
+    .tag-green {
+      background-color: #dcfce7;
+      color: #166534;
+      border: 1px solid #4ade80;
+    }
+
+    .tag-amber {
+      background-color: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+
+    .tag-blue {
+      background-color: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+
+    .mock-field {
+      background: #ffffff;
+      border: 1px solid #a7f3d0;
+      border-radius: 3px;
+      padding: 3px 6px;
+      font-size: 10px;
+      margin: 4px 0;
+      color: #1e293b;
+    }
+
+    .mock-field.error {
+      border-color: #ef4444;
+      background: #fff5f5;
+      color: #b91c1c;
+    }
+
+    .timeline-bar-mock {
+      background: #e2e8f0;
+      border-radius: 4px;
+      height: 8px;
+      width: 100%;
+      margin: 6px 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .timeline-fill {
+      background: #10b981;
+      height: 100%;
+      width: 66%;
+    }
+
+    .timeline-marker {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      height: 100%;
+      background: #dc2626;
+    }
+
+    /* Card Action Button (Vibrant Teal/Sea-Green) */
+    .card-btn {
+      background-color: #34d399;
+      color: #064e3b;
+      border: none;
+      border-radius: 4px;
+      padding: 7px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: background 0.15s ease;
+    }
+
+    .card-btn:hover {
+      background-color: #10b981;
+      color: #ffffff;
+    }
+
+    .left-footer-note {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 14px;
+      line-height: 1.4;
+    }
+
+    /* Right Column: Peer Test and Observation */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .obs-boxes {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 6px;
+      flex: 1;
+    }
+
+    /* 4 Distinct Colored Boxes matching slide benchmark */
+    .box-item {
+      border-radius: 4px;
+      padding: 13px 16px;
+      font-size: 12px;
+      line-height: 1.4;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .box-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    /* Box 1: Task (Dark Blue / Navy) */
+    .box-task {
+      background-color: #1e3a5f;
+      color: #f8fafc;
+    }
+
+    .box-task .box-label {
+      color: #93c5fd;
+    }
+
+    /* Box 2: Outcome (Cream / Light Yellow) */
+    .box-outcome {
+      background-color: #fffbeb;
+      color: #78350f;
+      border: 1px solid #fef08a;
+    }
+
+    .box-outcome .box-label {
+      color: #b45309;
+    }
+
+    .outcome-stat-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+      font-size: 11.5px;
+    }
+
+    /* Box 3: What happened / Why it matters (Deep Teal / Ocean Blue) */
+    .box-happened {
+      background-color: #0e7490;
+      color: #f0fdfa;
+    }
+
+    .box-happened .box-label {
+      color: #a5f3fc;
+    }
+
+    .obs-item {
+      margin-bottom: 6px;
+    }
+
+    .obs-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .obs-arrow {
+      color: #67e8f9;
+      font-weight: bold;
+    }
+
+    /* Box 4: Change / priority / reason (Emerald / Green) */
+    .box-changes {
+      background-color: #059669;
+      color: #f0fdf4;
+    }
+
+    .box-changes .box-label {
+      color: #a7f3d0;
+    }
+
+    .change-entry {
+      margin-bottom: 5px;
+    }
+
+    .change-entry:last-child {
+      margin-bottom: 0;
+    }
+
+    .right-footer-note {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 14px;
+      line-height: 1.4;
+    }
+
+    /* Bottom Global Footer Navigation */
+    footer {
+      margin-top: 22px;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .nav-links a {
+      color: #2563eb;
+      text-decoration: none;
+      margin-right: 14px;
+      font-weight: 500;
+    }
+
+    .nav-links a.active {
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 2px;
+    }
+
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+
+    .academic-tag {
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    /* Responsive Adaptation for small screens */
+    @media (max-width: 1024px) {
+      .canvas-body {
+        grid-template-columns: 1fr;
+      }
+      .wireframes-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="board-container">
+    
+    <!-- Header Matching Template -->
+    <header>
+      <div class="board-title">
+        Team 6 / C. Prototype & Peer Lab
+        <span class="team-tag">Warranty & Subscription Wallet</span>
+      </div>
+      <p class="board-subtitle">
+        Six wireframes and empirical peer lab test record showing how observations with Team 7 led to design iterations.
+      </p>
+    </header>
+
+    <!-- Canvas Two-Column Body -->
+    <div class="canvas-body">
+      
+      <!-- LEFT COLUMN: Six Static Prototype Views (60% width) -->
+      <section class="left-column">
+        <div class="section-header-group">
+          <h2 class="section-title">Six static prototype views</h2>
+          <p class="section-desc">
+            Illustrative screens, not a working app. Demo data based on Saturn Sony WH-1000XM4 purchase and Spotify subscription. Screen 3 shows the validation variant, and Screen 6 shows recovery.
+          </p>
+        </div>
+
+        <div class="wireframes-grid">
+          
+          <!-- Screen 1: Dashboard -->
+          <article class="proto-card" id="screen-1">
+            <div class="card-top">
+              <div class="card-header-label">
+                <span>1 / Dashboard</span>
+                <span>Home</span>
+              </div>
+              <div class="card-content">
+                <p><strong>[=] Warranty Wallet</strong> &nbsp;[(+)]</p>
+                <div class="mock-field">🔍 Sony, Spotify, Apple...</div>
+                <p style="font-size: 10px; color: #047857;">Filter: <strong>All (8)</strong> · Hw (3) · Subs (5)</p>
+                
+                <div style="background: #ffffff; padding: 5px; border-radius: 4px; margin: 4px 0; border: 1px solid #cbd5e1;">
+                  <p style="font-size: 10px;">🎵 Spotify <span class="tag tag-red">Renews 3d</span></p>
+                  <p style="font-size: 9.5px; color: #64748b;">€5.99/mo · Flexible BGB § 309</p>
+                </div>
+
+                <div style="background: #ffffff; padding: 5px; border-radius: 4px; margin: 4px 0; border: 1px solid #cbd5e1;">
+                  <p style="font-size: 10px;">🎧 Sony XM4 <span class="tag tag-green">Protected</span></p>
+                  <p style="font-size: 9.5px; color: #64748b;">Saturn · 16m left · § 477 active</p>
+                  <span class="tag tag-blue">§ 9 EStG Tax</span>
+                </div>
+              </div>
+            </div>
+            <button class="card-btn" onclick="highlightScreen(1)">Quick add item</button>
+          </article>
+
+          <!-- Screen 2: Quick Add -->
+          <article class="proto-card" id="screen-2">
+            <div class="card-top">
+              <div class="card-header-label">
+                <span>2 / Quick Add</span>
+                <span>&lt;15s Flow</span>
+              </div>
+              <div class="card-content">
+                <p><strong>Quick Add Purchase</strong></p>
+                <div class="mock-field">Sony WH-1000XM4</div>
+                <p style="font-size: 9.5px;">Auto: <span class="tag tag-green">[Sony]</span> [Apple] [Bose]</p>
+                
+                <p style="font-size: 10px; margin-top: 3px;">Category: <strong>(•) Hardware (24m BGB)</strong></p>
+                <p style="font-size: 10px;">Date: <strong>2026-03-15</strong> · €279.00</p>
+                
+                <div style="background: #ffffff; padding: 4px; border-radius: 3px; margin: 3px 0; border: 1px solid #6ee7b7;">
+                  <p style="font-size: 9.5px;">📷 <strong>Saturn Receipt Attached</strong></p>
+                  <p style="font-size: 8.5px; color: #64748b;">GoBD SHA-256: 8f4b2c9a...</p>
+                </div>
+                <p style="font-size: 9.5px;">[✓] Werbungskosten (§ 9 EStG)</p>
+              </div>
+            </div>
+            <button class="card-btn" onclick="highlightScreen(2)">Save to wallet</button>
+          </article>
+
+          <!-- Screen 3: Validation Error -->
+          <article class="proto-card" id="screen-3">
+            <div class="card-top">
+              <div class="card-header-label">
+                <span>3 / Validation</span>
+                <span>Error State</span>
+              </div>
+              <div class="card-content">
+                <p><strong>⚠️ One thing missing.</strong></p>
+                <p style="font-size: 10px; color: #b91c1c;">Nothing has been submitted yet.</p>
+                
+                <div class="mock-field error">[empty - required] ❗</div>
+                <p style="font-size: 9.5px; color: #dc2626;">Item name or brand required.</p>
+                
+                <p style="font-size: 10px; margin-top: 4px;">Cat: <strong>(•) Hardware</strong> · Date: <strong>15.03.2026</strong></p>
+                
+                <div style="background: #fffbeb; border: 1px solid #fef08a; padding: 4px; border-radius: 3px; margin-top: 4px;">
+                  <p style="font-size: 9px; color: #92400e;">
+                    ℹ️ <strong>Legal Rule:</strong> Name &amp; date strictly required to calculate § 477 Beweislastumkehr.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <button class="card-btn" onclick="highlightScreen(3)">Return to form</button>
+          </article>
+
+          <!-- Screen 4: Item Details & Timeline -->
+          <article class="proto-card" id="screen-4">
+            <div class="card-top">
+              <div class="card-header-label">
+                <span>4 / Item Details</span>
+                <span>Timeline</span>
+              </div>
+              <div class="card-content">
+                <p><strong>🎧 Sony WH-1000XM4</strong></p>
+                <p style="font-size: 10px; color: #64748b;">Saturn Berlin · €279.00</p>
+                
+                <p style="font-size: 10px; margin-top: 4px;">Statutory Timeline: <strong>16m left</strong></p>
+                <div class="timeline-bar-mock">
+                  <div class="timeline-fill"></div>
+                  <div class="timeline-marker" title="Month 12 Cliff"></div>
+                </div>
+                <p style="font-size: 9px; color: #047857;">Month 8 of 24 · m12 cliff marked</p>
+                
+                <div style="background: #ffffff; padding: 4px; border-radius: 3px; margin: 4px 0; border: 1px solid #6ee7b7;">
+                  <p style="font-size: 9.5px;">🛡️ <strong>BGB § 477 ACTIVE</strong></p>
+                  <p style="font-size: 8.5px; color: #166534;">Defect presumed at delivery.</p>
+                </div>
+                <p style="font-size: 9.5px;">📷 Receipt Vault (GoBD Valid)</p>
+              </div>
+            </div>
+            <button class="card-btn" onclick="highlightScreen(4)">1-Tap Generate Claim</button>
+          </article>
+
+          <!-- Screen 5: Action Dossier -->
+          <article class="proto-card" id="screen-5">
+            <div class="card-top">
+              <div class="card-header-label">
+                <span>5 / Action Dossier</span>
+                <span>Act View</span>
+              </div>
+              <div class="card-content">
+                <p><strong>Formal Mängelrüge (§ 437)</strong></p>
+                <p style="font-size: 10px; color: #64748b;">Target: Saturn Berlin</p>
+                
+                <div class="mock-field" style="font-size: 9.5px;">
+                  Left earbud audio drops / charging
+                </div>
+                
+                <div style="background: #ffffff; padding: 4px; border-radius: 3px; margin: 3px 0; border: 1px solid #cbd5e1;">
+                  <p style="font-size: 9px; color: #334155;"><strong>Notice Preview:</strong></p>
+                  <p style="font-size: 8.5px; color: #475569;">
+                    "Fristgerechte Rüge gem. § 437/439 BGB. Frist: 14 Tage (22.11.2026). Beweislastumkehr § 477 greift."
+                  </p>
+                </div>
+                <p style="font-size: 8.5px; color: #64748b;">⚖️ LexFox Safe Harbor (BGH VIII ZR 285/18)</p>
+              </div>
+            </div>
+            <button class="card-btn" onclick="highlightScreen(5)">Download PDF dossier</button>
+          </article>
+
+          <!-- Screen 6: Empty Results / Recovery -->
+          <article class="proto-card" id="screen-6">
+            <div class="card-top">
+              <div class="card-header-label">
+                <span>6 / Empty Results</span>
+                <span>Recovery</span>
+              </div>
+              <div class="card-content">
+                <p><strong>[=] Warranty Wallet</strong> &nbsp;[(+)]</p>
+                <div class="mock-field">🔍 Dyson &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;✖</div>
+                <p style="font-size: 10px;">Filter: (•) Hardware</p>
+                
+                <p style="font-size: 10.5px; color: #b91c1c; margin: 4px 0;">
+                  🔍 <strong>No matching items for "Dyson"</strong>
+                </p>
+                
+                <div style="background: #ffffff; padding: 4px; border-radius: 3px; margin: 3px 0; border: 1px solid #cbd5e1;">
+                  <p style="font-size: 9px; color: #475569;">
+                    💡 You have 8 protected items. Try resetting filters or adding item.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <button class="card-btn" onclick="highlightScreen(6)">Reset filters</button>
+          </article>
+
+        </div>
+
+        <p class="left-footer-note">
+          Test the normal task first, then no matches and invalid input. Record assistance before proposing changes. Real findings come from Team 6's testing with Team 7.
+        </p>
+      </section>
+
+      <!-- RIGHT COLUMN: Peer Test and Observation (40% width) -->
+      <section class="right-column">
+        <div class="section-header-group">
+          <h2 class="section-title">Peer test and observation</h2>
+          <p class="section-desc">
+            Empirical protocol and observations from two 15-minute testing rounds with Team 7.
+          </p>
+        </div>
+
+        <div class="obs-boxes">
+          
+          <!-- Box 1: Task (Dark Blue / Navy) -->
+          <div class="box-item box-task">
+            <span class="box-label">1. Task: [user goal without instructions]</span>
+            <p>
+              "You just purchased a pair of Sony WH-1000XM4 headphones on sale at Saturn with a paper receipt. Log your new headphones into your wallet so you are protected against hardware defects, get alerted before statutory deadlines, and check your legal warranty rights."
+            </p>
+          </div>
+
+          <!-- Box 2: Outcome (Cream / Light Yellow) -->
+          <div class="box-item box-outcome">
+            <span class="box-label">2. Outcome: [unaided / with help / not completed]</span>
+            <p><strong>• Round 1 (Initial wireframes): WITH HELP (38.0s)</strong><br>
+            Tester paused looking for automated camera OCR scan, typed slowly with hesitation over researching legal warranty lengths, bypassed receipt upload, and suffered confusion over separate warranty tabs.</p>
+            <div style="margin-top: 6px;"></div>
+            <p><strong>• Round 2 (Revised wireframes): UNAIDED (11.4s) — 70% Speedup</strong><br>
+            In-memory brand autocomplete pre-filled Sony defaults in &lt;10ms, tester snapped receipt attachment immediately beside Item Name, tapped Save, and viewed active BGB § 477 protection badge in one fluid flow.</p>
+          </div>
+
+          <!-- Box 3: What Happened / Why it Matters (Teal / Light Blue) -->
+          <div class="box-item box-happened">
+            <span class="box-label">3. What happened? / Why does it matter? [Hesitations, errors, assistance]</span>
+            
+            <div class="obs-item">
+              <strong>• Hesitation (Typing &amp; Legal Dread):</strong> Tester froze on Brand input expecting OCR and dreaded researching German warranty law.<br>
+              <span class="obs-arrow">↳ Why it matters:</span> Typing friction and legal dread destroy onboarding. Prefix-trie autocomplete pre-fills legal defaults in &lt;10ms with zero token burn.
+            </div>
+
+            <div class="obs-item">
+              <strong>• Error (Receipt Attachment Bypassed):</strong> Tester tapped "Save" before attaching receipt because camera was below optional notes.<br>
+              <span class="obs-arrow">↳ Why it matters:</span> Missing receipt proof invalidates future claims under BGB § 437. Repositioned camera attach directly beside Item Name with GoBD SHA-256 hash.
+            </div>
+
+            <div class="obs-item">
+              <strong>• Confusion (Statutory vs Commercial Tabs):</strong> Split tabs for guarantee vs warranty caused uncertainty over remedy in month 8.<br>
+              <span class="obs-arrow">↳ Why it matters:</span> Legal jargon causes decision paralysis. Unified 24-month visual timeline with Month 12 Beweislastumkehr (§ 477) clarifies rights.
+            </div>
+          </div>
+
+          <!-- Box 4: Change / Priority / Reason (Emerald / Green) -->
+          <div class="box-item box-changes">
+            <span class="box-label">4. Change / priority / reason [Revisions based on observations]</span>
+            
+            <div class="change-entry">
+              <strong>1. In-Memory Brand Autocomplete (Prefix-Trie) [HIGH / Story 1]:</strong> Auto-fills category and 24m statutory defaults (BGB § 438) upon typing 2 characters; reduced capture time from 38.0s to 11.4s with zero cloud API token cost.
+            </div>
+
+            <div class="change-entry">
+              <strong>2. Repositioned Receipt Attachment [HIGH / Story 2]:</strong> Relocated camera button directly into the primary 3-field container beside Item Name; features client-side downsampling (&lt;1.5MB) and GoBD-compliant SHA-256 pre-encryption hash stamp.
+            </div>
+
+            <div class="change-entry">
+              <strong>3. Unified Timeline &amp; 1-Tap Claim Generator [MEDIUM / Stories 4 &amp; 5]:</strong> Replaced split tabs with continuous 24-month progress bar highlighting Month 12 cliff (BGB § 477 Abs. 1) and 1-tap formal Mängelrüge generator (§ 437).
+            </div>
+          </div>
+
+        </div>
+
+        <p class="right-footer-note">
+          After the test: improve the highest-priority issues and update your tracker. For each next task: result, owner, due date and completion check.
+        </p>
+      </section>
+
+    </div>
+
+    <!-- Bottom Navigation Footer Matching Template -->
+    <footer>
+      <nav class="nav-links">
+        <a href="#user-stories">A. User Stories</a>
+        <a href="#journey">B. Journey</a>
+        <a href="#prototype" class="active">C. Prototype &amp; Test</a>
+        <a href="#homework">D. Homework</a>
+        <a href="#team-status">Team Status</a>
+        <a href="#session-route">Session Route</a>
+      </nav>
+      <div class="academic-tag">
+        SRH University Heidelberg · Applied AI &amp; Software Engineering · Prof. Franziska Schwarz
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    function highlightScreen(num) {
+      const card = document.getElementById('screen-' + num);
+      if (card) {
+        card.style.transition = 'all 0.3s ease';
+        card.style.transform = 'scale(1.04)';
+        card.style.boxShadow = '0 0 0 3px #10b981, 0 10px 15px -3px rgba(0,0,0,0.1)';
+        setTimeout(() => {
+          card.style.transform = 'scale(1)';
+          card.style.boxShadow = '';
+        }, 800);
+      }
+    }
+  </script>
+</body>
+</html>
