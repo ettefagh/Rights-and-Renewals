@@ -1,83 +1,153 @@
-# 🎯 Project Goal & AI Agent Operational Charter
+# 🎯 Project Goal & AI Agent Operational Charter (`GOAL.md`)
 
+**Document ID:** `CM-LAB-GOAL-CHARTER-V2` · **Status:** Ratified Single Source of Truth (SSOT)  
 **Project:** Warranty, Subscription & Tax-Ready Wallet + Policy Wiki (MCP/API-Enabled)  
-**Academic Module:** *Computer & Media Lab* (WiSe 2026, SRH Hochschule) · **Instructor:** Prof. Franziska Schwarz  
+**Academic Module:** *Computer & Media Lab* (WiSe 2026, SRH University of Applied Sciences) · **Instructor:** Prof. Franziska Schwarz  
 **Repository:** [`https://github.com/ettefagh/CM-LAB`](https://github.com/ettefagh/CM-LAB) · **Active Milestone:** Session 5 (MVP Scope Lock Gate)  
+**Sprint Commitment:** Team 6 (`92h` Total Capacity · WIP Limit $\le 2$ · 7 Quality Gates `#30`)
 
 ---
 
 ## 🚀 Mission Statement
 Deliver an **offline-first, zero-cloud Progressive Web App (PWA) and Model Context Protocol (MCP) Server** enabling German university students and young professionals to:
-1. **Capture** any physical hardware purchase or digital subscription in **$<15\text{ seconds}$** (`11.4s` benchmark).
+1. **Capture** any physical hardware purchase or digital subscription in **$<15\text{ seconds}$** (`11.4s` verified benchmark) via the manual-first Unified Omni-Bar or Portable FAB Speed Dial.
 2. **Store** encrypted receipts and GoBD-compliant `SHA-256` proofs locally on-device with zero privacy leakage (`GDPR Art. 25`).
-3. **Alert** users before statutory 12-month burden-of-proof cliffs (`BGB § 477 Abs. 1`) and auto-renewals (`09:00 Europe/Berlin`).
+3. **Alert** users before statutory 12-month burden-of-proof cliffs (`BGB § 477 Abs. 1`) and auto-renewals (`09:00 Europe/Berlin` with zero DST drift).
 4. **Act** via 1-tap formal German legal letters (`BGB §§ 437, 439, 309 Nr. 9, 312k Abs. 6`) and German tax write-offs (`§ 9 EStG` / BMF 2022).
+5. **Educate & Provide Ground Truth** via an in-app zero-auth **Brand Policy Wiki** and an open **Model Context Protocol (MCP)** server for external AI agents (Claude Desktop, Cursor, Gemini CLI) to query statutory consumer rights without web scraping or hallucinations.
 
 ---
 
 ## 👥 Team 6 Roster & Ownership (92h Sprint 1)
 
-| Member | First Name | Role | Sprint 1 Capacity | Core Jurisdiction & Key Issue |
+| Member | First Name | Role | Sprint 1 Capacity | Core Jurisdiction & Key Issues |
 | :--- | :--- | :--- | :---: | :--- |
-| **Member E** | **Jeetkumar** | Project Manager | `10h` | Kanban board governance, WIP limit $\le 2$, 7-Gate DoD audit ([#30](https://github.com/ettefagh/CM-LAB/issues/30)). |
+| **Member E** | **Jeetkumar** | Project Manager | `10h` | Sprint planning, 5-column Kanban governance, WIP limit $\le 2$, 7-Gate DoD audit ([#30](https://github.com/ettefagh/CM-LAB/issues/30)). |
 | **Member B** | **AmirHossein** | Product / Research Lead | `14h` | BGB notice formulations ([#8](https://github.com/ettefagh/CM-LAB/issues/8)), Top 20 Policy Wiki ([#9](https://github.com/ettefagh/CM-LAB/issues/9)), BMF 2022 tax ([#11](https://github.com/ettefagh/CM-LAB/issues/11)). |
-| **Member C** | **Prushti** | UX / UI Lead | `26h` | Views 1–5 Svelte 5 components ([#1](https://github.com/ettefagh/CM-LAB/issues/1)), Design tokens, Storybook CSF ([#4](https://github.com/ettefagh/CM-LAB/issues/4)). |
+| **Member C** | **Prushti** | UX / UI Lead | `26h` | Views 1–6 Svelte 5 components ([#1](https://github.com/ettefagh/CM-LAB/issues/1)), Design tokens, FAB Speed Dial, Storybook CSF ([#4](https://github.com/ettefagh/CM-LAB/issues/4)). |
 | **Member D** | **Kyle** | Development Lead | `22h` | Dexie.js v4 storage ([#5](https://github.com/ettefagh/CM-LAB/issues/5)), push scheduler ([#6](https://github.com/ettefagh/CM-LAB/issues/6)), Worker `/api/mcp` ([#10](https://github.com/ettefagh/CM-LAB/issues/10)). |
 | **Member A** | **Mojtaba** | Quality / Media Lead | `20h` | `<1.5MB` Web Worker compression + GoBD `SHA-256` ([#5](https://github.com/ettefagh/CM-LAB/issues/5)), PDF/Text compiler ([#19](https://github.com/ettefagh/CM-LAB/issues/19)), Vitest suite. |
 
 ---
 
-## 🏛️ Ratified System Architecture (`ADR-04` & `ADR-05` · [`BLUEPRINT.md`](./BLUEPRINT.md))
+## 🏛️ Ratified System Architecture (`ADR-01`–`ADR-05` · [`BLUEPRINT.md`](./BLUEPRINT.md))
 
-```
-[Domain 1: Public Showcase — [Project].pages.dev]
-  • Astro 6 Static + Interactive Preview Islands on Cloudflare Pages/Workers
-  • Introduces Dual Interfaces (1: Open MCP Server, 2: Wallet PWA)
-  • Modular Preview Dashboard: Calendar Widgets (Grid/Timeline/Countdown) + Demo Omni-Bar
+```mermaid
+flowchart TB
+    subgraph ShowcaseDomain["Domain 1: Public Showcase ([Project].pages.dev)"]
+        S_Hero["Dual-Interface Showcase\n1) Open MCP JSON-RPC 2.0 Server\n2) Offline-First Consumer Wallet PWA"]
+        S_Dash["Interactive Preview Dashboard\n• Modular Calendar Widgets (Grid / Timeline / Countdown)\n• Live Preview Omni-Bar & MCP Console"]
+    end
 
-[Domain 2: Cloudflare Edge Plane — app.[Project].pages.dev]
-  • Astro 6 App Shell on Cloudflare Workers (wrangler.jsonc)
-  • Authoritative MCP Endpoint: POST /api/mcp (Zod -32602 validated, <30ms latency)
-  • Phase 1: In-memory Top 20 Seed (policy_wiki_seed_v1.json)
-  • Phase 2: EmDash CMS (emdashcms.dev) + Cloudflare D1 (ec_policy_wiki) + Workers KV
+    subgraph AppDomain["Domain 2: Modern Wallet App (app.[Project].pages.dev)"]
+        A_Shell["Astro 6 Edge Shell on Cloudflare Workers\nPOST /api/mcp (Zod -32602 Validated, <30ms Latency)"]
+        A_Wiki["In-App Zero-Auth Brand Policy Wiki (/wiki)\n100% Public Direct Access (No Login Required)"]
+        A_Island["Single Root Svelte 5 Island: <WalletApp client:only='svelte' />\n(~11.8 KB gzip · Fine-Grained $state / $derived Runes)"]
+        A_Omni["Centerpiece Unified Omni-Bar (Search / Activity / Request)\n1. Query Policy Wiki PrefixTrie (<10ms)\n2. Filter Saved Local Items (Dexie searchTokens)\n3. Trigger <15s Create / Vault Import Flow"]
+        A_Fab["Portable Floating Action Menu (FAB Speed Dial)\n• Google Calendar Pattern (+ to ✕ Morph)\n• Accessible Backdrop Scrim (WCAG 1.4.3)\n• Virtual Keyboard Avoidance (visualViewport)\n• Page-Contextual Actions across Views 1–6"]
+        A_Local["100% Client-Side Vault (GDPR Art. 25)\n• Dexie.js v4 IndexedDB + WebCrypto AES-GCM-256\n• Web Worker <1.5MB Downsampler + GoBD SHA-256"]
+    end
 
-[Domain 2: Client Device Plane — 100% Offline-First]
-  • Single Root Island: <WalletApp client:only="svelte" /> (~11.8 KB gzip)
-  • Centerpiece Unified Omni-Bar: Search Wiki + Search Saved Items + Create/Import (<10ms)
-  • Reactive State: wallet.svelte.ts (Svelte 5 Runes: $state.raw + createSubscriber)
-  • Local Persistence: Dexie.js v4 (IndexedDB) with AES-GCM-256 encrypted blobs
-  • Pure TS Engine: PrefixTrie.ts (<10ms), AlertScheduler.ts (0h DST drift)
-  • Media Pipeline: Web Worker downsampler (<1.5MB) + Pre-Encryption GoBD SHA-256
+    ShowcaseDomain --> AppDomain
+    A_Shell --> A_Island & A_Wiki
+    A_Island --> A_Omni & A_Fab
+    A_Omni & A_Fab <--> A_Local
 ```
 
 ---
 
 ## 📱 6 Core Views & MVP Deliverables
 
-* **View 1: Modern Widget Dashboard (`US-04`)** — Unified Omni-Bar (`Search / Activity / Request`) + modular calendar widgets (Monthly Grid, 24m/12m Timeline, 30/7/1d Urgency Countdowns: 🟢 Protected, 🟡 Expiring Soon, 🔴 Urgent).
-* **View 2: Quick Capture Modal (`US-01`)** — Sub-15s entry via Prefix-Trie autocomplete, auto-filling `BGB § 438`/`§ 309 Nr. 9` terms + BMF 2022 tax toggle.
-* **View 3: Item Detail & Timeline (`Iteration C-3`)** — Interactive 24m warranty bar highlighting the 12m `BGB § 477` cliff + pinch-to-zoom receipt viewer.
-* **View 4: 1-Tap Claim & Cancel (`US-05`, `D-2`)** — Live preview of formal German legal letters (`BGB §§ 437, 439, 312k Abs. 6`) + 1-tap PDF/clipboard export.
-* **View 5: German Tax Summary (`US-08`, `D-4`)** — Student/employee *Werbungskosten* summary table and CSV export.
-* **View 6: Policy Wiki & MCP Explorer (`US-06`, `US-07`, `D-3`)** — Public brand directory + interactive console to test MCP JSON-RPC 2.0 calls.
+1. **View 1: Modern Widget Dashboard (`US-04`)** — Centerpiece Unified Omni-Bar (`Search / Activity / Request`), Portable FAB Speed Dial, and 3 modular calendar widgets (Monthly Renewal Grid, Statutory 24m/12m Timeline Bar, and 30/7/1d Urgency Countdown Stream).
+2. **View 2: Quick Capture Modal (`US-01`)** — Sub-15s (`11.4s` benchmark) rapid capture via Prefix-Trie autocomplete auto-filling `BGB § 438`/`§ 309 Nr. 9` terms, camera/file receipt attachment, and BMF 2022 tax toggle.
+3. **View 3: Item Detail & Timeline (`Iteration C-3`)** — Interactive 24-month lifespan progress bar highlighting the 12-month `BGB § 477 Abs. 1` *Beweislastumkehr* cliff + offline pinch-to-zoom receipt viewer.
+4. **View 4: 1-Tap Statutory Claim & Cancel (`US-05`, `D-2`)** — Deterministic client-side generator for German legal notices (*Mängelrüge* `§§ 437, 439`, *Kündigung* `§ 309 Nr. 9, § 312k Abs. 6`, *Widerruf* `§ 355`) with embedded receipt proof and safe-harbor disclaimers.
+5. **View 5: German Tax Summary & Export (`US-08`, `D-4`)** — *Werbungskosten* categorization table (`§ 9 EStG`), BMF 2022 1-year 100% write-off calculation, and UTF-8-BOM semicolon-delimited CSV export for ELSTER / WISO / Taxfix.
+6. **View 6: Brand Policy Wiki & Open MCP Explorer (`US-06`, `US-07`, `D-3`)** — Public zero-auth directory of Top 20 student hardware/subscription brands at `/wiki` + interactive testbed for external AI agents querying the 4 MCP tools.
 
 ---
 
-## ⚠️ Non-Negotiable Agent Guardrails (The 5 Red Lines)
+## 🌿 GitFlow Branch Structure & Worktree Policy
 
-1. **NO OCR in MVP (`ADR-01` / `WON'T-HAVE #12`):** Cloud/camera OCR fails on 42% of faded thermal receipts and costs token fees. Entry must strictly use the manual-first `<15s` autocomplete flow.
-2. **ZERO Cloud Plaintext Receipts (`GDPR Art. 25`):** Raw receipt images and personal items stay 100% in local IndexedDB. Cloudflare edge only handles public brand policies and stateless `/api/mcp` requests.
-3. **NO Hallucinated Legal Advice (`Risk R-3 #15` / `ADR-03`):** Legal letters MUST use the deterministic templates in `02_German_Consumer_Law_BGB_and_Statutory_Templates_Spec.md` and embed mandatory **BGH VIII ZR 285/18 (*LexFox*) / RDG §§ 2, 3** safe-harbor disclaimers.
-4. **NO Mobile Safari Camera Lockout:** `public/_headers` must enforce `Permissions-Policy: camera=(self)` and **strictly omit `Cross-Origin-Embedder-Policy: require-corp`** so camera capture never deadlocks.
-5. **STRICT 92h Sprint Budget (`Risk R-5 #17`):** Phase 1 MVP boots strictly from bundled `policy_wiki_seed_v1.json`. Do not introduce Cloudflare D1 migrations or external cloud databases into the Session 5 critical path.
+To preserve repository integrity and issue isolation, all development follows a strict GitFlow-adapted model:
+
+* **Canonical Branches:**
+  - `main`: Production release branch. Only fast-forward merges from approved release branches or reviewed PRs.
+  - `release/vX.Y.Z`: Release staging and QA freeze branch.
+* **Feature & Task Branches:**
+  - Strictly named: `codex/issue-<number>-<short-kebab-slug>` (e.g. `codex/issue-1-manual-capture-vault`).
+  - Exactly one branch per issue deliverable. No generic `test/*`, `fix-slice-*`, or agent-named branches.
+* **Detached Worktree Policy:**
+  - Independent review, verification, and Storybook visual testing MUST run in a fresh detached worktree at the exact implementation commit SHA.
+
+---
+
+## 📋 Contract-Governed Issue Ledger Tracking (CampusWeb v9 Protocol)
+
+Derived from the [`campusweb-issue-orchestrator`](file:///C:/Users/admin/.gemini/config/skills/campusweb-issue-orchestrator/SKILL.md) v9 governance contract:
+
+1. **Native GitHub Relationships as SSOT:**
+   - Always query native fields: `number`, `title`, `updatedAt`, `issueType`, `labels`, `parent`, `subIssues`, `blockedBy`, `blocking`, `state`.
+   - Never simulate hierarchy or blockers with synthetic labels.
+2. **Operating Modes for Agents:**
+   - **Audit:** Read-only inspection of issue topology, blockers, evidence, and DoD status.
+   - **Engineer:** Coordinate advisors, synthesize bounded technical response, stop at human gate.
+   - **Proceed:** Execute only approved scope through Coordinator $\to$ Proceeder $\to$ Reviewer lifecycle.
+   - **Repair:** Reconcile stale or invalid metadata before proceeding.
+3. **Bounded Multi-Agent Debate Protocol:**
+   - Capture fresh issue snapshot (`updatedAt`).
+   - Run parallel read-only advisors (Taxonomy, Topology, Readiness).
+   - Require structured feedback (`Evidence`, `Proposal`, `Risks`, `Open questions`).
+   - Critic adjudicates contradictions; produce unified mutation plan before modifying state.
+4. **5-Column Kanban Board:**
+   - `1. Backlog` $\to$ `2. Ready (Sprint 1)` $\to$ `3. In Progress` (WIP $\le 2$) $\to$ `4. In Review / QA` $\to$ `5. Done` (Requires 7-Gate sign-off `#30`).
+
+---
+
+## 🛠️ Specialized Tooling & Skill Execution Directives
+
+All AI agents operating in this repository MUST activate and adhere to the following specialized tools:
+
+### 1. Cloudflare Platform & CLI
+* **CLI Policy:** When interacting with Cloudflare, use the **`cf` CLI** unless the project contains a Wrangler configuration file (`wrangler.jsonc`).
+* **Deployment Scope:** Astro 6 SSR/Static edge pages on Cloudflare Workers/Pages, EmDash CMS (`emdashcms.dev`) zero-auth brand wiki pages, and `/api/mcp` JSON-RPC worker endpoint.
+
+### 2. Svelte 5 Runes & MCP Skills (`svelte-code-writer`, `svelte-core-bestpractices`)
+* **Runes-First Architecture:** All UI components MUST use Svelte 5 runes (`$state`, `$derived`, `$props`). Never author legacy Svelte 3/4 stores (`writable`, `derived`) or `export let`.
+* **Mandatory Autofixer:** Agents MUST execute the `svelte-autofixer` MCP tool on all Svelte files before finalizing output to ensure zero reactivity leaks and complete ARIA conformance.
+* **Dexie Reactive Bridge:** Bind IndexedDB live queries via Svelte 5's `createSubscriber` in `wallet.svelte.ts`.
+
+### 3. Node-Graph Architect (`/node-graph-architect` / Graphify)
+* **Local LLM Warm-Up:** Before running Graphify AST extractions or Tier 2 semantic passes, the local LLM (`qwen3:0.6b`) MUST be pre-loaded in memory via `curl -s http://localhost:11434/api/generate -d '{"model":"qwen3:0.6b","prompt":"ping","keep_alive":-1,"stream":false}'`.
+* **Tiered Investigation:** Query AST node graphs (`query_graph`, `get_node`, `god_nodes`, `graph_stats`, `get_pr_impact`) before editing architecture. Enforce component boundaries, design token compliance, and prevent God Nodes.
+
+### 4. Frontend Design Taste (`design-taste-frontend`)
+* **Anti-Slop Directives:** Ban generic AI card grids, empty margins, un-scrimmed backgrounds, and purposeless neon gradients.
+* **The 3 Aesthetic Dials:**
+  - `DESIGN_VARIANCE`: **`6`** (Distinctive consumer fintech wallet).
+  - `MOTION_INTENSITY`: **`4`** (Tactile micro-interactions: 2px hover lift, 0.98 active press scale, 220ms ease-out FAB morph).
+  - `VISUAL_DENSITY`: **`5`** (Balanced mobile productivity, $\ge 48\times 48\text{px}$ touch targets).
+* **Responsive Stability:** All screens MUST pass pre-flight checks across `390px`, `768px`, `1024px`, and `1440px` viewports without layout shifts or text collisions.
+
+---
+
+## ⚠️ The 5 Non-Negotiable Guardrails (Red Lines)
+
+1. **NO OCR in MVP (`ADR-01` / `WON'T-HAVE #12`):** Cloud/camera OCR fails on 42% of faded thermal receipts and incurs token costs. Capture strictly uses the manual-first `<15s` autocomplete flow.
+2. **ZERO Cloud Plaintext Receipts (`GDPR Art. 25`):** Raw receipts and personal items stay 100% in local browser IndexedDB (`Dexie.js v4`). Cloudflare edge handles only public wiki records and stateless `/api/mcp` queries.
+3. **NO Hallucinated Legal Advice (`Risk R-3 #15` / `ADR-03`):** Legal letters MUST compile strictly from the 5 verbatim templates (`DOC-PRD-02`) with non-removable **`BGH VIII ZR 285/18 (LexFox)` / `RDG §§ 2, 3`** and **`§ 2 StBerG`** safe-harbor disclaimers.
+4. **NO Mobile Safari Camera Lockout:** `public/_headers` must enforce `Permissions-Policy: camera=(self)` and **strictly omit `Cross-Origin-Embedder-Policy: require-corp`** so `<input capture="environment">` never deadlocks.
+5. **STRICT 92h Sprint 1 Scope Fence (`Risk R-5 #17`):** Phase 1 MVP boots strictly from bundled `policy_wiki_seed_v1.json` (`0h` cloud DB overhead). Cloudflare D1 migrations belong strictly to Session 6 (`US-06`).
 
 ---
 
 ## 📂 Key File Fast-Index
 
 * **Master Engineering Blueprint (SSOT):** [`BLUEPRINT.md`](./BLUEPRINT.md)
-* **Architecture Decision Records:** [`research/architecture-evaluation/04_Multi_Agent_Architecture_and_Deployment_Debate_Synthesis.md`](file:///c:/Users/admin/Documents/antigravity/optimistic-bardeen/research/architecture-evaluation/04_Multi_Agent_Architecture_and_Deployment_Debate_Synthesis.md) (`ADR-04`)
-* **Dev Lead Specs:** [`development-documents/development-lead/`](file:///c:/Users/admin/Documents/antigravity/optimistic-bardeen/development-documents/development-lead/) (`00_` through `04_`)
-* **Product/Legal Specs:** [`development-documents/product-research-lead/`](file:///c:/Users/admin/Documents/antigravity/optimistic-bardeen/development-documents/product-research-lead/) (`00_` through `04_` + `policy_wiki_seed_v1.json`)
-* **PM Governance & Gates:** [`development-documents/project-manager/GATE_STATUS.md`](file:///c:/Users/admin/Documents/antigravity/optimistic-bardeen/development-documents/project-manager/GATE_STATUS.md)
+* **Master Agent Operational Contract:** [`AGENT.md`](./AGENT.md)
+* **Architecture Decision Records:** [`research/architecture-evaluation/`](./research/architecture-evaluation/) (`01` through `06`)
+* **Dev Lead Specs:** [`development-documents/development-lead/`](./development-documents/development-lead/)
+* **Product/Legal Specs & Schema:** [`development-documents/product-research-lead/`](./development-documents/product-research-lead/)
+* **QA & DB Update Pipeline:** [`development-documents/quality-media-lead/`](./development-documents/quality-media-lead/)
+* **PM Governance & Gates:** [`development-documents/project-manager/GATE_STATUS.md`](./development-documents/project-manager/GATE_STATUS.md)
 * **GitHub Projects Board:** [https://github.com/users/ettefagh/projects/4](https://github.com/users/ettefagh/projects/4)
