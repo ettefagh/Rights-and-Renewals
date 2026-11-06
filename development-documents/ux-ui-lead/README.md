@@ -20,6 +20,8 @@ All documents in this directory are verified CM-LAB specifications governing bot
 | **`DOC-UX-04`** | [`DESIGN_SYSTEM_AND_TOKENS_SUMMARY.md`](./DESIGN_SYSTEM_AND_TOKENS_SUMMARY.md) | W3C DTCG 3-tier tokens anchored on CM-LAB's official palette (`#2F524C` Teal, `#D96B4B` Coral, `#F4F7F6` Canvas, semantic urgency colors), CSS custom properties (`--color-*`), `>=48x48px` touch ergonomics, and Svelte 5 component variant matrix. | Gate 6 |
 | **`DOC-UX-05`** | [`ACCESSIBILITY_AND_ENGINEERING_HANDOFF_SUMMARY.md`](./ACCESSIBILITY_AND_ENGINEERING_HANDOFF_SUMMARY.md) | WCAG 2.1 AA compliance (`Gate 6`), ARIA 1.2 combobox/listbox contracts, modal focus traps, Airplane Mode offline UX, `Permissions-Policy: camera=(self)` mobile Safari safety (`Red Line #4`), and developer handoff contracts to **Kyle** & **Mojtaba**. | Gates 1, 6, 7 |
 | **`DOC-UX-06`** | [`TEST_INFRA_OVERVIEW.md`](./TEST_INFRA_OVERVIEW.md) | Storybook 10.5+ CSF (`@storybook/addon-svelte-csf` `.stories.svelte`, `@storybook/addon-a11y`, `@storybook/addon-vitest`), Vitest component suite (`>=75%`), and `<15.0s` stopwatch usability benchmark protocol (`Gate 2`). | Gates 2, 5, 6 |
+| **`DOC-UX-07`** | [`ONBOARDING_WIZARD_AND_3D_SPECIFICATION.md`](./ONBOARDING_WIZARD_AND_3D_SPECIFICATION.md) | 4-step progressive onboarding wizard contract + Threlte 8 declarative 3D canvas (Svelte 5 runes) for warm tactile welcome, Dexie storage setup, and interactive showcase hero card scene. | Gates 1, 2, 6 |
+| **`DOC-UX-08`** | [`DRAWER_ICON_AND_MEDIA_PIPELINE_SPEC.md`](./DRAWER_ICON_AND_MEDIA_PIPELINE_SPEC.md) | Runes-first bottom-sheet & 520px side drawer primitive (`@harshmandan/svaul`), authoritative 24x24 UI icons (`lucide-svelte`), build-time brand vector pipeline (`unplugin-icons` + `@iconify-json/simple-icons`), static showcase hero downsampling (`astro:assets`), and client-side Web Worker receipt vault preservation (`image-compression.worker.ts`, GoBD `SHA-256`, GDPR Art. 25). | Gates 1, 2, 6, 7 |
 
 ---
 
@@ -35,6 +37,18 @@ All documents in this directory are verified CM-LAB specifications governing bot
      * *Monthly Renewal & Expiry Grid* (with same-day collision grouping, e.g., `"Nov 1 · 3 Renewals"`).
      * *24m / 12m `BGB § 477 Abs. 1` Warranty Cliff Timeline Bar* (`Iteration C-3 #24`).
      * *30 / 7 / 1-Day Expiration Countdown Stack* (`09:00 Europe/Berlin`, `0h` CET/CEST DST drift).
+
+---
+
+## 🛠️ UI Package Standards & Media Division of Labor (`DOC-UX-08`)
+
+Ratified in [`DRAWER_ICON_AND_MEDIA_PIPELINE_SPEC.md`](./DRAWER_ICON_AND_MEDIA_PIPELINE_SPEC.md) (`DOC-UX-08`), the repository enforces a strict separation between presentation primitives, build-time vectors, and sandboxed client media:
+
+1. **`@harshmandan/svaul` (Runes-First Drawer Primitive):** Powers the Contextual Item Detail Drawer (520px fixed on desktop, bottom-sheet on mobile), 1-Tap Claim Drawer, and filter drawers with velocity snapping and full ARIA modal focus trapping.
+2. **`lucide-svelte` (Universal UI Icon Standard):** Consistent 24x24 vector stroke icons across FAB Speed Dial, Unified Omni-Bar, Calendar widgets, and drawer headers with WCAG AA/AAA contrast ratios.
+3. **`unplugin-icons` + `@iconify-json/simple-icons` (Brand Vector Pipeline):** Zero-runtime build-time SVG compilation of official vector logos for the Top 20 student brands across the Brand Policy Wiki (`/wiki`), eliminating heavy raster images and CLS.
+4. **`astro:assets` (Static Showcase Media):** Build-time AVIF/WebP downsampling, zero-CLS intrinsic dimensions, and EXIF stripping for static showcase hero graphics.
+5. **Preservation of `image-compression.worker.ts` (Client-Side Receipt Vault):** Raw consumer receipt photos ($15MB+) are strictly processed locally via Web Worker (<1.5MB) with GoBD Rn. 108–110 `SHA-256` pre-encryption hashing and `AES-GCM-256` local IndexedDB encryption (`GDPR Art. 25`). Build-time tools never touch user receipts.
 
 ---
 

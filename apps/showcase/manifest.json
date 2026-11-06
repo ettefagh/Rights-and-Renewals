@@ -1,0 +1,16 @@
+{
+  "name": "CM-LAB Showcase",
+  "short_name": "CM-LAB",
+  "description": "Warranty, Subscription & Tax-Ready Consumer Ground Truth Showcase",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F7F6",
+  "theme_color": "#2F524C",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

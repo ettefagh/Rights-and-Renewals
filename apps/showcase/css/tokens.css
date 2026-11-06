@@ -1,0 +1,224 @@
+/**
+ * CM-LAB W3C DTCG 3-Tier Design System Tokens
+ * Master Specifications: SPEC-M1-UIUX-ARCH-001 & Blueprint M2
+ * File: apps/showcase/styles/tokens.css
+ */
+
+:root {
+  /* ========================================================================
+     TIER 1: PRIMITIVES (Raw Hex Literals, Spacing, Typography & Metrics)
+     ======================================================================== */
+
+  /* Brand Pine Palette */
+  --color-primitive-pine-950: #0F1C19;
+  --color-primitive-pine-900: #1B322E;
+  --color-primitive-pine-800: #23413C;
+  --color-primitive-pine-700: #2F524C; /* Primary Brand Pine */
+  --color-primitive-pine-600: #3D6A62;
+  --color-primitive-pine-500: #4C8279;
+  --color-primitive-pine-100: #D7E6E3;
+  --color-primitive-pine-50:  #EEF5F4;
+
+  /* Brand Coral Palette */
+  --color-primitive-coral-900: #582012;
+  --color-primitive-coral-800: #7E2D19;
+  --color-primitive-coral-700: #9A371F;
+  --color-primitive-coral-600: #B44A2D; /* High-Contrast Accent (WCAG AA Certified 5.31:1 on white) */
+  --color-primitive-coral-500: #D96B4B; /* Base Accent Coral */
+  --color-primitive-coral-400: #F08264;
+  --color-primitive-coral-300: #F7A892;
+  --color-primitive-coral-100: #FCE7E2;
+  --color-primitive-coral-50:  #FFF5F2;
+
+  /* State & Neutral Primitives */
+  --color-primitive-slate-950: #020617;
+  --color-primitive-slate-900: #0F172A; /* Dark Canvas */
+  --color-primitive-slate-800: #1E293B; /* Dark Card Surface */
+  --color-primitive-slate-700: #334155;
+  --color-primitive-slate-600: #475569; /* Secondary Text */
+  --color-primitive-slate-500: #64748B;
+  --color-primitive-slate-400: #94A3B8; /* Muted Text Dark */
+  --color-primitive-slate-300: #CBD5E1;
+  --color-primitive-slate-200: #E2E8F0;
+  --color-primitive-slate-100: #F1F5F9; /* Subtle Surface */
+  --color-primitive-slate-50:  #F8FAFC; /* Light Canvas */
+  --color-primitive-white:     #FFFFFF;
+
+  /* Status Primitives */
+  --color-primitive-red-900:   #7F1D1D;
+  --color-primitive-red-700:   #B91C1C;
+  --color-primitive-red-600:   #DC2626; /* Urgent Red */
+  --color-primitive-red-500:   #EF4444;
+  --color-primitive-red-400:   #F87171;
+  --color-primitive-red-100:   #FEE2E2;
+
+  --color-primitive-amber-900: #78350F;
+  --color-primitive-amber-700: #B45309;
+  --color-primitive-amber-600: #D97706; /* Warning Amber */
+  --color-primitive-amber-500: #F59E0B;
+  --color-primitive-amber-100: #FEF3C7;
+
+  --color-primitive-emerald-900: #14532D;
+  --color-primitive-emerald-700: #047857;
+  --color-primitive-emerald-600: #059669; /* Protected Green */
+  --color-primitive-emerald-500: #10B981;
+  --color-primitive-emerald-100: #DCFCE7;
+
+  --color-primitive-blue-700:  #1D4ED8;
+  --color-primitive-blue-600:  #2563EB; /* Focus Blue */
+  --color-primitive-blue-500:  #3B82F6;
+  --color-primitive-gray-500:  #6B7280; /* Neutral / Expired */
+
+  /* Spacing Scale (4px/8px Geometric Progression) */
+  --space-0:   0px;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+
+  /* Border Radii */
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-2xl:  16px;
+  --radius-full: 9999px;
+
+  /* Elevations & Shadows */
+  --elevation-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --elevation-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --elevation-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --elevation-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* Monotonic 11-Tier Z-Index Strata */
+  --z-index-base:      0;
+  --z-index-sticky:    100;
+  --z-index-navbar:    200;
+  --z-index-dropdown:  300;
+  --z-index-drawer:    400;
+  --z-index-backdrop:  500;
+  --z-index-modal:     600;
+  --z-index-popover:   700;
+  --z-index-toast:     800;
+  --z-index-tooltip:   900;
+  --z-index-max:       1000;
+
+  /* Typography Font Stacks */
+  --font-sans:  Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:  "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Responsive Breakpoints (Pixel Boundaries) */
+  --breakpoint-xs: 0px;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 900px;
+  --breakpoint-lg: 1200px;
+  --breakpoint-xl: 1600px;
+
+  /* Viewport Height & Insets */
+  --height-viewport: 100dvh;
+  --padding-safe-bottom: env(safe-area-inset-bottom, 16px);
+  --padding-safe-top: env(safe-area-inset-top, 0px);
+
+  /* ========================================================================
+     TIER 2: SEMANTICS — LIGHT THEME (Default)
+     ======================================================================== */
+  --color-surface-canvas:      #F4F7F6;
+  --color-surface-card:        #FFFFFF;
+  --color-surface-subtle:      #F1F5F9;
+  --color-surface-sunken:      #E2E8F0;
+
+  --color-text-primary:        #0F172A;
+  --color-text-secondary:      #475569;
+  --color-text-muted:          #64748B;
+  --color-text-inverse:        #FFFFFF;
+
+  --color-brand-primary:       var(--color-primitive-pine-700);  /* #2F524C */
+  --color-brand-primary-hover: var(--color-primitive-pine-800);  /* #23413C */
+  --color-brand-accent:        var(--color-primitive-coral-500); /* #D96B4B */
+  --color-brand-accent-hover:  var(--color-primitive-coral-400); /* #F08264 */
+  --color-brand-accent-contrast: #B44A2D; /* Certified WCAG AA 5.31:1 with white text */
+
+  --color-border-default:      var(--color-primitive-slate-500); /* #64748B */
+  --color-border-subtle:       var(--color-primitive-slate-200); /* #E2E8F0 */
+  --color-border-focus:        var(--color-primitive-blue-600);  /* #2563EB */
+  --color-interactive-focus:   var(--color-primitive-blue-600);  /* #2563EB */
+
+  /* Status Colors */
+  --color-status-urgent:       var(--color-primitive-red-600);   /* #DC2626 */
+  --color-status-urgent-bg:    var(--color-primitive-red-100);   /* #FEE2E2 */
+  --color-status-urgent-text:  var(--color-primitive-red-900);   /* #7F1D1D */
+  --color-status-urgent-border: var(--color-primitive-red-600);  /* #DC2626 */
+
+  --color-status-warning:      var(--color-primitive-amber-600); /* #D97706 */
+  --color-status-warning-bg:   var(--color-primitive-amber-100); /* #FEF3C7 */
+  --color-status-warning-text: var(--color-primitive-amber-900); /* #78350F */
+  --color-status-warning-border: var(--color-primitive-amber-700); /* #B45309 */
+
+  --color-status-protected:    var(--color-primitive-emerald-600); /* #059669 */
+  --color-status-protected-bg: var(--color-primitive-emerald-100); /* #DCFCE7 */
+  --color-status-protected-text: var(--color-primitive-emerald-900); /* #14532D */
+  --color-status-protected-border: var(--color-primitive-emerald-600); /* #059669 */
+
+  --color-status-neutral:      var(--color-primitive-gray-500);  /* #6B7280 */
+  --color-status-neutral-bg:   var(--color-primitive-slate-100); /* #F1F5F9 */
+  --color-status-neutral-text: var(--color-primitive-slate-700); /* #334155 */
+  --color-status-neutral-border: var(--color-primitive-slate-400); /* #94A3B8 */
+
+  /* Backwards-compatibility aliases */
+  --color-primary-teal:        var(--color-brand-primary);
+  --color-accent-coral:        var(--color-brand-accent);
+}
+
+/* ========================================================================
+   TIER 2: SEMANTICS — DARK THEME
+   ======================================================================== */
+[data-theme="dark"] {
+  --color-surface-canvas:      #0F172A;
+  --color-surface-card:        #1E293B;
+  --color-surface-subtle:      #1E293B;
+  --color-surface-sunken:      #020617;
+
+  --color-text-primary:        #F8FAFC;
+  --color-text-secondary:      #CBD5E1;
+  --color-text-muted:          #94A3B8;
+  --color-text-inverse:        #0F172A;
+
+  --color-brand-primary:       var(--color-primitive-pine-700);  /* #2F524C */
+  --color-brand-primary-hover: var(--color-primitive-pine-600);  /* #3D6A62 */
+  --color-brand-accent:        var(--color-primitive-coral-500); /* #D96B4B */
+  --color-brand-accent-hover:  var(--color-primitive-coral-400); /* #F08264 */
+  --color-brand-accent-contrast: #B44A2D;
+
+  --color-border-default:      var(--color-primitive-slate-400); /* #94A3B8 */
+  --color-border-subtle:       var(--color-primitive-slate-700); /* #334155 */
+  --color-border-focus:        var(--color-primitive-blue-500);  /* #3B82F6 */
+  --color-interactive-focus:   var(--color-primitive-blue-500);  /* #3B82F6 */
+
+  --color-status-urgent:       var(--color-primitive-red-500);   /* #EF4444 */
+  --color-status-urgent-bg:    var(--color-primitive-red-900);   /* #7F1D1D */
+  --color-status-urgent-text:  var(--color-primitive-red-100);   /* #FEE2E2 */
+  --color-status-urgent-border: var(--color-primitive-red-400);  /* #F87171 */
+
+  --color-status-warning:      var(--color-primitive-amber-500); /* #F59E0B */
+  --color-status-warning-bg:   var(--color-primitive-amber-900); /* #78350F */
+  --color-status-warning-text: var(--color-primitive-amber-100); /* #FEF3C7 */
+  --color-status-warning-border: var(--color-primitive-amber-500); /* #F59E0B */
+
+  --color-status-protected:    var(--color-primitive-emerald-500); /* #10B981 */
+  --color-status-protected-bg: var(--color-primitive-emerald-900); /* #14532D */
+  --color-status-protected-text: var(--color-primitive-emerald-100); /* #BBF7D0 */
+  --color-status-protected-border: var(--color-primitive-emerald-500); /* #10B981 */
+
+  --color-status-neutral:      var(--color-primitive-slate-400);
+  --color-status-neutral-bg:   var(--color-primitive-slate-800);
+  --color-status-neutral-text: var(--color-primitive-slate-300);
+  --color-status-neutral-border: var(--color-primitive-slate-500);
+}

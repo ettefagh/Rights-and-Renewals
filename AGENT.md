@@ -147,6 +147,27 @@ Agents must follow these exact tooling protocols when developing or reviewing co
 * **Multi-Viewport Pre-Flight Check:**
   - Test and verify layouts across `390px` (mobile portrait), `768px` (tablet portrait), `1024px` (laptop), and `1440px` (desktop) viewports.
 
+### 4.5 UI Component, Drawer, Icon & Media Asset Pipeline Rules (`DOC-UX-08`)
+All agents modifying UI, drawers, icons, brand marks, or media pipelines must adhere strictly to [`DRAWER_ICON_AND_MEDIA_PIPELINE_SPEC.md`](./development-documents/ux-ui-lead/DRAWER_ICON_AND_MEDIA_PIPELINE_SPEC.md) (`DOC-UX-08`):
+* **Runes-First Drawer Primitive (`@harshmandan/svaul`):**
+  - Use `@harshmandan/svaul` for all modal sheets and drawer interactions (Contextual Item Detail Drawer, 1-Tap Claim Drawer, Filter Drawer).
+  - Enforce dual-mode layout: fixed 520px side drawer on desktop ($\ge 768\text{px}$), tactile bottom-sheet on mobile ($< 768\text{px}$) with drag handle ($36\times 4\text{px}$).
+  - Implement velocity snapping (downward swipe release velocity $v \ge 0.5\text{ px/ms}$ dismisses), snap points `[0, 0.5, 0.92]`, WAI-ARIA modal contracts (`role="dialog"`, `aria-modal="true"`, focus trap, `Escape` key dismissal), and backdrop scrim (`rgba(15, 23, 42, 0.45)` with `backdrop-filter: blur(2px)`).
+* **Authoritative UI Icon Standard (`lucide-svelte`):**
+  - `lucide-svelte` is the exclusive UI icon standard across both web properties (`[Project].pages.dev` and `app.[Project].pages.dev`).
+  - Maintain clean $24\times 24$ vector line geometry, $2\text{px}$ stroke width, round caps/joins, and `stroke="currentColor"` bound to W3C DTCG tokens.
+  - WCAG 2.1 AA/AAA conformance: decorative icons MUST declare `aria-hidden="true"`; standalone icon buttons MUST declare an explicit `aria-label` with $\ge 48\times 48\text{px}$ touch target padding.
+* **Brand Vector Pipeline (`unplugin-icons` with `@iconify-json/simple-icons`):**
+  - Brand marks for the Top 20 student brands across the Brand Policy Wiki (`/wiki`) MUST compile at build time on-demand via `unplugin-icons` and `@iconify-json/simple-icons`.
+  - Strictly prohibit heavy raster PNG/JPEG logos (eliminating CLS and multi-megabyte bundle bloat). Provide accessible uppercase monograms for arbitrary or uncataloged merchants.
+* **Static Showcase Hero Graphics (`astro:assets` / `@sveltejs/enhanced-img`):**
+  - Marketing hero visuals, mockups, and architectural explainer diagrams on `[Project].pages.dev` MUST be processed at build time via `astro:assets` (or `@sveltejs/enhanced-img`).
+  - Automatically downsample to AVIF/WebP, inject intrinsic `width`/`height` dimensions (zero CLS), generate responsive `srcset`, and strip all camera/EXIF metadata.
+* **Preservation of Client-Side Web Worker (`image-compression.worker.ts`):**
+  - Build-time media tools MUST NEVER touch runtime consumer receipts.
+  - Raw consumer receipt photos ($15\text{MB}+$) MUST be processed locally in the background via `image-compression.worker.ts` (`OffscreenCanvas` $\le 2048\text{px}$, target $<1.5\text{MB}$).
+  - Compute pre-encryption `SHA-256` digest on the raw file buffer (GoBD Rn. 108–110 evidentiary proof of purchase) and encrypt locally via `AES-GCM-256` before writing to `Dexie.js v4` (`GDPR Art. 25` zero cloud plaintext).
+
 ---
 
 ## 5. Quick Command Reference for Agents

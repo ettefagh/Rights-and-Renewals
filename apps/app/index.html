@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2F524C">
+  <meta name="description" content="CM-LAB Privater Tresor für Verbrauchergarantien, Kündigungen (BGB § 312k) und Steuerabschreibungen (BMF 2022).">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>CM-LAB Wallet — BGB Fristen, Kündigung &amp; Steuern</title>
+
+  <!-- Viewport Geometry & Safe Area Tokens -->
+  <style>
+    :root {
+      --height-viewport: 100dvh;
+      --padding-safe-bottom: env(safe-area-inset-bottom, 16px);
+    }
+  </style>
+
+  <!-- Favicon & PWA Manifest -->
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Zero-FOUC Theme Restoration Script -->
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('cmlab-theme');
+        const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', saved || (systemDark ? 'dark' : 'light'));
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- DTCG Design System & Component Stylesheets -->
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/app.css">
+  <link rel="stylesheet" href="./styles/omnibar.css">
+  <link rel="stylesheet" href="./styles/widgets.css">
+</head>
+<body class="app-shell">
+  <!-- Sticky Utility Header (role="banner") -->
+  <header role="banner" id="app-header">
+    <div class="app-header-brand-wrap">
+      <a href="#/" class="app-brand" aria-label="CM-LAB Wallet Startseite">
+        <span class="app-brand-logo" aria-hidden="true">🛡️</span>
+        <span>CM-LAB <span class="app-brand-badge">Wallet</span></span>
+      </a>
+    </div>
+
+    <!-- WAI-ARIA 1.3 Combobox Omnibar Root -->
+    <div role="combobox" aria-expanded="false" id="omnibar-root"></div>
+
+    <div class="app-header-actions">
+      <div class="sync-badge" title="GoBD Rn. 108–110: Lokale Unveränderbarkeit aktiv">
+        <span class="sync-dot" aria-hidden="true"></span>
+        <span>GoBD Aktiv</span>
+      </div>
+      <button type="button" id="quick-add-btn" class="btn-primary-compact" title="Neuen Beleg erfassen (<15s)">
+        <span aria-hidden="true">➕</span>
+        <span>Neuer Beleg</span>
+      </button>
+      <button type="button" id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Farbschema wechseln" title="Farbschema wechseln (Hell/Dunkel)">
+        🌓
+      </button>
+    </div>
+  </header>
+
+  <!-- Application Body Layout -->
+  <div class="app-layout">
+    <!-- Desktop & Tablet Side Navigation Rail -->
+    <nav class="app-sidebar" aria-label="Hauptnavigation">
+      <div class="sidebar-nav-section">
+        <div class="sidebar-heading">Tresor Navigation</div>
+        <div class="sidebar-nav">
+          <a href="#/dashboard" class="sidebar-link active" data-nav="dashboard">
+            <span class="sidebar-icon">📊</span>
+            <span class="sidebar-label">Übersicht</span>
+          </a>
+          <a href="#/vault" class="sidebar-link" data-nav="vault">
+            <span class="sidebar-icon">🗄️</span>
+            <span class="sidebar-label">Mein Tresor</span>
+            <span class="sidebar-badge" id="sidebar-vault-count">20</span>
+          </a>
+          <a href="#/calendar" class="sidebar-link" data-nav="calendar">
+            <span class="sidebar-icon">📅</span>
+            <span class="sidebar-label">Fristen &amp; Kalender</span>
+          </a>
+          <a href="#/tax" class="sidebar-link" data-nav="tax">
+            <span class="sidebar-icon">💶</span>
+            <span class="sidebar-label">Steuern (§ 9 EStG)</span>
+          </a>
+          <a href="#/policy-wiki" class="sidebar-link" data-nav="wiki">
+            <span class="sidebar-icon">⚖️</span>
+            <span class="sidebar-label">Policy Wiki</span>
+            <span class="sidebar-badge">20</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="storage-quota-card">
+          <div class="storage-header">
+            <span>Lokaler Tresor</span>
+            <span id="storage-quota-text">2.8 MB / 50 MB</span>
+          </div>
+          <div class="storage-bar-track">
+            <div class="storage-bar-fill" id="storage-bar-fill" style="width: 6%;"></div>
+          </div>
+          <div class="storage-subtext">
+            <span>Dexie.js Offline</span>
+            <span>0% Cloud-Leakage</span>
+          </div>
+        </div>
+        <div class="sidebar-legal-meta">
+          <span>§§ 437, 477 BGB · BMF 2022</span><br>
+          <span>GoBD Rn. 108–110 Konformität</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Primary Application Canvas -->
+    <main class="app-main-content">
+      <div id="app-dashboard-grid" class="grid-12-col">
+        <!-- Urgent Attention Banner Widget Container -->
+        <section id="urgent-banner-container" aria-label="Dringende Fristen und Warnungen"></section>
+
+        <!-- Financial and Subscription Radar Widget Container -->
+        <section id="radar-container" aria-label="Finanzradar und Steuerübersicht"></section>
+
+        <!-- Master Chronological Vault Ledger Widget Container -->
+        <section id="ledger-container" aria-label="Haupttresor Belege und Garantien"></section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
+    <button type="button" class="mobile-nav-link active" data-nav="dashboard">
+      <span class="mobile-nav-icon">📊</span>
+      <span>Dashboard</span>
+    </button>
+    <button type="button" class="mobile-nav-link" data-nav="search" id="mobile-search-btn">
+      <span class="mobile-nav-icon">🔍</span>
+      <span>Suche</span>
+    </button>
+    <button type="button" class="mobile-nav-link" id="mobile-add-btn">
+      <span class="mobile-nav-icon">➕</span>
+      <span>Neu</span>
+    </button>
+    <button type="button" class="mobile-nav-link" data-nav="tax" id="mobile-tax-btn">
+      <span class="mobile-nav-icon">💶</span>
+      <span>Steuern</span>
+    </button>
+    <button type="button" class="mobile-nav-link" data-nav="vault" id="mobile-vault-btn">
+      <span class="mobile-nav-icon">🗄️</span>
+      <span>Tresor</span>
+    </button>
+  </nav>
+
+  <!-- Modal Backdrop & Container -->
+  <div id="modal-container"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Application Bootstrap -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

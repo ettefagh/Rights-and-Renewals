@@ -76,6 +76,11 @@ cm-lab/
 │           │   └── api/mcp.ts              # Stateless POST /api/mcp JSON-RPC 2.0 handler (Zod -32602)
 │           ├── components/
 │           │   ├── WalletApp.svelte        # Single Root Island Router (Views 1–6)
+│           │   ├── onboarding/
+│           │   │   └── OnboardingModal.svelte    # 4-step progressive setup wizard + seed loader
+│           │   ├── 3d/
+│           │   │   ├── VaultScene.svelte         # Threlte 8 declarative canvas (Svelte 5 runes)
+│           │   │   └── VaultCardMesh.svelte      # Tactile titanium warranty card & sub orbit mesh
 │           │   ├── fab/
 │           │   │   ├── FloatingActionMenu.svelte # Speed dial FAB (+ to ✕ morph, backdrop scrim, keyboard auto-hide)
 │           │   │   ├── ActionItem.svelte         # Animated speed-dial action pill item
@@ -108,7 +113,8 @@ cm-lab/
 │   │   ├── legal/bgbNoticeCompiler.ts      # 5 verbatim BGB templates (T1–T5) + LexFox RDG safe-harbor
 │   │   ├── media/pdfDossierCompiler.ts     # pdf-lib DIN 5008 vector PDF + embedded receipt proof + fallback
 │   │   ├── tax/werbungskostenEngine.ts     # BMF 22.02.2022 + BFH GrS 1/06 3-tier split + BOM CSV export
-│   │   └── mcp/jsonRpcDispatcher.ts        # policy_lookup & claim_dossier_generate + Zod -32602 guard
+│   │   ├── mcp/jsonRpcDispatcher.ts        # 4 read-only tools dispatcher + Zod -32602 guard
+│   │   └── telemetry/edgeMetrics.ts        # Cloudflare WAE data point writer (privacy-first, zero PII)
 │   └── design-tokens/
 │       └── tokens.css                      # Official CM-LAB W3C DTCG CSS Custom Properties
 ├── .storybook/                             # Storybook 10.5+ (@storybook/addon-svelte-csf, addon-a11y, addon-mcp)
@@ -149,6 +155,25 @@ Adapted from the CampusWeb `portable-floating-action-menu` primitive (Svelte 5 r
 | **Subscriptions & Tax (`#tax`)** | `mode: 'menu'` | **🧾 Add Tax Receipt** (`isTaxDeductible`) | **⚡ Log SaaS / Tool** (100% AfA) | **📊 Recalculate Mixed-Use AfA** | **📥 Export Werbungskosten CSV** |
 | **Brand Wiki & MCP (`/wiki`)** | `mode: 'menu'` | **🔎 Query Open MCP Server** | **💻 Log Brand Warranty Defaults** | **⚡ Log Brand Subscription Defaults** | **📋 Copy MCP Stdio Config JSON** |
 | **Capture / Claim Modals** | `mode: 'hidden'` | *Hidden — Focus trapped inside modal* | — | — | — |
+
+### 3.4 Onboarding Wizard & Threlte 8 3D Experience (`OnboardingModal.svelte` & `VaultScene.svelte`)
+Codified in [`DOC-UX-05`](./development-documents/ux-ui-lead/ONBOARDING_WIZARD_AND_3D_SPECIFICATION.md), first-time visitors are welcomed by an accessible 4-step wizard accompanied by an interactive 3D spatial vault scene:
+
+* **3D Sovereign Vault & Card Mesh (Threlte 8 on Svelte 5 Runes):**
+  - Declarative Three.js `<Canvas>` rendering a brushed titanium Hardware Card (laser-etched `BGB § 438` badge and amber `§ 477` cliff marker) and a frosted emerald Subscription Card (pulsing billing orbit and `§ 312k` readiness pill).
+  - Dynamic cursor/gyro parallax ($\pm 12^\circ$ tilt) with physically grounded lighting (`directionalLight`, `ambientLight`).
+* **Dual-Surface Deployment:**
+  - **Showcase Hero (`[Project].pages.dev`):** Mounted via `<ShowcaseVaultScene client:visible />`, offering interactive 3D card inspection and feature flips.
+  - **In-App Onboarding (`app.[Project].pages.dev`):** Mounted via `<OnboardingModal client:idle />` triggered on first launch (`localStorage.cmlab_onboarding_completed !== 'true'`).
+* **The 4 Progressive Steps:**
+  1. *Warm 3D Welcome:* Spatial orientation introducing unified physical + digital consumer rights.
+  2. *Privacy Pledge:* Confirms 100% offline-first Dexie.js v4 storage (`GDPR Art. 25`) with pre-encryption GoBD `SHA-256` hashing.
+  3. *Notification Calibration:* Configures `09:00 Europe/Berlin` wall-clock alert schedule (0h DST drift) for $T-30\text{d}$ and $T-7\text{d}$ warnings.
+  4. *First Action:* Offers one-click **"Load Sample Student Vault"** (Spotify, MacBook, USB-C hub) or direct **"Snap First Receipt (<15s)"**.
+* **Accessibility & Performance Guardrails:**
+  - `prefers-reduced-motion` compliance: WebGL canvas is bypassed for a static high-contrast SVG badge.
+  - Device pixel ratio clamped to `Math.min(devicePixelRatio, 1.5)`. Render loop pauses on tab blur (`Page Visibility API`).
+  - Zero bundle overhead on subsequent visits (dynamically imported only during initial onboarding).
 
 ---
 
@@ -370,6 +395,13 @@ All Svelte 5 components, Astro pages, and Storybook CSF stories (`.stories.svelt
      4. `tax_deductibility_check`: Deterministic `§ 9 EStG` Werbungskosten and `BMF 22.02.2022` Sofortabschreibung 100% immediate write-off calculation and GWG rules.
    * Client-side dossier and PDF compilation stays entirely in local browser Web Workers (`pdfDossierCompiler.ts`) and Dexie for private user data (`GDPR Art. 25`), eliminating RDG legal practice liability.
    * Invalid or extra fields are rejected by `.strict()` Zod schemas returning JSON-RPC error code **`-32602` (`Invalid params`)** in `<200ms` (`Gate 4 DoD`).
+
+6. **Privacy-First Edge Analytics Architecture (Cloudflare & EmDash):**
+   * Codified in [`DOC-DEV-05`](./development-documents/development-lead/05_Cloudflare_EmDash_Analytics_and_Telemetry_Spec.md), telemetries operate behind a strict privacy firewall (`GDPR Art. 25`). Personal items, receipts, and prices **NEVER** leave the user's browser.
+   * **Cloudflare Web Analytics (Frontend RUM):** Uses cookieless `https://static.cloudflareinsights.com/beacon.min.js` to track Core Web Vitals (LCP, INP, CLS) across `[Project].pages.dev` and `app.[Project].pages.dev` with zero IP storage or device fingerprinting.
+   * **Cloudflare Workers Analytics Engine (WAE):** Stateless edge telemetry tracking `/api/mcp` JSON-RPC method hits, response status, and execution latency ($<200\text{ms}$ SLA), plus `/wiki/[slug]` public brand query aggregations.
+   * **EmDash CMS Freshness Metrics:** Tracks provider AGB SHA-256 revision diffs and staleness counters (>90d warning).
+   * **User Sovereignty:** App Settings View provides an explicit one-click toggle to disable all anonymous edge telemetry.
 
 ---
 

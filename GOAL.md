@@ -129,6 +129,13 @@ All AI agents operating in this repository MUST activate and adhere to the follo
   - `VISUAL_DENSITY`: **`5`** (Balanced mobile productivity, $\ge 48\times 48\text{px}$ touch targets).
 * **Responsive Stability:** All screens MUST pass pre-flight checks across `390px`, `768px`, `1024px`, and `1440px` viewports without layout shifts or text collisions.
 
+### 5. UI Packages & Media Division of Labor (`DOC-UX-08`)
+* **Sheet & Drawer Primitive (`@harshmandan/svaul`):** Svelte 5 runes-first bottom-sheet (mobile $<768\text{px}$) and 520px fixed side drawer (desktop $\ge 768\text{px}$) for Item Details, 1-Tap Claim, and Filter flows with velocity snapping ($v \ge 0.5\text{px/ms}$ dismiss) and ARIA modal focus trapping.
+* **Authoritative UI Icon Standard (`lucide-svelte`):** Exclusively powers all UI icons across Showcase and Wallet App (FAB Speed Dial, Unified Omni-Bar, Calendar widgets, drawer headers) with strict 24x24 vector geometry, 2px strokes, and WCAG AA/AAA contrast.
+* **Brand Vector Pipeline (`unplugin-icons` + `@iconify-json/simple-icons`):** Build-time on-demand SVG compilation for the Top 20 student brands across the Brand Policy Wiki (`/wiki`), eliminating heavy raster images and CLS.
+* **Static Showcase Media (`astro:assets` / `@sveltejs/enhanced-img`):** Build-time AVIF/WebP downsampling, zero-CLS intrinsic dimensions, and EXIF sanitization for static marketing graphics on `[Project].pages.dev`.
+* **Preservation of Client-Side Web Worker (`image-compression.worker.ts`):** Runtime consumer receipts ($15\text{MB}+$) are compressed locally via Web Worker ($<1.5\text{MB}$ `OffscreenCanvas`) with GoBD Rn. 108–110 `SHA-256` pre-encryption hashing and `AES-GCM-256` IndexedDB encryption (`GDPR Art. 25`). Build-time tools never touch user receipts.
+
 ---
 
 ## ⚠️ The 5 Non-Negotiable Guardrails (Red Lines)
@@ -146,6 +153,7 @@ All AI agents operating in this repository MUST activate and adhere to the follo
 * **Master Engineering Blueprint (SSOT):** [`BLUEPRINT.md`](./BLUEPRINT.md)
 * **Master Agent Operational Contract:** [`AGENT.md`](./AGENT.md)
 * **Architecture Decision Records:** [`research/architecture-evaluation/`](./research/architecture-evaluation/) (`01` through `06`)
+* **UX/UI Lead & Drawer/Icon/Media Specs:** [`development-documents/ux-ui-lead/`](./development-documents/ux-ui-lead/) (`DOC-UX-01` through `DOC-UX-08`)
 * **Dev Lead Specs:** [`development-documents/development-lead/`](./development-documents/development-lead/)
 * **Product/Legal Specs & Schema:** [`development-documents/product-research-lead/`](./development-documents/product-research-lead/)
 * **QA & DB Update Pipeline:** [`development-documents/quality-media-lead/`](./development-documents/quality-media-lead/)

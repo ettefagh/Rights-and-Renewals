@@ -1,0 +1,415 @@
+/* ==========================================================================
+   Unified Omnibar Component Styles (W3C DTCG 3-Tier Design System)
+   Scoped to: apps/app/styles/omnibar.css
+   ========================================================================== */
+
+.omnibar-container {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  font-family: var(--font-sans);
+  z-index: var(--z-index-dropdown, 300);
+}
+
+/* --- Combobox Input Row --- */
+.omnibar-combobox {
+  position: relative;
+  width: 100%;
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.omnibar-combobox[aria-expanded="true"] {
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--elevation-lg), 0 0 0 3px rgba(47, 82, 76, 0.15);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.omnibar-input-wrapper {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 var(--space-3);
+  gap: var(--space-2);
+}
+
+.omnibar-leading-icon {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+.omnibar-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  outline: none;
+  padding: 0;
+}
+
+.omnibar-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.omnibar-trailing-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.omnibar-spinner {
+  display: inline-block;
+  animation: omnibar-spin 0.8s linear infinite;
+  color: var(--color-brand-primary);
+  font-weight: bold;
+}
+
+@keyframes omnibar-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.omnibar-clear-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.omnibar-clear-btn:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-subtle);
+}
+
+.omnibar-kbd-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-subtle);
+  user-select: none;
+}
+
+/* --- Popover Dropdown --- */
+.omnibar-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-brand-primary);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  box-shadow: var(--elevation-lg);
+  max-height: 480px;
+  overflow-y: auto;
+  z-index: var(--z-index-dropdown, 300);
+}
+
+/* --- Filter Chips Bar --- */
+.omnibar-chip-bar {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background-color: var(--color-surface-subtle);
+}
+
+.omnibar-chip {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-surface-card);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.omnibar-chip:hover {
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+}
+
+.omnibar-chip.chip-active {
+  background-color: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+  color: #ffffff;
+}
+
+/* --- Section Headings --- */
+.omnibar-section {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.omnibar-section:last-child {
+  border-bottom: none;
+}
+
+.omnibar-section-title {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+/* --- Quick Action Grid --- */
+.omnibar-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+@media (max-width: 600px) {
+  .omnibar-quick-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.omnibar-quick-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-surface-subtle);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.omnibar-quick-btn:hover {
+  background-color: var(--color-surface-card);
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+  transform: translateY(-1px);
+}
+
+/* --- Option Items (Roving Focus) --- */
+.omnibar-option {
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.omnibar-option:hover,
+.omnibar-option.omnibar-option-active {
+  background-color: var(--color-surface-subtle);
+}
+
+.omnibar-option.omnibar-option-active {
+  outline: 2px solid var(--color-interactive-focus);
+  outline-offset: -2px;
+}
+
+/* --- Vault / Wiki Row Layout --- */
+.omnibar-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.item-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.item-info {
+  min-width: 0;
+}
+
+.item-title {
+  font-size: 0.88rem;
+  color: var(--color-text-primary);
+}
+
+.item-sub {
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.badge-price {
+  font-size: 0.82rem;
+  color: var(--color-text-primary);
+}
+
+.badge-gobd {
+  color: var(--color-status-protected);
+  font-weight: 500;
+}
+
+.badge-link {
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.omnibar-row-action-btn {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-surface-card);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.omnibar-row-action-btn:hover {
+  background-color: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+  color: #fff;
+}
+
+/* --- Recent Activity List --- */
+.omnibar-recent-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.recent-icon {
+  font-size: 1.2rem;
+}
+
+.recent-info {
+  min-width: 0;
+}
+
+.recent-title {
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+}
+
+.recent-sub {
+  font-size: 0.75rem;
+}
+
+/* --- Zero-Dead-End Suggestions --- */
+.omnibar-suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+}
+
+.omnibar-suggestion-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-surface-subtle);
+  margin-bottom: var(--space-1);
+}
+
+.omnibar-suggestion-card:hover {
+  background-color: var(--color-surface-card);
+  border-color: var(--color-brand-primary);
+}
+
+.sugg-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.sugg-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.84rem;
+}
+
+/* --- Command Mode List --- */
+.omnibar-command-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.command-option {
+  padding: var(--space-2) var(--space-3);
+}
+
+.command-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.command-verb {
+  font-size: 0.95rem;
+  color: var(--color-brand-accent-contrast);
+}
+
+.command-example {
+  font-size: 0.75rem;
+}
+
+.command-desc {
+  font-size: 0.78rem;
+  margin-top: 2px;
+}
+
+/* --- Footer Keyboard Hints --- */
+.omnibar-footer-hint {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+  background-color: var(--color-surface-subtle);
+  font-size: 0.72rem;
+}
+
+.omnibar-footer-hint kbd {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 1px 4px;
+  margin: 0 2px;
+}
