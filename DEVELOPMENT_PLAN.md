@@ -950,3 +950,71 @@ The 30 GitHub issues are restructured into the sequential production ledger for 
 ---
 
 *Authored deterministically by teamwork_worker (Worker Plan 1) — Greenfield Master Development Plan for CM-LAB.*
+
+
+---
+
+## 11. Greenfield Build Progress & Session Handoff Report (2026-11-06)
+
+### 11.1 Completed & Certified Milestones (Milestone M1 — Phases 1, 2, 6 Core, 7 Seed, 8 Core, 9 Core, 10 Core)
+
+The foundational workspace (`packages/design-tokens`) and the entire headless TypeScript domain engine (`packages/core`) have been implemented from scratch and verified:
+
+| Module / Subsystem | File Path | Status | Verification Evidence |
+| :--- | :--- | :---: | :--- |
+| **W3C DTCG Design Tokens (`design-taste-frontend`)** | `packages/design-tokens/tokens.css` | **DONE** | Deep Forest Teal (`#2F524C`), Warm Terracotta (`#D96B4B`), Soft Canvas (`#F4F7F6`), optical tracking, zero purple-slop gradients |
+| **Canonical Domain Contracts & DTOs** | `packages/core/src/types/contracts.ts` | **DONE** | `tsc --noEmit` (`0` errors) |
+| **WebCrypto AES-GCM-256 & GoBD SHA-256 Vault** | `packages/core/src/crypto/cryptoVault.ts` | **DONE** | `tests/cryptoVault.test.ts` (`10/10` pass, tamper detection `GoBDIntegrityError` verified) |
+| **Dexie.js v4 Multi-Store & ACID Persistence** | `packages/core/src/db/vaultDb.ts`, `persistenceService.ts` | **DONE** | `tests/vaultDb.test.ts` (`6/6`), `tests/persistenceService.test.ts` (`6/6` pass) |
+| **In-Memory PrefixTrie Brand/Policy Matcher (`<10ms`)** | `packages/core/src/search/PrefixTrie.ts` | **DONE** | `tests/PrefixTrie.test.ts` (`9/9` pass) |
+| **Europe/Berlin 09:00 Wall-Clock Alert Scheduler** | `packages/core/src/alerts/AlertScheduler.ts` | **DONE** | `tests/AlertScheduler.test.ts` (`7/7` pass, `0h` DST drift across CET/CEST) |
+| **Deterministic BGB Legal Notice Compiler (`T1`–`T5`)** | `packages/core/src/legal/bgbNoticeCompiler.ts` | **DONE** | `tests/bgbNoticeCompiler.test.ts` (`9/9` pass, `§§ 187, 188, 193 BGB` + Gauss Easter *Werktag* rollover + LexFox RDG safe-harbor footer) |
+| **DIN 5008 PDF & Plaintext Dossier Compiler** | `packages/core/src/media/pdfDossierCompiler.ts` | **DONE** | Verified in `tests/bgbNoticeCompiler.test.ts` |
+| **§ 9 EStG Werbungskosten & ELSTER CSV Compiler** | `packages/core/src/tax/werbungskostenEngine.ts`, `elsterCsvCompiler.ts` | **DONE** | `tests/werbungskostenEngine.test.ts` (`10/10` pass, €952 gross GWG, BMF 1-year digital AfA, 3-year linear AfA, `§ 2 StBerG` safe-harbor) |
+| **Top 20 Student Brands Seed Dataset** | `packages/core/data/policy_wiki_seed_v1.json`, `src/data/policyWikiSeed.ts` | **DONE** | 20 verified German/EU hardware & subscription brands |
+| **Stateless 4-Tool Open MCP JSON-RPC 2.0 Dispatcher** | `packages/core/src/mcp/jsonRpcDispatcher.ts` | **DONE** | `tests/jsonRpcDispatcher.test.ts` (`15/15` pass, strict Zod `-32602` validation, `<1ms` execution) |
+| **Zero-PII Cloudflare WAE Edge Telemetry** | `packages/core/src/telemetry/edgeMetrics.ts` | **DONE** | `tests/edgeMetrics.test.ts` (`3/3` pass) |
+| **Dual RFC 5545 iCal Subscription Generator** | `packages/core/src/calendar/icalGenerator.ts` | **DONE** | `tests/icalGenerator.test.ts` (`6/6` pass, 75-octet UTF-8 folding, separate `subscriptions.ics` & `warranties.ics`) |
+| **Total `packages/core` Test & Coverage Gate** | `packages/core/tests/*.test.ts` | **PASSED** | **11/11 test files, 82/82 tests passing**, **95.92% line / 82.61% branch / 100% function coverage** (target $\ge 75\%$) + **92/92 adversarial stress tests** |
+
+---
+
+### 11.2 New Hable (`campusweb`) Architecture Additions for Milestone M2 (`apps/app`) & M3 (`apps/showcase`)
+
+Per user directive on `2026-11-06`, the following three capabilities modeled on the Hable (`campusweb`) reference project (`C:\Users\admin\Documents\Projects\GitHub\campusweb`) are locked into Milestone M2 (`apps/app`):
+
+1. **Separate RFC 5545 iCal Subscription Feeds (`Subscriptions` vs. `Warranties`):**
+   - Core generator already implemented in `packages/core/src/calendar/icalGenerator.ts`.
+   - **Feed 1 — Subscriptions (`GET /api/ical/subscriptions/[token].ics` & local `.ics` export):**
+     - `X-WR-CALNAME:CM-LAB Subscriptions & Cancellation Guard` (`#D96B4B`).
+     - Recurring billing events (`RRULE:FREQ=MONTHLY` / `YEARLY`) + explicit `§ 309 Nr. 9 BGB` cancellation cutoff events (`T-30d`, `T-7d`, `T-1d` at `09:00 Europe/Berlin`) with `-P7D` and `-P1D` `VALARM` triggers and direct `§ 312k BGB` cancellation links.
+   - **Feed 2 — Warranties & Returns (`GET /api/ical/warranties/[token].ics` & local `.ics` export):**
+     - `X-WR-CALNAME:CM-LAB Warranties & Legal Deadlines` (`#2F524C`).
+     - Three fixed non-recurring statutory milestones per hardware item (rolled forward via `§ 193 BGB` *Werktag*): Day 14 *Widerrufsfrist* (`§ 355 BGB`), Day 335 Reversed Burden-of-Proof Cliff (`§ 477 BGB`), and Month 24 *Gewährleistung* Expiry (`§ 438 BGB`).
+   - **UI Integration:** 1-click **Apple Calendar (`webcal://`)**, **Google Calendar (`?cid=`)**, **Copy URL**, and **Download `.ics`** popover modeled after Hable's `SecureCalendarInput.svelte`.
+
+2. **Account Creation & 6-Digit Email PIN Authentication (Cloudflare + Svelte Auth):**
+   - Modeled directly on Hable's `EmailGate.svelte`, `src/lib/server/auth/session.ts` (`jose` `SignJWT`/`jwtVerify`, CSPRNG 6-digit `generatePin()`, `HMAC-SHA256` `createPinHash()`, `constantTimeEqualBase64Url()`, `createBackupBaseSecret()`), `src/lib/server/auth/email.ts`, and `src/workers/mailer.ts` (`[[send_email]]` Cloudflare Email Routing binding + REST API fallback) plus `@auth/sveltekit` compatible session hooks.
+   - Issues a signed per-user `icalToken` for live `webcal://` calendar feeds and `baseSecret` for encrypted settings backup while keeping local-first anonymous mode 100% functional offline and **preserving Red Line #2 (zero plaintext receipts ever leave the device)**.
+
+3. **Web Push & Notification Configurations (`@pushforge/builder` + VAPID P-256):**
+   - Modeled on Hable's `SettingsNotifications.svelte`, `pushSubscriptionSync.ts`, and `src/lib/server/push/broadcast.ts`.
+   - Includes master Web Push toggle (`PushManager` + Service Worker + iOS *"Add to Home Screen"* hint) and 4 granular category toggles:
+     - `notifyWiderruf` (14-Day Return Window Alerts)
+     - `notifyWarranty` (Day 335 `§ 477 BGB` & 24-Month Warranty Cliffs)
+     - `notifySubscriptions` (`T-30d` / `T-7d` / `T-1d` Renewal & Cancellation Guards)
+     - `notifyTax` (Annual `§ 9 EStG` ELSTER Tax Filing Reminders)
+
+---
+
+### 11.3 Next Steps for Next Session (Resume Point)
+
+1. **Milestone M2 (`apps/app` — Phases 3, 4, 5, 6 UI, 8 UI, 9 UI):**
+   - Build `<WalletApp client:only="svelte" />` root island & `wallet.svelte.ts` reactive store (`#18`).
+   - Build 4-step Onboarding Wizard (`OnboardingModal.svelte`) + Threlte 8 3D Canvas (`VaultScene.svelte`) (`#25`, `#26`).
+   - Build Triple Calendar Widgets + Dual iCal Subscription Cards + FAB Speed Dial + Svaul Responsive Drawers (`#7`, `#23`, `#24`).
+   - Build QuickCaptureModal (`<15s` Omni-Bar) + `image-compression.worker.ts` (`#1`, `#4`, `#5`).
+   - Build Hable-style `EmailGate.svelte` (6-digit PIN auth) + `SettingsNotifications.svelte` (VAPID Web Push) + Claim/Tax UI views (`#6`, `#8`, `#21`).
+2. **Milestone M3 (`apps/showcase` & Delivery Gates — Phases 7 UI, 10 API, Gate Verification):**
+   - Build static `/wiki/[slug]` Brand Policy Wiki pages with `unplugin-icons` + `@iconify-json/simple-icons` and `POST /api/mcp` endpoint (`#9`, `#10`).
+   - Run full Playwright E2E, Axe-Core accessibility, and 60-test Python E2E verification (`#30`).

@@ -72,7 +72,10 @@ export async function computeSha256Hex(
   buffer: Uint8Array | ArrayBuffer
 ): Promise<string> {
   const data = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashBuffer = await crypto.subtle.digest(
+    'SHA-256',
+    data as unknown as BufferSource
+  );
   return bufferToHex(hashBuffer);
 }
 
@@ -143,7 +146,7 @@ export async function encryptReceiptBlob(
       iv,
     },
     key,
-    data
+    data as unknown as BufferSource
   );
 
   return {
@@ -173,10 +176,10 @@ export async function decryptReceiptBlob(
     decryptedBuffer = await crypto.subtle.decrypt(
       {
         name: 'AES-GCM',
-        iv,
+        iv: iv as unknown as BufferSource,
       },
       key,
-      cipherBytes
+      cipherBytes as unknown as BufferSource
     );
   } catch (err) {
     throw new GoBDIntegrityError(

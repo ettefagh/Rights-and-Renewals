@@ -15,3 +15,5 @@ dist/
 .astro/
 .wrangler/
 *.log
+
+coverage/

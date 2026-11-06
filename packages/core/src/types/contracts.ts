@@ -38,14 +38,14 @@ export interface WalletItem {
   expiryDate: string; // ISO 8601 YYYY-MM-DD (Warranty end or Subscription renewal)
   priceGrossEur: number;
   isTaxDeductible: boolean;
-  taxCategory?: TaxCategory;
-  beruflicheNutzungProzent?: number; // 0 to 100 (Default 50 or 100 for mixed use)
-  receiptSha256?: string; // 64-character pre-encryption GoBD hash
-  receiptBlobId?: string; // Reference to ReceiptVaultBlob.id
+  taxCategory?: TaxCategory | undefined;
+  beruflicheNutzungProzent?: number | undefined; // 0 to 100 (Default 50 or 100 for mixed use)
+  receiptSha256?: string | undefined; // 64-character pre-encryption GoBD hash
+  receiptBlobId?: string | undefined; // Reference to ReceiptVaultBlob.id
   status: ItemStatus;
   searchTokens: string[]; // Autocomplete tokens for *searchTokens compound index
-  notes?: string;
-  cancellationUrl?: string;
+  notes?: string | undefined;
+  cancellationUrl?: string | undefined;
   hasProofOfPurchase: boolean;
   createdAt: number; // Unix epoch ms
   updatedAt: number; // Unix epoch ms
@@ -63,7 +63,7 @@ export interface ReceiptVaultBlob {
   mimeType: string;
   byteLength: number;
   sha256: string; // Pre-encryption forensic digest (GoBD Rn. 108-110)
-  thumbnailBase64?: string; // <8KB unencrypted low-res micro-thumbnail for fast list views
+  thumbnailBase64?: string | undefined; // <8KB unencrypted low-res micro-thumbnail for fast list views
   createdAt: number;
 }
 
@@ -77,7 +77,7 @@ export interface AlarmScheduleRecord {
   reminderType: ReminderType;
   scheduledEpochMs: number;
   status: AlarmStatus;
-  notifiedAt?: number;
+  notifiedAt?: number | undefined;
 }
 
 /**
@@ -92,8 +92,8 @@ export interface PolicyWikiEntry {
   commercialGuaranteeMonths: number; // Voluntary manufacturer warranty
   cancellationNoticeMonths: number; // Statutory max 1 month (BGB § 309 Nr. 9)
   cancellationButtonCompliant: boolean; // BGB § 312k 2-step button audit
-  cancellationUrl?: string;
-  supportEmail?: string;
+  cancellationUrl?: string | undefined;
+  supportEmail?: string | undefined;
   legalNotes: string;
   verifiedDate: string; // ISO 8601 YYYY-MM-DD
   searchAliases: string[];
@@ -109,5 +109,5 @@ export interface DisputeLogEntry {
   generatedText: string;
   recipientEmailOrAddress: string;
   dateGenerated: string; // ISO 8601 string
-  receiptSha256?: string;
+  receiptSha256?: string | undefined;
 }
