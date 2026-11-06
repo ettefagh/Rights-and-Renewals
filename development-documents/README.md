@@ -16,10 +16,10 @@ This directory serves as the centralized development documentation repository fo
 development-documents/
 ├── README.md                      # Master directory & team governance overview (this file)
 ├── project-manager/               # Jeetkumar: Sprint planning, Kanban, WIP limits, DoD
-├── product-research-lead/         # AmirHossein: User discovery, BGB legal, Tax brief, Policy Wiki
-├── ux-ui-lead/                    # Prushti: Wireframes, 6 Views, Design tokens, WCAG AA, UI flows
+├── product-research-lead/         # AmirHossein: User discovery, BGB legal, Tax brief, Policy Wiki, Citation Guide
+├── ux-ui-lead/                    # Prushti: Wireframes, 6 Views, Design tokens, WCAG AA, FAB Speed Dial
 ├── development-lead/              # Kyle: Offline-first DB, Push alerts (DST), Open MCP server
-└── quality-media-lead/            # Mojtaba: Dual media formats (receipt vault + PDF dossier), QA suite
+└── quality-media-lead/            # Mojtaba: Dual media formats, QA suite, DB Update Pipeline
 ```
 
 ---
@@ -51,7 +51,7 @@ No pull request or issue may be moved to `5. Done` without passing all 7 gates v
 1. **Gate 1 (Core Journey):** End-to-end `Capture -> Store -> Alert -> Act` pipeline functional across Views 1–6.
 2. **Gate 2 (Speed Benchmark):** Manual entry stopwatch verified at $<15$s (`11.4s` in Session 4 peer lab).
 3. **Gate 3 (Gherkin AC):** 100% testable acceptance criteria pass rate across Must-Have stories (`US-01` to `US-05`).
-4. **Gate 4 (MCP Protocol):** JSON-RPC 2.0 validation (`policy_lookup`, `claim_dossier_generate`, $<200$ms response, `-32602` error handling).
+4. **Gate 4 (MCP Protocol):** JSON-RPC 2.0 validation (`policy_lookup`, `statutory_law_lookup`, `subscription_category_rules`, `tax_deductibility_check`), $<200$ms response, `-32602` error handling.
 5. **Gate 5 (Code Quality & Tests):** Zero TypeScript/linter errors; automated test suite coverage $\ge 75\%$.
 6. **Gate 6 (Accessibility & Responsive):** Tested on mobile viewports ($375\text{px}–412\text{px}$) with WCAG 2.1 AA compliance.
 7. **Gate 7 (Legal Disclaimers):** Mandatory German legal disclaimers (`BGH VIII ZR 285/18`, `§§ 2, 3 RDG`, `§ 2 StBerG`) present on all export flows.

@@ -76,6 +76,10 @@ cm-lab/
 │           │   └── api/mcp.ts              # Stateless POST /api/mcp JSON-RPC 2.0 handler (Zod -32602)
 │           ├── components/
 │           │   ├── WalletApp.svelte        # Single Root Island Router (Views 1–6)
+│           │   ├── fab/
+│           │   │   ├── FloatingActionMenu.svelte # Speed dial FAB (+ to ✕ morph, backdrop scrim, keyboard auto-hide)
+│           │   │   ├── ActionItem.svelte         # Animated speed-dial action pill item
+│           │   │   └── types.ts                  # FloatingAction, ActionInvocationContext contracts
 │           │   ├── omnibar/
 │           │   │   └── UnifiedOmniBar.svelte # Search Wiki + Saved Items + Create/Import Action Bar
 │           │   ├── widgets/
@@ -129,6 +133,22 @@ Both `[Project].pages.dev` (interactive demo dataset) and `app.[Project].pages.d
 1. **Calendar Widget A — Monthly Renewal & Deadline Grid (`MonthlyCalendarGrid.svelte`):** Interactive `7×5` / `7×6` month matrix in `Europe/Berlin` highlighting subscription billing renewals, `T-30d` cancellation cutoffs, `12m BGB § 477` cliffs, and `24m BGB § 438` expiries with color-coded urgency dots (`#DC2626`, `#D97706`, `#059669`).
 2. **Calendar Widget B — Statutory 24m/12m Timeline Bar (`StatutoryTimelineBar.svelte`):** Horizontal lifespan bar (`Iteration C-3 #24`) contrasting **Months 0–12 (`BGB § 477 Abs. 1` Reversed Burden of Proof — Seller Must Prove)** against **Months 13–24 (`BGB § 438` Standard Statutory Coverage)** plus optional manufacturer guarantee overlay (`§ 443 BGB`).
 3. **Calendar Widget C — Proactive 30 / 7 / 1-Day Countdown Stream (`UrgencyCountdownWidget.svelte`):** Chronological agenda cards synchronized with `AlertScheduler.ts` (`09:00 Europe/Berlin`, `0h` CEST/CET DST drift) offering direct `1-Tap Claim` or `1-Tap § 312k Cancel` triggers.
+
+### 3.3 Portable Floating Action Menu (FAB Speed Dial) Contract (`FloatingActionMenu.svelte`)
+Adapted from the CampusWeb `portable-floating-action-menu` primitive (Svelte 5 runes, rotated `+` to `✕` morph) and refined using the Google Calendar mobile speed-dial interaction pattern:
+
+* **Ergonomics & Placement:** Floating standalone at bottom-right (`bottom: calc(72px + env(safe-area-inset-bottom))`, `right: 20px`), resting directly above the mobile navigation bar within the primary thumb sweep zone.
+* **Accessible Backdrop Scrim:** Tapping the `+` expands the menu, morphs the icon into `✕`, and renders a semi-transparent scrim (`rgba(15, 23, 42, 0.45)` with `backdrop-filter: blur(2px)`), dimming background dashboard content to satisfy WCAG 1.4.3 contrast and dismissing on tap.
+* **Virtual Keyboard Avoidance:** Subscribes to `window.visualViewport` resize/focus events to auto-hide the speed-dial when mobile virtual keyboards are active, eliminating viewport jitter and input occlusion.
+* **Page-Contextual Speed-Dial Action Mapping:**
+
+| Active View / Page | State | Action 1 (Top Primary) | Action 2 | Action 3 | Action 4 (Contextual) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Dashboard (`/`)** | `mode: 'menu'` | **📷 Snap / Import Receipt** (`<15s`) | **💻 New Hardware Warranty** (BGB §§ 438/477) | **⚡ New Subscription** (§ 309 Nr. 9) | **🔍 Filter Expiring Soon** ($\le 30$d) |
+| **Items Library (`/items`)** | `mode: 'menu'` | **📷 Snap / Import Receipt** | **💻 Add Hardware Item** | **⚡ Add Subscription** | **📦 Export GoBD Vault Backup** |
+| **Subscriptions & Tax (`#tax`)** | `mode: 'menu'` | **🧾 Add Tax Receipt** (`isTaxDeductible`) | **⚡ Log SaaS / Tool** (100% AfA) | **📊 Recalculate Mixed-Use AfA** | **📥 Export Werbungskosten CSV** |
+| **Brand Wiki & MCP (`/wiki`)** | `mode: 'menu'` | **🔎 Query Open MCP Server** | **💻 Log Brand Warranty Defaults** | **⚡ Log Brand Subscription Defaults** | **📋 Copy MCP Stdio Config JSON** |
+| **Capture / Claim Modals** | `mode: 'hidden'` | *Hidden — Focus trapped inside modal* | — | — | — |
 
 ---
 
@@ -341,9 +361,15 @@ All Svelte 5 components, Astro pages, and Storybook CSF stories (`.stories.svelt
 4. **German Tax Engine (`werbungskostenEngine.ts`):**
    * `BMF 22.02.2022 (BStBl I S. 187)`: Notebooks, desktops, tablets, monitors, docks, headsets, peripherals, and software qualify for `100%` write-off in purchase year regardless of the `€952` gross GWG cap; smartphones/furniture use `<= €952.00` gross GWG (`§ 6 Abs. 2 EStG`).
    * `BFH GrS 1/06` Split: `u >= 90% => 100%`; `10% <= u < 90% => round2(priceEur * u / 100)`; `u < 10% => €0.00`. Exports UTF-8 with BOM (`\uFEFF`) semicolon-delimited CSV for **Mein ELSTER / WISO Steuer / Taxfix** (Anlage N, Zeilen 46–48).
-5. **Authoritative MCP Endpoint (`POST /api/mcp` & `stdio`):**
-   * Tools: `policy_lookup` and `claim_dossier_generate` only (strictly NO OCR tool).
-   * Invalid or extra fields rejected by `.strict()` Zod schemas returning JSON-RPC error code **`-32602` (`Invalid params`)** in `<200ms` (`Gate 4 DoD`).
+5. **Authoritative Open MCP Endpoint (`POST /api/mcp` & `stdio`):**
+   * The Open MCP Server is strictly an **authoritative, read-only knowledge infrastructure** providing external AI agents (Claude Desktop, Cursor, Gemini CLI) deterministic, zero-hallucination ground truth on German consumer law, brand cancellation rules, and tax depreciation without web scraping.
+   * **4 Authoritative Read-Only Tools:**
+     1. `policy_lookup`: Retrieves verified brand warranty periods, statutory notice deadlines, cooling-off periods, and direct cancellation URLs (`§ 312k BGB`) for the Top 20 student brands.
+     2. `statutory_law_lookup`: Retrieves authoritative German civil code articles (`BGB §§ 434, 437, 438, 439, 475e, 477 Abs. 1, 309 Nr. 9, 312k, 355`) and consumer rights definitions.
+     3. `subscription_category_rules`: Returns statutory statutory rules by contract category (telecoms, SaaS, fitness, streaming, insurance) including maximum initial terms, rolling renewals, and notice ceilings.
+     4. `tax_deductibility_check`: Deterministic `§ 9 EStG` Werbungskosten and `BMF 22.02.2022` Sofortabschreibung 100% immediate write-off calculation and GWG rules.
+   * Client-side dossier and PDF compilation stays entirely in local browser Web Workers (`pdfDossierCompiler.ts`) and Dexie for private user data (`GDPR Art. 25`), eliminating RDG legal practice liability.
+   * Invalid or extra fields are rejected by `.strict()` Zod schemas returning JSON-RPC error code **`-32602` (`Invalid params`)** in `<200ms` (`Gate 4 DoD`).
 
 ---
 
@@ -361,7 +387,7 @@ All Svelte 5 components, Astro pages, and Storybook CSF stories (`.stories.svelt
 1. **Gate 1 (Dual-Domain & Core Journey):** Both `[Project].pages.dev` and `app.[Project].pages.dev` build cleanly (`npm run build`) and execute `Omni-Bar / Capture → Store → Alert → Act` offline.
 2. **Gate 2 (Speed Benchmark):** Unassisted item + receipt capture completes in **`< 15.0s`** (`11.4s` baseline) and Omni-Bar search resolves in **`< 10ms`**.
 3. **Gate 3 (Gherkin AC):** `100%` pass rate across `US-01` through `US-05` acceptance scenarios.
-4. **Gate 4 (MCP Protocol):** `POST /api/mcp` passes `tools/list`, `policy_lookup`, `claim_dossier_generate` in `< 200ms` and returns `-32602` on malformed JSON-RPC params.
+4. **Gate 4 (MCP Protocol):** `POST /api/mcp` passes `tools/list` and all 4 read-only tools (`policy_lookup`, `statutory_law_lookup`, `subscription_category_rules`, `tax_deductibility_check`) in `< 200ms` and returns `-32602` on malformed JSON-RPC params.
 5. **Gate 5 (Quality & Coverage):** `npm run check` (`svelte-check` + `tsc --noEmit`) has `0` errors; `npm run test:coverage` achieves **`>= 75%`** across `packages/core/`.
 6. **Gate 6 (Accessibility & Mobile):** Zero `axe-core` AA violations in Storybook (`@storybook/addon-a11y`), touch targets `>= 48×48px` on `375px–412px` viewports, `public/_headers` camera check passed.
 7. **Gate 7 (Statutory Disclaimers):** Automated assertions verify non-removable `BGH VIII ZR 285/18` (`RDG §§ 2, 3`) and `§ 2 StBerG` footers on every PDF, plaintext, clipboard, and CSV export.

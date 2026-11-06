@@ -21,11 +21,13 @@ As **Quality / Media Lead**, **Mojtaba** is responsible for the design, implemen
    * Client-side document compiler producing formatted statutory PDF and plain-text claim packages (*Mängelrüge* citing `BGB §§ 437, 439, 477 Abs. 1` or *Kündigungsschreiben* citing `§ 309 Nr. 9, § 312k Abs. 6`).
    * Embeds receipt photo thumbnail, metadata table, and mandatory **BGH VIII ZR 285/18 / RDG §§ 2, 3** disclaimer.
    * Resilient fallback modal with `<textarea readonly>`, user-activated `Copy to Clipboard` button, and `.txt` file download to prevent browser clipboard security exceptions.
-3. **Automated Testing Suite ($\ge 75\%$ Coverage):**
+3. **Database Maintenance & Automated AI Agent Pipeline (`DOC-QA-02`):**
+   * Co-owns [**`DATABASE_UPDATE_PIPELINE.md`**](./DATABASE_UPDATE_PIPELINE.md) defining weekly HTTP liveness checks, monthly AGB SHA-256 diff scans, and autonomous Cloud AI Agent (Spark / Jules) pull requests with human-in-the-loop review.
+4. **Automated Testing Suite ($\ge 75\%$ Coverage):**
    * Unit and integration testing with Vitest/Jest.
    * Mock system clock testing validating deterministic push alert firing across CEST/CET Daylight Saving Time boundaries ($0\text{h}$ drift).
    * Schema validation tests for Zod and MCP JSON-RPC 2.0 endpoints.
-4. **Definition of Done Verification:** Partner with Jeetkumar (PM) to audit all 7 quality gates prior to marking issues `5. Done`.
+5. **Definition of Done Verification:** Partner with Jeetkumar (PM) to audit all 7 quality gates prior to marking issues `5. Done`.
 
 ---
 
