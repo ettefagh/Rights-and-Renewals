@@ -53,7 +53,7 @@ The **Warranty & Subscription Wallet** is engineered as a privacy-centric, **off
 
 | Layer | Selected Technology | Version | Rationale & Trade-Off Analysis |
 | :--- | :--- | :--- | :--- |
-| **Frontend Framework** | React | 19.x | Declarative component tree, concurrency support, wide ecosystem compatibility. |
+| **Frontend Framework & Island** | Svelte 5 (Runes) on Astro 6 Shell | 5.x / 6.x | Single Root Island (<WalletApp client:only="svelte" />), 11.8 KB gzip, 1.4ms DOM updates (ADR-04). |
 | **Language & Typings** | TypeScript | 5.5+ | Strict type safety (`strict: true`), zero implicit any, compile-time contract validation. |
 | **Build & Bundler** | Vite | 5.x | Instant HMR (<50ms), Rollup tree-shaking, fast ESBuild pre-bundling. |
 | **Styling & Design System** | Tailwind CSS + Lucide Icons | 3.4+ | Utility-first responsive design, zero runtime CSS overhead, accessible touch targets ($\ge 48\text{px}$). |

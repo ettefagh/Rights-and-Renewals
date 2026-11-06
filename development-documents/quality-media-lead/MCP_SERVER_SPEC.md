@@ -49,7 +49,7 @@ flowchart TB
         StatuteTable[("BGB & EU Directives Table\n(§§ 437, 439, 477, 309, 312k)")]
     end
 
-    subgraph Web Application Client [React 19 / Dexie.js]
+    subgraph Web Application Client [Svelte 5 / Dexie.js] (ADR-04)
         WebClient["Offline-First Frontend\n(Dexie IndexedDB Vault)"]
         PolicyExplorer["View 6: PolicyExplorerView\n(Interactive MCP Testbed)"]
     end
@@ -105,7 +105,7 @@ The server conforms strictly to the **Model Context Protocol (MCP)** specificati
 ### 2.2 Architectural Decoupling from Frontend
 
 To satisfy Session 5 engineering guidelines:
-1. **Zero Browser Runtime Coupling:** The MCP server is built as an autonomous, headless TypeScript module (`packages/mcp-server`) with zero dependencies on React, Document Object Model (DOM), canvas, or browser-specific Web APIs.
+1. **Zero Browser Runtime Coupling:** The MCP server is built as an autonomous, headless TypeScript module (`packages/mcp-server`) with zero dependencies on Svelte 5, Document Object Model (DOM), canvas, or browser-specific Web APIs.
 2. **Shared Ground-Truth Core:** Immutable domain types, BGB statutory definitions, and brand policies live in `@wallet/policy-wiki`. Both the MCP server and the frontend client (`apps/wallet-web`) import this shared library directly.
 3. **Stateless & Idempotent Operations:** Tools perform pure mathematical date evaluations and relational lookups without mutating server state or persisting sensitive PII.
 4. **Privacy Sandboxing:** Consumer identifiers, serial numbers, and defect descriptions provided during a tool call are processed in-memory for the duration of the RPC call and immediately garbage-collected. No data is stored, logged, or forwarded to external third parties.

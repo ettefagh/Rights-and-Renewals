@@ -27,17 +27,23 @@ Deliver an **offline-first, zero-cloud Progressive Web App (PWA) and Model Conte
 
 ---
 
-## 🏛️ Ratified System Architecture (`ADR-04`)
+## 🏛️ Ratified System Architecture (`ADR-04` & `ADR-05` · [`BLUEPRINT.md`](./BLUEPRINT.md))
 
 ```
-[Cloudflare Edge Plane]
+[Domain 1: Public Showcase — [Project].pages.dev]
+  • Astro 6 Static + Interactive Preview Islands on Cloudflare Pages/Workers
+  • Introduces Dual Interfaces (1: Open MCP Server, 2: Wallet PWA)
+  • Modular Preview Dashboard: Calendar Widgets (Grid/Timeline/Countdown) + Demo Omni-Bar
+
+[Domain 2: Cloudflare Edge Plane — app.[Project].pages.dev]
   • Astro 6 App Shell on Cloudflare Workers (wrangler.jsonc)
   • Authoritative MCP Endpoint: POST /api/mcp (Zod -32602 validated, <30ms latency)
   • Phase 1: In-memory Top 20 Seed (policy_wiki_seed_v1.json)
   • Phase 2: EmDash CMS (emdashcms.dev) + Cloudflare D1 (ec_policy_wiki) + Workers KV
 
-[Client Device Plane - 100% Offline-First]
+[Domain 2: Client Device Plane — 100% Offline-First]
   • Single Root Island: <WalletApp client:only="svelte" /> (~11.8 KB gzip)
+  • Centerpiece Unified Omni-Bar: Search Wiki + Search Saved Items + Create/Import (<10ms)
   • Reactive State: wallet.svelte.ts (Svelte 5 Runes: $state.raw + createSubscriber)
   • Local Persistence: Dexie.js v4 (IndexedDB) with AES-GCM-256 encrypted blobs
   • Pure TS Engine: PrefixTrie.ts (<10ms), AlertScheduler.ts (0h DST drift)
@@ -48,7 +54,7 @@ Deliver an **offline-first, zero-cloud Progressive Web App (PWA) and Model Conte
 
 ## 📱 6 Core Views & MVP Deliverables
 
-* **View 1: Dashboard (`US-04`)** — Unified list with live countdowns and urgency badges (🟢 Protected, 🟡 Expiring Soon, 🔴 Urgent).
+* **View 1: Modern Widget Dashboard (`US-04`)** — Unified Omni-Bar (`Search / Activity / Request`) + modular calendar widgets (Monthly Grid, 24m/12m Timeline, 30/7/1d Urgency Countdowns: 🟢 Protected, 🟡 Expiring Soon, 🔴 Urgent).
 * **View 2: Quick Capture Modal (`US-01`)** — Sub-15s entry via Prefix-Trie autocomplete, auto-filling `BGB § 438`/`§ 309 Nr. 9` terms + BMF 2022 tax toggle.
 * **View 3: Item Detail & Timeline (`Iteration C-3`)** — Interactive 24m warranty bar highlighting the 12m `BGB § 477` cliff + pinch-to-zoom receipt viewer.
 * **View 4: 1-Tap Claim & Cancel (`US-05`, `D-2`)** — Live preview of formal German legal letters (`BGB §§ 437, 439, 312k Abs. 6`) + 1-tap PDF/clipboard export.
@@ -69,6 +75,7 @@ Deliver an **offline-first, zero-cloud Progressive Web App (PWA) and Model Conte
 
 ## 📂 Key File Fast-Index
 
+* **Master Engineering Blueprint (SSOT):** [`BLUEPRINT.md`](./BLUEPRINT.md)
 * **Architecture Decision Records:** [`research/architecture-evaluation/04_Multi_Agent_Architecture_and_Deployment_Debate_Synthesis.md`](file:///c:/Users/admin/Documents/antigravity/optimistic-bardeen/research/architecture-evaluation/04_Multi_Agent_Architecture_and_Deployment_Debate_Synthesis.md) (`ADR-04`)
 * **Dev Lead Specs:** [`development-documents/development-lead/`](file:///c:/Users/admin/Documents/antigravity/optimistic-bardeen/development-documents/development-lead/) (`00_` through `04_`)
 * **Product/Legal Specs:** [`development-documents/product-research-lead/`](file:///c:/Users/admin/Documents/antigravity/optimistic-bardeen/development-documents/product-research-lead/) (`00_` through `04_` + `policy_wiki_seed_v1.json`)

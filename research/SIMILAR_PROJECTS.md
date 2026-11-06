@@ -379,7 +379,7 @@ The matrix below summarizes the architectural comparison between CM-LAB and all 
 
 | Project Name | License | Platform & Architecture | Mobile <15s Entry (ADR-01) | Unified Scope (ADR-02) | Deterministic Claims (ADR-03) | GoBD SHA-256 Hash | German Tax § 9 EStG | Open MCP Server |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **CM-LAB (Baseline)** | **MIT** | **Offline-First PWA (React 19 / Dexie)** | **✅ Yes (<11.4s Trie)** | **✅ Warranties + Subs** | **✅ BGB §§ 437/477/312k** | **✅ Client SHA-256** | **✅ BMF 2022 100%** | **✅ JSON-RPC 2.0** |
+| **CM-LAB (Baseline)** | **MIT** | **Offline-First PWA (Astro 6 / Svelte 5 Runes / Dexie)** | **✅ Yes (<11.4s Trie)** | **✅ Warranties + Subs** | **✅ BGB §§ 437/477/312k** | **✅ Client SHA-256** | **✅ BMF 2022 100%** | **✅ JSON-RPC 2.0** |
 | **Warracker** | AGPL-3.0 | Self-Hosted (Python/Postgres) | ❌ Form / Paperless | ❌ Warranties Only | ❌ Manual Status | ❌ Raw File Store | ❌ No | ❌ No |
 | **Homebox** | AGPL-3.0 | Self-Hosted (Go/SQLite) | ❌ Asset Hierarchy | ❌ Assets Only | ❌ No Claims | ❌ Raw File Store | ❌ No | ❌ REST Only |
 | **Wallos** | GPL-3.0 | Self-Hosted (PHP/SQLite) | ❌ Form Entry | ❌ Subs Only | ❌ No Claims | ❌ No Receipts | ❌ No | ❌ No |

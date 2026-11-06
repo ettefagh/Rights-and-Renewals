@@ -10,7 +10,7 @@
 
 ## 🧭 Overview & Directory Index
 
-This directory serves as the centralized development documentation repository for **Team 6**. Each functional discipline maintains a dedicated documentation directory outlining role-specific architecture, technical specifications, task mappings, acceptance criteria, and deliverable protocols.
+This directory serves as the centralized development documentation repository for **Team 6**. Each functional discipline maintains a dedicated documentation directory outlining role-specific architecture, technical specifications, task mappings, acceptance criteria, and deliverable protocols, reconciled under the canonical [**`BLUEPRINT.md`**](../BLUEPRINT.md) Single Source of Truth (`ADR-04` Astro 6 + Svelte 5 Runes + Dual-Domain `[Project].pages.dev` & `app.[Project].pages.dev`).
 
 ```
 development-documents/

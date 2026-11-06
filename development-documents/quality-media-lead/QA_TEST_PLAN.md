@@ -23,7 +23,7 @@ Our quality engineering adheres to three non-negotiable principles:
 flowchart TD
     subgraph TestPyramid["Testing Pyramid & Verification Layers"]
         E2E["Playwright E2E Tests<br>(Full Journey: Capture -> Store -> Alert -> Claim)"]
-        Integ["React Testing Library Integration Tests<br>(View 1-5 Interactions, Form Validation, Modal State)"]
+        Integ["Svelte Testing Library / Vitest Integration Tests<br>(View 1-5 Interactions, Form Validation, Modal State)"]
         Unit["Vitest Unit Tests<br>(Date Math, Urgency Badges, GoBD SHA-256, BGB Statutory Engine)"]
     end
     

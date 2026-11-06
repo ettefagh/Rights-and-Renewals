@@ -1,72 +1,70 @@
-# 🎨 UX/UI Interaction Design & Accessibility
+# 🎨 UX/UI Interaction Design, Dual-Domain Showcase & Accessibility (`DOC-UX-00`)
 
 **Role Title:** UX/UI Lead  
-**Role Owner:** **Prushti**  
-**Working Team:** **Team 6** · *Computer & Media Lab* (SRH Hochschule WiSe 2026)  
-**Assigned Capacity:** 26h Total (16h `US-01` Manual Entry UI + 10h `US-04` Unified Dashboard)  
+**Role Owner:** **Prushti** (Member C)  
+**Working Team:** **Team 6** · *Computer & Media Lab* (SRH University of Applied Sciences · WiSe 2026 · Prof. Franziska Schwarz)  
+**Assigned Capacity:** `26h` Total (`16h` `US-01` `<15s` Capture & Unified Omni-Bar + `10h` `US-04` Modular Dashboard & Calendar Widgets)  
 **Active Milestone:** Session 5 — MVP Scope Lock & Working Core User Journey Gate  
 
 ---
 
-## 🎯 Role Objectives & Design Mandate
+## 📂 Authoritative UX/UI Pre-Build Specification Index
 
-As **UX/UI Lead**, **Prushti** is responsible for user interaction design, mobile-first responsive layouts, design tokens, WCAG 2.1 AA accessibility compliance, paper prototype iteration, and end-user walkthrough coordination:
+All documents in this directory are verified CM-LAB specifications governing both the **Public Showcase (`[Project].pages.dev`)** and the **Offline-First Wallet Application (`app.[Project].pages.dev`)**:
 
-1. **Sub-15-Second Manual Entry Flow (`US-01`):** Design the frictionless 3-field modal (Item Name with brand autocomplete, Purchase Date, Category) enabling users to log hardware or subscriptions in $<15$s (`11.4s` benchmark verified in Session 4 peer lab).
-2. **Unified Dashboard & Urgency Status Badges (`US-04`):** Design the chronological combined feed with color-coded urgency pills:
-   * **Red (`Urgent`):** $\le 7$ days remaining (immediate action required).
-   * **Amber (`Expiring Soon`):** $8–30$ days remaining (inspection window).
-   * **Green (`Protected`):** $> 30$ days remaining (active coverage).
-   * **Grey (`Expired`):** $0$ days remaining (archived / lapsed).
-3. **WCAG 2.1 AA Accessibility Standards:**
-   * Minimum color contrast ratio $\ge 4.5:1$ for normal text and $\ge 3:1$ for large text/badges.
-   * Touch targets $\ge 48\times 48\text{px}$ across mobile viewports ($375\text{px}–412\text{px}$).
-4. **Peer Lab Usability Iterations (Session 4 with Team 7):**
-   * `C-1`: Brand typeahead autocomplete (reduced entry from 38.0s to 11.4s).
-   * `C-2`: Primary receipt photo container elevated next to Item Name.
-   * `C-3`: Unified visual BGB § 477 warranty timeline highlighting 12-month reversed burden of proof.
-5. **External Walkthrough B Coordination (`#26`):** Conduct usability testing with Participant Beta (7 active subscriptions, gym renewal in 7 days, 1-tap § 312k Abs. 6 cancellation notice).
+| Doc ID | File | Scope & Primary Deliverables | Mapped Gates |
+| :---: | :--- | :--- | :---: |
+| **`DOC-UX-01`** | [`MASTER_UIUX_PREBUILD_SPECIFICATION.md`](./MASTER_UIUX_PREBUILD_SPECIFICATION.md) | Master UI/UX blueprint covering Dual-Domain topology (`[Project].pages.dev` Showcase + `app.[Project].pages.dev` App), the **Unified Search / Activity / Request Omni-Bar**, 3 Calendar Widgets, 6 Core Views, and Svelte 5 Runes (`OmniBar.svelte`). | Gates 1, 2, 6, 7 |
+| **`DOC-UX-02`** | [`USER_RESEARCH_SUMMARY.md`](./USER_RESEARCH_SUMMARY.md) | Authentic empirical research synthesis: Qualitative Interviews (**Persons 1–4**), Consumer Friction Asymmetry, Session 3 OCR failure benchmark (`42%` fail rate), Team 7 Peer Lab (`38.0s -> 11.4s`, `0% -> 100%` receipt capture), and External Walkthroughs A (`#25`) & B (`#26`). | Gate 2, `ADR-01`, `ADR-02` |
+| **`DOC-UX-03`** | [`INFORMATION_ARCHITECTURE_AND_INTERACTION_SUMMARY.md`](./INFORMATION_ARCHITECTURE_AND_INTERACTION_SUMMARY.md) | Dual-domain sitemap, Single-Island routing (`<WalletApp client:only="svelte" />`), deterministic state machine & keyboard shortcuts for the **Unified Omni-Bar**, and interaction rules for the 3 Calendar Widgets. | Gates 1, 2, 6 |
+| **`DOC-UX-04`** | [`DESIGN_SYSTEM_AND_TOKENS_SUMMARY.md`](./DESIGN_SYSTEM_AND_TOKENS_SUMMARY.md) | W3C DTCG 3-tier tokens anchored on CM-LAB's official palette (`#2F524C` Teal, `#D96B4B` Coral, `#F4F7F6` Canvas, semantic urgency colors), CSS custom properties (`--color-*`), `>=48x48px` touch ergonomics, and Svelte 5 component variant matrix. | Gate 6 |
+| **`DOC-UX-05`** | [`ACCESSIBILITY_AND_ENGINEERING_HANDOFF_SUMMARY.md`](./ACCESSIBILITY_AND_ENGINEERING_HANDOFF_SUMMARY.md) | WCAG 2.1 AA compliance (`Gate 6`), ARIA 1.2 combobox/listbox contracts, modal focus traps, Airplane Mode offline UX, `Permissions-Policy: camera=(self)` mobile Safari safety (`Red Line #4`), and developer handoff contracts to **Kyle** & **Mojtaba**. | Gates 1, 6, 7 |
+| **`DOC-UX-06`** | [`TEST_INFRA_OVERVIEW.md`](./TEST_INFRA_OVERVIEW.md) | Storybook 10.5+ CSF (`@storybook/addon-svelte-csf` `.stories.svelte`, `@storybook/addon-a11y`, `@storybook/addon-vitest`), Vitest component suite (`>=75%`), and `<15.0s` stopwatch usability benchmark protocol (`Gate 2`). | Gates 2, 5, 6 |
 
 ---
 
-## 📋 Assigned GitHub Issues & Ownership
+## 🏛️ Dual-Domain & Modern Widget Dashboard Architecture
 
-| Issue | Title | Story Points | Column Status | Focus |
-| :---: | :--- | :---: | :---: | :--- |
-| [**#1**](https://github.com/ettefagh/CM-LAB/issues/1) | `[Panel A Core Story US1] Rapid Manual Capture & Receipt Vault` | 10 SP | `3. In Progress` | Primary owner for AC1 (UI interaction & autocomplete) |
-| [**#2**](https://github.com/ettefagh/CM-LAB/issues/2) | `[Panel A Core Story US2] Proactive Dual Expiry Alert Engine` | 8 SP | `3. In Progress` | Co-owner for AC1 (Dashboard timeline & urgency badges) |
-| [**#4**](https://github.com/ettefagh/CM-LAB/issues/4) | `[Backlog US-01] Manual Entry (<15s Structured Flow)` | 5 SP | `3. In Progress` | 16h direct UI build for Quick Capture modal |
-| [**#7**](https://github.com/ettefagh/CM-LAB/issues/7) | `[Backlog US-04] Unified Overview & Urgency Status Badges` | 3 SP | `3. In Progress` | 10h direct UI build for 4–6 responsive views |
-| [**#13**](https://github.com/ettefagh/CM-LAB/issues/13) | `[Risk R-1] OCR Cost Trap & Onboarding Churn Guardrail` | — | `4. In Review / QA` | UI mitigation via brand typeahead autocomplete |
-| [**#18**](https://github.com/ettefagh/CM-LAB/issues/18) | `[Deliverable D-1] Working Core User Journey Implementation` | — | `3. In Progress` | Navigation & layout across Views 1–5 |
-| [**#22**](https://github.com/ettefagh/CM-LAB/issues/22) | `[Peer Lab Iteration C-1] Brand Typeahead Autocomplete` | — | `5. Done` | Tested with Team 7; reduced entry to 11.4s |
-| [**#23**](https://github.com/ettefagh/CM-LAB/issues/23) | `[Peer Lab Iteration C-2] Elevate Receipt Photo Container` | — | `5. Done` | Positioned receipt container beside name input |
-| [**#24**](https://github.com/ettefagh/CM-LAB/issues/24) | `[Peer Lab Iteration C-3] Unified Visual BGB § 477 Timeline` | — | `5. Done` | Visual progress bar with 12-month legal checkpoint |
-| [**#26**](https://github.com/ettefagh/CM-LAB/issues/26) | `[Walkthrough B] External User Test — Participant Beta` | — | `5. Done` | Usability test completed with student managing 7 subs |
-| [**#28**](https://github.com/ettefagh/CM-LAB/issues/28) | `[ADR-02] Unifying Subscriptions Alongside Hardware` | — | `5. Done` | Co-owner with AmirHossein on unified UI architecture |
+1. **Main Showcase Webpage (`[Project].pages.dev`):**
+   * Public Astro 6 showcase introducing CM-LAB's **two primary interfaces** (**Authoritative MCP Server** `POST /api/mcp` and **Offline-First Wallet App**).
+   * Features an interactive read-only preview dashboard with sample modular calendar widgets, a preview **Unified Omni-Bar**, zero-JS SEO Policy Wiki pages (`/wiki/[slug]`), and the live `<McpExplorerIsland client:load />` JSON-RPC 2.0 console.
+2. **Modern Wallet Application (`app.[Project].pages.dev`):**
+   * 100% offline-first PWA mounted as a **Single Root Island (`<WalletApp client:only="svelte" />`, `~11.8 KB` gzipped)** backed by `Dexie.js v4` and `wallet.svelte.ts`.
+   * **Unified Search / Activity / Request Omni-Bar (Centerpiece):** Simultaneously queries the bundled Policy Wiki (`policy_wiki_seed_v1.json` in `<2ms`), searches encrypted local `Dexie.js` items & activity logs (`<5ms`), and triggers `<15s` quick capture / receipt import (`11.4s` verified benchmark).
+   * **Modular Dashboard & 3 Distinct Calendar Widgets:**
+     * *Monthly Renewal & Expiry Grid* (with same-day collision grouping, e.g., `"Nov 1 · 3 Renewals"`).
+     * *24m / 12m `BGB § 477 Abs. 1` Warranty Cliff Timeline Bar* (`Iteration C-3 #24`).
+     * *30 / 7 / 1-Day Expiration Countdown Stack* (`09:00 Europe/Berlin`, `0h` CET/CEST DST drift).
 
 ---
 
-## 🎨 Design System Tokens & Color Palette
+## 🎨 Official Design System Tokens & Color Palette
 
 | Token Name | Hex Code | Purpose / Application | Contrast Ratio (on `#FFFFFF`) |
 | :--- | :---: | :--- | :---: |
-| `color-primary-teal` | `#2F524C` | Primary headers, active tab borders, brand typography | **7.8:1** (AAA) |
-| `color-accent-coral` | `#D96B4B` | Primary CTAs, active highlights, key action links | **4.6:1** (AA) |
-| `color-bg-canvas` | `#F4F7F6` | Main application background (soft neutral) | — |
-| `color-card-white` | `#FFFFFF` | Elevated card surfaces and modal dialogs | — |
-| `color-urgent-red` | `#DC2626` | Urgent badge ($\le 7$d), critical warnings | **4.8:1** (AA) |
-| `color-warning-amber` | `#D97706` | Expiring soon badge ($8–30$d), notice window alerts | **4.5:1** (AA) |
-| `color-protected-green`| `#059669` | Active protected badge ($>30$d), completed checks | **4.9:1** (AA) |
-| `color-expired-grey` | `#6B7280` | Expired / archived records, neutral metadata | **4.7:1** (AA) |
+| `--color-primary-teal` | `#2F524C` | Primary headers, active Omni-Bar border, brand typography | **7.8 : 1** (AAA) |
+| `--color-accent-coral` | `#D96B4B` | Primary CTAs (`+ Quick Capture`), Omni-Bar create highlight | **4.6 : 1** (AA) |
+| `--color-bg-canvas` | `#F4F7F6` | Main application & showcase background (soft mineral neutral) | — |
+| `--color-card-white` | `#FFFFFF` | Elevated widget surfaces, Omni-Bar listbox, modal dialogs | — |
+| `--color-urgent-red` | `#DC2626` | Urgent badge ($\le 7$d), immediate action cutoffs, field errors | **4.8 : 1** (AA) |
+| `--color-warning-amber` | `#D97706` | Expiring soon badge ($8–30$d), Month 11 `BGB § 477` cliff alert | **4.5 : 1** (AA) |
+| `--color-protected-green`| `#059669` | Protected badge ($>30$d), verified GoBD `SHA-256` vault status | **4.9 : 1** (AA) |
+| `--color-expired-grey` | `#6B7280` | Expired / archived records ($0$d), neutral secondary metadata | **4.7 : 1** (AA) |
 
 ---
 
-## 📱 6 Core Application Views (Information Architecture)
+## 📋 Assigned GitHub Issues & Ownership (`Prushti`)
 
-1. **View 1: Unified Wallet Dashboard:** Chronological timeline of hardware warranties and recurring subscriptions with instant category pills and search filtering.
-2. **View 2: Quick Capture Modal:** Sub-15-second 3-field entry form with brand autocomplete typeahead, receipt photo container, and German tax toggle.
-3. **View 3: Item Detail & Receipt Vault View:** Visual statutory BGB progress bar (highlighting 12-month reversed burden of proof) and edge-to-edge pinch-to-zoom receipt viewer.
-4. **View 4: 1-Tap Claim & Cancellation Action View:** Contextual action screen generating formal statutory notices citing BGB §§ 437/312k with embedded receipt image.
-5. **View 5: Subscriptions & Tax Summary View:** Cumulative monthly subscription spend tracker and German tax *Werbungskosten* export preview.
-6. **View 6: Policy Wiki & MCP Explorer:** Student brand knowledge base directory and interactive MCP JSON-RPC 2.0 tool execution sandbox.
+| Issue | Title | Story Points | Column Status | UX/UI Deliverable Focus |
+| :---: | :--- | :---: | :---: | :--- |
+| [**#1**](https://github.com/ettefagh/CM-LAB/issues/1) | `[Panel A Core Story US1] Rapid Manual Capture & Receipt Vault` | 10 SP | `3. In Progress` | Primary owner for AC1 (Omni-Bar + `<15s` Quick Capture UI) |
+| [**#2**](https://github.com/ettefagh/CM-LAB/issues/2) | `[Panel A Core Story US2] Proactive Dual Expiry Alert Engine` | 8 SP | `3. In Progress` | Co-owner for AC1 (Modular Calendar Widgets & urgency badges) |
+| [**#4**](https://github.com/ettefagh/CM-LAB/issues/4) | `[Backlog US-01] Manual Entry (<15s Structured Flow)` | 5 SP | `4. In Review / QA` | `16h` UI spec & Svelte 5 `QuickCaptureModal` (`11.4s` verified) |
+| [**#7**](https://github.com/ettefagh/CM-LAB/issues/7) | `[Backlog US-04] Unified Overview & Urgency Status Badges` | 3 SP | `3. In Progress` | `10h` UI build across Views 1–6 & Dual-Domain preview |
+| [**#13**](https://github.com/ettefagh/CM-LAB/issues/13) | `[Risk R-1] OCR Cost Trap & Onboarding Churn Guardrail` | — | `4. In Review / QA` | Mitigated via `<10ms` Prefix-Trie & Omni-Bar create suggestion |
+| [**#18**](https://github.com/ettefagh/CM-LAB/issues/18) | `[Deliverable D-1] Working Core User Journey Implementation` | — | `4. In Review / QA` | Single-Island `<WalletApp client:only="svelte" />` navigation |
+| [**#22**](https://github.com/ettefagh/CM-LAB/issues/22) | `[Peer Lab Iteration C-1] Brand Typeahead Autocomplete` | — | `5. Done` | Tested with Team 7; cut capture latency from `38.0s` to `11.4s` |
+| [**#23**](https://github.com/ettefagh/CM-LAB/issues/23) | `[Peer Lab Iteration C-2] Elevate Receipt Photo Container` | — | `5. Done` | Positioned receipt vault container beside `Item Name` (`100%` capture) |
+| [**#24**](https://github.com/ettefagh/CM-LAB/issues/24) | `[Peer Lab Iteration C-3] Unified Visual BGB § 477 Timeline` | — | `5. Done` | `BgbCliffTimelineWidget` highlighting Month 12 *Beweislastumkehr* |
+| [**#26**](https://github.com/ettefagh/CM-LAB/issues/26) | `[Walkthrough B] External User Test — Participant Beta` | — | `5. Done` | Verified unaided 7-subscription triage & `§ 312k Abs. 6` cancel |
+| [**#28**](https://github.com/ettefagh/CM-LAB/issues/28) | `[ADR-02] Unifying Subscriptions Alongside Hardware` | — | `5. Done` | Co-owner with AmirHossein on unified widget dashboard IA |

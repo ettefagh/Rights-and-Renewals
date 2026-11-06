@@ -591,167 +591,156 @@ In View 3 (Item Detail & Receipt Vault), users must inspect tiny thermal print l
 4. **Hardware Acceleration:** Executed via CSS `will-change: transform` and `transform: translate3d(x, y, 0) scale(s)`.
 5. **Memory Hygiene:** Generated Object URLs are strictly revoked upon unmount.
 
-```tsx
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+```svelte
+<!-- src/components/ReceiptViewerModal.svelte -->
+<script lang="ts">
+  interface Props {
+    receiptBlob: Blob;
+    sha256: string;
+    onClose: () => void;
+  }
 
-interface ReceiptViewerModalProps {
-  receiptBlob: Blob;
-  sha256: string;
-  onClose: () => void;
-}
+  let { receiptBlob, sha256, onClose }: Props = $props();
 
-export const ReceiptViewerModal: React.FC<ReceiptViewerModalProps> = ({
-  receiptBlob,
-  sha256,
-  onClose
-}) => {
-  const [imageUrl, setImageUrl] = useState<string>('');
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
+  let imageUrl = $state('');
+  let scale = $state(1);
+  let position = $state({ x: 0, y: 0 });
+  let isDragging = $state(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const dragStartRef = useRef({ x: 0, y: 0 });
-  const initialTouchDistanceRef = useRef<number | null>(null);
-  const initialScaleRef = useRef(1);
-  const lastTapRef = useRef<number>(0);
+  let dragStart = { x: 0, y: 0 };
+  let initialTouchDistance: number | null = null;
+  let initialScale = 1;
+  let lastTap = 0;
 
   // Object URL lifecycle management
-  useEffect(() => {
+  $effect(() => {
     const url = URL.createObjectURL(receiptBlob);
-    setImageUrl(url);
+    imageUrl = url;
     return () => {
       URL.revokeObjectURL(url);
     };
-  }, [receiptBlob]);
+  });
 
-  // Keyboard accessibility (WCAG 2.1 AA)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      else if (e.key === '+' || e.key === '=') setScale((s) => Math.min(s + 0.5, 5));
-      else if (e.key === '-' || e.key === '_') setScale((s) => Math.max(s - 0.5, 1));
-      else if (e.key === '0') { setScale(1); setPosition({ x: 0, y: 0 }); }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') onClose();
+    else if (e.key === '+' || e.key === '=') scale = Math.min(scale + 0.5, 5);
+    else if (e.key === '-' || e.key === '_') scale = Math.max(scale - 0.5, 1);
+    else if (e.key === '0') {
+      scale = 1;
+      position = { x: 0, y: 0 };
+    }
+  }
 
-  // Double-tap zoom toggle
-  const handleTouchStart = (e: React.TouchEvent) => {
+  function handleTouchStart(e: TouchEvent) {
     if (e.touches.length === 1) {
       const now = Date.now();
-      if (now - lastTapRef.current < 300) {
-        // Double tap detected
-        setScale((prev) => (prev > 1.2 ? 1 : 2.5));
-        setPosition({ x: 0, y: 0 });
-        lastTapRef.current = 0;
+      if (now - lastTap < 300) {
+        scale = scale > 1.2 ? 1 : 2.5;
+        position = { x: 0, y: 0 };
+        lastTap = 0;
         return;
       }
-      lastTapRef.current = now;
-      setIsDragging(true);
-      dragStartRef.current = {
-        x: e.touches[0].clientX - position.x,
-        y: e.touches[0].clientY - position.y
-      };
+      lastTap = now;
+      dragStart = { x: e.touches[0].clientX - position.x, y: e.touches[0].clientY - position.y };
+      isDragging = true;
     } else if (e.touches.length === 2) {
-      // Pinch start
-      const dist = Math.hypot(
+      initialTouchDistance = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
-      initialTouchDistanceRef.current = dist;
-      initialScaleRef.current = scale;
+      initialScale = scale;
     }
-  };
+  }
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  function handleTouchMove(e: TouchEvent) {
     if (e.touches.length === 1 && isDragging && scale > 1) {
-      setPosition({
-        x: e.touches[0].clientX - dragStartRef.current.x,
-        y: e.touches[0].clientY - dragStartRef.current.y
-      });
-    } else if (e.touches.length === 2 && initialTouchDistanceRef.current !== null) {
+      position = {
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y,
+      };
+    } else if (e.touches.length === 2 && initialTouchDistance !== null) {
       const dist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
-      const factor = dist / initialTouchDistanceRef.current;
-      const newScale = Math.min(Math.max(initialScaleRef.current * factor, 1), 5);
-      setScale(newScale);
-      if (newScale === 1) setPosition({ x: 0, y: 0 });
+      scale = Math.min(Math.max((dist / initialTouchDistance) * initialScale, 1), 5);
     }
-  };
+  }
 
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    initialTouchDistanceRef.current = null;
-  };
+  function handleTouchEnd() {
+    isDragging = false;
+    initialTouchDistance = null;
+  }
+</script>
 
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Offline Receipt High-Resolution Inspection Viewer"
-      className="fixed inset-0 z-50 flex flex-col bg-black/95 select-none touch-none"
-      ref={containerRef}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Top Action Bar */}
-      <div className="flex items-center justify-between p-4 bg-gray-900/80 backdrop-blur z-10 text-white">
-        <div className="flex items-center space-x-2">
-          <span className="text-xs font-mono bg-emerald-900/60 text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-500/30">
-            GoBD SHA-256: {sha256.slice(0, 8)}...{sha256.slice(-6)}
-          </span>
-          <span className="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded">
-            {Math.round(scale * 100)}%
-          </span>
-        </div>
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => { setScale(1); setPosition({ x: 0, y: 0 }); }}
-            className="p-2 text-sm bg-gray-800 hover:bg-gray-700 rounded text-gray-200"
-            title="Reset Zoom"
-          >
-            Reset
-          </button>
-          <button
-            onClick={onClose}
-            className="p-2 text-sm font-semibold bg-red-600 hover:bg-red-700 rounded text-white min-w-[44px] min-h-[44px]"
-            aria-label="Close Viewer"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
+<svelte:window onkeydown={handleKeyDown} />
 
-      {/* Main Viewport */}
-      <div className="flex-1 overflow-hidden flex items-center justify-center relative">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt="Original Proof of Purchase Receipt"
-            className="max-h-full max-w-full object-contain cursor-grab active:cursor-grabbing transition-transform duration-75 ease-out"
-            style={{
-              transform: `translate3d(${position.x}px, ${position.y}px, 0px) scale(${scale})`,
-              willChange: 'transform'
-            }}
-            draggable={false}
-          />
-        ) : (
-          <div className="text-gray-400">Loading receipt asset from local vault...</div>
-        )}
-      </div>
-
-      {/* Touch Helper Footer */}
-      <div className="p-3 bg-gray-900/70 text-center text-xs text-gray-400">
-        Pinch or double-tap to zoom in · Drag to pan around invoice details
-      </div>
+<div
+  class="fixed inset-0 z-50 flex flex-col bg-black/90 backdrop-blur-sm touch-none select-none animate-in fade-in duration-200"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Receipt Viewer Modal"
+>
+  <header class="flex items-center justify-between p-4 bg-gray-900/80 text-white border-b border-gray-800 z-10">
+    <div class="flex items-center space-x-3">
+      <span class="font-mono text-xs bg-gray-800 px-2.5 py-1 rounded text-teal-400 border border-teal-500/20" title="GoBD SHA-256 Audit Hash">
+        SHA-256: {sha256.slice(0, 12)}...
+      </span>
+      <span class="text-xs text-gray-400">{Math.round(scale * 100)}% zoom</span>
     </div>
-  );
-};
+    <div class="flex items-center space-x-2">
+      <button
+        type="button"
+        onclick={() => (scale = Math.max(scale - 0.5, 1))}
+        class="p-2 text-sm bg-gray-800 hover:bg-gray-700 rounded text-gray-200 min-w-[36px]"
+        aria-label="Zoom Out"
+      >-</button>
+      <button
+        type="button"
+        onclick={() => (scale = Math.min(scale + 0.5, 5))}
+        class="p-2 text-sm bg-gray-800 hover:bg-gray-700 rounded text-gray-200 min-w-[36px]"
+        aria-label="Zoom In"
+      >+</button>
+      <button
+        type="button"
+        onclick={() => { scale = 1; position = { x: 0, y: 0 }; }}
+        class="p-2 text-sm bg-gray-800 hover:bg-gray-700 rounded text-gray-200"
+        title="Reset Zoom"
+      >Reset</button>
+      <button
+        type="button"
+        onclick={onClose}
+        class="p-2 text-sm font-semibold bg-red-600 hover:bg-red-700 rounded text-white min-w-[44px] min-h-[44px]"
+        aria-label="Close Viewer"
+      >✕</button>
+    </div>
+  </header>
+
+  <div
+    class="flex-1 overflow-hidden flex items-center justify-center relative"
+    role="region"
+    aria-label="Receipt image viewport"
+    ontouchstart={handleTouchStart}
+    ontouchmove={handleTouchMove}
+    ontouchend={handleTouchEnd}
+  >
+    {#if imageUrl}
+      <img
+        src={imageUrl}
+        alt="Original Proof of Purchase Receipt"
+        class="max-h-full max-w-full object-contain cursor-grab active:cursor-grabbing transition-transform duration-75 ease-out"
+        style="transform: translate3d({position.x}px, {position.y}px, 0px) scale({scale}); will-change: transform;"
+        draggable="false"
+      />
+    {:else}
+      <div class="text-gray-400">Loading receipt asset from local vault...</div>
+    {/if}
+  </div>
+
+  <footer class="p-3 bg-gray-900/70 text-center text-xs text-gray-400">
+    Pinch or double-tap to zoom in · Drag to pan around invoice details
+  </footer>
+</div>
 ```
 
 ---
@@ -1000,7 +989,7 @@ Students frequently believe that losing a paper cash register receipt (*Kassenbo
 When Scenario 5.3 triggers (user initiates claim for an item lacking an attached receipt), the application intercepts the generation and displays the **Evidentiary Proof Guidance Modal**:
 
 ```tsx
-export const EvidentiaryProofModal: React.FC<{
+export const EvidentiaryProofModal: SvelteComponent<{
   onAttachProof: () => void;
   onProceedTextOnly: () => void;
   onCancel: () => void;
@@ -1079,7 +1068,7 @@ To guarantee bulletproof execution without uncaught exceptions:
 5. Concurrently initiate a direct `.txt` file download fallback using a `data:text/plain;charset=utf-8` blob.
 
 ```tsx
-export const AsyncFailureRecoveryModal: React.FC<{
+export const AsyncFailureRecoveryModal: SvelteComponent<{
   compiledText: string;
   errorMessage: string;
   onClose: () => void;
@@ -1241,7 +1230,7 @@ export const AsyncFailureRecoveryModal: React.FC<{
 | IndexedDB Master Blob Storage Commit     | < 80 ms               | < 200 ms         | Offline IDB  |
 | Full Client-Side PDF Generation          | < 1,800 ms            | < 3,500 ms       | DIN A4 Doc   |
 | JavaScript Heap Memory Delta (Pipeline)  | < 25 MB               | < 45 MB          | Chrome Dev   |
-| Garbage Collection Hygiene               | URL.revokeObjectURL   | Zero Leakage     | React Unmount|
+| Garbage Collection Hygiene               | URL.revokeObjectURL   | Zero Leakage     | Svelte 5 Effect Cleanup|
 +------------------------------------------+-----------------------+------------------+--------------+
 ```
 

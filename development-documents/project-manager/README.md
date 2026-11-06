@@ -1,10 +1,22 @@
-# 📊 Project Management & Governance
+# 📊 Project Management & Governance Hub
 
 **Role Title:** Project Manager  
-**Role Owner:** **Jeetkumar**  
-**Working Team:** **Team 6** · *Computer & Media Lab* (SRH Hochschule WiSe 2026)  
-**Assigned Capacity:** 10h Sprint Governance & Quality Verification (10.9% of 92h Sprint Total)  
+**Role Owner:** **Jeetkumar (Member E)**  
+**Working Team:** **Team 6** · *Computer & Media Lab* (SRH Hochschule Heidelberg / Berlin, WiSe 2026)  
+**Instructor:** Prof. Franziska Schwarz  
+**Assigned Capacity:** **10h Sprint Governance & Quality Verification** (10.9% of 92h Sprint Total)  
 **Active Milestone:** Session 5 — MVP Scope Lock & Working Core User Journey Gate  
+**Governing Documents:** [`BLUEPRINT.md`](../../BLUEPRINT.md) · [`GOAL.md`](../../GOAL.md)
+
+---
+
+## 🧭 Governance Documents Index
+
+| Document | Purpose & Contents | Primary Owner | Status |
+| :--- | :--- | :---: | :---: |
+| [**`GATE_STATUS.md`**](./GATE_STATUS.md) | **7-Gate Definition of Done & Pre-Build Gate Audit Ledger:** Tracks Gate 0 Pre-Build architectural sign-off (`ADR-01`–`ADR-05`) and the 7 Sprint 1 Quality Gates under Issue #30. | Jeetkumar & Mojtaba | **Active SSOT** |
+| [**`ISSUE_ORCHESTRATOR_STATUS_REPORT.md`**](./ISSUE_ORCHESTRATOR_STATUS_REPORT.md) | **Live GitHub Issue & Project 4 Audit Report:** Comprehensive audit of 30 issues, 10 milestones, and 5-member WIP limit compliance. | Jeetkumar | **Active Audit** |
+| [**`synthesis.md`**](./synthesis.md) | **Master Pre-Build Governance & Sprint 1 Framework:** Sprint 1 capacity reconciliation (92h), 5 Red Lines, causal ADR syntax, and SRH AI disclosure compliance. | Jeetkumar | **Active Framework** |
 
 ---
 
@@ -34,21 +46,6 @@ As **Project Manager**, **Jeetkumar** is responsible for agile sprint planning, 
 
 ## 📅 Team Cadence & Agile Rituals
 
-* **Weekly Async Standup:** Tuesdays at 18:00 CET via Slack/Discord:
-  * *What did I complete since last sync?*
-  * *What am I committing to deliver before Friday lab?*
-  * *Are there any blockers or dependencies?*
-* **Pre-Lab Sync:** Fridays at 09:30 CET (30 minutes prior to SRH lab session):
-  * Align on live demo deliverables, review peer feedback, and calibrate sprint velocity.
-* **Bi-Weekly Retrospective:** Following Friday lab sessions:
-  * Review completed user stories, inspect WIP bottlenecks, and refine next sprint backlog.
-
----
-
-## 🛡️ Risk Management Matrix (PM Focus)
-
-| Risk ID | Title | Severity | Mitigation Strategy | Early Warning Trigger |
-| :---: | :--- | :---: | :--- | :--- |
-| **R-1** | OCR Token Cost Trap & Onboarding Churn | **CRITICAL** | Manual-first `<15s` 3-field entry; camera strictly serves as receipt photo vault (`US-02`). | Manual entry stopwatch exceeds 15.0s (currently `11.4s`). |
-| **R-3** | Regulatory Liability (RDG §§ 2, 3 / StBerG § 2) | **MEDIUM** | Restrict to deterministic document drafting under BGH VIII ZR 285/18; mandatory disclaimers. | Missing disclaimer on exported PDF/text dossier or tax view. |
-| **R-5** | Scope Creep Across Hardware, Subs, Banking & Taxes | **CRITICAL** | Strict MoSCoW boundaries; ban PSD2 banking sync & live ELSTER filing; enforce WIP $\le 2$. | Any member with $>2$ active `In Progress` tasks. |
+* **Weekly Async Standup:** Tuesdays at 18:00 CET via Slack/Discord.
+* **Pre-Lab Sync:** Fridays at 09:30 CET (30 minutes prior to SRH lab session).
+* **Bi-Weekly Retrospective:** Following Friday lab sessions.
