@@ -1,0 +1,126 @@
+{
+  "testedViewports": {
+    "320": {
+      "docMetrics": {
+        "windowInnerWidth": 349,
+        "windowScrollX": 0,
+        "htmlClientWidth": 320,
+        "htmlScrollWidth": 349,
+        "bodyClientWidth": 320,
+        "bodyScrollWidth": 349,
+        "hasHorizontalOverflow": false
+      },
+      "overflowingElements": [],
+      "cal1Metrics": {
+        "cardWidth": 288,
+        "matrixWidth": 262,
+        "navWidth": 262,
+        "cellWidth": 36.3,
+        "pillWidth": 32.3,
+        "pillNameDisplay": "none",
+        "glyphDisplay": "block",
+        "glyphFontSize": "12px"
+      },
+      "cal2Metrics": {
+        "cardWidth": 288,
+        "barWidth": 188,
+        "itemCardWidth": 238
+      },
+      "cal3Metrics": {
+        "cardWidth": 288,
+        "kpiBannerWidth": 238,
+        "wrapperWidth": 238,
+        "gridScrollWidth": 777,
+        "gridClientWidth": 190,
+        "gridHasScroll": true
+      },
+      "dashboardMetrics": {
+        "gridWidth": 288,
+        "spendRadarWidth": 264,
+        "gobdFeedWidth": 288
+      }
+    },
+    "375": {
+      "docMetrics": {
+        "windowInnerWidth": 375,
+        "windowScrollX": 0,
+        "htmlClientWidth": 375,
+        "htmlScrollWidth": 375,
+        "bodyClientWidth": 375,
+        "bodyScrollWidth": 375,
+        "hasHorizontalOverflow": false
+      },
+      "overflowingElements": [],
+      "cal1Metrics": {
+        "cardWidth": 343,
+        "matrixWidth": 317,
+        "navWidth": 317,
+        "cellWidth": 44.1,
+        "pillWidth": 40.1,
+        "pillNameDisplay": "none",
+        "glyphDisplay": "block",
+        "glyphFontSize": "12px"
+      },
+      "cal2Metrics": {
+        "cardWidth": 343,
+        "barWidth": 243,
+        "itemCardWidth": 293
+      },
+      "cal3Metrics": {
+        "cardWidth": 343,
+        "kpiBannerWidth": 293,
+        "wrapperWidth": 293,
+        "gridScrollWidth": 777,
+        "gridClientWidth": 245,
+        "gridHasScroll": true
+      },
+      "dashboardMetrics": {
+        "gridWidth": 343,
+        "spendRadarWidth": 319,
+        "gobdFeedWidth": 343
+      }
+    },
+    "414": {
+      "docMetrics": {
+        "windowInnerWidth": 414,
+        "windowScrollX": 0,
+        "htmlClientWidth": 414,
+        "htmlScrollWidth": 414,
+        "bodyClientWidth": 414,
+        "bodyScrollWidth": 414,
+        "hasHorizontalOverflow": false
+      },
+      "overflowingElements": [],
+      "cal1Metrics": {
+        "cardWidth": 382,
+        "matrixWidth": 356,
+        "navWidth": 356,
+        "cellWidth": 49.7,
+        "pillWidth": 45.7,
+        "pillNameDisplay": "none",
+        "glyphDisplay": "block",
+        "glyphFontSize": "12px"
+      },
+      "cal2Metrics": {
+        "cardWidth": 382,
+        "barWidth": 282,
+        "itemCardWidth": 332
+      },
+      "cal3Metrics": {
+        "cardWidth": 382,
+        "kpiBannerWidth": 332,
+        "wrapperWidth": 332,
+        "gridScrollWidth": 777,
+        "gridClientWidth": 284,
+        "gridHasScroll": true
+      },
+      "dashboardMetrics": {
+        "gridWidth": 382,
+        "spendRadarWidth": 358,
+        "gobdFeedWidth": 382
+      }
+    }
+  },
+  "overflowFailures": [],
+  "calendarMetrics": {}
+}

@@ -1,0 +1,563 @@
+{
+  "total": 111,
+  "passed": 111,
+  "failed": 0,
+  "findings": [],
+  "tests": [
+    {
+      "name": "OmnibarState defines exactly 8 states",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "OmnibarState has IDLE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "OmnibarState has FOCUSED_EMPTY",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "OmnibarState has QUERYING",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "OmnibarState has VAULT_MATCHES",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "OmnibarState has WIKI_MATCHES",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "OmnibarState has HYBRID_MATCHES",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "OmnibarState has NO_MATCH_SUGGESTION",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "OmnibarState has COMMAND_MODE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Initial FSM state is IDLE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM rejects illegal state transition with Error",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Transition to FOCUSED_EMPTY (Rule 1)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Executed rule 1 recorded in executedRules set",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "History records transition",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Transition to QUERYING (Rule 3)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Transition to WIKI_MATCHES (Rule 8)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Transition back to FOCUSED_EMPTY on Esc 1 (Rule 20)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Transition back to IDLE on Esc 2 (Rule 21)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM reset restores IDLE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM reset clears history and rules",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search \"Netflix\" finds wiki brand match",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search \"Netflix\" has 0 vault matches",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Matches brand_name \"Netflix\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search by service_slug \"apple\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search by search_alias \"streaming\" matches Spotify",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search by statutory basis \"312k\" returns BGB § 312k brands",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search \"MacBook\" finds saved vault item",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Matches vault item v101",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search by merchant \"MediaMarkt\" finds Sony item",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search \"Spotify\" has wiki matches",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search \"Spotify\" has vault matches",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Search \"Spotify\" produces HYBRID matches",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Zero-match query has 0 wiki matches",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Zero-match query has 0 vault matches",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Empty query returns empty results",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Whitespace query returns empty results",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Category filter \"hardware\" excludes subscription wiki",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Category filter \"hardware\" excludes subscription vault",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Category filter \"subscription\" includes Spotify wiki",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Category filter \"subscription\" includes Spotify vault item",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Omnibar combobox root exists",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Combobox has role=\"combobox\" (WAI-ARIA 1.3)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Initial combobox aria-expanded is \"false\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Combobox has aria-haspopup=\"listbox\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Combobox aria-controls points to \"omnibar-dropdown\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Initial dropdown is hidden (display: none)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Initial FSM state is IDLE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Ctrl+K focuses the input",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Ctrl+K transitions FSM to FOCUSED_EMPTY (Rule 1)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Combobox aria-expanded becomes \"true\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dropdown displays block",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FOCUSED_EMPTY renders quick action buttons (6)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FOCUSED_EMPTY renders recent activity items (3)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Input value is \"Spotify\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM resolved to match state: HYBRID_MATCHES",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Results rendered options (2)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "1st Esc clears input text",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "1st Esc transitions FSM to FOCUSED_EMPTY (Rule 20)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "1st Esc keeps combobox open (aria-expanded=\"true\")",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "1st Esc keeps dropdown visible",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "1st Esc restores quick action buttons",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "2nd Esc transitions FSM to IDLE (Rule 21)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "2nd Esc sets aria-expanded=\"false\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "2nd Esc closes dropdown (display: none)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "2nd Esc blurs the input",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Forward slash \"/\" focuses the input",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Forward slash \"/\" opens dropdown to FOCUSED_EMPTY",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "1st ArrowDown highlights first option (omnibar-opt-0)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Highlighted option has aria-selected=\"true\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "input aria-activedescendant updated to omnibar-opt-0",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ArrowDown clamps to bottom of list (no index overflow)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ArrowUp moves backward through option list",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ArrowUp clamps to index 0 at top of list (no negative underflow)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Zero-match query transitions FSM to NO_MATCH_SUGGESTION (Rule 10)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "NO_MATCH_SUGGESTION renders exactly 4 recovery cards (4)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Recovery card 1: create_warranty",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Recovery card 2: add_subscription",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Recovery card 3: import_receipt",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Recovery card 4: search_wiki",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "XSS security check: no unescaped <img> element in DOM",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "XSS security check: HTML tags escaped (&lt;img)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command \">claim Sony WH-1000XM5\" dispatches \"omnibar:execute-command\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches verb \">claim\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches parsed args \"Sony WH-1000XM5\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command execution closes Omnibar and returns to IDLE (Rule 19)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command \">cancel Spotify\" dispatches \"omnibar:execute-command\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches verb \">cancel\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches parsed args \"Spotify\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command execution closes Omnibar and returns to IDLE (Rule 19)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command \">tax 2026\" dispatches \"omnibar:execute-command\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches verb \">tax\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches parsed args \"2026\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command execution closes Omnibar and returns to IDLE (Rule 19)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command \">import Saturn\" dispatches \"omnibar:execute-command\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches verb \">import\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches parsed args \"Saturn\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command execution closes Omnibar and returns to IDLE (Rule 19)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command \">audit\" dispatches \"omnibar:execute-command\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches verb \">audit\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches parsed args \"\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command execution closes Omnibar and returns to IDLE (Rule 19)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command \">export\" dispatches \"omnibar:execute-command\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches verb \">export\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Dispatches parsed args \"\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command execution closes Omnibar and returns to IDLE (Rule 19)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Production application loads in browser with zero console errors",
+      "status": "PASS",
+      "details": "Found errors: "
+    },
+    {
+      "name": "Production application successfully mounts Unified Omnibar instance (window.cmApp.omnibar)",
+      "status": "PASS",
+      "details": "Omnibar instance is null; never mounted"
+    },
+    {
+      "name": "Omnibar DOM elements mounted in production app shell (#omnibar-container)",
+      "status": "PASS",
+      "details": "#omnibar-container missing from DOM"
+    },
+    {
+      "name": "Events dispatched via window.dispatchEvent bubble to document listeners",
+      "status": "PASS",
+      "details": "document.addEventListener did NOT receive event dispatched on window"
+    },
+    {
+      "name": "Command mode first item has .omnibar-option-active class",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Command mode input has aria-activedescendant=\"omnibar-opt-0\"",
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}

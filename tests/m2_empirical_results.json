@@ -1,0 +1,472 @@
+{
+  "total": 87,
+  "passed": 87,
+  "failed": 0,
+  "findings": [],
+  "benchmarks": {
+    "tools/list": {
+      "iterations": 100,
+      "avg": 0.020720999999999493,
+      "min": 0.004099999999993997,
+      "max": 0.995599999999996,
+      "median": 0.006699999999995043,
+      "p95": 0.030900000000002592,
+      "p99": 0.995599999999996
+    },
+    "policy_lookup": {
+      "iterations": 100,
+      "avg": 0.027468000000000076,
+      "min": 0.011900000000011346,
+      "max": 0.21479999999999677,
+      "median": 0.0239000000000118,
+      "p95": 0.06449999999999534,
+      "p99": 0.21479999999999677
+    },
+    "claim_dossier_generate": {
+      "iterations": 100,
+      "avg": 0.04538000000000153,
+      "min": 0.01850000000000307,
+      "max": 0.8863000000000056,
+      "median": 0.030900000000002592,
+      "p95": 0.06980000000000075,
+      "p99": 0.8863000000000056
+    }
+  },
+  "tests": [
+    {
+      "name": "MockMcpTransport.js (src): initialize envelope validity",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): MCP protocolVersion == 2024-11-05",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): serverInfo name",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): tools/list envelope validity",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): tools/list exposes policy_lookup",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): tools/list exposes claim_dossier_generate",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): policy_lookup (service_slug: spotify) valid JSON-RPC",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): policy_lookup (service_slug: spotify) has no error",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): policy_lookup returned correct brand_name Spotify",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): dual-slug: brand_slug: 'spotify' succeeds without error",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): dual-slug brand_slug: 'spotify' returns identical data",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): dual-slug apple lookup succeeds for both service_slug and brand_slug",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): all 20 canonical brands retrievable via policy_lookup",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): search alias & case insensitivity ('SPOTIFY STUDENT')",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): claim_dossier_generate with brand_slug succeeds",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): claim_dossier contains LexFox certification",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): dossier contains LexFox BGH citation",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): dossier contains BGB § 437 notice",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "MockMcpTransport.js (src): claim_dossier_generate dual-slug compatibility with service_slug",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): initialize envelope validity",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): MCP protocolVersion == 2024-11-05",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): serverInfo name",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): tools/list envelope validity",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): tools/list exposes policy_lookup",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): tools/list exposes claim_dossier_generate",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): policy_lookup (service_slug: spotify) valid JSON-RPC",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): policy_lookup (service_slug: spotify) has no error",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): policy_lookup returned correct brand_name Spotify",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): dual-slug: brand_slug: 'spotify' succeeds without error",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): dual-slug brand_slug: 'spotify' returns identical data",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): dual-slug apple lookup succeeds for both service_slug and brand_slug",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): all 20 canonical brands retrievable via policy_lookup",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): search alias & case insensitivity ('SPOTIFY STUDENT')",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): claim_dossier_generate with brand_slug succeeds",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): claim_dossier contains LexFox certification",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): dossier contains LexFox BGH citation",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): dossier contains BGB § 437 notice",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "mock-mcp-engine.js (js): claim_dossier_generate dual-slug compatibility with service_slug",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Envelope: null payload returns code -32600",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Envelope: null payload error message",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Envelope: missing jsonrpc version returns code -32600",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Envelope: jsonrpc: \"1.0\" returns code -32600",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Method: non-existent method returns code -32601",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Method: -32601 error message",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Tool: unknown tool name returns code -32601",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "policy_lookup: empty arguments returns -32602",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "policy_lookup: whitespace slug returns -32602",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "policy_lookup: non-string slug returns -32602",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "claim_dossier_generate: missing required fields returns -32602",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "claim_dossier_generate: invalid date string returns -32602",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "claim_dossier_generate: non-ISO date returns -32602",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Unknown brand: returns valid JSON-RPC response",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Unknown brand: returns result.isError === true",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Unknown brand: message explains not found",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Latency: tools/list average latency < 30ms SLA",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Latency: tools/list in-memory target < 1.0ms",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Latency: policy_lookup average latency < 30ms SLA",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Latency: policy_lookup in-memory target < 1.0ms",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Latency: claim_dossier_generate average latency < 30ms SLA",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Latency: claim_dossier_generate in-memory target < 1.0ms",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Adversarial: handles 100KB defect payload without crashing",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Adversarial: 100KB payload processed in 0.33ms (< 50ms)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Adversarial: XSS sanitization safe execution for payload: <script>alert(1)</sc",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Adversarial: XSS sanitization safe execution for payload: \"><img src=x onerror",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Adversarial: XSS sanitization safe execution for payload: ${7*7}",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Adversarial: XSS sanitization safe execution for payload: {{constructor.constr",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Adversarial: XSS sanitization safe execution for payload: ../../../../etc/pass",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Adversarial: XSS sanitization safe execution for payload: null\u0000byte",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Leap year calculation: 2024-02-29 correctly clamps to 2025-02-28 per BGB § 188 Abs. 3",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "BGB § 477: Standard weekday purchase 2025-11-05 -> 2026-11-05",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "BGB § 477: Leap year clamping 2024-02-29 -> 2025-02-28 (§ 188 Abs. 3)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "BGB § 477: Saturday deadline (2026-11-14) expires strictly without § 193 rollover",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "BGB § 477: Sunday deadline (2026-11-15) expires strictly without § 193 rollover",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "showcaseSampleData: exactly 10 hardware items present",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "showcaseSampleData: all 10 hardware items have exact 12-month BGB § 477 cliff dates",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "showcaseSampleData: exactly 10 subscription items present",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "showcaseSampleData: all 10 subscription items have exact daysRemaining from anchor date",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Heatmap: generates exactly 364 cells (52 weeks * 7 days)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Heatmap: first cell starts on SHOWCASE_ANCHOR_DATE (2026-11-05)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Heatmap: has level 0 cells (calm days with no deadlines)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Heatmap: has level 4 cells (urgent deadlines or capital > 500 €)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "Heatmap: 100% of cells adhere strictly to intensity matrix thresholds",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "KPI: totalTrackedCapitalEur matches sum of hardware prices (€6,057.99)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "KPI: monthlySubscriptionsEur matches sum of subscription prices (€146.26)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "KPI: annualSubscriptionsEur == monthly * 12 (€1,755.12)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "KPI: taxDeductibleEur matches sum of deductible items (€4,489.87)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "KPI: activeCliffsCount matches hardware with daysToCliff <= 45 (2 items: Sony & Lenovo)",
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}

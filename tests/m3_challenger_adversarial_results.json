@@ -1,0 +1,38 @@
+{
+  "total": 90,
+  "passed": 90,
+  "failed": 0,
+  "findings": [],
+  "categories": {
+    "keyboard": {
+      "total": 17,
+      "passed": 17,
+      "failed": 0
+    },
+    "escapeFSM": {
+      "total": 11,
+      "passed": 11,
+      "failed": 0
+    },
+    "dualDispatch": {
+      "total": 27,
+      "passed": 27,
+      "failed": 0
+    },
+    "verbCommands": {
+      "total": 30,
+      "passed": 30,
+      "failed": 0
+    },
+    "adversarialFuzzing": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "browserRuntime": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  }
+}

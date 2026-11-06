@@ -1,0 +1,598 @@
+{
+  "total": 93,
+  "passed": 93,
+  "failed": 0,
+  "findings": [],
+  "categories": {
+    "urgentAttentionBanner": {
+      "total": 26,
+      "passed": 26,
+      "failed": 0
+    },
+    "spendSubscriptionRadar": {
+      "total": 14,
+      "passed": 14,
+      "failed": 0
+    },
+    "masterVaultLedger": {
+      "total": 23,
+      "passed": 23,
+      "failed": 0
+    },
+    "contextualItemDrawer": {
+      "total": 19,
+      "passed": 19,
+      "failed": 0
+    },
+    "viewportGeometryHeadless": {
+      "total": 10,
+      "passed": 10,
+      "failed": 0
+    },
+    "appBootstrapAndIntegrity": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "tests": [
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Subscription at exactly daysRemaining=30 is included in banner",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Total spend includes daysRemaining=30 subscription",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Subscription at daysRemaining=31 is excluded from banner",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Total spend is 0 when daysRemaining=31",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Subscription at daysRemaining=7 is included in banner",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Subscription at daysRemaining=7 receives banner-critical CSS class",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Urgency badge displays \"Fristablauf ≤ 7 Tage\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Critical glyph 🛑 is rendered for daysRemaining=7",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Subscription at daysRemaining=8 receives banner-warning CSS class",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Urgency badge displays \"Fristablauf ≤ 30 Tage\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Warning glyph ⚠️ is rendered for daysRemaining=8",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Subscription at daysRemaining=0 receives banner-critical",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Overdue subscription with daysRemaining < 0 is captured",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Overdue subscription receives banner-critical",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Hardware at daysToCliff=45 with active proof burden is included",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Hardware at daysToCliff=46 is excluded",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Hardware with isWithinReversedBurdenOfProof=false is excluded from cliff alerts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Safe vault with no alerts renders banner-safe",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Safe banner displays \"Alle Fristen gesichert\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Safe banner renders shield glyph 🛡️",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Urgent subscriptions sorted ascending: s3 first",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Urgent subscriptions sorted ascending: s12 second",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Urgent subscriptions sorted ascending: s20 third",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Total spend correctly sums 10 + 5 + 8 = 23.0 €",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Banner renders .btn-urgent-cancel action button",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "urgentAttentionBanner",
+      "name": "Button text cites statutory § 312k",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Protected hardware capital sums active hardware (1800.00 €)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Monthly run rate correctly sums active subscriptions (29.98 €)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Annual subscription liability equals monthly * 12 (359.76 €)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Tax deductible total sums all isTaxDeductible items (1969.99 €)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Cancellable subscriptions must exclude already-expired subscriptions (status !== \"expired\")",
+      "status": "PASS",
+      "details": "Observed cancellableCount=1 (s3 with status=\"expired\" was included in cancellableSubs)"
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Zero items: totalProtectedCapital = 0",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Zero items: monthlyRunRate = 0",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Zero items: annualRunRate = 0",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Zero items: taxDeductibleTotal = 0",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "100 items of 0.10 € sum to exactly 10.00 €",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Annual liability sums to 120.00 €",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Radar renders .btn-export-tax CSV button",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Radar includes § 9 EStG tax metric label",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "spendSubscriptionRadar",
+      "name": "Radar includes BMF 2022 reference footnote",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Filter \"all\" returns all 20 seed items",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Filter \"hardware\" returns exactly 10 hardware items",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "All items in hardware filter have category === \"hardware\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Filter \"subscription\" returns exactly 10 subscription items",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "All items in subscription filter have category === \"subscription\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Filter \"tax\" returns 10 items qualifying for § 9 EStG",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "All items in tax filter have isTaxDeductible === true",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Filter \"urgent\" returns active urgent items",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "All urgent items satisfy <= 30d or <= 45d cliff condition",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Search for \"Spotify\" returns Spotify Premium Student",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Search by partial SHA-256 hash finds matching hardware item",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Urgent status pill contains glyph [🛑]",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Urgent row contains class pill-urgent",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Warning status pill contains glyph [!]",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Warning row contains class pill-warning",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Protected status pill contains glyph [✓]",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Protected row contains class pill-protected",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Expired status pill contains glyph [x]",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Expired row contains class pill-expired",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Row with receiptSha256 renders .btn-copy-hash button",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Copy button data-hash attribute contains full 64-char hash",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Displayed hash is truncated to 8 chars with ellipsis",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "masterVaultLedger",
+      "name": "Row without receiptSha256 displays em-dash placeholder \"—\"",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "BGBTimelineService.calculateMilestones executes without ReferenceError",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "addMonths(\"2025-01-31\", 1) = 2025-02-28 (month-end cap)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "addMonths(\"2024-01-31\", 1) = 2024-02-29 (month-end cap)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "addMonths(\"2025-03-31\", 1) = 2025-04-30 (month-end cap)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "addMonths(\"2025-05-31\", 1) = 2025-06-30 (month-end cap)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "addMonths(\"2025-08-31\", 1) = 2025-09-30 (month-end cap)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "addMonths(\"2025-10-31\", 1) = 2025-11-30 (month-end cap)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "GoBD pre-encryption digest produces 64-char hex SHA-256 string",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "GoBD tamper detection: 1-byte payload change alters digest",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "GoBD tamper detection: 1-cent metadata change alters digest",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "GoBD digest is canonical and deterministic regardless of metadata key insertion order",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "GoBDCryptoService.computeReceiptDigest exists (called in app.js:631, 669)",
+      "status": "PASS",
+      "details": "computeReceiptDigest is undefined on GoBDCryptoService (only computeDigest is defined)"
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "styles/widgets.css specifies \"max-width: 520px;\" for drawer",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "styles/widgets.css defines .drawer-container class",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "Drawer starts off-canvas with translateX(100%)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "Drawer slides in with translateX(0)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "Spotify subscription specifies statutory cancellation URL",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "Spotify item references BGB § 312k statutory online cancellation button mandate",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "contextualItemDrawer",
+      "name": "BGBTimelineService.generateStatutoryNotice matches app.js call signature and provides notice.fullNoticeText",
+      "status": "PASS",
+      "details": "notice.fullNoticeText is undefined"
+    },
+    {
+      "category": "appBootstrapAndIntegrity",
+      "name": "Modern App boots in browser without fatal initialization error",
+      "status": "PASS",
+      "details": "App booted cleanly"
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 320px has 0px horizontal overflow (scrollDelta=0)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 320px has 0 uncontained overflowing elements",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 375px has 0px horizontal overflow (scrollDelta=0)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 375px has 0 uncontained overflowing elements",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 414px has 0px horizontal overflow (scrollDelta=0)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 414px has 0 uncontained overflowing elements",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 768px has 0px horizontal overflow (scrollDelta=0)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 768px has 0 uncontained overflowing elements",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 1024px has 0px horizontal overflow (scrollDelta=0)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "category": "viewportGeometryHeadless",
+      "name": "Viewport 1024px has 0 uncontained overflowing elements",
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}

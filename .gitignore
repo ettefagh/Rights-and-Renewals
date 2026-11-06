@@ -8,3 +8,10 @@ __pycache__/
 *.pyo
 .DS_Store
 Thumbs.db
+
+# Dependencies & Build Artefacts
+node_modules/
+dist/
+.astro/
+.wrangler/
+*.log
