@@ -1,0 +1,35 @@
+{
+  "name": "@cmlab/core",
+  "version": "1.0.0",
+  "description": "Headless TypeScript Domain Engine for CM-LAB Sovereign Consumer Wallet",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./src/index.ts"
+    },
+    "./data/policy_wiki_seed_v1.json": "./data/policy_wiki_seed_v1.json"
+  },
+  "files": [
+    "dist",
+    "data"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "dexie": "^4.0.11",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.0.0",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
+}

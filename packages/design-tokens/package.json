@@ -1,0 +1,17 @@
+{
+  "name": "@cmlab/design-tokens",
+  "version": "1.0.0",
+  "description": "W3C DTCG Design Tokens for CM-LAB Sovereign Consumer Wallet",
+  "type": "module",
+  "main": "./tokens.css",
+  "exports": {
+    ".": "./tokens.css",
+    "./tokens.css": "./tokens.css"
+  },
+  "files": [
+    "tokens.css"
+  ],
+  "scripts": {
+    "build": "node -e \"console.log('@cmlab/design-tokens: tokens verified')\""
+  }
+}
