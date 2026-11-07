@@ -1,16 +1,40 @@
 {
-  "name": "CM-LAB Wallet App",
-  "short_name": "CM-LAB App",
-  "description": "Privacy-Preserving Consumer Rights & Warranty Wallet with 8-State Unified Omnibar",
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "CM-LAB Sovereign Consumer Rights & Warranty Wallet",
+  "short_name": "CM-LAB Wallet",
+  "description": "Offline-first sovereign consumer rights, subscription guard, and tax-ready wallet PWA with zero cloud plaintext receipts.",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#F4F7F6",
+  "orientation": "portrait-primary",
   "theme_color": "#2F524C",
+  "background_color": "#F4F7F6",
+  "categories": ["finance", "utilities", "productivity"],
+  "lang": "de-DE",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Neuer Beleg erfassen",
+      "short_name": "Erfassen",
+      "description": "Schnelle manuelle Belegerfassung (<15s)",
+      "url": "/#action=capture",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Garantie-Fristen prüfen",
+      "short_name": "Fristen",
+      "description": "Urgent Attention Fristen und BGB § 477 Status",
+      "url": "/#action=calendar",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
     }
   ]
 }

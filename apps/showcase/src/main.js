@@ -38,7 +38,7 @@ const EMBEDDED_SEED_BRANDS = [
 
 async function loadBrandsData() {
   try {
-    const response = await fetch('./public/data/policy_wiki_seed_v1.json');
+    const response = await fetch('/data/policy_wiki_seed_v1.json');
     if (response.ok) {
       const data = await response.json();
       if (Array.isArray(data) && data.length > 0) return data;
@@ -49,7 +49,7 @@ async function loadBrandsData() {
   return EMBEDDED_SEED_BRANDS;
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initShowcase() {
   const seedBrands = await loadBrandsData();
 
   // 1. Initialize MCP Playground
@@ -82,4 +82,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   console.log('CM-LAB Showcase Webpage Initialized (M2 Production Ready).');
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initShowcase);
+} else {
+  initShowcase();
+}
+

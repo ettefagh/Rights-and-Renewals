@@ -1,0 +1,388 @@
+---
+import { policySeedData } from '@cmlab/core';
+import type { PolicyWikiEntry } from '@cmlab/core';
+import BrandIcon from '../../components/BrandIcon.svelte';
+import '../../../styles/tokens.css';
+import '../../../styles/main.css';
+
+export function getStaticPaths() {
+  return policySeedData.map((brand: PolicyWikiEntry) => ({
+    params: { slug: brand.brandSlug },
+    props: { brand },
+  }));
+}
+
+export const prerender = true;
+
+const { brand } = Astro.props as { brand: PolicyWikiEntry };
+
+const isSubscription = brand.category === 'subscription';
+const pageTitle = `${brand.brandName} · Verbraucherrechte & Kündigung · CM-LAB Brand Policy Wiki`;
+const pageDescription = isSubscription
+  ? `Gesetzliche Kündigungsfristen nach BGB § 309 Nr. 9 und Kündigungsbutton-Direktlink (§ 312k BGB) für ${brand.brandName}.`
+  : `Gesetzliche Gewährleistung nach BGB § 438, 12-Monate Beweislastumkehr (§ 477 BGB) und Garantiebestimmungen für ${brand.brandName}.`;
+
+const deepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${brand.brandSlug}`;
+const deepLinkCapture = `https://app.cm-lab.pages.dev/#action=quick-add&brand=${encodeURIComponent(brand.brandName)}&category=${brand.category}`;
+---
+
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <script is:inline>
+    (function() {
+      try {
+        const saved = localStorage.getItem('cmlab-theme');
+        const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', saved || (systemDark ? 'dark' : 'light'));
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/main.css" />
+
+  <style>
+    .wiki-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-8, 32px) var(--space-4, 16px) var(--space-16, 64px);
+    }
+    .wiki-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 8px);
+      font-size: var(--font-size-sm, 14px);
+      color: var(--color-text-muted, #64748B);
+      margin-bottom: var(--space-6, 24px);
+    }
+    .wiki-breadcrumb a {
+      color: var(--color-primary-teal, #2F524C);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .wiki-header-card {
+      background: var(--color-surface-card, #FFFFFF);
+      border: 1px solid var(--color-border-subtle, #E2E8F0);
+      border-radius: var(--radius-xl, 16px);
+      padding: var(--space-6, 24px);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-5, 20px);
+      box-shadow: 0 4px 16px rgba(15, 28, 25, 0.04);
+      margin-bottom: var(--space-8, 32px);
+    }
+    .brand-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-lg, 12px);
+      background: var(--color-surface-subtle, #F1F5F9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-teal, #2F524C);
+      flex-shrink: 0;
+      border: 1px solid var(--color-border-subtle, #E2E8F0);
+    }
+    .brand-title-wrap {
+      flex: 1;
+    }
+    .brand-title-wrap h1 {
+      font-size: var(--font-size-3xl, 28px);
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      margin: 0 0 var(--space-2, 8px);
+      color: var(--color-text-primary, #0F1C19);
+    }
+    .brand-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2, 8px);
+      align-items: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full, 9999px);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .badge-teal {
+      background: var(--color-pine-100, #D7E6E3);
+      color: var(--color-primary-teal, #2F524C);
+    }
+    .badge-coral {
+      background: var(--color-coral-100, #FCE7E2);
+      color: var(--color-primitive-coral-700, #9A371F);
+    }
+    .badge-green {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+    .badge-gray {
+      background: var(--color-surface-subtle, #F1F5F9);
+      color: var(--color-text-secondary, #475569);
+    }
+    .action-button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3, 12px);
+      margin-top: var(--space-4, 16px);
+    }
+    .wiki-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6, 24px);
+      margin-bottom: var(--space-8, 32px);
+    }
+    @media (max-width: 768px) {
+      .wiki-grid {
+        grid-template-columns: 1fr;
+      }
+      .wiki-header-card {
+        flex-direction: column;
+      }
+    }
+    .info-card {
+      background: var(--color-surface-card, #FFFFFF);
+      border: 1px solid var(--color-border-subtle, #E2E8F0);
+      border-radius: var(--radius-xl, 16px);
+      padding: var(--space-6, 24px);
+    }
+    .info-card h2 {
+      font-size: var(--font-size-lg, 18px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 var(--space-4, 16px);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 8px);
+      color: var(--color-text-primary, #0F1C19);
+    }
+    .stat-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3, 12px);
+    }
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: var(--space-2, 8px);
+      border-bottom: 1px dashed var(--color-border-subtle, #E2E8F0);
+    }
+    .stat-label {
+      font-size: var(--font-size-sm, 14px);
+      color: var(--color-text-secondary, #475569);
+    }
+    .stat-value {
+      font-size: var(--font-size-sm, 14px);
+      font-weight: 600;
+      color: var(--color-text-primary, #0F1C19);
+    }
+    .legal-text-box {
+      background: var(--color-surface-subtle, #F8FAFC);
+      border-left: 3px solid var(--color-primary-teal, #2F524C);
+      padding: var(--space-4, 16px);
+      border-radius: 0 var(--radius-md, 8px) var(--radius-md, 8px) 0;
+      font-size: var(--font-size-sm, 14px);
+      line-height: 1.6;
+      color: var(--color-text-secondary, #334155);
+    }
+    .safe-harbor-box {
+      margin-top: var(--space-8, 32px);
+      padding: var(--space-4, 16px);
+      background: var(--color-surface-subtle, #F8FAFC);
+      border: 1px solid var(--color-border-subtle, #E2E8F0);
+      border-radius: var(--radius-lg, 12px);
+      font-size: 12px;
+      color: var(--color-text-muted, #64748B);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body class="showcase-shell">
+
+  <!-- Header -->
+  <header role="banner" id="app-header" class="showcase-header">
+    <div class="layout-container header-inner">
+      <a href="/" class="brand-link" aria-label="CM-LAB Home">
+        <span class="brand-logo-icon" aria-hidden="true">🛡️</span>
+        <span class="brand-name">CM-LAB</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="/" class="nav-item">Showcase</a>
+        <a href="/wiki" class="nav-item font-bold">Brand Policy Wiki</a>
+        <a href="/#mcp-playground" class="nav-item">MCP Console</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href={deepLinkWallet} class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
+          📱 Zur Wallet-App ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wiki-container">
+    <!-- Breadcrumb -->
+    <nav class="wiki-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/wiki">Brand Policy Wiki</a>
+      <span>/</span>
+      <span aria-current="page">{brand.brandName}</span>
+    </nav>
+
+    <!-- Header Card -->
+    <section class="wiki-header-card" aria-label="Markenübersicht">
+      <div class="brand-avatar" aria-hidden="true">
+        <BrandIcon slug={brand.brandSlug} size={36} />
+      </div>
+
+      <div class="brand-title-wrap">
+        <h1>{brand.brandName}</h1>
+        <div class="brand-badges">
+          {isSubscription ? (
+            <span class="badge badge-coral">🔄 Abonnement</span>
+          ) : (
+            <span class="badge badge-teal">📦 Hardware-Kauf</span>
+          )}
+
+          {brand.cancellationButtonCompliant && (
+            <span class="badge badge-green">✓ § 312k Kündigungsbutton konform</span>
+          )}
+
+          <span class="badge badge-gray">📅 Verifiziert: {brand.verifiedDate}</span>
+        </div>
+
+        <div class="action-button-row">
+          <!-- 1-Tap Deep Link to Sovereign Consumer Wallet -->
+          <a
+            href={deepLinkWallet}
+            class="btn btn-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Diesen Eintrag in der lokalen Sovereign Wallet PWA ansehen"
+          >
+            📱 In Wallet-App öffnen ↗
+          </a>
+
+          {brand.cancellationUrl && (
+            <a
+              href={brand.cancellationUrl}
+              class="btn btn-outline"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Direkter Kündigungslink beim Anbieter gem. § 312k BGB"
+            >
+              🔗 Direkt zum Kündigungsbutton ↗
+            </a>
+          )}
+
+          <a
+            href={deepLinkCapture}
+            class="btn btn-accent"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Neuen Beleg oder Vertrag für diese Marke in die eigene Wallet aufnehmen"
+          >
+            ➕ In Wallet erfassen
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Details Grid -->
+    <div class="wiki-grid">
+      <!-- Statutory Protections Card -->
+      <section class="info-card" aria-label="Gesetzliche Schutzbestimmungen">
+        <h2>⚖️ Gesetzliche Schutzrechte</h2>
+        <div class="stat-list">
+          <div class="stat-item">
+            <span class="stat-label">Gesetzliche Mängelhaftung (Gewährleistung)</span>
+            <span class="stat-value">{brand.statutoryWarrantyMonths} Monate (§ 438 BGB)</span>
+          </div>
+
+          {!isSubscription && (
+            <>
+              <div class="stat-item">
+                <span class="stat-label">Gesetzliche Beweislastumkehr</span>
+                <span class="stat-value">12 Monate (§ 477 Abs. 1 BGB)</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Freiwillige Herstellergarantie</span>
+                <span class="stat-value">{brand.commercialGuaranteeMonths} Monate (§ 443 BGB)</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Belegverlust-Schutz (§ 286 ZPO)</span>
+                <span class="stat-value text-protected">Kontoauszug / Zeugenbeweis gültig</span>
+              </div>
+            </>
+          )}
+
+          {isSubscription && (
+            <>
+              <div class="stat-item">
+                <span class="stat-label">Kündigungsfrist nach Verlängerung</span>
+                <span class="stat-value">Max. {brand.cancellationNoticeMonths} Monat (§ 309 Nr. 9 BGB)</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Kündigungsbutton (§ 312k BGB)</span>
+                <span class="stat-value">{brand.cancellationButtonCompliant ? 'Konform & verifiziert' : 'Prüfung ausstehend'}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Sofortiges Kündigungsrecht (§ 312k Abs. 6)</span>
+                <span class="stat-value text-protected">Jederzeit bei fehlendem Button</span>
+              </div>
+            </>
+          )}
+
+          <div class="stat-item">
+            <span class="stat-label">Kundenservice &amp; Support-Kontakt</span>
+            <span class="stat-value">
+              <a href={`mailto:${brand.supportEmail}`} style="color: var(--color-primary-teal, #2F524C);">
+                {brand.supportEmail}
+              </a>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Legal Analysis Card -->
+      <section class="info-card" aria-label="Juristische Prüfung & Handlungsempfehlung">
+        <h2>📜 Juristische Einordnung</h2>
+        <div class="legal-text-box">
+          <p>{brand.legalNotes}</p>
+        </div>
+
+        <div style="margin-top: var(--space-4, 16px);">
+          <div class="stat-label" style="margin-bottom: var(--space-2, 8px);">Such-Aliase &amp; Synonyme:</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            {brand.searchAliases.map((alias: string) => (
+              <span class="badge badge-gray">{alias}</span>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Safe-Harbor Legal Footer -->
+    <footer class="safe-harbor-box" role="contentinfo">
+      <strong>Gesetzlicher Hinweis gem. BGH VIII ZR 285/18 (LexFox):</strong>
+      Die in diesem Brand Policy Wiki bereitgestellten Informationen wurden mit wissenschaftlicher Sorgfalt automatisiert zusammengestellt. Sie stellen allgemeine rechtliche Vorab-Informationen dar und begründen keine individuelle Rechtsberatung im Sinne des Rechtsdienstleistungsgesetzes (RDG §§ 2, 3). Alle Daten basieren auf den verifizierten Bestimmungen des deutschen Bürgerlichen Gesetzbuches (BGB).
+    </footer>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+---
+import WalletApp from '../components/WalletApp.svelte';
+---
+
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#2F524C" />
+  <meta name="description" content="CM-LAB: Sovereign Consumer Rights, Subscription & Tax-Ready Wallet PWA" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>CM-LAB Wallet — BGB Fristen, Kündigung & Steuern</title>
+
+  <style is:global>
+    @import '@cmlab/design-tokens/tokens.css';
+
+    :root {
+      --height-viewport: 100dvh;
+      --padding-safe-bottom: env(safe-area-inset-bottom, 16px);
+      --padding-safe-top: env(safe-area-inset-top, 0px);
+      box-sizing: border-box;
+    }
+
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100dvh;
+      background-color: var(--color-surface-canvas, #F4F7F6);
+      color: var(--color-text-primary, #0F172A);
+      font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 12-Column Responsive Grid Contract */
+    .grid-12-col {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: var(--space-4, 16px);
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: var(--space-4, 16px);
+      padding-bottom: calc(var(--space-12, 48px) + var(--padding-safe-bottom));
+    }
+
+    @media (max-width: 768px) {
+      .grid-12-col {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3, 12px);
+        padding: var(--space-3, 12px);
+      }
+    }
+  </style>
+</head>
+<body class="app-shell">
+  <!-- Greenfield Svelte 5 Single Root Island Router -->
+  <WalletApp client:only="svelte" />
+
+  <noscript>
+    <header role="banner" id="app-header">
+      <div role="combobox" aria-expanded="false" id="omnibar-root"></div>
+    </header>
+    <main id="app-dashboard-grid" class="grid-12-col">
+      <div style="padding: 24px; text-align: center; color: #7F1D1D; background: #FEE2E2; margin: 20px; border-radius: 8px;">
+        <h2>JavaScript Required</h2>
+        <p>CM-LAB Sovereign Consumer Wallet requires JavaScript for 100% client-side IndexedDB encryption and BGB statutory calculations.</p>
+      </div>
+    </main>
+  </noscript>
+</body>
+</html>

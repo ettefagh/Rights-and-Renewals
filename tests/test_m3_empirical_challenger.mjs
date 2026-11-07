@@ -1,682 +1,631 @@
 /**
- * test_m3_empirical_challenger.mjs
- * Empirical Challenger Verification & Stress Test Harness for Milestone 3 Gate (apps/app/)
- * Author: Empirical Challenger (teamwork_challenger_m3_2)
- *
- * Verifies:
- * 1. UrgentAttentionBanner: boundary days <= 30 (urgent cliff), <= 7 (imminent renewal), > 30 (not in banner)
- * 2. SpendSubscriptionRadar: sum calculation of monthly recurring expenses, annual liability, and tax deduction filtering
- * 3. MasterVaultLedger: category filtering, status pills, and GoBD SHA-256 copy functionality
- * 4. ContextualItemDrawer: 520px slide-over width, 24m statutory BGB timeline, GoBD receipt tamper detection, and cancellation CTA (BGB § 312k)
- * 5. Viewport geometry and DOM layout down to 320px/375px (0px horizontal overflow) via Headless Chromium CDP
- * 6. Application Bootstrap & Runtime Integrity
+ * tests/test_m3_empirical_challenger.mjs
+ * Comprehensive Empirical Adversarial Verification Suite for Milestone M3 (Showcase, Wiki, MCP, Quality Gates)
+ * Author: Empirical Challenger (challenger_m3_2)
  */
 
-import http from 'http';
 import fs from 'fs';
 import path from 'path';
-import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
-
-import { UrgentAttentionBanner, SpendSubscriptionRadar, MasterVaultLedger } from '../apps/app/js/components/widgets.js';
-import { BGBTimelineService } from '../apps/app/js/services/bgbTimeline.js';
-import { GoBDCryptoService } from '../apps/app/js/services/gobdCrypto.js';
-import { INITIAL_VAULT_ITEMS, ANCHOR_DATE } from '../apps/app/js/data/sampleItems.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, '..');
-const APP_DIR = path.join(REPO_ROOT, 'apps', 'app');
 
-// Results collector
-const results = {
+// Import showcase production built edge endpoint & Cloudflare pages function
+import { page as mcpPage } from '../apps/showcase/dist/_worker.js/pages/api/mcp.astro.mjs';
+const { POST: showcasePost, OPTIONS: showcaseOptions, ALL: showcaseAll } = mcpPage();
+import { onRequest as pagesOnRequest } from '../apps/showcase/functions/api/mcp.ts';
+
+// Test statistics
+const stats = {
   total: 0,
   passed: 0,
   failed: 0,
-  findings: [],
-  categories: {
-    urgentAttentionBanner: { total: 0, passed: 0, failed: 0 },
-    spendSubscriptionRadar: { total: 0, passed: 0, failed: 0 },
-    masterVaultLedger: { total: 0, passed: 0, failed: 0 },
-    contextualItemDrawer: { total: 0, passed: 0, failed: 0 },
-    viewportGeometryHeadless: { total: 0, passed: 0, failed: 0 },
-    appBootstrapAndIntegrity: { total: 0, passed: 0, failed: 0 }
-  },
-  tests: []
+  failures: []
 };
 
-function assert(category, condition, testName, details = '') {
-  results.total++;
-  results.categories[category].total++;
+function assert(condition, name, details = '') {
+  stats.total++;
   if (condition) {
-    results.passed++;
-    results.categories[category].passed++;
-    results.tests.push({ category, name: testName, status: 'PASS', details });
-    console.log(`  [PASS] [${category}] ${testName}`);
+    stats.passed++;
+    console.log(`  [PASS] ${name}`);
   } else {
-    results.failed++;
-    results.categories[category].failed++;
-    const errMsg = `[${category}] FAILED: ${testName} - ${details}`;
-    results.findings.push(errMsg);
-    results.tests.push({ category, name: testName, status: 'FAIL', details });
-    console.error(`  [FAIL] [${category}] ${testName} - ${details}`);
+    stats.failed++;
+    stats.failures.push({ name, details });
+    console.error(`  [FAIL] ${name} — ${details}`);
   }
 }
 
-function createMockContainer() {
-  const listeners = new Map();
-  return {
-    innerHTML: '',
-    querySelectorAll: () => [],
-    querySelector: () => null,
-    addEventListener: (ev, cb) => {
-      if (!listeners.has(ev)) listeners.set(ev, []);
-      listeners.get(ev).push(cb);
+// Mock Request helper for Astro API Route
+function createAstroContext(body, method = 'POST', headers = {}) {
+  const req = new Request('https://cm-lab.pages.dev/api/mcp', {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    body: method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS'
+      ? (typeof body === 'string' ? body : JSON.stringify(body))
+      : undefined
+  });
+  return { request: req };
+}
+
+async function runM3EmpiricalSuite() {
+  console.log('='.repeat(80));
+  console.log('  MILESTONE M3 EMPIRICAL ADVERSARIAL CHALLENGER SUITE');
+  console.log('='.repeat(80));
+
+  // ==========================================================================
+  // SUITE 1: SHOWCASE LANDING PAGE DOM ARCHITECTURE & STATIC CONTRACTS
+  // ==========================================================================
+  console.log('\n--- SUITE 1: Landing Page DOM Element Contracts & Structure ---');
+  const indexAstroPath = path.join(REPO_ROOT, 'apps', 'showcase', 'src', 'pages', 'index.astro');
+  assert(fs.existsSync(indexAstroPath), 'apps/showcase/src/pages/index.astro exists');
+  const indexAstroContent = fs.readFileSync(indexAstroPath, 'utf8');
+
+  // Verify mandatory DOM elements specified by challenger mandate
+  const mandatoryElements = [
+    { selector: '#mcp-playground', desc: 'Split-Screen MCP Protocol Playground root section' },
+    { selector: '.mcp-console-panel', desc: 'MCP Protocol Console panel' },
+    { selector: '#app-simulator-root', desc: 'Live App Simulator container' },
+    { selector: '#showcase-omnibar-root', desc: 'Multi-Domain Omnibar Search container' },
+    { selector: '#calendar-suite-root', desc: 'Triple Calendar Suite container' },
+    { selector: '#spend-radar-widget', desc: 'Spend & Warranty Radar widget container' },
+    { selector: '#gobd-feed-widget', desc: 'GoBD SHA-256 Receipt Feed widget container' },
+    { selector: '#quick-connect-modal', desc: 'AI Agent Quick-Connect dialog' },
+    { selector: '#header-connect-btn', desc: 'Header Agent Connect button' },
+    { selector: '#theme-toggle-btn', desc: 'Theme toggle button' },
+    { selector: '.hero-3d-scene-container', desc: 'Hero 3D Spatial Canvas wrapper' },
+    { selector: '#safe-harbor-footer-root', desc: 'Safe-Harbor Legal Notice container' }
+  ];
+
+  for (const el of mandatoryElements) {
+    const rawPattern = el.selector.startsWith('#')
+      ? `id="${el.selector.slice(1)}"`
+      : `class=".*${el.selector.slice(1)}.*"`;
+    const regex = new RegExp(rawPattern);
+    assert(regex.test(indexAstroContent), `DOM Element exists: ${el.selector} (${el.desc})`);
+  }
+
+  // ==========================================================================
+  // SUITE 2: THRELTE 8 3D CANVAS & REDUCED-MOTION VECTOR FALLBACK
+  // ==========================================================================
+  console.log('\n--- SUITE 2: Threlte 8 3D Canvas Fallback & WebGL Context Loss ---');
+  const scenePath = path.join(REPO_ROOT, 'apps', 'showcase', 'src', 'components', '3d', 'ShowcaseVaultScene.svelte');
+  const fallbackPath = path.join(REPO_ROOT, 'apps', 'showcase', 'src', 'components', '3d', 'StaticVectorFallback.svelte');
+
+  assert(fs.existsSync(scenePath), 'ShowcaseVaultScene.svelte exists');
+  assert(fs.existsSync(fallbackPath), 'StaticVectorFallback.svelte exists');
+
+  const sceneContent = fs.readFileSync(scenePath, 'utf8');
+  const fallbackContent = fs.readFileSync(fallbackPath, 'utf8');
+
+  // Verify conditional rendering logic in ShowcaseVaultScene
+  assert(
+    sceneContent.includes('reducedMotion = false') && sceneContent.includes('hasContextLost = $state'),
+    'ShowcaseVaultScene manages reducedMotion and hasContextLost reactive runes'
+  );
+  assert(
+    sceneContent.includes('{#if !reducedMotion && !hasContextLost}') && sceneContent.includes('<StaticVectorFallback />'),
+    'ShowcaseVaultScene falls back to StaticVectorFallback when reducedMotion or hasContextLost is true'
+  );
+  assert(
+    sceneContent.includes('webglcontextlost') && sceneContent.includes('handleContextLost'),
+    'ShowcaseVaultScene attaches webglcontextlost listener and transitions gracefully'
+  );
+  assert(
+    sceneContent.includes('Math.min(window.devicePixelRatio || 1, 1.5)'),
+    'ShowcaseVaultScene clamps DPR <= 1.5 to prevent GPU overload'
+  );
+  assert(
+    sceneContent.includes('visibilitychange') && sceneContent.includes('isPageHidden'),
+    'ShowcaseVaultScene monitors document visibility to freeze rendering loop on tab blur'
+  );
+
+  // Verify StaticVectorFallback SVG specifications
+  assert(fallbackContent.includes('<svg class="fallback-svg"'), 'StaticVectorFallback renders vector SVG');
+  assert(fallbackContent.includes('role="img"'), 'StaticVectorFallback sets role="img" for accessibility');
+  assert(fallbackContent.includes('CM-LAB VAULT'), 'StaticVectorFallback includes titanium card brand text');
+  assert(fallbackContent.includes('BGB'), 'StaticVectorFallback includes BGB gold seal chip');
+  assert(fallbackContent.includes('12m · § 477'), 'StaticVectorFallback visualizes BGB § 477 12-month cliff');
+  assert(fallbackContent.includes('24m · § 438'), 'StaticVectorFallback visualizes BGB § 438 24-month warranty expiry');
+  assert(fallbackContent.includes('AES-GCM-256 · ZERO CLOUD PLAINTEXT'), 'StaticVectorFallback declares AES-GCM-256 zero cloud plaintext');
+
+  // ==========================================================================
+  // SUITE 3: STATIC BRAND POLICY WIKI PRERENDER AUDIT
+  // ==========================================================================
+  console.log('\n--- SUITE 3: Static Brand Policy Wiki Prerender Output Audit ---');
+  const distWikiDir = path.join(REPO_ROOT, 'apps', 'showcase', 'dist', 'wiki');
+  assert(fs.existsSync(distWikiDir), 'apps/showcase/dist/wiki directory exists in build output');
+
+  const wikiIndexHtml = path.join(distWikiDir, 'index.html');
+  assert(fs.existsSync(wikiIndexHtml), 'Static /wiki/index.html directory exists');
+  const wikiIndexContent = fs.readFileSync(wikiIndexHtml, 'utf8');
+
+  // Canonical 20 student brands
+  const canonicalBrands = [
+    'spotify', 'apple', 'mediamarkt', 'amazon', 'netflix', 'adobe', 'microsoft',
+    'deutsche-bahn', 'github', 'jetbrains', 'youtube', 'saturn', 'otto',
+    'mindfactory', 'notion', 'gymshark', 'mcfit', 'urban-sports-club', 'disney-plus', 'vodafone'
+  ];
+
+  assert(canonicalBrands.length === 20, 'Top 20 student brands list complete');
+
+  for (const slug of canonicalBrands) {
+    const brandHtmlPath = path.join(distWikiDir, slug, 'index.html');
+    const brandExists = fs.existsSync(brandHtmlPath);
+    assert(brandExists, `Static page generated: /wiki/${slug}/index.html`);
+
+    if (brandExists) {
+      const content = fs.readFileSync(brandHtmlPath, 'utf8');
+      assert(content.length > 2500, `/wiki/${slug}/index.html has complete content (>2.5KB, actual: ${content.length} bytes)`);
+
+      // Verify BGB citations
+      const hasBgb = content.includes('BGB') && (content.includes('§ 438') || content.includes('§ 309') || content.includes('§ 312k') || content.includes('§ 477'));
+      assert(hasBgb, `/wiki/${slug}/index.html contains statutory BGB citations`);
+
+      // Verify LexFox safe harbor
+      const hasLexFox = content.includes('BGH VIII ZR 285/18 (LexFox)') || content.includes('BGH, Urteil vom 27.11.2019 – VIII ZR 285/18') || content.includes('LexFox');
+      assert(hasLexFox, `/wiki/${slug}/index.html contains LexFox safe-harbor notice`);
+
+      // Verify deep links with hash fragments (preserves zero cloud plaintext)
+      const hasDeepLink = content.includes(`https://app.cm-lab.pages.dev/#action=view&slug=${slug}`);
+      assert(hasDeepLink, `/wiki/${slug}/index.html includes 1-tap deep link to sovereign wallet with hash fragment`);
+
+      // Verify index page links to this brand
+      assert(wikiIndexContent.includes(`/wiki/${slug}`), `Directory index /wiki links to /wiki/${slug}`);
+    }
+  }
+
+  // ==========================================================================
+  // SUITE 4: OPEN MCP SERVER ADVERSARIAL STRESS & PROTOCOL CONFORMANCE
+  // ==========================================================================
+  console.log('\n--- SUITE 4: Open MCP JSON-RPC 2.0 Server Adversarial Testing ---');
+
+  // 4.1 CORS & OPTIONS
+  const optionsCtx = createAstroContext(null, 'OPTIONS');
+  const optRes = await showcaseOptions(optionsCtx);
+  assert(optRes.status === 204, 'OPTIONS returns HTTP 204 No Content');
+  assert(optRes.headers.get('Access-Control-Allow-Origin') === '*', 'OPTIONS header Access-Control-Allow-Origin is *');
+  assert(optRes.headers.get('Access-Control-Allow-Methods').includes('POST'), 'OPTIONS header allows POST');
+
+  // 4.2 Non-POST HTTP methods via ALL handler
+  for (const method of ['GET', 'PUT', 'DELETE', 'PATCH']) {
+    const allCtx = createAstroContext(null, method);
+    const allRes = await showcaseAll(allCtx);
+    assert(allRes.status === 405, `${method} returns HTTP 405 Method Not Allowed`);
+    const allJson = await allRes.json();
+    assert(allJson.error?.code === -32600, `${method} returns JSON-RPC error code -32600`);
+  }
+
+  // 4.3 Malformed JSON (Parse Error -32700)
+  const parseCtx = createAstroContext('{ malformed json }', 'POST');
+  const parseRes = await showcasePost(parseCtx);
+  assert(parseRes.status === 400, 'Malformed JSON returns HTTP 400');
+  const parseJson = await parseRes.json();
+  assert(parseJson.error?.code === -32700, 'Malformed JSON returns code -32700 (Parse error)');
+
+  // 4.4 Invalid Request Envelopes (-32600)
+  const invalidEnvelopes = [
+    {},
+    { id: 1 },
+    { jsonrpc: '1.0', id: 2, method: 'tools/list' },
+    { jsonrpc: '3.0', id: 3, method: 'tools/list' },
+    { jsonrpc: '2.0', id: 4 } // missing method
+  ];
+  for (let i = 0; i < invalidEnvelopes.length; i++) {
+    const envCtx = createAstroContext(invalidEnvelopes[i], 'POST');
+    const envRes = await showcasePost(envCtx);
+    assert(envRes.status === 400, `Invalid envelope #${i + 1} returns HTTP 400`);
+    const envJson = await envRes.json();
+    assert(envJson.error?.code === -32600, `Invalid envelope #${i + 1} returns error code -32600`);
+  }
+
+  // 4.5 Unknown Method (-32601)
+  const unkCtx = createAstroContext({ jsonrpc: '2.0', id: 'm1', method: 'non_existent_method' }, 'POST');
+  const unkRes = await showcasePost(unkCtx);
+  const unkJson = await unkRes.json();
+  assert(unkJson.error?.code === -32601, 'Non-existent method returns error code -32601', `Received raw response: ${JSON.stringify(unkJson)}`);
+
+  // 4.6 Initialize Protocol Call
+  const initCtx = createAstroContext({ jsonrpc: '2.0', id: 'init-1', method: 'initialize' }, 'POST');
+  const initRes = await showcasePost(initCtx);
+  const initJson = await initRes.json();
+  assert(initJson.result?.protocolVersion === '2024-11-05', 'initialize returns protocolVersion 2024-11-05');
+  assert(initJson.result?.serverInfo?.name === 'cmlab-warranty-mcp', 'initialize returns serverInfo.name cmlab-warranty-mcp');
+
+  // 4.7 Tools List
+  const listCtx = createAstroContext({ jsonrpc: '2.0', id: 'list-1', method: 'tools/list' }, 'POST');
+  const listRes = await showcasePost(listCtx);
+  const listJson = await listRes.json();
+  const toolNames = listJson.result?.tools?.map(t => t.name) || [];
+  assert(toolNames.includes('policy_lookup'), 'tools/list includes policy_lookup');
+  assert(toolNames.includes('claim_dossier_generate'), 'tools/list includes claim_dossier_generate');
+  assert(toolNames.includes('statutory_law_lookup'), 'tools/list includes statutory_law_lookup');
+  assert(toolNames.includes('subscription_category_rules'), 'tools/list includes subscription_category_rules');
+  assert(toolNames.includes('tax_deductibility_check'), 'tools/list includes tax_deductibility_check');
+
+  // 4.8 policy_lookup tool calls
+  // Valid lookup with service_slug
+  const p1Ctx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'p1',
+    method: 'tools/call',
+    params: { name: 'policy_lookup', arguments: { service_slug: 'spotify' } }
+  });
+  const p1Res = await showcasePost(p1Ctx);
+  const p1Json = await p1Res.json();
+  assert(!p1Json.error, 'policy_lookup(service_slug: spotify) succeeds without error');
+  const p1Data = JSON.parse(p1Json.result.content[0].text);
+  assert(p1Data.brand_name === 'Spotify', 'policy_lookup returns Spotify metadata');
+  assert(p1Data.cancellation_button_compliant === true, 'Spotify marked § 312k button compliant');
+
+  // Dual-slug compatibility with brand_slug
+  const p2Ctx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'p2',
+    method: 'tools/call',
+    params: { name: 'policy_lookup', arguments: { brand_slug: 'spotify' } }
+  });
+  const p2Res = await showcasePost(p2Ctx);
+  const p2Json = await p2Res.json();
+  const p2Data = JSON.parse(p2Json.result.content[0].text);
+  assert(p2Data.brand_name === 'Spotify', 'policy_lookup with dual-slug brand_slug succeeds');
+
+  // Alias resolution
+  const p3Ctx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'p3',
+    method: 'tools/call',
+    params: { name: 'policy_lookup', arguments: { service_slug: 'macbook' } }
+  });
+  const p3Res = await showcasePost(p3Ctx);
+  const p3Json = await p3Res.json();
+  const p3Data = JSON.parse(p3Json.result.content[0].text);
+  assert(p3Data.brand_name === 'Apple', 'Alias "macbook" successfully resolves to brand Apple');
+
+  // Invalid params rejection (-32602)
+  const badPolicyArgs = [
+    {},
+    { service_slug: '' },
+    { service_slug: '   ' },
+    { brand_slug: '' },
+    { brand_slug: 12345 }
+  ];
+  for (let i = 0; i < badPolicyArgs.length; i++) {
+    const badCtx = createAstroContext({
+      jsonrpc: '2.0',
+      id: `bad-p-${i}`,
+      method: 'tools/call',
+      params: { name: 'policy_lookup', arguments: badPolicyArgs[i] }
+    });
+    const badRes = await showcasePost(badCtx);
+    const badJson = await badRes.json();
+    assert(badJson.error?.code === -32602, `policy_lookup rejects bad params #${i + 1} with code -32602`);
+  }
+
+  // Unknown brand handling
+  const unkBrandCtx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'unk-b',
+    method: 'tools/call',
+    params: { name: 'policy_lookup', arguments: { service_slug: 'unregistered-fake-brand-999' } }
+  });
+  const unkBrandRes = await showcasePost(unkBrandCtx);
+  const unkBrandJson = await unkBrandRes.json();
+  assert(unkBrandJson.result?.isError === true, 'Unknown brand returns result.isError === true without crashing');
+
+  // 4.9 claim_dossier_generate tool calls
+  // Valid claim dossier
+  const c1Ctx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'c1',
+    method: 'tools/call',
+    params: {
+      name: 'claim_dossier_generate',
+      arguments: {
+        brand_slug: 'apple',
+        item_name: 'Apple MacBook Pro 16 M3 Max',
+        purchase_date: '2026-01-15',
+        defect_description: 'Kernel panic on external display connection'
+      }
+    }
+  });
+  const c1Res = await showcasePost(c1Ctx);
+  const c1Json = await c1Res.json();
+  assert(!c1Json.error, 'claim_dossier_generate succeeds');
+  const c1Data = JSON.parse(c1Json.result.content[0].text);
+  assert(c1Data.burden_of_proof === 'seller', 'Recent purchase within 12m places burden of proof on seller (§ 477 Abs. 1)');
+  assert(c1Data.lexfox_safe_harbor_certified === true, 'Claim dossier is LexFox safe-harbor certified');
+  assert(c1Data.dossier_text_de.includes('MÄNGELRÜGE GEMÄSS § 437 BGB'), 'Dossier text includes BGB § 437 header');
+  assert(c1Data.dossier_text_de.includes('BGH VIII ZR 285/18 (LexFox)'), 'Dossier text embeds non-removable LexFox disclaimer');
+
+  // Leap year boundary test: 2024-02-29 purchase cliff date
+  const leapCtx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'leap-1',
+    method: 'tools/call',
+    params: {
+      name: 'claim_dossier_generate',
+      arguments: {
+        brand_slug: 'sony',
+        item_name: 'Sony Headphones',
+        purchase_date: '2024-02-29',
+        defect_description: 'Driver rattle'
+      }
+    }
+  });
+  const leapRes = await showcasePost(leapCtx);
+  const leapJson = await leapRes.json();
+  const leapData = JSON.parse(leapJson.result.content[0].text);
+  assert(leapData.cliff_date === '2025-02-28', 'Leap day 2024-02-29 correctly resolves to 2025-02-28 cliff (§ 188 Abs. 3 BGB)');
+
+  // Missing and malformed arguments rejection (-32602)
+  const badClaimArgs = [
+    {},
+    { brand_slug: 'apple' },
+    { brand_slug: 'apple', item_name: 'MacBook' },
+    { brand_slug: 'apple', item_name: 'MacBook', purchase_date: '2026-01-01' }, // missing defect_description
+    { brand_slug: 'apple', item_name: 'MacBook', purchase_date: 'invalid-date', defect_description: 'crack' },
+    { brand_slug: 'apple', item_name: 'MacBook', purchase_date: '15.01.2026', defect_description: 'crack' },
+    { brand_slug: 'apple', item_name: 'MacBook', purchase_date: '2026/01/15', defect_description: 'crack' }
+  ];
+  for (let i = 0; i < badClaimArgs.length; i++) {
+    const badCtx = createAstroContext({
+      jsonrpc: '2.0',
+      id: `bad-c-${i}`,
+      method: 'tools/call',
+      params: { name: 'claim_dossier_generate', arguments: badClaimArgs[i] }
+    });
+    const badRes = await showcasePost(badCtx);
+    const badJson = await badRes.json();
+    assert(badJson.error?.code === -32602, `claim_dossier_generate rejects invalid input #${i + 1} with -32602`);
+  }
+
+  // 4.10 Core-delegated tools
+  // statutory_law_lookup
+  const lawCtx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'law-1',
+    method: 'tools/call',
+    params: { name: 'statutory_law_lookup', arguments: { statute_section: '477' } }
+  });
+  const lawRes = await showcasePost(lawCtx);
+  const lawJson = await lawRes.json();
+  const hasLawResult = Boolean(lawJson && lawJson.result && Array.isArray(lawJson.result.content));
+  assert(hasLawResult, 'statutory_law_lookup(477) returns valid JSON-RPC 2.0 result envelope', `Received raw response: ${JSON.stringify(lawJson)}`);
+  if (hasLawResult) {
+    const lawData = JSON.parse(lawJson.result.content[0].text);
+    assert(lawData.statute_section === '§ 477 BGB' || lawData.statute_section?.includes('477'), 'Returns BGB § 477 summary');
+  }
+
+  // subscription_category_rules
+  const subRuleCtx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'sub-1',
+    method: 'tools/call',
+    params: { name: 'subscription_category_rules', arguments: { subscription_type: 'streaming' } }
+  });
+  const subRuleRes = await showcasePost(subRuleCtx);
+  const subRuleJson = await subRuleRes.json();
+  const hasSubRuleResult = Boolean(subRuleJson && subRuleJson.result && Array.isArray(subRuleJson.result.content));
+  assert(hasSubRuleResult, 'subscription_category_rules(streaming) returns valid JSON-RPC 2.0 result envelope', `Received raw response: ${JSON.stringify(subRuleJson)}`);
+  if (hasSubRuleResult) {
+    const subRuleData = JSON.parse(subRuleJson.result.content[0].text);
+    assert(subRuleData.max_initial_term_months === 24, 'Streaming rules cite max 24 months initial term');
+  }
+
+  // tax_deductibility_check
+  const taxCtx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'tax-1',
+    method: 'tools/call',
+    params: {
+      name: 'tax_deductibility_check',
+      arguments: {
+        item_name: 'Dell Monitor UltraSharp 27',
+        item_category: 'hardware',
+        gross_price_eur: 450.00,
+        professional_use_percent: 100,
+        purchase_date: '2026-03-01'
+      }
+    }
+  });
+  const taxRes = await showcasePost(taxCtx);
+  const taxJson = await taxRes.json();
+  const hasTaxResult = Boolean(taxJson && taxJson.result && Array.isArray(taxJson.result.content));
+  assert(hasTaxResult, 'tax_deductibility_check returns valid JSON-RPC 2.0 result envelope', `Received raw response: ${JSON.stringify(taxJson)}`);
+  if (hasTaxResult) {
+    const taxData = JSON.parse(taxJson.result.content[0].text);
+    assert(taxData.is_deductible === true, 'Computer monitor is tax deductible');
+    assert(taxData.write_off_method?.includes('Sofortabschreibung'), 'Digital hardware qualifies for 100% Sofortabschreibung under BMF 2022');
+  }
+
+  // 4.11 Adversarial Payloads & Injection Fuzzing
+  console.log('\n--- SUITE 5: Adversarial Fuzzing, Injections & Edge Cases ---');
+  const hostilePayloads = [
+    { name: 'XSS script injection', payload: '<script>alert(document.cookie)</script>' },
+    { name: 'XSS img onerror', payload: '"><img src=x onerror=alert(1)>' },
+    { name: 'Template string evaluation', payload: '${process.exit(1)}' },
+    { name: 'SQL injection string', payload: "'; DROP TABLE items; --" },
+    { name: 'Directory traversal', payload: '../../../../../../windows/system32/cmd.exe' },
+    { name: 'Null byte injection', payload: 'spotify\u0000admin' },
+    { name: 'German umlauts & sharp s', payload: 'Mängelrüge & Kündigung für Maßanzug' },
+    { name: 'Unicode symbols & emoji', payload: '🛡️ ⚖️ ⚡ 📱 🇩🇪' },
+    { name: 'RTL override unicode', payload: '\u202Ereversed_text\u202C' }
+  ];
+
+  for (const { name: pName, payload } of hostilePayloads) {
+    const fuzzedCtx = createAstroContext({
+      jsonrpc: '2.0',
+      id: `fuzz-${pName}`,
+      method: 'tools/call',
+      params: {
+        name: 'claim_dossier_generate',
+        arguments: {
+          brand_slug: 'apple',
+          item_name: payload,
+          purchase_date: '2026-02-01',
+          defect_description: payload
+        }
+      }
+    });
+    const fuzzedRes = await showcasePost(fuzzedCtx);
+    assert(fuzzedRes.status === 200, `Hostile input [${pName}] processed safely without 500 crash`);
+    const fuzzedJson = await fuzzedRes.json();
+    assert(fuzzedJson.result?.content?.[0]?.text?.length > 0, `Hostile input [${pName}] produced valid output envelope`);
+  }
+
+  // Prototype pollution attempt
+  const pollutionCtx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'pollution-1',
+    method: 'tools/call',
+    params: {
+      name: 'policy_lookup',
+      arguments: {
+        service_slug: '__proto__',
+        constructor: { prototype: { poll: true } }
+      }
+    }
+  });
+  const pollRes = await showcasePost(pollutionCtx);
+  assert(pollRes.status === 200, 'Prototype pollution attempt does not crash server');
+  assert(Object.prototype.poll === undefined, 'Global prototype was not polluted');
+
+  // Gigantic payload (100KB defect description)
+  const giantDescription = 'Defekt in Touchpad '.repeat(5000); // ~100KB
+  const startGiant = performance.now();
+  const giantCtx = createAstroContext({
+    jsonrpc: '2.0',
+    id: 'giant-1',
+    method: 'tools/call',
+    params: {
+      name: 'claim_dossier_generate',
+      arguments: {
+        brand_slug: 'apple',
+        item_name: 'MacBook Pro',
+        purchase_date: '2026-01-10',
+        defect_description: giantDescription
+      }
+    }
+  });
+  const giantRes = await showcasePost(giantCtx);
+  const giantElapsed = performance.now() - startGiant;
+  assert(giantRes.status === 200, '100KB defect payload handled cleanly');
+  assert(giantElapsed < 100, `100KB defect processed in ${giantElapsed.toFixed(2)}ms (< 100ms)`);
+
+  // Concurrent Execution Stress Test
+  console.log('\n--- SUITE 6: Concurrent Execution Performance Benchmarking ---');
+  const concurrencyLevel = 50;
+  const concurrentPromises = [];
+  const startConcurrent = performance.now();
+
+  for (let i = 0; i < concurrencyLevel; i++) {
+    const slug = canonicalBrands[i % canonicalBrands.length];
+    const ctx = createAstroContext({
+      jsonrpc: '2.0',
+      id: `conc-${i}`,
+      method: 'tools/call',
+      params: { name: 'policy_lookup', arguments: { service_slug: slug } }
+    });
+    concurrentPromises.push(showcasePost(ctx));
+  }
+
+  const concurrentResults = await Promise.all(concurrentPromises);
+  const totalConcurrentElapsed = performance.now() - startConcurrent;
+  const avgLatency = totalConcurrentElapsed / concurrencyLevel;
+
+  assert(concurrentResults.every(r => r.status === 200), `All ${concurrencyLevel} concurrent requests returned HTTP 200`);
+  assert(avgLatency < 30, `Average concurrent latency ${avgLatency.toFixed(2)}ms meets < 30ms SLA`);
+  console.log(`  [BENCHMARK] ${concurrencyLevel} concurrent requests executed in ${totalConcurrentElapsed.toFixed(2)}ms (avg: ${avgLatency.toFixed(2)}ms/req)`);
+
+  // ==========================================================================
+  // SUITE 7: SECURITY HEADERS & ZERO STUDENT ATTRIBUTION AUDIT
+  // ==========================================================================
+  console.log('\n--- SUITE 7: Security Headers & Attribution Audit ---');
+  const headersPath = path.join(REPO_ROOT, 'apps', 'showcase', 'public', '_headers');
+  assert(fs.existsSync(headersPath), 'apps/showcase/public/_headers exists');
+  const headersContent = fs.readFileSync(headersPath, 'utf8');
+
+  assert(headersContent.includes('Permissions-Policy: camera=(self)'), 'Declares Permissions-Policy: camera=(self)');
+  assert(!headersContent.includes('Cross-Origin-Embedder-Policy: require-corp'), 'Strictly omits COEP: require-corp (Red Line 4)');
+  assert(headersContent.includes('Strict-Transport-Security:'), 'Declares Strict-Transport-Security (HSTS)');
+
+  // Student attribution audit across showcase source files
+  const showcaseFiles = [
+    indexAstroPath,
+    scenePath,
+    fallbackPath,
+    path.join(REPO_ROOT, 'apps', 'showcase', 'src', 'pages', 'api', 'mcp.ts'),
+    path.join(REPO_ROOT, 'apps', 'showcase', 'src', 'pages', 'wiki', '[slug].astro'),
+    path.join(REPO_ROOT, 'apps', 'showcase', 'src', 'pages', 'wiki', 'index.astro'),
+    path.join(REPO_ROOT, 'apps', 'showcase', 'src', 'main.js')
+  ];
+
+  const forbiddenAttributionTerms = [
+    'MojiRha', 'JeetKan', 'KhantLinHtut', 'Khant Lin Htut',
+    'student name', 'matriculation', 'matrikelnummer', 'homework assignment'
+  ];
+
+  let attributionLeaks = 0;
+  for (const f of showcaseFiles) {
+    if (fs.existsSync(f)) {
+      const txt = fs.readFileSync(f, 'utf8');
+      for (const term of forbiddenAttributionTerms) {
+        if (txt.toLowerCase().includes(term.toLowerCase())) {
+          console.error(`  [LEAK] Found attribution term "${term}" in ${path.relative(REPO_ROOT, f)}`);
+          attributionLeaks++;
+        }
+      }
+    }
+  }
+  assert(attributionLeaks === 0, 'Zero student names or personal homework attributions found in showcase source code');
+
+  // ==========================================================================
+  // FINAL SUMMARY
+  // ==========================================================================
+  console.log('\n' + '='.repeat(80));
+  console.log('  MILESTONE M3 CHALLENGER VERIFICATION SUMMARY');
+  console.log('='.repeat(80));
+  console.log(`  Total Checks: ${stats.total}`);
+  console.log(`  Passed:       ${stats.passed} (${((stats.passed / stats.total) * 100).toFixed(1)}%)`);
+  console.log(`  Failed:       ${stats.failed}`);
+  if (stats.failures.length > 0) {
+    console.log('\n  Failures:');
+    for (const f of stats.failures) {
+      console.log(`  - ${f.name}: ${f.details}`);
+    }
+  }
+  console.log('='.repeat(80));
+
+  // Write results to JSON artifact
+  const resultsArtifact = {
+    timestamp: new Date().toISOString(),
+    milestone: 'M3',
+    agent: 'challenger_m3_2',
+    verdict: stats.failed === 0 ? 'APPROVE' : 'REQUEST_CHANGES',
+    stats,
+    benchmark: {
+      concurrencyLevel,
+      totalConcurrentElapsedMs: totalConcurrentElapsed,
+      avgLatencyMsPerReq: avgLatency
     }
   };
+
+  fs.writeFileSync(
+    path.join(REPO_ROOT, 'tests', 'm3_empirical_challenger_results.json'),
+    JSON.stringify(resultsArtifact, null, 2)
+  );
+
+  return stats.failed === 0;
 }
 
-console.log('='.repeat(80));
-console.log('  CM-LAB MILESTONE 3 GATE: EMPIRICAL CHALLENGER VERIFICATION HARNESS');
-console.log('='.repeat(80));
-
-// ============================================================================
-// PART 1: UrgentAttentionBanner ADVERSARIAL STRESS & BOUNDARY TESTING
-// ============================================================================
-console.log('\n--- 1. Testing UrgentAttentionBanner Boundaries & Calculations ---');
-
-{
-  const container = createMockContainer();
-  const banner = new UrgentAttentionBanner(container);
-
-  // Boundary 1: Subscription with exactly daysRemaining = 30 (must be included)
-  banner.update([
-    { id: 'sub-30', category: 'subscription', name: 'Sub 30d', priceEur: 10.0, daysRemaining: 30 }
-  ]);
-  const alerts30 = banner.computeAlerts();
-  assert('urgentAttentionBanner', alerts30.urgentSubs.length === 1, 'Subscription at exactly daysRemaining=30 is included in banner');
-  assert('urgentAttentionBanner', alerts30.totalSpend === 10.0, 'Total spend includes daysRemaining=30 subscription');
-
-  // Boundary 2: Subscription with daysRemaining = 31 (must NOT be in banner)
-  banner.update([
-    { id: 'sub-31', category: 'subscription', name: 'Sub 31d', priceEur: 10.0, daysRemaining: 31 }
-  ]);
-  const alerts31 = banner.computeAlerts();
-  assert('urgentAttentionBanner', alerts31.urgentSubs.length === 0, 'Subscription at daysRemaining=31 is excluded from banner');
-  assert('urgentAttentionBanner', alerts31.totalSpend === 0, 'Total spend is 0 when daysRemaining=31');
-
-  // Boundary 3: Subscription with exactly daysRemaining = 7 (triggers critical red alert)
-  banner.update([
-    { id: 'sub-7', category: 'subscription', name: 'Sub 7d', priceEur: 15.0, daysRemaining: 7 }
-  ]);
-  const alerts7 = banner.computeAlerts();
-  assert('urgentAttentionBanner', alerts7.urgentSubs.length === 1, 'Subscription at daysRemaining=7 is included in banner');
-  assert('urgentAttentionBanner', container.innerHTML.includes('banner-critical'), 'Subscription at daysRemaining=7 receives banner-critical CSS class');
-  assert('urgentAttentionBanner', container.innerHTML.includes('Fristablauf ≤ 7 Tage'), 'Urgency badge displays "Fristablauf ≤ 7 Tage"');
-  assert('urgentAttentionBanner', container.innerHTML.includes('🛑'), 'Critical glyph 🛑 is rendered for daysRemaining=7');
-
-  // Boundary 4: Subscription with daysRemaining = 8 (warning amber alert, NOT critical red)
-  banner.update([
-    { id: 'sub-8', category: 'subscription', name: 'Sub 8d', priceEur: 12.0, daysRemaining: 8 }
-  ]);
-  assert('urgentAttentionBanner', container.innerHTML.includes('banner-warning'), 'Subscription at daysRemaining=8 receives banner-warning CSS class');
-  assert('urgentAttentionBanner', container.innerHTML.includes('Fristablauf ≤ 30 Tage'), 'Urgency badge displays "Fristablauf ≤ 30 Tage"');
-  assert('urgentAttentionBanner', container.innerHTML.includes('⚠️'), 'Warning glyph ⚠️ is rendered for daysRemaining=8');
-
-  // Boundary 5: Subscription with daysRemaining = 0 (renewal today, critical red)
-  banner.update([
-    { id: 'sub-0', category: 'subscription', name: 'Sub Today', priceEur: 9.99, daysRemaining: 0 }
-  ]);
-  assert('urgentAttentionBanner', container.innerHTML.includes('banner-critical'), 'Subscription at daysRemaining=0 receives banner-critical');
-
-  // Boundary 6: Past due subscription with daysRemaining < 0 (e.g. -2)
-  banner.update([
-    { id: 'sub-past', category: 'subscription', name: 'Sub Overdue', priceEur: 8.50, daysRemaining: -2 }
-  ]);
-  const alertsPast = banner.computeAlerts();
-  assert('urgentAttentionBanner', alertsPast.urgentSubs.length === 1, 'Overdue subscription with daysRemaining < 0 is captured');
-  assert('urgentAttentionBanner', container.innerHTML.includes('banner-critical'), 'Overdue subscription receives banner-critical');
-
-  // Boundary 7: Hardware at exactly daysToCliff = 45 with isWithinReversedBurdenOfProof = true
-  banner.update([
-    { id: 'hw-45', category: 'hardware', name: 'HW 45d', priceEur: 499.0, daysToCliff: 45, isWithinReversedBurdenOfProof: true }
-  ]);
-  const alertsHw45 = banner.computeAlerts();
-  assert('urgentAttentionBanner', alertsHw45.cliffWarnings.length === 1, 'Hardware at daysToCliff=45 with active proof burden is included');
-
-  // Boundary 8: Hardware at daysToCliff = 46 (excluded)
-  banner.update([
-    { id: 'hw-46', category: 'hardware', name: 'HW 46d', priceEur: 499.0, daysToCliff: 46, isWithinReversedBurdenOfProof: true }
-  ]);
-  const alertsHw46 = banner.computeAlerts();
-  assert('urgentAttentionBanner', alertsHw46.cliffWarnings.length === 0, 'Hardware at daysToCliff=46 is excluded');
-
-  // Boundary 9: Hardware at daysToCliff = 20 but isWithinReversedBurdenOfProof = false (consumer proof, excluded)
-  banner.update([
-    { id: 'hw-false', category: 'hardware', name: 'HW Expired Burden', priceEur: 300.0, daysToCliff: 20, isWithinReversedBurdenOfProof: false }
-  ]);
-  const alertsHwFalse = banner.computeAlerts();
-  assert('urgentAttentionBanner', alertsHwFalse.cliffWarnings.length === 0, 'Hardware with isWithinReversedBurdenOfProof=false is excluded from cliff alerts');
-
-  // Boundary 10: Empty vault or only safe items renders banner-safe
-  banner.update([
-    { id: 'safe-sub', category: 'subscription', name: 'Safe Sub', priceEur: 10.0, daysRemaining: 180 },
-    { id: 'safe-hw', category: 'hardware', name: 'Safe HW', priceEur: 800.0, daysToCliff: 250, isWithinReversedBurdenOfProof: true }
-  ]);
-  assert('urgentAttentionBanner', container.innerHTML.includes('banner-safe'), 'Safe vault with no alerts renders banner-safe');
-  assert('urgentAttentionBanner', container.innerHTML.includes('Alle Fristen gesichert'), 'Safe banner displays "Alle Fristen gesichert"');
-  assert('urgentAttentionBanner', container.innerHTML.includes('🛡️'), 'Safe banner renders shield glyph 🛡️');
-
-  // Boundary 11: Multi-item sorting: ensure urgent items are sorted ascending by daysRemaining
-  banner.update([
-    { id: 's20', category: 'subscription', name: 'Sub 20', priceEur: 10.0, daysRemaining: 20 },
-    { id: 's3', category: 'subscription', name: 'Sub 3', priceEur: 5.0, daysRemaining: 3 },
-    { id: 's12', category: 'subscription', name: 'Sub 12', priceEur: 8.0, daysRemaining: 12 }
-  ]);
-  const sortedAlerts = banner.computeAlerts();
-  assert('urgentAttentionBanner', sortedAlerts.urgentSubs[0].id === 's3', 'Urgent subscriptions sorted ascending: s3 first');
-  assert('urgentAttentionBanner', sortedAlerts.urgentSubs[1].id === 's12', 'Urgent subscriptions sorted ascending: s12 second');
-  assert('urgentAttentionBanner', sortedAlerts.urgentSubs[2].id === 's20', 'Urgent subscriptions sorted ascending: s20 third');
-  assert('urgentAttentionBanner', sortedAlerts.totalSpend === 23.0, 'Total spend correctly sums 10 + 5 + 8 = 23.0 €');
-
-  // Boundary 12: Action button presence for subscription (BGB § 312k cancel button)
-  assert('urgentAttentionBanner', container.innerHTML.includes('btn-urgent-cancel'), 'Banner renders .btn-urgent-cancel action button');
-  assert('urgentAttentionBanner', container.innerHTML.includes('Kündigen via Online-Button (§ 312k)'), 'Button text cites statutory § 312k');
-}
-
-// ============================================================================
-// PART 2: SpendSubscriptionRadar SUM CALCULATION & FILTERING
-// ============================================================================
-console.log('\n--- 2. Testing SpendSubscriptionRadar Calculations & Filters ---');
-
-{
-  const container = createMockContainer();
-  const radar = new SpendSubscriptionRadar(container);
-
-  // Scenario 1: Standard mix of hardware, subscriptions, and tax items
-  const testItems = [
-    { id: 'h1', category: 'hardware', priceEur: 1500.0, status: 'protected', isTaxDeductible: true },
-    { id: 'h2', category: 'hardware', priceEur: 300.0, status: 'warning', isTaxDeductible: false },
-    { id: 'h3', category: 'hardware', priceEur: 450.0, status: 'expired', isTaxDeductible: true }, // expired hardware
-    { id: 's1', category: 'subscription', priceEur: 9.99, status: 'urgent', daysRemaining: 5, isTaxDeductible: false },
-    { id: 's2', category: 'subscription', priceEur: 19.99, status: 'protected', daysRemaining: 120, isTaxDeductible: true },
-    { id: 's3', category: 'subscription', priceEur: 5.00, status: 'expired', daysRemaining: 0, isTaxDeductible: false } // expired subscription
-  ];
-
-  radar.update(testItems);
-  const kpis = radar.calculateKpis();
-
-  // Test 1: Total protected capital (active hardware: 1500 + 300 = 1800.0; expired h3 excluded)
-  assert('spendSubscriptionRadar', Math.abs(kpis.totalProtectedCapital - 1800.0) < 0.001, 'Protected hardware capital sums active hardware (1800.00 €)');
-
-  // Test 2: Monthly run rate (active subscriptions: 9.99 + 19.99 = 29.98 €; expired s3 excluded)
-  assert('spendSubscriptionRadar', Math.abs(kpis.monthlyRunRate - 29.98) < 0.001, 'Monthly run rate correctly sums active subscriptions (29.98 €)');
-
-  // Test 3: Annual liability (monthly * 12 = 29.98 * 12 = 359.76 €)
-  assert('spendSubscriptionRadar', Math.abs(kpis.annualRunRate - 359.76) < 0.001, 'Annual subscription liability equals monthly * 12 (359.76 €)');
-
-  // Test 4: Tax deductible total (all items where isTaxDeductible=true: h1 1500 + h3 450 + s2 19.99 = 1969.99 €)
-  assert('spendSubscriptionRadar', Math.abs(kpis.taxDeductibleTotal - 1969.99) < 0.001, 'Tax deductible total sums all isTaxDeductible items (1969.99 €)');
-
-  // Test 5 (ADVERSARIAL STRESS): Assert that cancellable subscriptions filter out expired items
-  const excludesExpiredFromCancellable = kpis.cancellableCount === 1;
-  assert('spendSubscriptionRadar', excludesExpiredFromCancellable, 'Cancellable subscriptions must exclude already-expired subscriptions (status !== "expired")',
-    `Observed cancellableCount=${kpis.cancellableCount} (s3 with status="expired" was included in cancellableSubs)`);
-
-  // Test 6: Zero items edge case
-  radar.update([]);
-  const zeroKpis = radar.calculateKpis();
-  assert('spendSubscriptionRadar', zeroKpis.totalProtectedCapital === 0, 'Zero items: totalProtectedCapital = 0');
-  assert('spendSubscriptionRadar', zeroKpis.monthlyRunRate === 0, 'Zero items: monthlyRunRate = 0');
-  assert('spendSubscriptionRadar', zeroKpis.annualRunRate === 0, 'Zero items: annualRunRate = 0');
-  assert('spendSubscriptionRadar', zeroKpis.taxDeductibleTotal === 0, 'Zero items: taxDeductibleTotal = 0');
-
-  // Test 7: Floating point precision stress test (many small decimals)
-  const floatItems = Array.from({ length: 100 }, (_, idx) => ({
-    id: `float-${idx}`,
-    category: 'subscription',
-    priceEur: 0.10,
-    status: 'protected',
-    daysRemaining: 15,
-    isTaxDeductible: true
-  }));
-  radar.update(floatItems);
-  const floatKpis = radar.calculateKpis();
-  assert('spendSubscriptionRadar', Math.abs(floatKpis.monthlyRunRate - 10.0) < 0.001, '100 items of 0.10 € sum to exactly 10.00 €');
-  assert('spendSubscriptionRadar', Math.abs(floatKpis.annualRunRate - 120.0) < 0.001, 'Annual liability sums to 120.00 €');
-
-  // Test 8: Render validation (contains metric cells and tax export button)
-  assert('spendSubscriptionRadar', container.innerHTML.includes('btn-export-tax'), 'Radar renders .btn-export-tax CSV button');
-  assert('spendSubscriptionRadar', container.innerHTML.includes('Steuerabzugsfähig (§ 9 EStG)'), 'Radar includes § 9 EStG tax metric label');
-  assert('spendSubscriptionRadar', container.innerHTML.includes('BMF 2022 Sofortabschreibung'), 'Radar includes BMF 2022 reference footnote');
-}
-
-// ============================================================================
-// PART 3: MasterVaultLedger CATEGORY FILTERING, STATUS PILLS & GOBD COPY
-// ============================================================================
-console.log('\n--- 3. Testing MasterVaultLedger Filters, Status Pills & GoBD Hashes ---');
-
-{
-  const container = createMockContainer();
-  const ledger = new MasterVaultLedger(container);
-
-  ledger.update(INITIAL_VAULT_ITEMS);
-
-  // Test 1: Category filter 'all'
-  ledger.setCategoryFilter('all');
-  const allItems = ledger.getFilteredItems();
-  assert('masterVaultLedger', allItems.length === 20, 'Filter "all" returns all 20 seed items');
-
-  // Test 2: Category filter 'hardware'
-  ledger.setCategoryFilter('hardware');
-  const hwItems = ledger.getFilteredItems();
-  assert('masterVaultLedger', hwItems.length === 10, 'Filter "hardware" returns exactly 10 hardware items');
-  assert('masterVaultLedger', hwItems.every(i => i.category === 'hardware'), 'All items in hardware filter have category === "hardware"');
-
-  // Test 3: Category filter 'subscription'
-  ledger.setCategoryFilter('subscription');
-  const subItems = ledger.getFilteredItems();
-  assert('masterVaultLedger', subItems.length === 10, 'Filter "subscription" returns exactly 10 subscription items');
-  assert('masterVaultLedger', subItems.every(i => i.category === 'subscription'), 'All items in subscription filter have category === "subscription"');
-
-  // Test 4: Category filter 'tax'
-  ledger.setCategoryFilter('tax');
-  const taxItems = ledger.getFilteredItems();
-  const expectedTaxCount = INITIAL_VAULT_ITEMS.filter(i => i.isTaxDeductible).length;
-  assert('masterVaultLedger', taxItems.length === expectedTaxCount, `Filter "tax" returns ${expectedTaxCount} items qualifying for § 9 EStG`);
-  assert('masterVaultLedger', taxItems.every(i => i.isTaxDeductible), 'All items in tax filter have isTaxDeductible === true');
-
-  // Test 5: Category filter 'urgent' (daysRemaining <= 30 or (within burden and daysToCliff <= 45))
-  ledger.setCategoryFilter('urgent');
-  const urgentItems = ledger.getFilteredItems();
-  assert('masterVaultLedger', urgentItems.length > 0, 'Filter "urgent" returns active urgent items');
-  assert('masterVaultLedger', urgentItems.every(i => {
-    const d = i.daysRemaining !== undefined ? i.daysRemaining : 999;
-    const c = i.daysToCliff !== undefined ? i.daysToCliff : 999;
-    return d <= 30 || (i.isWithinReversedBurdenOfProof && c <= 45);
-  }), 'All urgent items satisfy <= 30d or <= 45d cliff condition');
-
-  // Test 6: Search query filtering by name
-  ledger.setCategoryFilter('all');
-  ledger.searchQuery = 'Spotify';
-  const spotifySearch = ledger.getFilteredItems();
-  assert('masterVaultLedger', spotifySearch.length === 1 && spotifySearch[0].id === 'sub-01', 'Search for "Spotify" returns Spotify Premium Student');
-
-  // Test 7: Search query filtering by SHA-256 hash
-  const sonyHw = INITIAL_VAULT_ITEMS.find(i => i.id === 'hw-01');
-  ledger.searchQuery = sonyHw.receiptSha256.substring(0, 10);
-  const hashSearch = ledger.getFilteredItems();
-  assert('masterVaultLedger', hashSearch.length === 1 && hashSearch[0].id === 'hw-01', 'Search by partial SHA-256 hash finds matching hardware item');
-
-  // Test 8: Non-color geometric glyph invariants across all 4 status pills
-  const sampleStatuses = [
-    { id: 't1', status: 'urgent', name: 'T1', daysRemaining: 3, priceEur: 10 },
-    { id: 't2', status: 'warning', name: 'T2', daysToCliff: 25, priceEur: 10 },
-    { id: 't3', status: 'protected', name: 'T3', daysRemaining: 200, priceEur: 10 },
-    { id: 't4', status: 'expired', name: 'T4', daysRemaining: 0, priceEur: 10 }
-  ];
-  for (const s of sampleStatuses) {
-    const rowHtml = ledger.renderTableRow(s);
-    if (s.status === 'urgent') {
-      assert('masterVaultLedger', rowHtml.includes('[🛑]'), 'Urgent status pill contains glyph [🛑]');
-      assert('masterVaultLedger', rowHtml.includes('pill-urgent'), 'Urgent row contains class pill-urgent');
-    } else if (s.status === 'warning') {
-      assert('masterVaultLedger', rowHtml.includes('[!]'), 'Warning status pill contains glyph [!]');
-      assert('masterVaultLedger', rowHtml.includes('pill-warning'), 'Warning row contains class pill-warning');
-    } else if (s.status === 'protected') {
-      assert('masterVaultLedger', rowHtml.includes('[✓]'), 'Protected status pill contains glyph [✓]');
-      assert('masterVaultLedger', rowHtml.includes('pill-protected'), 'Protected row contains class pill-protected');
-    } else if (s.status === 'expired') {
-      assert('masterVaultLedger', rowHtml.includes('[x]'), 'Expired status pill contains glyph [x]');
-      assert('masterVaultLedger', rowHtml.includes('pill-expired'), 'Expired row contains class pill-expired');
-    }
-  }
-
-  // Test 9: GoBD SHA-256 Copy Button rendering
-  const hwWithHash = INITIAL_VAULT_ITEMS.find(i => i.receiptSha256);
-  const rowWithHash = ledger.renderTableRow(hwWithHash);
-  assert('masterVaultLedger', rowWithHash.includes('btn-copy-hash'), 'Row with receiptSha256 renders .btn-copy-hash button');
-  assert('masterVaultLedger', rowWithHash.includes(`data-hash="${hwWithHash.receiptSha256}"`), 'Copy button data-hash attribute contains full 64-char hash');
-  assert('masterVaultLedger', rowWithHash.includes(hwWithHash.receiptSha256.substring(0, 8) + '...'), 'Displayed hash is truncated to 8 chars with ellipsis');
-
-  const subWithoutHash = INITIAL_VAULT_ITEMS.find(i => !i.receiptSha256);
-  const rowWithoutHash = ledger.renderTableRow(subWithoutHash);
-  assert('masterVaultLedger', rowWithoutHash.includes('—'), 'Row without receiptSha256 displays em-dash placeholder "—"');
-}
-
-// ============================================================================
-// PART 4: ContextualItemDrawer, BGB TIMELINE & GOBD TAMPER DETECTION
-// ============================================================================
-console.log('\n--- 4. Testing ContextualItemDrawer, BGB Timeline & GoBD Tamper Proof ---');
-
-{
-  // Test 1 (ADVERSARIAL STRESS): BGBTimelineService.calculateMilestones runtime execution check
-  let milestonesWorked = false;
-  let milestonesError = null;
-  try {
-    const m = BGBTimelineService.calculateMilestones('2024-02-29');
-    milestonesWorked = Boolean(m);
-  } catch (err) {
-    milestonesError = err;
-  }
-  assert('contextualItemDrawer', milestonesWorked, 'BGBTimelineService.calculateMilestones executes without ReferenceError',
-    milestonesError ? milestonesError.message : '');
-
-  // Test 2: BGB § 188 Abs. 3 month-end date capping (addMonths logic directly)
-  const addMonthCases = [
-    { start: '2025-01-31', m: 1, expected: '2025-02-28' },
-    { start: '2024-01-31', m: 1, expected: '2024-02-29' }, // leap year
-    { start: '2025-03-31', m: 1, expected: '2025-04-30' },
-    { start: '2025-05-31', m: 1, expected: '2025-06-30' },
-    { start: '2025-08-31', m: 1, expected: '2025-09-30' },
-    { start: '2025-10-31', m: 1, expected: '2025-11-30' }
-  ];
-  for (const c of addMonthCases) {
-    const res = BGBTimelineService.formatIso(BGBTimelineService.addMonths(c.start, c.m));
-    assert('contextualItemDrawer', res === c.expected, `addMonths("${c.start}", ${c.m}) = ${c.expected} (month-end cap)`);
-  }
-
-  // Test 3: GoBD Receipt Cryptographic Immutability & Tamper Detection
-  const originalMetadata = { item_name: 'Apple MacBook Pro', price: 1899.0, purchase_date: '2025-06-20' };
-  const authenticBlob = 'AUTHENTIC_ORIGINAL_RECEIPT_IMAGE_BINARY_DATA_XYZ_123';
-  const digestOriginal = await GoBDCryptoService.computeDigest(authenticBlob, originalMetadata);
-
-  assert('contextualItemDrawer', typeof digestOriginal === 'string' && digestOriginal.length === 64, 'GoBD pre-encryption digest produces 64-char hex SHA-256 string');
-
-  // Tamper test 1: Flip 1 byte in receipt payload
-  const tamperedBlob = 'AUTHENTIC_ORIGINAL_RECEIPT_IMAGE_BINARY_DATA_XYZ_124'; // last char changed
-  const digestTamperedPayload = await GoBDCryptoService.computeDigest(tamperedBlob, originalMetadata);
-  assert('contextualItemDrawer', digestOriginal !== digestTamperedPayload, 'GoBD tamper detection: 1-byte payload change alters digest');
-
-  // Tamper test 2: Alter metadata (e.g. price change)
-  const tamperedMeta = { ...originalMetadata, price: 1899.01 };
-  const digestTamperedMeta = await GoBDCryptoService.computeDigest(authenticBlob, tamperedMeta);
-  assert('contextualItemDrawer', digestOriginal !== digestTamperedMeta, 'GoBD tamper detection: 1-cent metadata change alters digest');
-
-  // Test 4: Key order invariance in canonical JSON serialization
-  const metaShuffled = { purchase_date: '2025-06-20', price: 1899.0, item_name: 'Apple MacBook Pro' };
-  const digestShuffled = await GoBDCryptoService.computeDigest(authenticBlob, metaShuffled);
-  assert('contextualItemDrawer', digestOriginal === digestShuffled, 'GoBD digest is canonical and deterministic regardless of metadata key insertion order');
-
-  // Test 5 (ADVERSARIAL STRESS): Check GoBDCryptoService API contract consistency with app.js
-  const hasComputeReceiptDigest = typeof GoBDCryptoService.computeReceiptDigest === 'function';
-  assert('contextualItemDrawer', hasComputeReceiptDigest, 'GoBDCryptoService.computeReceiptDigest exists (called in app.js:631, 669)',
-    'computeReceiptDigest is undefined on GoBDCryptoService (only computeDigest is defined)');
-
-  // Test 6: CSS Contract verification for 520px slide-over drawer
-  const widgetsCssPath = path.join(APP_DIR, 'styles', 'widgets.css');
-  const widgetsCss = fs.readFileSync(widgetsCssPath, 'utf8');
-  assert('contextualItemDrawer', widgetsCss.includes('max-width: 520px;'), 'styles/widgets.css specifies "max-width: 520px;" for drawer');
-  assert('contextualItemDrawer', widgetsCss.includes('.drawer-container'), 'styles/widgets.css defines .drawer-container class');
-  assert('contextualItemDrawer', widgetsCss.includes('transform: translateX(100%);'), 'Drawer starts off-canvas with translateX(100%)');
-  assert('contextualItemDrawer', widgetsCss.includes('transform: translateX(0);'), 'Drawer slides in with translateX(0)');
-
-  // Test 7: Subscription Cancellation CTA (BGB § 312k)
-  const spotifySub = INITIAL_VAULT_ITEMS.find(i => i.id === 'sub-01');
-  assert('contextualItemDrawer', spotifySub.cancellationUrl === 'https://www.spotify.com/account/subscription/cancel/', 'Spotify subscription specifies statutory cancellation URL');
-  assert('contextualItemDrawer', spotifySub.bgbClauses.includes('BGB § 312k'), 'Spotify item references BGB § 312k statutory online cancellation button mandate');
-
-  // Test 8 (ADVERSARIAL STRESS): Check statutory claim notice parameter signature consistency
-  const sampleClaimItem = { id: 'hw-01', name: 'Sony WH-1000XM5', merchant: 'MediaMarkt', purchaseDate: '2025-12-15' };
-  let claimNoticeWorksWithAppJsCall = false;
-  let claimNoticeError = null;
-  try {
-    // app.js:715 calls generateStatutoryNotice(item, purchaseDate, defectDescription)
-    const notice = BGBTimelineService.generateStatutoryNotice(sampleClaimItem, new Date(sampleClaimItem.purchaseDate), 'Mangel...');
-    claimNoticeWorksWithAppJsCall = Boolean(notice && notice.fullNoticeText);
-  } catch (err) {
-    claimNoticeError = err;
-  }
-  assert('contextualItemDrawer', claimNoticeWorksWithAppJsCall, 'BGBTimelineService.generateStatutoryNotice matches app.js call signature and provides notice.fullNoticeText',
-    claimNoticeError ? claimNoticeError.message : 'notice.fullNoticeText is undefined');
-}
-
-// ============================================================================
-// PART 5: HEADLESS CHROMIUM VIEWPORT GEOMETRY & RUNTIME BOOTSTRAP FOR apps/app
-// ============================================================================
-console.log('\n--- 5. Testing Viewport Geometry & Bootstrap in Headless Chromium ---');
-
-const MIME_TYPES = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'application/javascript; charset=utf-8',
-  '.mjs': 'application/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png'
-};
-
-const APP_PORT = 4325;
-const appServer = http.createServer((req, res) => {
-  const urlPath = req.url.split('?')[0];
-  let filePath = path.join(APP_DIR, urlPath === '/' ? 'index.html' : urlPath);
-  if (!fs.existsSync(filePath)) {
-    const altPath = path.join(REPO_ROOT, urlPath);
-    if (fs.existsSync(altPath)) filePath = altPath;
-  }
-
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, {
-      'Content-Type': MIME_TYPES[ext] || 'application/octet-stream',
-      'Access-Control-Allow-Origin': '*'
-    });
-    fs.createReadStream(filePath).pipe(res);
-  } else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found: ' + urlPath);
-  }
-});
-
-await new Promise(resolve => appServer.listen(APP_PORT, '127.0.0.1', resolve));
-console.log(`Local static server for apps/app running on http://127.0.0.1:${APP_PORT}`);
-
-const chromePaths = [
-  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
-];
-const chromeExe = chromePaths.find(p => fs.existsSync(p));
-
-if (!chromeExe) {
-  console.warn('No Chromium binary found; skipping headless browser layout pass.');
-  appServer.close();
-} else {
-  const CDP_PORT = 9338;
-  const browserProc = spawn(chromeExe, [
-    '--headless=new',
-    `--remote-debugging-port=${CDP_PORT}`,
-    '--disable-gpu',
-    '--no-first-run',
-    '--no-default-browser-check',
-    '--disable-background-networking',
-    '--disable-extensions',
-    'about:blank'
-  ], { stdio: 'ignore' });
-
-  async function waitForCDP(maxAttempts = 30) {
-    for (let i = 0; i < maxAttempts; i++) {
-      try {
-        const res = await fetch(`http://127.0.0.1:${CDP_PORT}/json/version`);
-        if (res.ok) return await res.json();
-      } catch (e) {}
-      await new Promise(r => setTimeout(r, 200));
-    }
-    throw new Error('Timeout waiting for CDP');
-  }
-
-  class CDPClient {
-    constructor(wsUrl) {
-      this.ws = new WebSocket(wsUrl);
-      this.id = 0;
-      this.callbacks = new Map();
-      this.eventListeners = new Map();
-
-      this.ready = new Promise(resolve => {
-        this.ws.addEventListener('open', resolve);
-      });
-
-      this.ws.addEventListener('message', event => {
-        const msg = JSON.parse(event.data);
-        if (msg.id && this.callbacks.has(msg.id)) {
-          const { resolve, reject } = this.callbacks.get(msg.id);
-          this.callbacks.delete(msg.id);
-          if (msg.error) reject(new Error(msg.error.message));
-          else resolve(msg.result);
-        } else if (msg.method && this.eventListeners.has(msg.method)) {
-          for (const cb of this.eventListeners.get(msg.method)) cb(msg.params);
-        }
-      });
-    }
-
-    async send(method, params = {}) {
-      await this.ready;
-      const msgId = ++this.id;
-      return new Promise((resolve, reject) => {
-        this.callbacks.set(msgId, { resolve, reject });
-        this.ws.send(JSON.stringify({ id: msgId, method, params }));
-      });
-    }
-
-    async eval(expression) {
-      const res = await this.send('Runtime.evaluate', {
-        expression,
-        returnByValue: true,
-        awaitPromise: true
-      });
-      if (res.exceptionDetails) {
-        throw new Error('Evaluation exception: ' + JSON.stringify(res.exceptionDetails));
-      }
-      return res.result?.value;
-    }
-  }
-
-  try {
-    const cdpVersion = await waitForCDP();
-    console.log(`Connected to headless browser: ${cdpVersion.Browser}`);
-
-    const newTab = await (await fetch(`http://127.0.0.1:${CDP_PORT}/json/new`, { method: 'PUT' })).json();
-    const client = new CDPClient(newTab.webSocketDebuggerUrl);
-
-    const consoleLogs = [];
-    const exceptions = [];
-
-    client.eventListeners.set('Runtime.consoleAPICalled', [
-      (params) => consoleLogs.push({ type: params.type, text: params.args.map(a => a.value || a.description).join(' ') })
-    ]);
-    client.eventListeners.set('Runtime.exceptionThrown', [
-      (params) => exceptions.push(params.exceptionDetails)
-    ]);
-
-    await client.send('Console.enable');
-    await client.send('Runtime.enable');
-    await client.send('Page.enable');
-    await client.send('DOM.enable');
-
-    await client.send('Page.navigate', { url: `http://127.0.0.1:${APP_PORT}` });
-
-    // Wait for full hydration
-    await new Promise(r => setTimeout(r, 2500));
-
-    // Test Bootstrap Health
-    const bootError = consoleLogs.find(l => l.type === 'error' && l.text.includes('Fatal initialization error'));
-    assert('appBootstrapAndIntegrity', !bootError, 'Modern App boots in browser without fatal initialization error',
-      bootError ? bootError.text : 'App booted cleanly');
-
-    // Test Viewport Geometry on 320px, 375px, 414px
-    const TARGET_VIEWPORTS = [320, 375, 414, 768, 1024];
-
-    for (const width of TARGET_VIEWPORTS) {
-      await client.send('Emulation.setDeviceMetricsOverride', {
-        width,
-        height: 800,
-        deviceScaleFactor: 2,
-        mobile: width < 768
-      });
-
-      await new Promise(r => setTimeout(r, 250));
-
-      const geometry = await client.eval(`(() => {
-        const html = document.documentElement;
-        const body = document.body;
-        const winWidth = window.innerWidth;
-        const htmlClient = html.clientWidth;
-        const htmlScroll = html.scrollWidth;
-        const bodyClient = body.clientWidth;
-        const bodyScroll = body.scrollWidth;
-
-        // Protrusion scan: detect elements with right > winWidth
-        const overflowing = [];
-        const allElements = document.querySelectorAll('*');
-        for (const el of allElements) {
-          const rect = el.getBoundingClientRect();
-          if (el.classList.contains('drawer-container') && !el.classList.contains('open')) continue;
-          if (el.closest('.drawer-container') && !el.closest('.drawer-container').classList.contains('open')) continue;
-
-          if (rect.right > winWidth + 1.5 && rect.width > 0 && rect.height > 0) {
-            const style = window.getComputedStyle(el);
-            if (style.overflow !== 'hidden' && style.display !== 'none') {
-              overflowing.push({
-                tag: el.tagName,
-                id: el.id,
-                className: el.className,
-                right: Math.round(rect.right),
-                winWidth
-              });
-            }
-          }
-        }
-
-        return {
-          winWidth,
-          htmlClient,
-          htmlScroll,
-          bodyClient,
-          bodyScroll,
-          hasHorizontalOverflow: htmlScroll > htmlClient || bodyScroll > bodyClient,
-          overflowDelta: Math.max(0, htmlScroll - htmlClient, bodyScroll - bodyClient),
-          overflowCount: overflowing.length
-        };
-      })()`);
-
-      console.log(`  Viewport ${width}px: scrollDelta=${geometry.overflowDelta}px, uncontained=${geometry.overflowCount}`);
-      assert('viewportGeometryHeadless', geometry.overflowDelta === 0, `Viewport ${width}px has 0px horizontal overflow (scrollDelta=${geometry.overflowDelta})`);
-      assert('viewportGeometryHeadless', geometry.overflowCount === 0, `Viewport ${width}px has 0 uncontained overflowing elements`);
-    }
-
-  } catch (err) {
-    console.error('Headless Chromium execution error:', err);
-    assert('viewportGeometryHeadless', false, 'Headless Chromium execution completed without error', err.message);
-  } finally {
-    browserProc.kill();
-    appServer.close();
-  }
-}
-
-// ============================================================================
-// FINAL SUMMARY & RESULTS PERSISTENCE
-// ============================================================================
-console.log('\n' + '='.repeat(80));
-console.log(`EMPIRICAL CHALLENGER AUDIT SUMMARY:`);
-console.log(`  Total Checks: ${results.total}`);
-console.log(`  Passed:       ${results.passed} (${((results.passed / results.total) * 100).toFixed(1)}%)`);
-console.log(`  Failed:       ${results.failed}`);
-console.log(`  Findings:     ${results.findings.length}`);
-for (const [cat, stats] of Object.entries(results.categories)) {
-  console.log(`    - ${cat}: ${stats.passed}/${stats.total} passed`);
-}
-console.log('='.repeat(80));
-
-const resultsFilePath = path.join(REPO_ROOT, 'tests', 'm3_empirical_results.json');
-fs.writeFileSync(resultsFilePath, JSON.stringify(results, null, 2), 'utf8');
-console.log(`Detailed verification report saved to: ${resultsFilePath}`);
-
-if (results.failed > 0) {
-  console.error('\nFindings that require changes:');
-  for (const f of results.findings) {
-    console.error(`  - ${f}`);
-  }
+runM3EmpiricalSuite().then(success => {
+  process.exit(success ? 0 : 1);
+}).catch(err => {
+  console.error('Fatal error in empirical test harness:', err);
   process.exit(1);
-} else {
-  console.log('\n✓ ALL EMPIRICAL CHALLENGER TESTS PASSED (100.0%). VERDICT: APPROVE.');
-  process.exit(0);
-}
+});

@@ -3,15 +3,35 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "CM-LAB Main Showcase Webpage introducing MCP server tools and modern consumer wallet",
+  "description": "CM-LAB Public Showcase, Static Brand Policy Wiki & Open MCP Server",
   "scripts": {
-    "serve": "python -m http.server 3000 --directory .",
-    "serve:node": "node -e \"const http=require('http'),fs=require('fs'),p=require('path');http.createServer((q,s)=>{let f=p.join('.',q.url==='/'?'index.html':q.url.split('?')[0]);fs.readFile(f,(e,d)=>{if(e){s.writeHead(404);s.end('Not Found')}else{s.writeHead(200,{'Content-Type':f.endsWith('.css')?'text/css':f.endsWith('.js')?'application/javascript':f.endsWith('.json')?'application/json':f.endsWith('.svg')?'image/svg+xml':'text/html'});s.end(d)}})}).listen(3000,()=>console.log('Serving on http://localhost:3000'))\"",
+    "dev": "astro dev --port 3000 --host",
+    "build": "astro build",
+    "preview": "astro preview --port 3000",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "serve": "python -m http.server 3000 --directory dist",
     "test:e2e": "python ../../tests/e2e/runner.py"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.2.0",
+    "@astrojs/svelte": "^7.0.0",
+    "@cmlab/core": "workspace:*",
+    "@cmlab/design-tokens": "workspace:*",
     "@iconify-json/simple-icons": "^1.2.101",
+    "@threlte/core": "^8.0.0",
+    "@threlte/extras": "^9.0.0",
+    "astro": "^5.4.0",
     "lucide-svelte": "^1.0.1",
-    "unplugin-icons": "^24.0.0"
+    "svelte": "^5.0.0",
+    "three": "^0.170.0",
+    "unplugin-icons": "^24.0.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/three": "^0.170.0",
+    "svelte-check": "^4.0.0",
+    "typescript": "^5.8.2",
+    "wrangler": "^3.114.0"
   }
 }

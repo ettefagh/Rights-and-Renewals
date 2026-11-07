@@ -3,16 +3,37 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "CM-LAB Modern Application Interface (app.[Project].page.dev) with Unified Omnibar and Dashboard",
+  "description": "CM-LAB Sovereign Consumer Rights, Subscription & Tax-Ready Wallet PWA on Astro 6 + Svelte 5",
   "scripts": {
-    "serve": "python -m http.server 3001 --directory .",
-    "serve:node": "node -e \"const http=require('http'),fs=require('fs'),p=require('path');http.createServer((q,s)=>{let f=p.join('.',q.url==='/'?'index.html':q.url.split('?')[0]);fs.readFile(f,(e,d)=>{if(e){s.writeHead(404);s.end('Not Found')}else{s.writeHead(200,{'Content-Type':f.endsWith('.css')?'text/css':f.endsWith('.js')?'application/javascript':f.endsWith('.json')?'application/json':f.endsWith('.svg')?'image/svg+xml':'text/html'});s.end(d)}})}).listen(3001,()=>console.log('Serving on http://localhost:3001'))\"",
+    "dev": "astro dev --port 3001 --host",
+    "build": "astro build",
+    "preview": "astro preview --port 3001",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "serve": "python -m http.server 3001 --directory dist",
     "test:e2e": "python ../../tests/e2e/runner.py"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.2.0",
+    "@astrojs/svelte": "^7.0.0",
+    "@cmlab/core": "workspace:*",
+    "@cmlab/design-tokens": "workspace:*",
     "@harshmandan/svaul": "^2.0.0",
     "@iconify-json/simple-icons": "^1.2.101",
+    "@threlte/core": "^8.0.0",
+    "@threlte/extras": "^9.0.0",
+    "astro": "^5.4.0",
+    "dexie": "^4.0.11",
+    "jose": "^6.0.8",
     "lucide-svelte": "^1.0.1",
+    "svelte": "^5.0.0",
+    "three": "^0.170.0",
     "unplugin-icons": "^24.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/three": "^0.170.0",
+    "svelte-check": "^4.0.0",
+    "typescript": "^5.8.2",
+    "wrangler": "^3.114.0"
   }
 }
