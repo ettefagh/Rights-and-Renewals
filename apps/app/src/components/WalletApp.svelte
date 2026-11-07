@@ -47,12 +47,12 @@
         tabindex="0"
         onkeydown={(e) => e.key === 'Enter' && walletStore.setView('dashboard')}
       >
-        <div class="brand-icon">
-          <ShieldCheck size={22} color="#FFFFFF" />
+        <div class="brand-icon" style="padding: 0; overflow: hidden; background: transparent;">
+          <img src="/favicon.svg" alt="Rights & Renewals Icon" width="36" height="36" style="display: block; border-radius: 9px;" />
         </div>
         <div class="brand-text">
-          <span class="brand-title">CM-LAB</span>
-          <span class="brand-subtitle">Sovereign Wallet</span>
+          <span class="brand-title">Rights &amp; Renewals</span>
+          <span class="brand-subtitle">Sovereign Consumer Wallet</span>
         </div>
       </div>
     </div>

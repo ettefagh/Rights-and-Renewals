@@ -1,5 +1,7 @@
 ---
 import WalletApp from '../components/WalletApp.svelte';
+
+export const prerender = true;
 ---
 
 <!DOCTYPE html>
@@ -7,11 +9,13 @@ import WalletApp from '../components/WalletApp.svelte';
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#2F524C" />
-  <meta name="description" content="CM-LAB: Sovereign Consumer Rights, Subscription & Tax-Ready Wallet PWA" />
+  <meta name="theme-color" content="#0B3B4C" />
+  <meta name="description" content="Rights & Renewals (CM-LAB): Sovereign Consumer Rights, Subscription & Tax-Ready Wallet PWA" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
-  <title>CM-LAB Wallet — BGB Fristen, Kündigung & Steuern</title>
+  <title>Rights &amp; Renewals — BGB Fristen, Kündigung &amp; Steuern</title>
 
   <style is:global>
     @import '@cmlab/design-tokens/tokens.css';

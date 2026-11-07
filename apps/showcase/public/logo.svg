@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 64" width="380" height="64" fill="none">
+  <g>
+    <!-- Serrated Receipt Outline -->
+    <path
+      d="M10 14C10 10.134 13.134 7 17 7H37C40.866 7 44 10.134 44 14V28C38.8 29 35 33.5 35 39C35 42.8 36.9 46.1 39.8 48.1L35.5 52L30.5 48.2L25.5 52L20.5 48.2L15.5 52L10 48V14Z"
+      stroke="#0B3B4C"
+      stroke-width="4.2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <line x1="17.5" y1="16.5" x2="36.5" y2="16.5" stroke="#0B3B4C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="17.5" y1="24.5" x2="28.5" y2="24.5" stroke="#0B3B4C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="17.5" y1="32.5" x2="24.5" y2="32.5" stroke="#0B3B4C" stroke-width="4" stroke-linecap="round"/>
+    <!-- Emerald Renewal Loop -->
+    <path d="M33.5 41C33.5 34.0964 39.0964 28.5 46 28.5C49.9 28.5 53.4 30.3 55.6 33.1" stroke="#11D66C" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M55.8 28.5V33.8H50.5" stroke="#11D66C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M58.5 41C58.5 47.9036 52.9036 53.5 46 53.5C42.1 53.5 38.6 51.7 36.4 48.9" stroke="#11D66C" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M36.2 53.5V48.2H41.5" stroke="#11D66C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Checkmark -->
+    <path d="M41.8 41.2L44.8 44.2L50.8 38.2" stroke="#0B3B4C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="72" y="42" fill="#0B3B4C" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="32" font-weight="800" letter-spacing="-0.02em">Rights &amp; Renewals</text>
+</svg>

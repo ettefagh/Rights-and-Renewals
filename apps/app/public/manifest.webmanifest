@@ -1,14 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-  "name": "CM-LAB Sovereign Consumer Rights & Warranty Wallet",
-  "short_name": "CM-LAB Wallet",
-  "description": "Offline-first sovereign consumer rights, subscription guard, and tax-ready wallet PWA with zero cloud plaintext receipts.",
+  "name": "Rights & Renewals — Sovereign Consumer Rights & Warranty Wallet",
+  "short_name": "Rights&Renewals",
+  "description": "Rights & Renewals: Offline-first sovereign consumer rights, subscription guard, and tax-ready wallet PWA with zero cloud plaintext receipts.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#2F524C",
+  "theme_color": "#0B3B4C",
   "background_color": "#F4F7F6",
   "categories": ["finance", "utilities", "productivity"],
   "lang": "de-DE",
@@ -18,6 +18,18 @@
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
