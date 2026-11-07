@@ -22,8 +22,23 @@
     Calendar,
     FolderKanban,
     ChevronRight,
-    Camera
+    Camera,
+    Sun,
+    Moon
   } from 'lucide-svelte';
+
+  let isDarkTheme = $state(false);
+
+  function toggleThemeMode() {
+    if (typeof document === 'undefined') return;
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    isDarkTheme = next === 'dark';
+    try {
+      localStorage.setItem('cmlab-theme-mode', next);
+    } catch {}
+  }
 
   // Global ⌘K / Ctrl+K listener for Omni-Bar
   function handleKeydown(event: KeyboardEvent) {
@@ -38,6 +53,7 @@
 
 <div class="wallet-shell">
   <!-- Mandatory E2E Header Contract: role="banner" id="app-header" -->
+  <!-- svelte-ignore a11y_no_redundant_roles -->
   <header role="banner" id="app-header" class="app-header">
     <div class="header-left">
       <div
@@ -79,6 +95,20 @@
     </div>
 
     <div class="header-right">
+      <button
+        type="button"
+        class="icon-action-btn"
+        onclick={toggleThemeMode}
+        aria-label="Toggle Light/Dark Theme"
+        title="Toggle Light / Dark Theme"
+      >
+        {#if isDarkTheme}
+          <Sun size={18} />
+        {:else}
+          <Moon size={18} />
+        {/if}
+      </button>
+
       <button
         type="button"
         class="icon-action-btn"
@@ -135,13 +165,13 @@
         </div>
       </section>
 
-      <!-- Urgent Attention Radar Stream -->
-      <section class="col-12">
+      <!-- Urgent Attention Radar Stream (Asymmetrical Bento Left 5-col on Desktop) -->
+      <section class="col-12 bento-col-5">
         <UrgencyCountdownWidget />
       </section>
 
-      <!-- All Vault Contracts & Warranties -->
-      <section class="col-12 vault-overview-card">
+      <!-- All Vault Contracts & Warranties (Asymmetrical Bento Right 7-col on Desktop) -->
+      <section class="col-12 bento-col-7 vault-overview-card">
         <div class="card-header">
           <div class="header-title-cluster">
             <Receipt size={18} />
@@ -351,129 +381,188 @@
   .shortcut-badge {
     padding: 2px 6px;
     border-radius: 4px;
-    background: #FFFFFF;
-    border: 1px solid var(--color-border-subtle, #E2E8F0);
+    background: var(--color-card-white);
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-ink-secondary);
     font-size: 11px;
-    font-family: monospace;
+    font-family: var(--font-family-mono);
   }
 
   .icon-action-btn {
     width: 40px;
     height: 40px;
-    border-radius: var(--radius-md, 12px);
-    border: 1px solid var(--color-border-subtle, #E2E8F0);
-    background: #FFFFFF;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-card-white);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--color-ink-primary, #0F172A);
+    color: var(--color-ink-primary);
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease, border-color 150ms ease;
   }
 
   .icon-action-btn:hover {
-    background: #F8FAFC;
-    border-color: var(--color-pine-teal, #2F524C);
+    background: var(--color-surface-subtle);
+    border-color: var(--color-pine-teal);
+    transform: translateY(-2px);
+  }
+
+  .icon-action-btn:active,
+  .primary-action-btn:active,
+  .secondary-action-btn:active,
+  .omnibar-trigger-btn:active,
+  .vault-card:active {
+    transform: scale(0.98) translateY(1px);
   }
 
   .primary-action-btn {
     height: 40px;
-    padding: 0 var(--space-4, 16px);
-    border-radius: var(--radius-md, 12px);
-    background-color: var(--color-pine-teal, #2F524C);
-    color: #FFFFFF;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-pine-teal);
+    color: var(--color-text-inverse);
     border: none;
-    font-weight: var(--font-weight-semibold, 600);
+    font-weight: var(--font-weight-semibold);
     font-size: 14px;
     display: flex;
     align-items: center;
-    gap: var(--space-1, 4px);
+    gap: var(--space-1);
     cursor: pointer;
-    transition: background-color 150ms ease;
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease;
   }
 
   .primary-action-btn:hover {
-    background-color: #25423D;
+    background-color: var(--color-brand-primary-hover);
+    transform: translateY(-2px);
   }
 
   .secondary-action-btn {
     height: 40px;
-    padding: 0 var(--space-4, 16px);
-    border-radius: var(--radius-md, 12px);
-    background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    color: var(--color-ink-primary, #0F172A);
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--color-card-white);
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-ink-primary);
     font-weight: 500;
     font-size: 14px;
     cursor: pointer;
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .secondary-action-btn:hover {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-pine-teal);
+    transform: translateY(-2px);
+  }
+
+  @media (pointer: coarse), (max-width: 768px) {
+    .icon-action-btn,
+    .primary-action-btn,
+    .secondary-action-btn,
+    .omnibar-trigger-btn {
+      min-height: 48px;
+      min-width: 48px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .bento-col-5 {
+      grid-column: span 5;
+    }
+    .bento-col-7 {
+      grid-column: span 7;
+    }
   }
 
   .stat-banner-card, .vault-overview-card {
-    background: var(--color-card-white, #FFFFFF);
-    border: 1px solid var(--color-border-subtle, #E2E8F0);
-    border-radius: var(--radius-lg, 20px);
-    padding: var(--space-4, 16px);
+    background: var(--color-card-white);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
   }
 
   .stat-cluster {
-    display: flex;
-    gap: var(--space-8, 32px);
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 900px) {
+    .stat-cluster {
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+    }
   }
 
   .stat-block {
     display: flex;
     flex-direction: column;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-subtle);
+    border: 1px solid var(--color-border-subtle);
+  }
+
+  .stat-block:first-child {
+    border-left: 3px solid var(--color-pine-teal);
   }
 
   .stat-label {
-    font-size: var(--font-size-xs, 12px);
-    color: var(--color-ink-secondary, #475569);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-secondary);
   }
 
   .stat-value {
-    font-size: var(--font-size-2xl, 24px);
-    font-weight: var(--font-weight-bold, 700);
-    color: var(--color-ink-primary, #0F172A);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.015em;
+    color: var(--color-ink-primary);
+    margin-top: 4px;
   }
 
   :global(.text-urgent) {
-    color: var(--color-urgent-red, #DC2626);
+    color: var(--color-urgent-red);
   }
 
   :global(.text-pine) {
-    color: var(--color-pine-teal, #2F524C);
+    color: var(--color-pine-teal);
   }
 
   :global(.text-secondary) {
-    color: var(--color-ink-tertiary, #94A3B8);
+    color: var(--color-ink-tertiary);
   }
 
   .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-3, 12px);
+    margin-bottom: var(--space-3);
   }
 
   .header-title-cluster {
     display: flex;
     align-items: center;
-    gap: var(--space-2, 8px);
-    color: var(--color-pine-teal, #2F524C);
+    gap: var(--space-2);
+    color: var(--color-pine-teal);
   }
 
   .card-title {
     margin: 0;
-    font-size: var(--font-size-base, 16px);
-    font-weight: var(--font-weight-bold, 700);
-    color: var(--color-ink-primary, #0F172A);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.015em;
+    color: var(--color-ink-primary);
   }
 
   .count-tag {
     font-size: 12px;
     font-weight: 600;
-    color: var(--color-ink-secondary, #475569);
-    background: #F1F5F9;
+    color: var(--color-ink-secondary);
+    background: var(--color-surface-subtle);
+    border: 1px solid var(--color-border-subtle);
     padding: 2px 8px;
     border-radius: 9999px;
   }
@@ -485,7 +574,7 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    color: var(--color-ink-secondary, #475569);
+    color: var(--color-ink-secondary);
   }
 
   .empty-actions {
@@ -496,17 +585,17 @@
 
   .vault-items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-4, 16px);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-4);
   }
 
   .vault-card {
-    padding: var(--space-4, 16px);
-    border-radius: var(--radius-md, 12px);
-    border: 1px solid var(--color-border-subtle, #E2E8F0);
-    background: #FFFFFF;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-card-white);
     cursor: pointer;
-    transition: transform var(--motion-duration-fast, 150ms) ease, border-color var(--motion-duration-fast, 150ms) ease;
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 150ms ease, box-shadow 180ms ease;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -514,8 +603,8 @@
 
   .vault-card:hover {
     transform: translateY(-2px);
-    border-color: var(--color-pine-teal, #2F524C);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border-color: var(--color-pine-teal);
+    box-shadow: var(--elevation-md);
   }
 
   .vault-card-top {

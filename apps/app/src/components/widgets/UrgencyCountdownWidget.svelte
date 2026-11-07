@@ -89,12 +89,12 @@
   }
 
   .capital-badge {
-    font-size: var(--font-size-xs, 12px);
+    font-size: var(--font-size-xs);
     font-weight: 600;
     padding: 3px 8px;
     border-radius: 9999px;
-    background: #FEE2E2;
-    color: #991B1B;
+    background: var(--color-status-urgent-bg);
+    color: var(--color-status-urgent-text);
   }
 
   .urgent-items-list {
@@ -108,17 +108,21 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 12px;
-    border-radius: var(--radius-md, 12px);
-    border: 1px solid var(--color-border-subtle, #E2E8F0);
-    background: #FFFFFF;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-card-white);
     cursor: pointer;
-    transition: all 150ms ease;
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 150ms ease, box-shadow 180ms ease;
   }
 
   .urgent-item-row:hover {
-    border-color: var(--color-pine-teal, #2F524C);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border-color: var(--color-pine-teal);
+    transform: translateY(-2px);
+    box-shadow: var(--elevation-md);
+  }
+
+  .urgent-item-row:active {
+    transform: scale(0.98) translateY(1px);
   }
 
   .item-meta {
@@ -128,14 +132,14 @@
   }
 
   .item-name {
-    font-size: var(--font-size-sm, 14px);
+    font-size: var(--font-size-sm);
     font-weight: 600;
-    color: var(--color-ink-primary, #0F172A);
+    color: var(--color-ink-primary);
   }
 
   .item-merchant {
-    font-size: var(--font-size-xs, 12px);
-    color: var(--color-ink-secondary, #475569);
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-secondary);
   }
 
   .item-urgency {
@@ -149,13 +153,13 @@
     font-weight: 600;
     padding: 3px 8px;
     border-radius: 4px;
-    background: #FEF3C7;
-    color: #92400E;
+    background: var(--color-status-warning-bg);
+    color: var(--color-status-warning-text);
   }
 
   .countdown-badge.critical {
-    background: #FEE2E2;
-    color: #991B1B;
+    background: var(--color-status-urgent-bg);
+    color: var(--color-status-urgent-text);
   }
 
   :global(.chevron) {

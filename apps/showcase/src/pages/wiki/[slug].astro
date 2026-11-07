@@ -128,24 +128,24 @@ const legacyDeepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${b
       color: var(--color-primitive-coral-700, #9A371F);
     }
     .badge-green {
-      background: #D1FAE5;
-      color: #065F46;
+      background: var(--color-status-protected-bg);
+      color: var(--color-status-protected-text);
     }
     .badge-gray {
-      background: var(--color-surface-subtle, #F1F5F9);
-      color: var(--color-text-secondary, #475569);
+      background: var(--color-surface-subtle);
+      color: var(--color-text-secondary);
     }
     .action-button-row {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--space-3, 12px);
-      margin-top: var(--space-4, 16px);
+      gap: var(--space-3);
+      margin-top: var(--space-4);
     }
     .wiki-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-6, 24px);
-      margin-bottom: var(--space-8, 32px);
+      grid-template-columns: 7fr 5fr;
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
     }
     @media (max-width: 768px) {
       .wiki-grid {

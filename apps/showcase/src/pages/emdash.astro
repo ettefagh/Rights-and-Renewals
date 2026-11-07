@@ -36,33 +36,48 @@ export const prerender = true;
     }
     .emdash-metrics {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+    @media (min-width: 900px) {
+      .emdash-metrics {
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+      }
     }
     .metric-card {
-      background: var(--color-bg-surface, #FFFFFF);
-      border: 1px solid var(--color-border-subtle, #E2E8F0);
-      border-radius: 14px;
-      padding: 18px 20px;
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms ease;
+    }
+    .metric-card:first-child {
+      border-left: 3px solid var(--color-brand-primary);
+      background: var(--color-surface-subtle);
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-brand-primary);
     }
     .metric-label {
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--color-ink-secondary, #475569);
+      color: var(--color-text-secondary);
     }
     .metric-value {
       font-size: 28px;
       font-weight: 800;
-      color: var(--color-pine-teal, #0B3B4C);
+      letter-spacing: -0.015em;
+      color: var(--color-brand-primary);
       margin-top: 6px;
     }
     .emdash-grid {
       display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 24px;
+      grid-template-columns: 7fr 5fr;
+      gap: var(--space-6);
       align-items: start;
     }
     @media (max-width: 960px) {
@@ -71,54 +86,58 @@ export const prerender = true;
       }
     }
     .policy-table-card, .editor-card {
-      background: var(--color-bg-surface, #FFFFFF);
-      border: 1px solid var(--color-border-subtle, #E2E8F0);
-      border-radius: 16px;
-      padding: 20px;
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
     }
     .policy-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--color-border-subtle, #E2E8F0);
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border-subtle);
     }
     .policy-row:last-child {
       border-bottom: none;
     }
     .hash-pill {
-      font-family: var(--font-family-mono, monospace);
+      font-family: var(--font-mono);
       font-size: 11px;
-      background: #E9EFEF;
-      color: #0B3B4C;
+      background: var(--color-surface-subtle);
+      color: var(--color-brand-primary);
+      border: 1px solid var(--color-border-subtle);
       padding: 3px 8px;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
     }
     .status-fresh {
-      background: #DCFCE7;
-      color: #065F46;
+      background: var(--color-status-protected-bg);
+      color: var(--color-status-protected-text);
+      border: 1px solid var(--color-status-protected-border);
       font-size: 12px;
       font-weight: 700;
       padding: 3px 10px;
-      border-radius: 999px;
+      border-radius: var(--radius-full);
     }
     .form-field {
-      margin-bottom: 14px;
+      margin-bottom: var(--space-4);
     }
     .form-field label {
       display: block;
       font-size: 13px;
       font-weight: 600;
       margin-bottom: 6px;
+      color: var(--color-text-primary);
     }
     .form-field select, .form-field input, .form-field textarea {
       width: 100%;
       padding: 10px 12px;
-      border: 1px solid var(--color-border-strong, #CBD5E1);
-      border-radius: 8px;
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-md);
       font-size: 14px;
-      background: var(--color-bg-canvas, #F4F7F6);
+      background: var(--color-surface-subtle);
+      color: var(--color-text-primary);
     }
   </style>
 </head>

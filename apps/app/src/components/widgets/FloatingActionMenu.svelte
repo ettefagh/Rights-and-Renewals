@@ -90,17 +90,17 @@
   .fab-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.4);
+    background: rgba(15, 23, 42, 0.45);
     backdrop-filter: blur(2px);
-    z-index: var(--z-index-backdrop, 500);
+    z-index: var(--z-index-backdrop);
     transition: opacity 150ms ease;
   }
 
   .fab-container {
     position: fixed;
     right: 20px;
-    bottom: calc(20px + var(--padding-safe-bottom, 16px));
-    z-index: var(--z-index-popover, 700);
+    bottom: calc(20px + var(--padding-safe-bottom));
+    z-index: var(--z-index-popover);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -131,29 +131,33 @@
     height: 56px;
     border-radius: 9999px;
     border: none;
-    background: var(--color-pine-teal, #2F524C);
+    background: var(--color-pine-teal);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.25);
-    transition: transform 150ms ease, background-color 150ms ease;
+    box-shadow: var(--elevation-lg);
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease;
   }
 
   .main-fab:hover {
-    transform: scale(1.05);
-    background: #25423D;
+    transform: translateY(-2px);
+    background: var(--color-brand-primary-hover);
+  }
+
+  .main-fab:active {
+    transform: scale(0.98) translateY(1px);
   }
 
   .main-fab.open {
-    background: #0F172A;
+    background: var(--color-ink-primary);
   }
 
   .fab-icon-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .fab-icon-wrap.rotated {

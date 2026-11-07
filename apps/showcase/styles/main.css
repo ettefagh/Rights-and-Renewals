@@ -33,11 +33,12 @@ body {
   transition: background-color 200ms ease, color 200ms ease;
 }
 
-/* Typography elements */
+/* Typography elements — Optical tracking -0.015em on headings >= 24px (design-taste-frontend) */
 h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-primary);
   font-weight: 700;
   line-height: 1.25;
+  letter-spacing: -0.015em;
 }
 
 p {
@@ -84,11 +85,11 @@ code, pre, .font-mono {
   border-width: 0;
 }
 
-/* Coarse-pointer touch target expansion (WCAG SC 2.5.8) */
-@media (pointer: coarse) {
+/* Coarse-pointer & mobile viewport touch target expansion >= 48x48px (design-taste-frontend Rule 2.5) */
+@media (pointer: coarse), (max-width: 768px) {
   .btn, .btn-compact, .chip, .calendar-tab-btn, .theme-toggle-btn {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 48px;
+    min-width: 48px;
   }
 }
 
@@ -206,20 +207,28 @@ code, pre, .font-mono {
   gap: var(--space-3);
 }
 
-/* Buttons */
+/* Buttons — Tactile Micro-Interactions (design-taste-frontend Rule 2.4) */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   padding: 0 var(--space-4);
-  min-height: 40px;
+  min-height: 42px;
   font-weight: 600;
   font-size: 14px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease, border-color 150ms ease, box-shadow 180ms ease;
+}
+
+.btn:hover, .btn-compact:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active, .btn-compact:active, .theme-toggle-btn:active {
+  transform: scale(0.98) translateY(1px);
 }
 
 .btn-compact {
@@ -228,13 +237,13 @@ code, pre, .font-mono {
   justify-content: center;
   gap: var(--space-2);
   padding: 0 var(--space-3);
-  min-height: 34px;
+  min-height: 36px;
   font-weight: 600;
   font-size: 13px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease, border-color 150ms ease, box-shadow 180ms ease;
 }
 
 .btn-primary {
@@ -321,9 +330,11 @@ code, pre, .font-mono {
 }
 
 .hero-title .text-gradient {
-  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-brand-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-brand-accent);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
 }
 
 .hero-subtitle {
@@ -342,6 +353,7 @@ code, pre, .font-mono {
   margin-bottom: var(--space-10);
 }
 
+/* Asymmetrical 7fr / 5fr Architectural Bento Ledger (design-taste-frontend Rule 2.1: No 3-col AI Card Slop) */
 .hero-pillars-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -351,15 +363,42 @@ code, pre, .font-mono {
 
 @media (min-width: 768px) {
   .hero-pillars-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 7fr 5fr;
+    align-items: stretch;
   }
 }
 
 .pillar-card {
-  padding: var(--space-4);
+  padding: var(--space-5);
   border-radius: var(--radius-lg);
   background-color: var(--color-surface-card);
   border: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-2);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.pillar-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--elevation-md);
+}
+
+.pillar-card-primary {
+  grid-row: span 2;
+  background-color: var(--color-surface-subtle);
+  border-left: 3px solid var(--color-brand-primary);
+}
+
+.pillar-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-brand-primary);
 }
 
 .pillar-icon {
