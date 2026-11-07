@@ -4,9 +4,14 @@ import {
   vaultDb,
   saveWalletItemWithReceiptAndAlarms,
   deleteWalletItemCascade,
+  computeAlertSchedule,
   type WalletItem,
   type SaveItemPayload
 } from '@cmlab/core';
+import {
+  sortSubscriptionsByConcurrencyAndPrice,
+  computeMonthlyNormalizedPrice
+} from '../utils/dateFormatters';
 
 export type AppView = 'dashboard' | 'capture' | 'detail' | 'claim' | 'tax' | 'calendar' | 'settings';
 
@@ -26,6 +31,7 @@ export class ReactiveWalletStore {
   isOnboardingOpen = $state<boolean>(false);
   isSettingsOpen = $state<boolean>(false);
   isDrawerOpen = $state<boolean>(false);
+  isEditingDrawer = $state<boolean>(false);
   activeReceiptZoomItem = $state<WalletItem | null>(null);
   activeCancellationItem = $state<WalletItem | null>(null);
 
@@ -82,7 +88,14 @@ export class ReactiveWalletStore {
   }
 
   get digitalSubscriptions(): WalletItem[] {
-    return this.items.filter((item) => item.category === 'subscription');
+    return sortSubscriptionsByConcurrencyAndPrice(this.items);
+  }
+
+  get monthlyAutoPayTotal(): number {
+    return this.digitalSubscriptions.reduce(
+      (sum, sub) => sum + computeMonthlyNormalizedPrice(sub),
+      0
+    );
   }
 
   get taxDeductibleItems(): WalletItem[] {
@@ -103,6 +116,7 @@ export class ReactiveWalletStore {
     if (itemId) {
       this.selectedItemId = itemId;
       this.selectedItem = this.items.find((i) => i.id === itemId) ?? null;
+      this.isEditingDrawer = false;
       this.isDrawerOpen = true;
     }
     this.updateUrlHash();
@@ -111,14 +125,24 @@ export class ReactiveWalletStore {
   selectItem(item: WalletItem | null) {
     this.selectedItem = item;
     this.selectedItemId = item ? item.id : null;
+    this.isEditingDrawer = false;
     if (item) {
       this.isDrawerOpen = true;
     }
     this.updateUrlHash();
   }
 
+  openEditItem(item: WalletItem) {
+    this.selectedItem = item;
+    this.selectedItemId = item.id;
+    this.isEditingDrawer = true;
+    this.isDrawerOpen = true;
+    this.updateUrlHash();
+  }
+
   closeDrawer() {
     this.isDrawerOpen = false;
+    this.isEditingDrawer = false;
     this.selectedItem = null;
     this.selectedItemId = null;
     this.updateUrlHash();
@@ -145,6 +169,55 @@ export class ReactiveWalletStore {
     await saveWalletItemWithReceiptAndAlarms(payload);
   }
 
+  async updateItem(id: string, patch: Partial<WalletItem>): Promise<void> {
+    const existing = this.#items.find((i) => i.id === id) ?? (await vaultDb.items.get(id));
+    if (!existing) return;
+
+    const updatedTitle = (patch.title ?? existing.title).trim();
+    const updatedMerchant = (patch.merchantOrProvider ?? existing.merchantOrProvider).trim();
+    const updatedBrandSlug =
+      patch.brandSlug ??
+      (updatedMerchant.toLowerCase().replace(/[^a-z0-9]/g, '-') || existing.brandSlug);
+
+    const tokenSet = new Set<string>([
+      ...updatedTitle.toLowerCase().split(/\s+/).filter(Boolean),
+      ...updatedMerchant.toLowerCase().split(/\s+/).filter(Boolean),
+      updatedTitle.toLowerCase(),
+      updatedMerchant.toLowerCase(),
+    ]);
+    const finalSerial = patch.serialNumber !== undefined ? patch.serialNumber : existing.serialNumber;
+    if (finalSerial) {
+      tokenSet.add(finalSerial.toLowerCase());
+    }
+
+    const updatedItem: WalletItem = {
+      ...existing,
+      ...patch,
+      id,
+      title: updatedTitle,
+      merchantOrProvider: updatedMerchant,
+      brandSlug: updatedBrandSlug,
+      searchTokens: Array.from(tokenSet),
+      updatedAt: Date.now()
+    };
+
+    // Optimistic reactive update (<1ms UI patch)
+    this.#items = this.#items.map((item) => (item.id === id ? updatedItem : item));
+    if (this.selectedItemId === id) {
+      this.selectedItem = updatedItem;
+    }
+
+    // Persist atomically to Dexie + recompute alarm schedules
+    const alarms = computeAlertSchedule(updatedItem);
+    await vaultDb.transaction('rw', [vaultDb.items, vaultDb.alarm_schedules], async () => {
+      await vaultDb.items.put(updatedItem);
+      await vaultDb.alarm_schedules.where('itemId').equals(id).delete();
+      if (alarms.length > 0) {
+        await vaultDb.alarm_schedules.bulkPut(alarms);
+      }
+    });
+  }
+
   async updateItemStatus(id: string, status: WalletItem['status']): Promise<void> {
     await vaultDb.items.update(id, { status, updatedAt: Date.now() });
   }
@@ -154,6 +227,7 @@ export class ReactiveWalletStore {
     if (this.selectedItemId === id) {
       this.selectedItem = null;
       this.selectedItemId = null;
+      this.isEditingDrawer = false;
       this.isDrawerOpen = false;
       this.currentView = 'dashboard';
     }

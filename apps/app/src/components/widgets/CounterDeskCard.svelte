@@ -4,14 +4,14 @@
     generateBarcodeSvg,
     type WalletItem
   } from '@cmlab/core';
+  import { formatFriendlyDate } from '../../utils/dateFormatters';
   import {
     Copy,
     Check,
     Scan,
     Receipt,
     ShieldCheck,
-    AlertTriangle,
-    Sparkles
+    AlertTriangle
   } from 'lucide-svelte';
 
   interface Props {
@@ -23,7 +23,7 @@
 
   let copied = $state(false);
 
-  let serial = $derived(item.serialNumber || 'Nicht hinterlegt');
+  let serial = $derived(item.serialNumber || 'Not set (tap Edit to add)');
   let hasSerial = $derived(!!item.serialNumber && item.serialNumber.trim().length > 0);
 
   let barcodeValue = $derived(item.barcodeValue || item.serialNumber || '');
@@ -31,9 +31,8 @@
     barcodeValue ? generateBarcodeSvg(barcodeValue, { height: 50, moduleWidth: 1.8 }) : null
   );
 
-  // Statutory BGB § 477 calculation (12 months reversed burden of proof)
   let proofStatus = $derived.by(() => {
-    if (!item.purchaseDate) return { isWithin12m: false, label: 'Unbekannt' };
+    if (!item.purchaseDate) return { isWithin12m: false, label: 'Unknown' };
     const purchase = new Date(item.purchaseDate).getTime();
     const now = Date.now();
     const diffDays = Math.floor((now - purchase) / (1000 * 60 * 60 * 24));
@@ -42,8 +41,8 @@
       isWithin12m,
       diffDays,
       label: isWithin12m
-        ? 'BGB § 477 aktiv (Beweislastumkehr zugunsten des Käufers)'
-        : 'Monat 13–24 (Reguläre BGB § 438 Gewährleistung)'
+        ? 'Easy-Claim Period Active* (First 12 Months)'
+        : '2-Year Defect Protection* (Months 13–24)'
     };
   });
 
@@ -60,18 +59,18 @@
 <div class="counter-desk-card">
   <div class="desk-card-header">
     <div class="header-left">
-      <span class="desk-badge">Schalter-Modus • Reklamation &amp; Kasse</span>
-      <h3 class="desk-title">Geräte-Identifikation &amp; Beleg</h3>
+      <span class="desk-badge">In-Store Return Pass</span>
+      <h3 class="desk-title">Serial &amp; Checkout Barcode</h3>
     </div>
     {#if item.hasProofOfPurchase}
       <button
         type="button"
         class="receipt-quick-btn"
         onclick={onOpenReceiptZoom}
-        aria-label="Kassen-Beleg im Vollbild öffnen"
+        aria-label="Open full-screen receipt"
       >
         <Receipt size={16} />
-        <span>Kassen-Beleg (&lt;100ms)</span>
+        <span>Full-Screen Receipt</span>
       </button>
     {/if}
   </div>
@@ -79,7 +78,7 @@
   <!-- High-Contrast Serial Monospace Display -->
   <div class="serial-strip">
     <div class="serial-meta">
-      <span class="serial-label">Seriennummer (E-Nr. / IMEI / S/N)</span>
+      <span class="serial-label">Serial Number (S/N · IMEI · E-Nr.)</span>
       <span class="serial-code" class:empty={!hasSerial}>{serial}</span>
     </div>
     {#if hasSerial}
@@ -88,15 +87,15 @@
         class="copy-serial-btn"
         class:copied
         onclick={handleCopySerial}
-        aria-label="Seriennummer in Zwischenablage kopieren"
-        title="1-Tap Kopieren"
+        aria-label="Copy serial number"
+        title="1-Tap Copy"
       >
         {#if copied}
           <Check size={18} class="check-icon" />
-          <span class="btn-caption">Kopiert!</span>
+          <span class="btn-caption">Copied!</span>
         {:else}
           <Copy size={18} />
-          <span class="btn-caption">Kopieren</span>
+          <span class="btn-caption">Copy</span>
         {/if}
       </button>
     {/if}
@@ -107,7 +106,7 @@
     <div class="barcode-desk-section">
       <div class="barcode-meta">
         <Scan size={14} class="barcode-icon" />
-        <span class="barcode-label">Kassen-Scanner Barcode (Code 128)</span>
+        <span class="barcode-label">Store Scanner Barcode (Code 128)</span>
       </div>
       <div class="barcode-svg-box">
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -116,7 +115,7 @@
     </div>
   {/if}
 
-  <!-- Legal Proof Status Footer -->
+  <!-- Friendly Warranty Status Footer -->
   <div class="statutory-proof-footer" class:favorable={proofStatus.isWithin12m}>
     {#if proofStatus.isWithin12m}
       <ShieldCheck size={16} class="proof-icon green" />
@@ -126,7 +125,7 @@
     <div class="proof-text-cluster">
       <span class="proof-title">{proofStatus.label}</span>
       <span class="proof-sub">
-        Gekauft am {item.purchaseDate} bei {item.merchantOrProvider} • Verkäufer haftet nach BGB § 437.
+        Purchased {formatFriendlyDate(item.purchaseDate, 'long')} at {item.merchantOrProvider}
       </span>
     </div>
   </div>
@@ -316,7 +315,7 @@
     border-color: #BBF7D0;
   }
 
-  .proof-icon {
+  :global(.proof-icon) {
     flex-shrink: 0;
     margin-top: 2px;
   }

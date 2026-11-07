@@ -5,6 +5,10 @@
 
 export type ItemCategory = 'hardware' | 'subscription' | 'other';
 
+export type BillingCycle = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+
+export type PaymentMethodType = 'auto_pay' | 'invoice';
+
 export type ItemStatus =
   | 'active'
   | 'expiring_soon'
@@ -45,6 +49,8 @@ export interface WalletItem {
   purchaseDate: string; // ISO 8601 YYYY-MM-DD
   expiryDate: string; // ISO 8601 YYYY-MM-DD (Warranty end or Subscription renewal)
   priceGrossEur: number;
+  billingCycle?: BillingCycle | undefined; // Subscription concurrency ('daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly')
+  paymentType?: PaymentMethodType | undefined; // 'auto_pay' (automatic deduction) or 'invoice' (manual invoice)
   isTaxDeductible: boolean;
   taxCategory?: TaxCategory | undefined;
   beruflicheNutzungProzent?: number | undefined; // 0 to 100 (Default 50 or 100 for mixed use)

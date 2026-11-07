@@ -7,6 +7,8 @@
 export type {
   ItemCategory,
   ItemStatus,
+  BillingCycle,
+  PaymentMethodType,
   TaxCategory,
   ReminderType,
   AlarmStatus,

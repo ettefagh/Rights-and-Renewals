@@ -8,23 +8,26 @@
     computeAlertSchedule,
     type WalletItem,
     type ReceiptVaultBlob,
-    type TaxCategory
+    type TaxCategory,
+    type BillingCycle,
+    type PaymentMethodType
   } from '@cmlab/core';
   import {
     Camera,
     Upload,
     Check,
     X,
-    Lock,
-    Tag,
     Receipt,
     Shield
   } from 'lucide-svelte';
 
   let title = $state('');
   let merchant = $state('');
-  let category = $state<'hardware' | 'subscription'>('hardware');
+  let category = $state<'hardware' | 'subscription'>('subscription');
+  let billingCycle = $state<BillingCycle>('monthly');
+  let paymentType = $state<PaymentMethodType>('auto_pay');
   let priceStr = $state('');
+  let serialNumber = $state('');
   let purchaseDate = $state(new Date().toISOString().split('T')[0]!);
   let isTaxDeductible = $state(false);
   let taxCategory = $state<TaxCategory>('arbeitsmittel');
@@ -88,7 +91,6 @@
     try {
       const arrayBuffer = await file.arrayBuffer();
 
-      // Launch Web Worker for client-side OffscreenCanvas downsampling & GoBD SHA-256
       const worker = new Worker(
         new URL('../../workers/image-compression.worker.ts', import.meta.url),
         { type: 'module' }
@@ -105,7 +107,7 @@
         worker.terminate();
       };
 
-      worker.onerror = (err) => {
+      worker.onerror = () => {
         isCompressing = false;
         errorMessage = 'Worker compression failed';
         worker.terminate();
@@ -120,12 +122,12 @@
 
   async function handleSave() {
     if (!title.trim()) {
-      errorMessage = 'Please enter an item name.';
+      errorMessage = 'Please enter a name.';
       return;
     }
     const priceGross = parseFloat(priceStr.replace(',', '.')) || 0;
-    if (priceGross <= 0) {
-      errorMessage = 'Please enter a valid price.';
+    if (category === 'subscription' && priceGross <= 0) {
+      errorMessage = 'Please enter the recurring subscription price.';
       return;
     }
 
@@ -136,13 +138,13 @@
       const id = `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       const pDate = new Date(purchaseDate);
 
-      // Default statutory expiry: 24 months for hardware, 12 months for subscriptions
-      let expDate = new Date(pDate);
-      if (category === 'hardware') {
-        expDate.setMonth(pDate.getMonth() + 24);
-      } else {
-        expDate.setMonth(pDate.getMonth() + 1);
-      }
+      // Compute default expiry without mutating Date
+      const monthsToAdd = category === 'hardware' ? 24 : 1;
+      const expDate = new Date(
+        pDate.getFullYear(),
+        pDate.getMonth() + monthsToAdd,
+        pDate.getDate()
+      );
       const expiryDateStr = expDate.toISOString().split('T')[0]!;
 
       let receiptBlobRecord: ReceiptVaultBlob | undefined;
@@ -166,11 +168,15 @@
         id,
         title: title.trim(),
         category,
+        billingCycle: category === 'subscription' ? billingCycle : undefined,
+        paymentType: category === 'subscription' ? paymentType : undefined,
         brandSlug: merchant.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-        merchantOrProvider: merchant.trim() || 'Unknown Merchant',
+        merchantOrProvider: merchant.trim() || 'Unknown',
         purchaseDate,
         expiryDate: expiryDateStr,
         priceGrossEur: priceGross,
+        serialNumber: category === 'hardware' && serialNumber.trim() ? serialNumber.trim() : undefined,
+        barcodeValue: category === 'hardware' && serialNumber.trim() ? serialNumber.trim() : undefined,
         status: 'active',
         isTaxDeductible,
         taxCategory: isTaxDeductible ? taxCategory : undefined,
@@ -192,9 +198,9 @@
         alarmSchedules: alarms
       });
 
-      walletStore.setView('detail', id);
+      walletStore.setView('dashboard');
     } catch (err: any) {
-      errorMessage = err.message || 'Failed to save item to encrypted vault';
+      errorMessage = err.message || 'Failed to save entry';
     } finally {
       isSaving = false;
     }
@@ -204,8 +210,8 @@
 <div class="capture-panel">
   <div class="capture-header">
     <div>
-      <h2 class="panel-title">Quick Capture (&lt;15s Flow)</h2>
-      <p class="panel-subtitle">Register a physical warranty or recurring digital subscription.</p>
+      <h2 class="panel-title">Add Sub or Warranty</h2>
+      <p class="panel-subtitle">Stored locally on your device.</p>
     </div>
     <button
       type="button"
@@ -222,17 +228,8 @@
   {/if}
 
   <div class="capture-form">
-    <!-- Category Toggle -->
+    <!-- Category Toggle: Sub vs Warranty -->
     <div class="category-toggle-row">
-      <button
-        type="button"
-        class="cat-btn"
-        class:active={category === 'hardware'}
-        onclick={() => (category = 'hardware')}
-      >
-        <Shield size={16} />
-        <span>Hardware Guarantee (24m BGB)</span>
-      </button>
       <button
         type="button"
         class="cat-btn"
@@ -240,17 +237,30 @@
         onclick={() => (category = 'subscription')}
       >
         <Receipt size={16} />
-        <span>Digital Subscription (§ 309 BGB)</span>
+        <span>🔄 Sub (Recurring)</span>
+      </button>
+      <button
+        type="button"
+        class="cat-btn"
+        class:active={category === 'hardware'}
+        onclick={() => (category = 'hardware')}
+      >
+        <Shield size={16} />
+        <span>🛡️ Warranty (2-Year Protection*)</span>
       </button>
     </div>
 
     <!-- Title / Item Name -->
     <div class="field-wrap">
-      <label for="item-title" class="field-label">Item / Service Name *</label>
+      <label for="item-title" class="field-label">
+        {category === 'subscription' ? 'Subscription Name *' : 'Product Name *'}
+      </label>
       <input
         id="item-title"
         type="text"
-        placeholder="e.g. Apple MacBook Pro, Spotify Student..."
+        placeholder={category === 'subscription'
+          ? 'e.g. Spotify Student, Adobe Creative Cloud...'
+          : 'e.g. Apple MacBook Pro, Sony Headphones...'}
         bind:value={title}
         class="text-input"
         required
@@ -259,11 +269,13 @@
 
     <!-- Merchant with PrefixTrie Autocomplete -->
     <div class="field-wrap relative">
-      <label for="item-merchant" class="field-label">Merchant / Provider *</label>
+      <label for="item-merchant" class="field-label">
+        {category === 'subscription' ? 'Provider *' : 'Store / Brand *'}
+      </label>
       <input
         id="item-merchant"
         type="text"
-        placeholder="e.g. MediaMarkt, Apple Store, Spotify..."
+        placeholder="e.g. Spotify, Apple Store, MediaMarkt..."
         value={merchant}
         oninput={(e) => handleMerchantInput((e.target as HTMLInputElement).value)}
         class="text-input"
@@ -271,7 +283,7 @@
       />
       {#if brandSuggestions.length > 0}
         <div class="autocomplete-dropdown">
-          {#each brandSuggestions as suggestion}
+          {#each brandSuggestions as suggestion (suggestion)}
             <button
               type="button"
               class="suggestion-row"
@@ -284,35 +296,55 @@
       {/if}
     </div>
 
-    <!-- Price and Purchase Date Grid -->
-    <div class="form-grid-2">
-      <div class="field-wrap">
-        <label for="item-price" class="field-label">Gross Price (€) *</label>
-        <input
-          id="item-price"
-          type="text"
-          placeholder="e.g. 89.99"
-          bind:value={priceStr}
-          class="text-input"
-          required
-        />
-      </div>
-
-      <div class="field-wrap">
-        <label for="item-date" class="field-label">Purchase / Start Date *</label>
-        <input
-          id="item-date"
-          type="date"
-          bind:value={purchaseDate}
-          class="text-input"
-          required
-        />
-      </div>
-    </div>
-
     {#if category === 'subscription'}
+      <div class="form-grid-2">
+        <div class="field-wrap">
+          <label for="item-cycle" class="field-label">Billing Frequency</label>
+          <select id="item-cycle" bind:value={billingCycle} class="text-input">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+
+        <div class="field-wrap">
+          <label for="item-payment-type" class="field-label">Payment Method</label>
+          <select id="item-payment-type" bind:value={paymentType} class="text-input">
+            <option value="auto_pay">● Auto-Pay (Card / SEPA)</option>
+            <option value="invoice">Invoice Due (Manual)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="field-wrap">
+          <label for="item-price" class="field-label">Recurring Price (€) *</label>
+          <input
+            id="item-price"
+            type="text"
+            placeholder="e.g. 5.99"
+            bind:value={priceStr}
+            class="text-input"
+            required
+          />
+        </div>
+
+        <div class="field-wrap">
+          <label for="item-date" class="field-label">Start Date *</label>
+          <input
+            id="item-date"
+            type="date"
+            bind:value={purchaseDate}
+            class="text-input"
+            required
+          />
+        </div>
+      </div>
+
       <div class="field-wrap">
-        <label for="item-cancel-url" class="field-label">Direct Cancellation URL (§ 312k BGB)</label>
+        <label for="item-cancel-url" class="field-label">Official 1-Click Cancel Link** (URL)</label>
         <input
           id="item-cancel-url"
           type="url"
@@ -321,16 +353,40 @@
           class="text-input"
         />
       </div>
+    {:else}
+      <div class="form-grid-2">
+        <div class="field-wrap">
+          <label for="item-date" class="field-label">Purchase Date *</label>
+          <input
+            id="item-date"
+            type="date"
+            bind:value={purchaseDate}
+            class="text-input"
+            required
+          />
+        </div>
+
+        <div class="field-wrap">
+          <label for="item-serial" class="field-label">Serial Number (S/N · Optional)</label>
+          <input
+            id="item-serial"
+            type="text"
+            placeholder="e.g. C02X9481Q6L4"
+            bind:value={serialNumber}
+            class="text-input"
+          />
+        </div>
+      </div>
     {/if}
 
-    <!-- Receipt Capture Slot with Web Worker Compression -->
+    <!-- Receipt Capture Slot -->
     <div class="receipt-slot-card">
       <div class="receipt-header">
         <Camera size={18} class="text-pine" />
-        <strong>Proof of Purchase (Offline Encrypted)</strong>
+        <strong>Original Receipt Photo*** (Offline Encrypted)</strong>
       </div>
       <p class="receipt-desc">
-        Images are downsampled to &le;2048px (&lt;1.5MB) and sealed with GoBD SHA-256 pre-encryption digest.
+        Compressed on-device and sealed with a tamper-proof verification fingerprint***.
       </p>
 
       <div class="upload-controls">
@@ -347,11 +403,11 @@
         </label>
 
         {#if isCompressing}
-          <span class="processing-hint">Downsampling & hashing in Web Worker...</span>
+          <span class="processing-hint">Optimizing receipt photo...</span>
         {:else if receiptSha256}
           <div class="receipt-confirmed-badge">
             <Check size={14} color="#059669" />
-            <span>GoBD Proof Sealed: <code>{receiptSha256.slice(0, 12)}...</code></span>
+            <span>Verified Original Receipt***</span>
           </div>
         {/if}
       </div>
@@ -363,30 +419,42 @@
       {/if}
     </div>
 
-    <!-- Tax Deductibility Toggle (§ 9 EStG) -->
+    <!-- Optional Annual Tax Export Toggle -->
     <div class="tax-card">
       <label class="tax-toggle-row">
         <div class="tax-info">
-          <strong>Tax Deductible Expense (§ 9 EStG Werbungskosten)</strong>
-          <span class="sub-hint">1-year 100% digital Sofortabschreibung per BMF 22.02.2022.</span>
+          <strong>Include in Annual Tax Export (Work / Study Expense)</strong>
+          <span class="sub-hint">Optional tag for your year-end tax summary.</span>
         </div>
         <input type="checkbox" bind:checked={isTaxDeductible} class="switch-input" />
       </label>
 
       {#if isTaxDeductible}
         <div class="tax-details-row">
+          {#if category === 'hardware'}
+            <div class="field-wrap flex-1">
+              <label for="item-price-tax" class="field-label">Purchase Price (€)</label>
+              <input
+                id="item-price-tax"
+                type="text"
+                placeholder="e.g. 899.00"
+                bind:value={priceStr}
+                class="text-input"
+              />
+            </div>
+          {/if}
           <div class="field-wrap flex-1">
-            <label for="tax-cat-select" class="field-label">Tax Category</label>
+            <label for="tax-cat-select" class="field-label">Expense Type</label>
             <select id="tax-cat-select" bind:value={taxCategory} class="text-input">
-              <option value="arbeitsmittel">Arbeitsmittel (§ 9 EStG)</option>
-              <option value="software_saas">Digital Software / SaaS (BMF 2022)</option>
-              <option value="telekommunikation">Telekommunikation</option>
-              <option value="fachliteratur">Fachliteratur</option>
+              <option value="arbeitsmittel">Work Equipment</option>
+              <option value="software_saas">Software / SaaS</option>
+              <option value="telekommunikation">Telecom / Internet</option>
+              <option value="fachliteratur">Books &amp; Study</option>
               <option value="other">Other</option>
             </select>
           </div>
           <div class="field-wrap flex-1">
-            <label for="tax-pct" class="field-label">Professional Use %</label>
+            <label for="tax-pct" class="field-label">Work Use %</label>
             <input
               id="tax-pct"
               type="number"
@@ -406,7 +474,7 @@
       onclick={handleSave}
       disabled={isSaving || isCompressing}
     >
-      {isSaving ? 'Encrypting & Sealing...' : 'Save to Sovereign Vault'}
+      {isSaving ? 'Saving...' : 'Save Entry'}
     </button>
   </div>
 </div>
@@ -471,7 +539,7 @@
 
   .cat-btn {
     flex: 1;
-    height: 40px;
+    height: 42px;
     border-radius: var(--radius-md, 12px);
     border: 1.5px solid var(--color-border-subtle, #E2E8F0);
     background: #FFFFFF;
@@ -480,8 +548,8 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: var(--font-size-xs, 12px);
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
     transition: all 150ms ease;
   }
@@ -504,7 +572,7 @@
 
   .field-label {
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-ink-secondary, #475569);
   }
 
@@ -591,7 +659,7 @@
     background: var(--color-pine-teal, #2F524C);
     color: #FFFFFF;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
   }
 
@@ -609,6 +677,7 @@
     align-items: center;
     gap: 4px;
     font-size: 11px;
+    font-weight: 600;
     color: #065F46;
   }
 
@@ -660,10 +729,12 @@
   .tax-details-row {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
   }
 
   .flex-1 {
     flex: 1;
+    min-width: 110px;
   }
 
   .submit-action-btn {
@@ -673,7 +744,7 @@
     color: #FFFFFF;
     border: none;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     margin-top: 8px;
     transition: background 150ms ease;

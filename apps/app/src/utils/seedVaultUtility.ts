@@ -23,7 +23,73 @@ export async function populateSampleStudentVault(): Promise<number> {
   const now = new Date();
   const formatIso = (d: Date) => d.toISOString().split('T')[0]!;
 
-  // 1. Spotify Premium Student (Urgent renewal in 3 days)
+  // 1. Urban Sports Club Weekly Flex (Weekly concurrency, renews in 5 days)
+  const uscPurchase = new Date(now);
+  uscPurchase.setMonth(now.getMonth() - 2);
+  const uscRenewal = new Date(now);
+  uscRenewal.setDate(now.getDate() + 5);
+
+  const uscItem: WalletItem = {
+    id: 'sample-sub-usc',
+    title: 'Urban Sports Club Weekly Flex',
+    category: 'subscription',
+    brandSlug: 'urban-sports-club',
+    merchantOrProvider: 'Urban Sports GmbH',
+    purchaseDate: formatIso(uscPurchase),
+    expiryDate: formatIso(uscRenewal),
+    priceGrossEur: 14.99,
+    billingCycle: 'weekly',
+    paymentType: 'auto_pay',
+    status: 'expiring_soon',
+    isTaxDeductible: false,
+    notes: 'Member-ID: USC-DE-552019',
+    cancellationUrl: 'https://urbansportsclub.com/de/profile/membership',
+    hasProofOfPurchase: false,
+    searchTokens: ['urban', 'sports', 'gym', 'fitness', 'weekly'],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  await saveWalletItemWithReceiptAndAlarms({
+    item: uscItem,
+    alarmSchedules: computeAlertSchedule(uscItem, { now }),
+  });
+
+  // 2. Adobe Creative Cloud Student (Monthly concurrency, higher price €19.99/mo)
+  const adobePurchase = new Date(now);
+  adobePurchase.setMonth(now.getMonth() - 8);
+  const adobeRenewal = new Date(now);
+  adobeRenewal.setDate(now.getDate() + 18);
+
+  const adobeItem: WalletItem = {
+    id: 'sample-sub-adobe',
+    title: 'Adobe Creative Cloud Student',
+    category: 'subscription',
+    brandSlug: 'adobe',
+    merchantOrProvider: 'Adobe Systems Software Ireland Ltd.',
+    purchaseDate: formatIso(adobePurchase),
+    expiryDate: formatIso(adobeRenewal),
+    priceGrossEur: 19.99,
+    billingCycle: 'monthly',
+    paymentType: 'auto_pay',
+    status: 'active',
+    isTaxDeductible: true,
+    taxCategory: 'software_saas',
+    beruflicheNutzungProzent: 100,
+    notes: 'Contract-ID: ADB-9910421',
+    cancellationUrl: 'https://account.adobe.com/plans',
+    hasProofOfPurchase: false,
+    searchTokens: ['adobe', 'creative', 'cloud', 'photoshop', 'monthly'],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  await saveWalletItemWithReceiptAndAlarms({
+    item: adobeItem,
+    alarmSchedules: computeAlertSchedule(adobeItem, { now }),
+  });
+
+  // 3. Spotify Premium Student (Monthly concurrency, urgent renewal in 3 days, €5.99/mo)
   const spotifyPurchase = new Date(now);
   spotifyPurchase.setFullYear(now.getFullYear() - 1);
   const spotifyRenewal = new Date(now);
@@ -38,9 +104,11 @@ export async function populateSampleStudentVault(): Promise<number> {
     purchaseDate: formatIso(spotifyPurchase),
     expiryDate: formatIso(spotifyRenewal),
     priceGrossEur: 5.99,
+    billingCycle: 'monthly',
+    paymentType: 'auto_pay',
     status: 'expiring_soon',
     isTaxDeductible: false,
-    notes: 'Kunden-Nr: SPOT-DE-8839219',
+    notes: 'Customer-ID: SPOT-DE-8839219',
     cancellationUrl: 'https://www.spotify.com/account/subscription/cancel/',
     hasProofOfPurchase: false,
     searchTokens: ['spotify', 'music', 'streaming', 'student'],
@@ -54,7 +122,7 @@ export async function populateSampleStudentVault(): Promise<number> {
     alarmSchedules: spotifyAlarms,
   });
 
-  // 2. Apple MacBook Pro 14" M3 (Hardware, 17 months in, 100% tax deductible Arbeitsmittel)
+  // 4. Apple MacBook Pro 14" M3 (Warranty, 17 months in, 100% tax deductible Arbeitsmittel)
   const macbookPurchase = new Date(now);
   macbookPurchase.setMonth(now.getMonth() - 17);
   const macbookExpiry = new Date(macbookPurchase);
@@ -102,7 +170,7 @@ export async function populateSampleStudentVault(): Promise<number> {
     alarmSchedules: macbookAlarms,
   });
 
-  // 3. MediaMarkt USB-C 8-in-1 Hub (Hardware, 4 months old, active BGB § 477 reversed burden of proof)
+  // 5. MediaMarkt USB-C 8-in-1 Hub (Warranty, 4 months old, active Easy-Claim Period* § 477 BGB)
   const hubPurchase = new Date(now);
   hubPurchase.setMonth(now.getMonth() - 4);
   const hubExpiry = new Date(hubPurchase);
@@ -150,5 +218,5 @@ export async function populateSampleStudentVault(): Promise<number> {
     alarmSchedules: hubAlarms,
   });
 
-  return 3;
+  return 5;
 }

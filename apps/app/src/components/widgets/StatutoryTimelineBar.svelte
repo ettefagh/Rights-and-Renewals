@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { WalletItem } from '@cmlab/core';
+  import { formatFriendlyDate } from '../../utils/dateFormatters';
 
   interface Props {
     item: WalletItem;
@@ -7,29 +8,33 @@
 
   let { item }: Props = $props();
 
-  // Compute timeline milestone dates
   let milestones = $derived.by(() => {
     const purchase = new Date(item.purchaseDate || Date.now());
-    const cliff12m = new Date(purchase);
-    cliff12m.setMonth(purchase.getMonth() + 12);
-
-    const expiry24m = new Date(purchase);
-    expiry24m.setMonth(purchase.getMonth() + 24);
+    const cliff12m = new Date(
+      purchase.getFullYear() + 1,
+      purchase.getMonth(),
+      purchase.getDate()
+    );
+    const expiry24m = item.expiryDate
+      ? new Date(item.expiryDate)
+      : new Date(purchase.getFullYear() + 2, purchase.getMonth(), purchase.getDate());
 
     const formatIso = (d: Date) => d.toISOString().split('T')[0]!;
 
     const now = Date.now();
-    const totalDuration = expiry24m.getTime() - purchase.getTime();
+    const totalDuration = Math.max(1, expiry24m.getTime() - purchase.getTime());
     const elapsed = Math.max(0, Math.min(now - purchase.getTime(), totalDuration));
-    const progressPercent = totalDuration > 0 ? (elapsed / totalDuration) * 100 : 0;
+    const progressPercent = Math.round((elapsed / totalDuration) * 100);
+    const remainingPercent = Math.max(4, 100 - progressPercent);
 
     const isPast12m = now >= cliff12m.getTime();
 
     return {
-      purchaseDate: formatIso(purchase),
-      cliff12m: formatIso(cliff12m),
-      expiry24m: formatIso(expiry24m),
+      purchaseDate: formatFriendlyDate(formatIso(purchase), 'short'),
+      cliff12m: formatFriendlyDate(formatIso(cliff12m), 'short'),
+      expiry24m: formatFriendlyDate(formatIso(expiry24m), 'short'),
       progressPercent,
+      remainingPercent,
       isPast12m
     };
   });
@@ -38,33 +43,38 @@
 <div class="timeline-container">
   <div class="timeline-meta-row">
     <span class="timeline-badge" class:warning={milestones.isPast12m}>
-      {milestones.isPast12m ? '⚠️ Past § 477 Presumption Shift' : '🛡️ Active Seller Burden (§ 477 BGB)'}
+      <span class="status-dot" class:amber={milestones.isPast12m}></span>
+      {milestones.isPast12m ? 'Standard 2-Year Warranty*' : 'Easy-Claim Period Active*'}
     </span>
-    <span class="timeline-pct">{Math.round(milestones.progressPercent)}% of 24m</span>
+    <span class="timeline-pct">{milestones.remainingPercent}% coverage left</span>
   </div>
 
-  <!-- Linear Track -->
+  <!-- Coverage Lifespan Progress Track -->
   <div class="timeline-track">
-    <div class="timeline-fill" style:width="{milestones.progressPercent}%"></div>
-    <!-- 12-Month Cliff Marker at 50% -->
-    <div class="cliff-marker" title="12-Month Beweislastumkehr Cliff (§ 477 BGB)">
+    <div
+      class="timeline-fill"
+      class:amber={milestones.isPast12m}
+      style:width="{milestones.remainingPercent}%"
+    ></div>
+    <!-- 12-Month Easy-Claim Marker at 50% -->
+    <div class="cliff-marker" title="12-Month Easy-Claim Period* (§ 477 BGB)">
       <div class="marker-pin"></div>
-      <span class="marker-tag">12m Cliff</span>
+      <span class="marker-tag">1-Yr Mark*</span>
     </div>
   </div>
 
-  <!-- Milestone Nodes -->
+  <!-- Milestone Nodes with Friendly Dates -->
   <div class="milestone-nodes">
     <div class="node-item">
-      <span class="node-label">Purchase</span>
+      <span class="node-label">Purchased</span>
       <span class="node-date">{milestones.purchaseDate}</span>
     </div>
     <div class="node-item center">
-      <span class="node-label">§ 477 BGB Cliff</span>
+      <span class="node-label">Easy-Claim Ends*</span>
       <span class="node-date">{milestones.cliff12m}</span>
     </div>
     <div class="node-item end">
-      <span class="node-label">24m Expiry</span>
+      <span class="node-label">Warranty Ends*</span>
       <span class="node-date">{milestones.expiry24m}</span>
     </div>
   </div>
@@ -88,12 +98,15 @@
   }
 
   .timeline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 11px;
     font-weight: 600;
     color: var(--color-pine-teal, #2F524C);
     background: #E9EFEF;
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 9999px;
   }
 
   .timeline-badge.warning {
@@ -101,10 +114,22 @@
     background: #FEF3C7;
   }
 
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #059669;
+    display: inline-block;
+  }
+
+  .status-dot.amber {
+    background: #D97706;
+  }
+
   .timeline-pct {
     font-size: 11px;
     color: var(--color-ink-secondary, #475569);
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .timeline-track {
@@ -113,14 +138,18 @@
     border-radius: 9999px;
     background: #E2E8F0;
     overflow: visible;
-    margin: 8px 0;
+    margin: 10px 0 8px 0;
   }
 
   .timeline-fill {
     height: 100%;
     border-radius: 9999px;
-    background: var(--color-pine-teal, #2F524C);
+    background: linear-gradient(90deg, #059669 0%, #2F524C 100%);
     transition: width 300ms ease;
+  }
+
+  .timeline-fill.amber {
+    background: linear-gradient(90deg, #F59E0B 0%, #D97706 100%);
   }
 
   .cliff-marker {
@@ -131,28 +160,27 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    pointer-events: none;
   }
 
   .marker-pin {
     width: 3px;
     height: 16px;
-    background: var(--color-warning-amber, #D97706);
+    background: #D96B4B;
     border-radius: 2px;
   }
 
   .marker-tag {
     font-size: 9px;
     font-weight: 700;
-    color: var(--color-warning-amber, #D97706);
-    white-space: nowrap;
+    color: #D96B4B;
     margin-top: 2px;
+    white-space: nowrap;
   }
 
   .milestone-nodes {
     display: flex;
     justify-content: space-between;
-    font-size: 11px;
+    margin-top: 6px;
   }
 
   .node-item {
@@ -169,11 +197,14 @@
   }
 
   .node-label {
+    font-size: 10px;
+    color: var(--color-ink-secondary, #475569);
     font-weight: 600;
-    color: var(--color-ink-primary, #0F172A);
   }
 
   .node-date {
-    color: var(--color-ink-secondary, #475569);
+    font-size: 11px;
+    color: var(--color-ink-primary, #0F172A);
+    font-weight: 600;
   }
 </style>

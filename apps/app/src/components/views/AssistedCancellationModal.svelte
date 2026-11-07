@@ -5,6 +5,7 @@
     type WalletItem
   } from '@cmlab/core';
   import { walletStore } from '../../state/wallet.svelte';
+  import { formatFriendlyDate } from '../../utils/dateFormatters';
   import {
     X,
     ExternalLink,
@@ -31,14 +32,13 @@
   let tokenToCopy = $derived.by(() => {
     if (item.notes && item.notes.trim().length > 0) return item.notes.trim();
     if (item.serialNumber && item.serialNumber.trim().length > 0) return item.serialNumber.trim();
-    return `Vertrag ${item.title}`;
+    return `Contract ${item.title}`;
   });
 
   let effectiveCancellationUrl = $derived.by(() => {
     if (item.cancellationUrl && item.cancellationUrl.startsWith('http')) {
       return item.cancellationUrl;
     }
-    // Fallback search link for brand cancellation
     return `https://www.google.com/search?q=${encodeURIComponent(item.merchantOrProvider + ' verträge hier kündigen 312k')}`;
   });
 
@@ -51,16 +51,13 @@
   }
 
   async function handleOpenPortal() {
-    // 1. Copy contract token first synchronously
     await copyToClipboardSafe(tokenToCopy);
     copiedToken = true;
 
-    // 2. Open official vendor cancellation portal in authenticated session
     if (typeof window !== 'undefined') {
       window.open(effectiveCancellationUrl, '_blank', 'noopener,noreferrer');
     }
 
-    // 3. Trigger post-handoff check-in state
     handoffInitiated = true;
   }
 
@@ -72,7 +69,7 @@
     }, 1800);
   }
 
-  function routeToFormalNotice(templateId: 'T4' | 'T5') {
+  function routeToFormalNotice() {
     onClose();
     walletStore.setView('claim', item.id);
   }
@@ -85,22 +82,21 @@
   aria-labelledby="cancel-modal-title"
 >
   <div class="cancellation-card">
-    <!-- Header -->
     <header class="modal-header">
       <div class="header-left">
-        <span class="badge-law">§ 312k BGB Kündigungs-Assistent</span>
+        <span class="badge-law">1-Click Cancel Assistant**</span>
         <h2 id="cancel-modal-title" class="modal-title">
-          Kündigung: {item.title}
+          Cancel {item.title}
         </h2>
         <p class="modal-sub">
-          {item.merchantOrProvider} • Laufzeit/Verlängerung: {item.expiryDate}
+          {item.merchantOrProvider} • Next Renewal: {formatFriendlyDate(item.expiryDate, 'long')}
         </p>
       </div>
       <button
         type="button"
         class="close-btn"
         onclick={onClose}
-        aria-label="Assistent schließen"
+        aria-label="Close cancellation assistant"
       >
         <X size={20} />
       </button>
@@ -110,33 +106,32 @@
       {#if cancellationSaved}
         <div class="success-banner">
           <CheckCircle2 size={36} class="success-icon" />
-          <h3 class="success-title">Status: Kündigung eingereicht (Tracking aktiv)</h3>
+          <h3 class="success-title">Cancellation Marked as Submitted</h3>
           <p class="success-desc">
-            Der Status wurde auf <strong>Kündigung in Prüfung</strong> gesetzt. Das gesetzliche 14-Tage-Tracking für die Bestätigung (§ 312k Abs. 4 BGB) läuft ab heute.
+            Status updated to <strong>Cancellation Pending</strong>. We will track the 14-day confirmation window** starting today.
           </p>
         </div>
       {:else}
-        <!-- DUAL-RAIL CHOICE -->
         <div class="rails-container">
-          <!-- RAIL A: Statutory Web Cancellation (Fast Path) -->
+          <!-- RAIL A: 1-Click Web Cancellation -->
           <div class="rail-box rail-a">
             <div class="rail-header">
-              <span class="rail-badge fast">Schiene A (Schnellweg)</span>
-              <h3 class="rail-title">Offizielle § 312k Kündigungsseite</h3>
+              <span class="rail-badge fast">Option A (Fastest)</span>
+              <h3 class="rail-title">Official 1-Click Cancel Page**</h3>
             </div>
             <p class="rail-desc">
-              Öffnet die gesetzlich vorgeschriebene Kündigungsseite des Anbieters in deinem Browser. Deine Kundendaten werden vorab in die Zwischenablage kopiert.
+              Opens the provider's mandatory 2-step cancellation page in your browser and copies your reference details to the clipboard automatically.
             </p>
 
             <div class="token-preview">
-              <span class="token-label">Kunden-/Vertragsdaten:</span>
+              <span class="token-label">Reference / Account Note:</span>
               <div class="token-chip">
                 <code>{tokenToCopy}</code>
                 <button
                   type="button"
                   class="copy-chip-btn"
                   onclick={handleCopyToken}
-                  title="In Zwischenablage kopieren"
+                  title="Copy to clipboard"
                 >
                   {#if copiedToken}
                     <Check size={14} class="text-green" />
@@ -152,7 +147,7 @@
               class="primary-rail-btn"
               onclick={handleOpenPortal}
             >
-              <span>Kündigungsseite aufrufen &amp; Daten kopieren</span>
+              <span>Open Official Cancel Page &amp; Copy Info</span>
               <ExternalLink size={16} />
             </button>
 
@@ -162,9 +157,9 @@
                   <Clock size={18} class="text-amber" />
                 </div>
                 <div class="prompt-content">
-                  <h4 class="prompt-title">Hast du den Button "Jetzt kündigen" geklickt?</h4>
+                  <h4 class="prompt-title">Did you submit the cancellation on the provider page?</h4>
                   <p class="prompt-text">
-                    Bestätige die Einreichung, um den 14-tägigen Bestätigungsnachweis zu tracken.
+                    Confirm below so we can track your confirmation deadline.
                   </p>
                   <div class="prompt-actions">
                     <button
@@ -173,14 +168,14 @@
                       onclick={confirmCancellationSubmitted}
                     >
                       <Check size={14} />
-                      <span>Ja, Kündigung eingereicht</span>
+                      <span>Yes, Cancellation Submitted</span>
                     </button>
                     <button
                       type="button"
                       class="subtle-btn"
                       onclick={onClose}
                     >
-                      Noch nicht / Später
+                      Not yet / Later
                     </button>
                   </div>
                 </div>
@@ -188,39 +183,38 @@
             {/if}
           </div>
 
-          <!-- RAIL B: Deterministic Legal Notice Generation (Formal Path) -->
+          <!-- RAIL B: Written Notice -->
           <div class="rail-box rail-b">
             <div class="rail-header">
-              <span class="rail-badge legal">Schiene B (Schriftform &amp; Streitfall)</span>
-              <h3 class="rail-title">Rechtssicheres Kündigungsschreiben</h3>
+              <span class="rail-badge legal">Option B (Written Proof)</span>
+              <h3 class="rail-title">Ready-to-Send Cancellation Letter**</h3>
             </div>
             <p class="rail-desc">
-              Erstellt ein DIN 5008 Kündigungsschreiben mit SEPA-Lastschrift-Widerruf und GoBD SHA-256 Zeitstempel für E-Mail, Fax oder Einschreiben.
+              Generates a formal cancellation notice with direct-debit revocation for email or post.
             </p>
 
             <div class="rail-b-actions">
               <button
                 type="button"
                 class="secondary-rail-btn"
-                onclick={() => routeToFormalNotice('T5')}
+                onclick={routeToFormalNotice}
               >
                 <FileText size={16} />
-                <span>Ordentliche Kündigung erstellen (BGB § 309 Nr. 9)</span>
+                <span>Create Standard Cancellation Notice (Monthly Cancel Right**)</span>
               </button>
 
               <button
                 type="button"
                 class="alert-rail-btn"
-                onclick={() => routeToFormalNotice('T4')}
+                onclick={routeToFormalNotice}
               >
                 <ShieldAlert size={16} />
-                <span>Button fehlt? Fristlos kündigen (§ 312k Abs. 6 BGB)</span>
+                <span>No Cancel Button Found? Cancel Immediately**</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Safe Harbor Notice (BGH LexFox Compliance) -->
         <div class="safe-harbor-footer">
           <AlertCircle size={14} class="safe-harbor-icon" />
           <p class="safe-harbor-text">
@@ -438,10 +432,6 @@
     transform: translateY(-1px);
   }
 
-  .primary-rail-btn:active {
-    transform: scale(0.98);
-  }
-
   .post-handoff-prompt {
     margin-top: 14px;
     background: #FFFBEB;
@@ -495,10 +485,6 @@
     min-height: 40px;
   }
 
-  .confirm-btn:hover {
-    background: #047857;
-  }
-
   .subtle-btn {
     background: transparent;
     border: 1px solid #D97706;
@@ -517,7 +503,8 @@
     gap: 8px;
   }
 
-  .secondary-rail-btn, .alert-rail-btn {
+  .secondary-rail-btn,
+  .alert-rail-btn {
     width: 100%;
     border-radius: var(--radius-md, 8px);
     padding: 10px 14px;
@@ -536,19 +523,10 @@
     color: var(--color-ink-primary, #0F172A);
   }
 
-  .secondary-rail-btn:hover {
-    background: #F8FAFC;
-    border-color: #94A3B8;
-  }
-
   .alert-rail-btn {
     background: #FEF2F2;
     border: 1px solid #FECACA;
     color: #991B1B;
-  }
-
-  .alert-rail-btn:hover {
-    background: #FEE2E2;
   }
 
   .safe-harbor-footer {
