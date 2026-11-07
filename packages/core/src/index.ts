@@ -160,3 +160,8 @@ export type {
   IcalGeneratorOptions,
   CalendarSubscriptionLinks,
 } from './calendar/icalGenerator.js';
+
+// 12. Counter & Cancellation Action Utilities
+export { copyToClipboardSafe } from './utils/safeClipboard.js';
+export { generateBarcodeSvg } from './utils/barcodeSvg.js';
+

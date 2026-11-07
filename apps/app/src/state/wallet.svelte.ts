@@ -26,6 +26,8 @@ export class ReactiveWalletStore {
   isOnboardingOpen = $state<boolean>(false);
   isSettingsOpen = $state<boolean>(false);
   isDrawerOpen = $state<boolean>(false);
+  activeReceiptZoomItem = $state<WalletItem | null>(null);
+  activeCancellationItem = $state<WalletItem | null>(null);
 
   // User Auth & Session State
   isAuthenticated = $state<boolean>(false);
@@ -120,6 +122,22 @@ export class ReactiveWalletStore {
     this.selectedItem = null;
     this.selectedItemId = null;
     this.updateUrlHash();
+  }
+
+  openReceiptZoom(item: WalletItem) {
+    this.activeReceiptZoomItem = item;
+  }
+
+  closeReceiptZoom() {
+    this.activeReceiptZoomItem = null;
+  }
+
+  openCancellationModal(item: WalletItem) {
+    this.activeCancellationItem = item;
+  }
+
+  closeCancellationModal() {
+    this.activeCancellationItem = null;
   }
 
   // Database Mutation Operations

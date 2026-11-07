@@ -5,7 +5,13 @@
 
 export type ItemCategory = 'hardware' | 'subscription' | 'other';
 
-export type ItemStatus = 'active' | 'expiring_soon' | 'expired' | 'claimed' | 'cancelled';
+export type ItemStatus =
+  | 'active'
+  | 'expiring_soon'
+  | 'expired'
+  | 'claimed'
+  | 'cancelled'
+  | 'cancellation_pending';
 
 export type TaxCategory =
   | 'arbeitsmittel'
@@ -34,6 +40,8 @@ export interface WalletItem {
   category: ItemCategory;
   brandSlug: string;
   merchantOrProvider: string;
+  serialNumber?: string | undefined; // Hardware Serial/E-Nr./IMEI for retail counter actions
+  barcodeValue?: string | undefined; // Scannable POS barcode (Code 128 / EAN / Invoice)
   purchaseDate: string; // ISO 8601 YYYY-MM-DD
   expiryDate: string; // ISO 8601 YYYY-MM-DD (Warranty end or Subscription renewal)
   priceGrossEur: number;

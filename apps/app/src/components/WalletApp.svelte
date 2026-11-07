@@ -11,6 +11,8 @@
   import QuickCaptureModal from './capture/QuickCaptureModal.svelte';
   import ClaimCancelDossierView from './views/ClaimCancelDossierView.svelte';
   import TaxSummaryExportView from './views/TaxSummaryExportView.svelte';
+  import ReceiptRegisterZoomModal from './views/ReceiptRegisterZoomModal.svelte';
+  import AssistedCancellationModal from './views/AssistedCancellationModal.svelte';
 
   import {
     Search,
@@ -213,7 +215,15 @@
                 onkeydown={(e) => e.key === 'Enter' && walletStore.selectItem(item)}
               >
                 <div class="vault-card-top">
-                  <span class="category-pill">{item.category}</span>
+                  <div class="badge-cluster">
+                    <span class="category-pill">{item.category}</span>
+                    {#if item.status === 'cancellation_pending'}
+                      <span class="status-pill pending">§ 312k Kündigung läuft</span>
+                    {/if}
+                    {#if item.serialNumber}
+                      <span class="serial-pill" title={`Seriennummer: ${item.serialNumber}`}>E-Nr.</span>
+                    {/if}
+                  </div>
                   <span class="price-tag">€{item.priceGrossEur.toFixed(2)}</span>
                 </div>
                 <h4 class="vault-card-name">{item.title}</h4>
@@ -281,6 +291,22 @@
 
   <!-- Email 6-Digit PIN Auth Gate -->
   <EmailGate bind:open={walletStore.isEmailGateOpen} />
+
+  <!-- High-Contrast Kassen-Modus Receipt Zoom Modal -->
+  {#if walletStore.activeReceiptZoomItem}
+    <ReceiptRegisterZoomModal
+      item={walletStore.activeReceiptZoomItem}
+      onClose={() => walletStore.closeReceiptZoom()}
+    />
+  {/if}
+
+  <!-- Dual-Rail § 312k Assisted Cancellation Modal -->
+  {#if walletStore.activeCancellationItem}
+    <AssistedCancellationModal
+      item={walletStore.activeCancellationItem}
+      onClose={() => walletStore.closeCancellationModal()}
+    />
+  {/if}
 </div>
 
 <style>
@@ -611,6 +637,33 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .badge-cluster {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .status-pill.pending {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+  }
+
+  .serial-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background-color: #F1F5F9;
+    color: #475569;
+    border: 1px solid #CBD5E1;
   }
 
   .category-pill {

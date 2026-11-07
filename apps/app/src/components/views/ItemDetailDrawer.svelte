@@ -1,6 +1,7 @@
 <script lang="ts">
   import { walletStore } from '../../state/wallet.svelte';
   import StatutoryTimelineBar from '../widgets/StatutoryTimelineBar.svelte';
+  import CounterDeskCard from '../widgets/CounterDeskCard.svelte';
   import {
     X,
     Shield,
@@ -9,7 +10,8 @@
     Trash2,
     Calendar,
     ExternalLink,
-    Lock
+    Lock,
+    ShieldAlert
   } from 'lucide-svelte';
 
   let item = $derived(walletStore.selectedItem);
@@ -46,6 +48,35 @@
       </div>
 
       <div class="drawer-body">
+        <!-- Hardware Retail Counter Desk Card (Schalter-Modus) -->
+        {#if item.category === 'hardware'}
+          <CounterDeskCard
+            {item}
+            onOpenReceiptZoom={() => walletStore.openReceiptZoom(item)}
+          />
+        {/if}
+
+        <!-- Subscription § 312k Assisted Cancellation Card -->
+        {#if item.category === 'subscription'}
+          <div class="cancellation-prompt-card">
+            <div class="cancel-prompt-header">
+              <ShieldAlert size={16} class="text-pine" />
+              <span class="cancel-prompt-title">Verbraucherschutz § 312k &amp; § 309 Nr. 9 BGB</span>
+            </div>
+            <p class="cancel-prompt-desc">
+              Kündige diesen Vertrag direkt über das offizielle Portal ohne Retentionsfallen oder erstelle ein rechtssicheres Kündigungsschreiben.
+            </p>
+            <button
+              type="button"
+              class="open-cancel-assistant-btn"
+              onclick={() => walletStore.openCancellationModal(item)}
+            >
+              <ExternalLink size={16} />
+              <span>§ 312k Kündigungs-Assistent öffnen</span>
+            </button>
+          </div>
+        {/if}
+
         <!-- Overview Card -->
         <div class="detail-card">
           <div class="row">
@@ -372,5 +403,55 @@
 
   .delete-action-btn:hover {
     background: #FEE2E2;
+  }
+
+  .cancellation-prompt-card {
+    background: linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%);
+    border: 1px solid #BBF7D0;
+    border-radius: var(--radius-md, 12px);
+    padding: var(--space-3, 12px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cancel-prompt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cancel-prompt-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-ink-primary, #0F172A);
+  }
+
+  .cancel-prompt-desc {
+    margin: 0;
+    font-size: 11px;
+    color: #475569;
+    line-height: 1.35;
+  }
+
+  .open-cancel-assistant-btn {
+    background: var(--color-pine-teal, #2F524C);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 100ms ease;
+    min-height: 38px;
+  }
+
+  .open-cancel-assistant-btn:hover {
+    background: #233F3A;
   }
 </style>
