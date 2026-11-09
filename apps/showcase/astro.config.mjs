@@ -16,7 +16,14 @@ export default defineConfig({
   integrations: [
     svelte()
   ],
+  server: {
+    port: 3000,
+    host: true
+  },
   vite: {
+    server: {
+      allowedHosts: true
+    },
     plugins: [
       Icons({
         compiler: 'svelte',

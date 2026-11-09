@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schemas.agentskills.io/skill/0.2.0/schema.json",
+  "name": "bgb-statutory-calculator",
+  "version": "1.0.0",
+  "type": "skill-json",
+  "description": "Calculate statutory warranty deadlines under BGB § 438 (24-month limitation), § 477 (12-month burden of proof transition), and tacit contract renewal windows under § 309 Nr. 9 & § 312k.",
+  "invocation": {
+    "type": "mcp",
+    "endpoint": "https://rightsandrenewals.pages.dev/api/mcp",
+    "tool": "statutory_law_lookup",
+    "method": "POST"
+  },
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "statute_section": {
+        "type": "string",
+        "enum": [
+          "434",
+          "437",
+          "438",
+          "439",
+          "475e",
+          "477",
+          "309_nr_9",
+          "312k",
+          "355"
+        ],
+        "description": "German Civil Code (BGB) statute section identifier"
+      },
+      "purchase_date": {
+        "type": "string",
+        "format": "date",
+        "description": "Reference purchase date in ISO 8601 format (YYYY-MM-DD)"
+      }
+    },
+    "required": [
+      "statute_section"
+    ]
+  },
+  "examples": [
+    {
+      "intent": "Check 12-month burden of proof reversal rules under BGB § 477",
+      "arguments": {
+        "statute_section": "477"
+      }
+    },
+    {
+      "intent": "Lookup maximum tacit renewal periods under BGB § 309 Nr. 9",
+      "arguments": {
+        "statute_section": "309_nr_9"
+      }
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://rightsandrenewals-app.pages.dev/api/mcp",
+      "service-desc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/.well-known/mcp/server-card.json",
+          "type": "application/json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
+          "type": "text/markdown"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/api/health"
+        }
+      ]
+    },
+    {
+      "anchor": "https://rightsandrenewals-app.pages.dev/api/ical",
+      "service-desc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/openapi.json",
+          "type": "application/vnd.oai.openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
+          "type": "text/markdown"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/api/health"
+        }
+      ]
+    },
+    {
+      "anchor": "https://rightsandrenewals-app.pages.dev/.well-known/agent-skills",
+      "service-desc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/.well-known/agent-skills/index.json",
+          "type": "application/json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
+          "type": "text/markdown"
+        }
+      ]
+    },
+    {
+      "anchor": "https://rightsandrenewals-app.pages.dev/",
+      "service-desc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/.well-known/mcp/server-card.json",
+          "type": "application/json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
+          "type": "text/markdown"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/api/health"
+        }
+      ]
+    }
+  ]
+}

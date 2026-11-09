@@ -1,0 +1,11 @@
+{
+  "protocol_version": "0.1",
+  "organization": {
+    "name": "CM-LAB Sovereign Rights App",
+    "domain": "rightsandrenewals-app.pages.dev"
+  },
+  "web": {
+    "agent_card": "https://rightsandrenewals-app.pages.dev/.well-known/agent-card.json",
+    "mcp_server": "https://rightsandrenewals-app.pages.dev/api/mcp"
+  }
+}

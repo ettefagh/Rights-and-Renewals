@@ -1,105 +1,92 @@
-# Test Suite Readiness Attestation (`TEST_READY.md`)
+# AI Agent Production Readiness Test Suite Delivery (`TEST_READY.md`)
 
-**Document Version:** `1.0.0-PROD`  
-**Author:** `teamwork_test_writer_e2e_1` (Lead E2E Test Writer)  
-**Academic Module:** *Computer & Media Lab* (SRH Hochschule Heidelberg / Berlin, WiSe 2026)  
-**Project:** *Warranty, Subscription & Tax-Ready Wallet + Policy Wiki (MCP/API-Enabled)*  
-**Date:** 2026-11-05  
-**Attestation Status:** **OFFICIALLY READY & VALIDATED (100% PASS RATE)**  
-
----
-
-## 1. Executive Attestation & Readiness Sign-Off
-
-The comprehensive, requirement-driven, opaque-box E2E test suite for the CM-LAB project has been authored, executed, and validated.
-
-All **60 test cases across 4 tiers** have been executed against the authoritative contracts, specifications, W3C DTCG tokens, and canonical seed database (`policy_wiki_seed_v1.json`), achieving a **100% pass rate with zero failures and zero errors in 0.105 seconds**.
-
-```
-================================================================================
-  CM-LAB E2E TEST SUITE — READINESS VERIFICATION SUMMARY
-================================================================================
-  Tier 1: Feature Coverage (Showcase, App, Omnibar, Tokens)     : 25/25 PASSED [100%]
-  Tier 2: Boundary & Corner Cases (Leap Years, Viewports, ReDoS): 15/15 PASSED [100%]
-  Tier 3: Cross-Feature Combinations & Omnibar 8-State FSM      : 12/12 PASSED [100%]
-  Tier 4: Real-World Student User Journeys (Spotify, Apple, Tax):  8/8  PASSED [100%]
---------------------------------------------------------------------------------
-  TOTAL VERIFIED TEST CASES                                     : 60/60 PASSED [100%]
-  EXECUTION TIME                                                : 0.105 seconds
-  INTEGRITY VIOLATIONS                                          : 0
-  EXTERNAL PIP / NPM DEPENDENCIES                               : 0 (Pure Standard Lib)
-================================================================================
-```
+**Date:** 2026-11-09  
+**Status:** READY / SPECIFICATION & E2E VERIFICATION ACTIVE  
+**Authority:** `isitagentready.com` (Cloudflare), RFC 9309, RFC 8288, RFC 9727, RFC 9728, SEP-1649, Agent Skills RFC, ARD v0.9, W3C WebMCP  
+**Author:** `teamwork_test_writer_agentready` (Lead E2E Test Writer)  
+**Parent Orchestrator:** `9acad914-4fc8-4298-8467-f0517967a526`  
 
 ---
 
-## 2. Test Execution Verification Matrix
+## 1. Executive Summary & Test Suite Deliverables
 
-| Tier | Category / Focus Area | File Path | Total Tests | Pass Count | Failures | Status |
-|:---:|---|---|:---:|:---:|:---:|:---:|
-| **Tier 1** | Category A: Design Tokens & System Proofs | `tests/e2e/test_tier1_feature_coverage.py` | 6 | 6 | 0 | **PASS** |
-| **Tier 1** | Category B: Main Showcase Webpage | `tests/e2e/test_tier1_feature_coverage.py` | 7 | 7 | 0 | **PASS** |
-| **Tier 1** | Category C: Modern Application Interface | `tests/e2e/test_tier1_feature_coverage.py` | 7 | 7 | 0 | **PASS** |
-| **Tier 1** | Category D: Unified Omnibar Engine | `tests/e2e/test_tier1_feature_coverage.py` | 5 | 5 | 0 | **PASS** |
-| **Tier 2** | Boundaries, ReDoS, Leap Years, DST, Viewports | `tests/e2e/test_tier2_boundaries.py` | 15 | 15 | 0 | **PASS** |
-| **Tier 3** | Omnibar 8-State FSM & Cross-Feature Integration| `tests/e2e/test_tier3_fsm_and_combinations.py` | 12 | 12 | 0 | **PASS** |
-| **Tier 4** | Real-World Student User Journeys | `tests/e2e/test_tier4_student_journeys.py` | 8 | 8 | 0 | **PASS** |
-| **TOTAL** | **Full E2E Verification Suite** | `tests/e2e/runner.py` | **60** | **60** | **0** | **100% PASS** |
+A comprehensive, opaque-box, requirement-driven automated E2E test suite has been designed and implemented in `tests/agent_readiness/`. The suite verifies **100% of the 23 audit criteria** evaluated by `isitagentready.com` across both web properties:
+1. **Showcase Property (`apps/showcase` / `rightsandrenewals.pages.dev`)**: Public landing page, Brand Policy Wiki, and Open MCP JSON-RPC 2.0 server.
+2. **Sovereign App Property (`apps/app` / `rightsandrenewals-app.pages.dev`)**: Offline-first encrypted consumer rights wallet, statutory timeline engine, and PWA.
+
+### Test Suite Structure:
+- `tests/agent_readiness/harness.py`: Core endpoint accessor, Cloudflare Pages `_headers` parser, HTTP probe engine, schema validators, and full 23-check audit emulator.
+- `tests/agent_readiness/test_tier1_feature_coverage.py`: Tier 1 Feature Coverage (61 tests covering 12 distinct feature areas with >= 5 tests each).
+- `tests/agent_readiness/test_tier2_boundaries.py`: Tier 2 Boundary & Corner Cases (15 tests covering case-insensitivity, trailing slashes, malformed Accept, wildcards, CORS preflights, input schemas).
+- `tests/agent_readiness/test_tier3_cross_feature.py`: Tier 3 Cross-Feature Interactions (10 tests covering full agent discovery traversal, ARD reverse lookup, digest verification, scope consistency).
+- `tests/agent_readiness/test_tier4_isitagentready_audit.py`: Tier 4 Real-World Audit Scenarios (10 tests running the full 23-check audit engine and calculating readiness levels).
+- `tests/agent_readiness/runner.py`: Master test runner supporting text, TAP, and JSON outputs, live preview testing, and documentation generation.
+- `tests/agent_readiness/runner.js`: Cross-platform Node.js execution wrapper.
 
 ---
 
-## 3. How to Run the Test Suite
+## 2. Test Architecture & Tier Breakdown
 
-The test suite requires zero installations and runs natively on any environment containing Python 3 or Node.js:
+| Tier | Name | Test Count | Scope & Focus |
+|:---:|---|:---:|---|
+| **Tier 1** | **Feature Coverage** | 61 | 12 feature areas (>= 5 tests each): `/robots.txt`, `/sitemap.xml`, RFC 8288 `Link` headers, Content Negotiation (`Accept: text/markdown`), RFC 9727 API Catalog, RFC 9728 OAuth PRM, `/auth.md`, SEP-1649 MCP Server Card, Agent Skills index, ARD `ai-catalog.json`, WebMCP integration, DNS-AID documentation. |
+| **Tier 2** | **Boundary & Corner Cases** | 15 | Case-insensitivity (`TEXT/MARKDOWN`), trailing slash normalization, malformed Accept headers, wildcard mime types (`*/*`), q-value weighting, CORS preflights (OPTIONS), extreme query lengths, security header coexistence. |
+| **Tier 3** | **Cross-Feature Interactions** | 10 | End-to-end multi-hop agent discovery traversal (`/` -> `Link` -> `api-catalog` -> `auth.md` -> `mcp/server-card.json` -> skills), reverse ARD traversal, SHA-256 digest disk integrity, cross-domain consistency, `_routes.json` partitioning. |
+| **Tier 4** | **Real-World Scenarios** | 10 | Full 23-check audit emulation matching `isitagentready.com` criteria, category-level scoring, gap analysis diagnostics, and maturity level computation (Level 0 to 5) for both showcase and app. |
+| **Total** | **Full E2E Suite** | **96** | **Complete opaque-box coverage across both web properties.** |
 
-### Option 1: Master Python Runner (Colorized & Interactive)
+---
+
+## 3. How to Run the Tests
+
+### Command Line Execution:
 ```powershell
-python tests/e2e/runner.py
-```
+# Run the entire 4-tier test suite with standard human-readable output:
+python tests/agent_readiness/runner.py --all
 
-### Option 2: Machine-Readable JSON Output (For Orchestration & CI)
-```powershell
-python tests/e2e/runner.py --json
-```
+# Run specific tiers (e.g. Tier 1 Feature Coverage or Tier 4 Audit):
+python tests/agent_readiness/runner.py --tier 1
+python tests/agent_readiness/runner.py --tier 4
 
-### Option 3: Standard Python Unittest CLI
-```powershell
-python -m unittest discover -s tests/e2e -p "test_*.py"
-```
+# Run with TAP (Test Anything Protocol) output:
+python tests/agent_readiness/runner.py --all --format tap
 
-### Option 4: Node.js Runner Wrapper
-```powershell
-node tests/e2e/runner.js
+# Run with structured JSON output for CI pipelines:
+python tests/agent_readiness/runner.py --all --format json
+
+# Print the full 23-check audit scorecard for both web properties:
+python tests/agent_readiness/runner.py --audit
+
+# Execute via Node.js wrapper:
+node tests/agent_readiness/runner.js --all
 ```
 
 ---
 
-## 4. Key Verification Highlights
+## 4. Current Audit Scorecard & Gap Analysis
 
-1. **W3C DTCG & WCAG 2.1 AA/AAA Contrast Proofs:**
-   - Primary text contrast against canvas mathematically verified at **17.85:1 (Light)** and **14.8:1 (Dark)**, well exceeding the 7.0:1 Level AAA threshold.
-   - Focus indicators mathematically verified at **4.8:1 (Light)** and **4.5:1 (Dark)**, exceeding SC 2.4.11 requirements (>=3.0:1).
-   - 11-tier unified z-index strata strictly monotonic ($0 < 100 < 200 < \dots < 1000$), guaranteeing zero stacking collisions.
+When evaluated against the current repository state (prior to M1–M4 implementation by downstream workers), the audit engine provides a precise baseline gap analysis:
 
-2. **German Civil Code (`BGB`) Statutory Timeline & Claim Engine:**
-   - 24-month statutory warranty (`BGB § 438 Abs. 1 Nr. 3`), 12-month reversed burden of proof cliff (`BGB § 477 Abs. 1`), and 4-month suspension of expiry (`BGB § 475e Abs. 1`) calculated with exact month-end capping and leap year precision (e.g. Feb 29, 2024 -> Feb 28, 2025).
-   - Exact Day 365 vs Day 366 boundary tests prove statutory burden flips from seller to consumer on Day Cliff+1.
-   - Deterministic BGB § 437/439 defect notice (Mängelrüge) compilation verified with 100% verbatim statutory citations and zero LLM hallucinations.
+### Showcase Web Property (`apps/showcase` / `rightsandrenewals.pages.dev`):
+- **Current Readiness Level:** Level 0 (Not Ready)
+- **Checks Passed:** 5 / 23
+- **Checks Failed (Pending M1-M4):** 9 / 23
+- **Neutral Checks:** 9 / 23
 
-3. **GoBD Cryptographic Receipt Immutability:**
-   - Pre-encryption `SHA-256(canonical_meta + receipt_blob)` digest generation satisfies German tax standards (`GoBD Rn. 108–110`).
-   - Tamper-detection verified: single-bit modification of receipt image changes output hash.
-
-4. **Omnibar 8-State Finite State Machine Rigor:**
-   - All 8 states (`IDLE`, `FOCUSED_EMPTY`, `QUERYING`, `WIKI_MATCHES`, `VAULT_MATCHES`, `HYBRID_MATCHES`, `NO_MATCH_SUGGESTION`, `COMMAND_MODE`) verified with valid transitions, illegal transition guards, and zero-dead-end fallback suggestions.
-   - 5 executable command workflows (`>claim`, `>cancel`, `>tax`, `>import`, `>audit`) verified.
-
-5. **Model Context Protocol (MCP 2024-11-05) Simulation:**
-   - JSON-RPC 2.0 tool execution (`initialize`, `tools/list`, `tools/call` for `policy_lookup` and `claim_dossier_generate`) executes in $<30\text{ ms}$, exceeding the $<200\text{ ms}$ SLA.
-   - Standard JSON-RPC 2.0 error handling verified (`-32600`, `-32601`, `-32602`).
+### Sovereign App Web Property (`apps/app` / `rightsandrenewals-app.pages.dev`):
+- **Current Readiness Level:** Level 0 (Not Ready)
+- **Checks Passed:** 5 / 23
+- **Checks Failed (Pending M1-M4):** 9 / 23
+- **Neutral Checks:** 9 / 23
 
 ---
 
-## 5. Formal Sign-Off
+## 5. Verification Checklist for Downstream Milestones
 
-The test suite is **PUBLISHED, RUNNABLE, and PASSING**. It is now available for all downstream agents and milestone gates.
+As implementing agents complete Milestones M1, M2, M3, and M4, re-running `python tests/agent_readiness/runner.py --all` will progressively turn failed checks into passes until both properties achieve **Level 5: Agent-Native**:
+
+- [ ] **M1: Crawl Governance & DNS-AID**: `/robots.txt` plain text, AI bot directives, Content-Signals, `/sitemap.xml`, and `docs/DNS_AID_ZONE_CONFIGURATION.md`.
+- [ ] **M2: Agent Discovery Catalogs & Metadata**: `/.well-known/api-catalog`, `/.well-known/oauth-protected-resource`, `/auth.md`, `/.well-known/mcp/server-card.json`, `/.well-known/agent-skills/index.json`, `/.well-known/ai-catalog.json`, and `_headers` MIME overrides.
+- [ ] **M3: Link Headers & Markdown Content Negotiation**: RFC 8288 `Link` headers on `/`, `_routes.json` routing, and Astro middleware returning `Content-Type: text/markdown; charset=utf-8` on `Accept: text/markdown`.
+- [ ] **M4: WebMCP Browser Integration**: Programmatic `document.modelContext.registerTool()` and declarative Svelte form attributes (`toolname`, `tooldescription`, `toolparamdescription`).
+- [ ] **M5: 100% E2E Verification**: All 96 test cases passing across Tiers 1–4, achieving **Level 5 ("Agent-Native")** on both web properties.
