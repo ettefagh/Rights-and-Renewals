@@ -143,6 +143,17 @@
       case 'tax':
         walletStore.setView('tax');
         break;
+      case 'emdash':
+      case 'cms':
+        if (typeof window !== 'undefined') {
+          window.open('https://rightsandrenewals.pages.dev/emdash', '_blank', 'noopener,noreferrer');
+        }
+        break;
+      case 'wiki':
+        if (typeof window !== 'undefined') {
+          window.open('https://rightsandrenewals.pages.dev/wiki', '_blank', 'noopener,noreferrer');
+        }
+        break;
       case 'import':
       case 'audit':
       default:
@@ -232,11 +243,11 @@
           </div>
           <div class="command-hints">
             <span>Available verbs:</span>
+            <code>>emdash</code>
+            <code>>wiki</code>
+            <code>>tax</code>
             <code>>claim</code>
             <code>>cancel</code>
-            <code>>tax</code>
-            <code>>import</code>
-            <code>>audit</code>
           </div>
 
         {:else if fsmState === 'FOCUSED_EMPTY'}
@@ -253,6 +264,16 @@
               >
                 <Camera size={14} />
                 <span>Snap New Receipt (&lt;15s)</span>
+              </button>
+              <button
+                type="button"
+                class="chip-btn"
+                onclick={() => {
+                  executeCommand('emdash');
+                }}
+              >
+                <Zap size={14} />
+                <span>⚡ EmDash Desk</span>
               </button>
               <button
                 type="button"

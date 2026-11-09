@@ -207,6 +207,19 @@
             >
               <span>Sync / PIN</span>
             </button>
+            <button
+              type="button"
+              class="notif-util-btn"
+              onclick={() => {
+                isNotifCenterOpen = false;
+                if (typeof window !== 'undefined') {
+                  window.open('https://rightsandrenewals.pages.dev/emdash', '_blank', 'noopener,noreferrer');
+                }
+              }}
+              title="Open EmDash Editorial & Policy Telemetry Desk"
+            >
+              <span>⚡ EmDash</span>
+            </button>
           </div>
         </div>
       {/if}
@@ -553,8 +566,18 @@
       <!-- User-Friendly Starred Legal Glossary Footer with Public Wiki Hyperlinks -->
       <footer class="col-12 app-glossary-footer" aria-label="Consumer Rights Glossary">
         <div class="glossary-header">
-          <BookOpen size={15} />
-          <span>Quick Guide to Your Consumer Rights (Tap to read in the Public Wiki)</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <BookOpen size={15} />
+            <span>Quick Guide to Your Consumer Rights</span>
+          </div>
+          <div style="display: flex; gap: 14px; margin-left: auto;">
+            <a href="https://rightsandrenewals.pages.dev/wiki" target="_blank" rel="noopener noreferrer" style="color: var(--color-pine-teal, #2F524C); font-size: 12px; font-weight: 700; text-decoration: underline;">
+              Public Wiki ↗
+            </a>
+            <a href="https://rightsandrenewals.pages.dev/emdash" target="_blank" rel="noopener noreferrer" style="color: var(--color-pine-teal, #2F524C); font-size: 12px; font-weight: 700; text-decoration: underline;">
+              ⚡ EmDash CMS Desk ↗
+            </a>
+          </div>
         </div>
         <div class="glossary-items-grid">
           <div class="glossary-footnote">

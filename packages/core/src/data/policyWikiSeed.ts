@@ -18,7 +18,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'support@spotify.com',
     legalNotes:
       'BGB § 309 Nr. 9 lit. b applies: contracts tacitly renewed roll monthly with maximum 1-month notice. BGB § 312k cancellation button compliant.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['spotify student', 'spotify premium', 'music streaming'],
   },
   {
@@ -33,7 +33,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'contactus.de@euro.apple.com',
     legalNotes:
       'Statutory 24m defect liability (BGB § 438 Abs. 1 Nr. 3). 12m reversed burden of proof (BGB § 477 Abs. 1). Apple 1-Year Limited Manufacturer Guarantee (BGB § 443) does not limit statutory seller claims.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['macbook', 'iphone', 'ipad', 'airpods', 'apple store'],
   },
   {
@@ -48,7 +48,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'kontakt@mediamarkt.de',
     legalNotes:
       'Seller is liable for 24 months (BGB § 437). § 286 ZPO allows alternative proof of purchase (bank statement) if receipt is lost. Retailer cannot demand manufacturer RMA referral.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['media markt', 'mediamarkt saturn', 'electronics'],
   },
   {
@@ -63,7 +63,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'impressum@amazon.de',
     legalNotes:
       'BGB § 309 Nr. 9 rolling 1-month cancellation. Prime student subscriptions refund pro-rata if unused benefits remain.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['amazon prime', 'prime student', 'aws'],
   },
   {
@@ -78,7 +78,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'support@netflix.com',
     legalNotes:
       'Monthly rolling billing. Compliant with BGB § 312k 2-step cancellation button. Termination takes effect at end of current billing period.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['netflix de', 'streaming', 'movies'],
   },
   {
@@ -93,7 +93,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'support@adobe.com',
     legalNotes:
       'Student discount annual plans paid monthly. Under German law (BGB § 309 Nr. 9), post-first-year renewal must allow monthly cancellation without early termination penalty fees.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['adobe cc', 'photoshop', 'illustrator', 'premiere'],
   },
   {
@@ -108,7 +108,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'kunden@microsoft.com',
     legalNotes:
       'Office 365 single/family. Complies with BGB § 312k. Surface hardware purchases carry statutory 24-month seller defect liability under BGB § 438.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['ms office', 'office 365', 'surface', 'xbox game pass'],
   },
   {
@@ -123,7 +123,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'kundendialog@bahn.de',
     legalNotes:
       'Deutschlandticket subscription must be cancelled by the 10th of each month for the subsequent month per tariff terms, compliant with BGB § 309 Nr. 9.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: [
       'bahn',
       'db navigator',
@@ -144,7 +144,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'support@github.com',
     legalNotes:
       'Developer tools qualify as 100% digital tax write-offs under BMF 22.02.2022 decree without GWG ceiling.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['github copilot', 'git', 'gh pro'],
   },
   {
@@ -159,7 +159,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'sales@jetbrains.com',
     legalNotes:
       'Free student licenses renew annually with university email. Commercial renewals subject to monthly/annual terms under BGB § 309.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['intellij', 'pycharm', 'webstorm', 'clion'],
   },
   {
@@ -174,7 +174,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'support@google.com',
     legalNotes:
       'Monthly subscription cancellable at any time before next billing date. BGB § 312k 2-step button compliant.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['yt premium', 'google play', 'youtube music'],
   },
   {
@@ -189,7 +189,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'kontakt@saturn.de',
     legalNotes:
       'Identical statutory terms to MediaMarkt. BGB § 439 gives buyer remedy choice between repair or replacement.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['saturn tech', 'saturn de', 'electronics'],
   },
   {
@@ -204,7 +204,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'service@otto.de',
     legalNotes:
       'Statutory 24m Gewährleistung under BGB § 438. Otto also offers 30-day extended voluntary return policy for distance sales.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['otto versand', 'otto de'],
   },
   {
@@ -219,7 +219,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'info@mindfactory.de',
     legalNotes:
       'PC hardware components. BGB § 477 12-month reversed burden of proof protects against retailer claims that pins or sockets were user-damaged.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['pc parts', 'hardware', 'gpu', 'cpu'],
   },
   {
@@ -234,7 +234,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'team@makenotion.com',
     legalNotes:
       'Productivity SaaS tool qualifying as 100% tax-deductible digital workspace asset under BMF 22.02.2022.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['notion ai', 'productivity', 'workspace'],
   },
   {
@@ -249,7 +249,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'support@gymshark.com',
     legalNotes:
       'Textile and fitness gear. Statutory 24-month defect liability under BGB §§ 434, 438 applies to zipper and seam defects.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['fitness', 'apparel', 'sportswear'],
   },
   {
@@ -264,7 +264,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'kontakt@mcfit.com',
     legalNotes:
       'Fitness studio contracts. Following BGB § 309 Nr. 9 lit. b reform, post-initial-term renewals are strictly limited to monthly rolling termination.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['fitness studio', 'rsg group', 'gym'],
   },
   {
@@ -279,7 +279,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'help@urbansportsclub.com',
     legalNotes:
       'Flexible sports membership. BGB § 312k 2-step button compliant with 1-month cancellation notice.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['usc', 'sports membership', 'fitness'],
   },
   {
@@ -294,7 +294,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'help@disneyplus.com',
     legalNotes:
       'Streaming subscription. BGB § 312k compliant. Rolling monthly renewal after initial billing.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['disney', 'disneyplus', 'streaming'],
   },
   {
@@ -310,7 +310,7 @@ export const policySeedData: PolicyWikiEntry[] = [
     supportEmail: 'kontakt@vodafone.com',
     legalNotes:
       'Telecommunication contracts (TKG § 56 & BGB § 309 Nr. 9). After 24-month minimum term, contracts roll indefinitely with a maximum 1-month notice period.',
-    verifiedDate: '2026-01-15',
+    verifiedDate: '2026-10-25',
     searchAliases: ['vodafone dsl', 'gigacube', 'mobile', 'telekom'],
   },
 ];
