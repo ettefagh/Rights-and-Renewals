@@ -7,6 +7,7 @@
 import { z } from 'zod';
 import type { PolicyWikiEntry } from '../types/contracts.js';
 import { policySeedData } from '../data/policyWikiSeed.js';
+import { getPolicyScope } from './policyScope.js';
 
 // ============================================================================
 // 1. JSON-RPC 2.0 & MCP Standard Type Definitions
@@ -121,6 +122,9 @@ export const TaxDeductibilityCheckInputSchema = z
       'computer_hardware',
       'peripherals',
       'software_saas',
+      'subscription',
+      'hardware',
+      'acquired_business_software',
       'academic_literature',
       'smartphone',
       'office_furniture',
@@ -133,7 +137,7 @@ export const TaxDeductibilityCheckInputSchema = z
         'bachelor_erststudium',
       ])
       .default('werkstudent_employee'),
-    academic_usage_percent: z.number().int().min(0).max(100).default(50),
+    academic_usage_percent: z.number().min(0).max(100).optional(),
   })
   .strict();
 
@@ -322,54 +326,25 @@ const STATUTES_REGISTRY: Record<string, StatuteData> = {
 export function handlePolicyLookup(input: PolicyLookupInput) {
   const slug = input.service_slug.toLowerCase().trim();
   const found = policySeedData.find(
-    (e) =>
-      e.brandSlug.toLowerCase() === slug ||
-      e.searchAliases.some((a) => a.toLowerCase() === slug)
+    (entry) =>
+      entry.brandSlug.toLowerCase() === slug ||
+      entry.searchAliases.some((alias) => alias.toLowerCase() === slug)
   );
+  const category = found?.category ?? input.category;
+  const isHardware = category === 'hardware';
+  const scope = getPolicyScope(category, found);
 
-  if (found) {
-    const isHardware = found.category === 'hardware';
-    return {
-      service_slug: found.brandSlug,
-      brand_name: found.brandName,
-      category: found.category,
-      jurisdiction: input.jurisdiction,
-      statutory_warranty_months: found.statutoryWarrantyMonths,
-      reversed_burden_months: isHardware ? 12 : 0,
-      statutory_basis: isHardware
-        ? ['BGB § 437', 'BGB § 438 Abs. 1 Nr. 3', 'BGB § 477 Abs. 1']
-        : ['BGB § 309 Nr. 9', 'BGB § 312k'],
-      commercial_guarantee_months: found.commercialGuaranteeMonths,
-      cancellation_notice_months: found.cancellationNoticeMonths,
-      cancellation_button_compliant: found.cancellationButtonCompliant,
-      cancellation_button_url: !isHardware ? found.cancellationUrl ?? null : null,
-      escalation_rma_url: isHardware ? found.cancellationUrl ?? null : null,
-      notes: found.legalNotes,
-    };
-  }
-
-  // Statutory baseline for uncataloged brand
-  const isHardware = input.category === 'hardware';
   return {
-    service_slug: slug,
-    brand_name: slug.charAt(0).toUpperCase() + slug.slice(1),
-    category: input.category,
+    ...scope,
+    service_slug: found?.brandSlug ?? slug,
+    brand_name: found?.brandName ?? slug.charAt(0).toUpperCase() + slug.slice(1),
+    category,
     jurisdiction: input.jurisdiction,
-    statutory_warranty_months: 24,
-    reversed_burden_months: isHardware ? 12 : 0,
-    statutory_basis: isHardware
-      ? ['BGB § 437', 'BGB § 438 Abs. 1 Nr. 3', 'BGB § 477 Abs. 1']
-      : ['BGB § 309 Nr. 9', 'BGB § 312k'],
-    commercial_guarantee_months: 0,
-    cancellation_notice_months: !isHardware ? 1 : 0,
-    cancellation_button_compliant: true,
-    cancellation_button_url: null,
-    escalation_rma_url: null,
-    notes: `Brand '${slug}' is not in the curated Top 20 student brands list. Statutory German BGB consumer rules apply directly: 24 months seller warranty (§ 438) and ${
-      isHardware
-        ? '12 months reversed burden of proof (§ 477)'
-        : '1-month maximum rolling notice (§ 309 Nr. 9)'
-    }.`,
+    cancellation_button_url: isHardware ? null : found?.cancellationUrl ?? null,
+    escalation_rma_url: isHardware ? found?.cancellationUrl ?? null : null,
+    notes: found
+      ? scope.notes
+      : `Brand '${slug}' is not in the curated Top 20 student brands list. ${scope.legal_scope}`,
   };
 }
 
@@ -507,7 +482,40 @@ export function handleSubscriptionCategoryRules(
 export function handleTaxDeductibilityCheck(
   input: TaxDeductibilityCheckInput
 ) {
+  const sources = [
+    { title: 'EStG § 9 — work-related expenses', url: 'https://www.gesetze-im-internet.de/estg/__9.html' },
+    { title: 'BMF guidance of 22 February 2022 — scope of the one-year useful life', url: 'https://stberh.bundesfinanzministerium.de/esth/2022/C-Anhaenge/Anhang-01/V/anhang-1-V.html' },
+  ];
+
   const usage = input.academic_usage_percent;
+  const needsClassification = ['hardware', 'subscription', 'software_saas'].includes(input.asset_category);
+  if (needsClassification || usage === undefined) {
+    return {
+      asset_name: input.asset_name,
+      asset_category: input.asset_category,
+      status: 'manual_review',
+      is_deductible: false,
+      governing_statute: '§ 9 Abs. 1 Satz 3 Nr. 6 EStG (Arbeitsmittel)',
+      bmf_2022_eligible: false,
+      bmf_decree_reference: null,
+      depreciation_type: 'MANUAL_REVIEW',
+      deductible_year: null,
+      gross_price_eur: input.gross_price_eur,
+      academic_usage_percent: input.academic_usage_percent ?? null,
+      deductible_amount_eur: null,
+      loss_carryforward_eligible: false,
+      form_target: null,
+      sources,
+      review_reason: input.asset_category === 'hardware'
+        ? 'Generic hardware does not identify a covered computer or peripheral. Check the asset type and documented work or study use.'
+        : needsClassification
+          ? 'A recurring subscription, including streaming or SaaS, does not establish an acquired software asset or a deductible work or study expense. Review the invoice, contract and documented use.'
+          : 'Supply a documented work or study use percentage before estimating a deductible share.',
+      notes:
+        'Hinweis gem. §§ 2, 3, 5 StBerG: Dient ausschließlich der technischen Organisation und Belegdokumentation. Keine individuelle Steuerberatung oder geschäftsmäßige Hilfeleistung in Steuersachen.',
+    };
+  }
+
   let effectiveRatio = 0.0;
   let isDeductible = false;
 
@@ -530,7 +538,7 @@ export function handleTaxDeductibilityCheck(
   const isDigitalBmf = [
     'computer_hardware',
     'peripherals',
-    'software_saas',
+    'acquired_business_software',
   ].includes(input.asset_category);
   const isGwg = input.gross_price_eur <= 952.0;
 
@@ -543,8 +551,8 @@ export function handleTaxDeductibilityCheck(
     bmf2022Eligible = true;
     bmfDecreeReference =
       'BMF IV C 3 - S 2190/21/10002 :025 vom 22.02.2022 (BStBl I 2022 S. 187)';
-    depreciationType = 'SOFORTABSCHREIBUNG_1_YEAR';
-    deductibleYear = 'Year of purchase in full (no pro-rata temporis reduction)';
+    depreciationType = 'ONE_YEAR_USEFUL_LIFE_BMF';
+    deductibleYear = 'One-year useful life under the BMF guidance; this does not itself establish an immediate deduction.';
   } else if (input.asset_category === 'academic_literature') {
     depreciationType = 'SOFORTABSCHREIBUNG_SOFORTAUFWAND';
     deductibleYear = 'Year of purchase in full (current operating expense)';
@@ -587,6 +595,8 @@ export function handleTaxDeductibilityCheck(
 
   return {
     asset_name: input.asset_name,
+    asset_category: input.asset_category,
+    status: 'review_required',
     is_deductible: isDeductible,
     governing_statute: governingStatute,
     bmf_2022_eligible: bmf2022Eligible,
@@ -594,10 +604,11 @@ export function handleTaxDeductibilityCheck(
     depreciation_type: depreciationType,
     deductible_year: deductibleYear,
     gross_price_eur: input.gross_price_eur,
-    academic_usage_percent: input.academic_usage_percent,
+    academic_usage_percent: input.academic_usage_percent ?? null,
     deductible_amount_eur: deductibleAmountEur,
     loss_carryforward_eligible: lossCarryforwardEligible,
     form_target: formTarget,
+    sources,
     notes:
       'Hinweis gem. §§ 2, 3, 5 StBerG: Dient ausschließlich der technischen Organisation und Belegdokumentation. Keine individuelle Steuerberatung oder geschäftsmäßige Hilfeleistung in Steuersachen.',
   };
@@ -612,7 +623,7 @@ export function listMcpTools(): McpToolDefinition[] {
     {
       name: 'policy_lookup',
       description:
-        'Query verified brand ground truth (statutory warranty periods, commercial manufacturer guarantees, BGB § 312k cancellation links, and RMA URLs) for major consumer brands in Germany.',
+        'Look up cataloged German consumer policies and scoped statutory references for goods purchases or subscriptions.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -705,7 +716,7 @@ export function listMcpTools(): McpToolDefinition[] {
     {
       name: 'tax_deductibility_check',
       description:
-        'Check German income tax (Werbungskosten gem. § 9 EStG) deductibility, determine 1-year immediate write-off eligibility under BMF Guidance of 22.02.2022 (BStBl I 2022 S. 187), and check GWG price thresholds (§ 6 Abs. 2 EStG).',
+        'Provide a preliminary German work/study expense categorization under § 9 EStG. Generic software subscriptions require manual review. The BMF 22.02.2022 guidance describes a one-year useful life for specified computer hardware, peripherals, and qualifying acquired business/application software; it does not by itself establish immediate deductibility.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -720,11 +731,15 @@ export function listMcpTools(): McpToolDefinition[] {
               'computer_hardware',
               'peripherals',
               'software_saas',
+              'subscription',
+              'hardware',
+              'acquired_business_software',
               'academic_literature',
               'smartphone',
               'office_furniture',
             ],
-            description: 'Tax asset category.',
+            description:
+              'Tax asset category. software_saas means a recurring or otherwise unverified subscription and returns manual review. acquired_business_software is for acquired operating/application software within the BMF guidance scope.',
           },
           gross_price_eur: {
             type: 'number',
@@ -746,7 +761,6 @@ export function listMcpTools(): McpToolDefinition[] {
             type: 'integer',
             minimum: 0,
             maximum: 100,
-            default: 50,
             description:
               'Documented work/study usage percentage (standard simplification: 50%).',
           },

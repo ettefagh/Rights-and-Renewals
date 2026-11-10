@@ -101,8 +101,12 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     if ('result' in spotifyRes) {
       const parsed = JSON.parse((spotifyRes.result as any).content[0].text);
       expect(parsed.brand_name).toBe('Spotify');
-      expect(parsed.cancellation_button_compliant).toBe(true);
-      expect(parsed.cancellation_notice_months).toBe(1);
+      expect(parsed.cancellation_button_compliant).toBeNull();
+      expect(parsed.cancellation_notice_months).toBeNull();
+      expect(parsed.statutory_warranty_months).toBeNull();
+      expect(parsed.sources).toContainEqual(expect.objectContaining({
+        url: 'https://support.spotify.com/de/article/cancel-premium/',
+      }));
     }
 
     // Uncataloged brand
@@ -210,6 +214,8 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
       const content = JSON.parse((macbookRes.result as any).content[0].text);
       expect(content.is_deductible).toBe(true);
       expect(content.bmf_2022_eligible).toBe(true);
+      expect(content.deductible_year).toMatch(/one-year useful life/i);
+      expect(content.deductible_year).not.toMatch(/sofortabschreibung/i);
       expect(content.deductible_amount_eur).toBe(1000);
       expect(content.loss_carryforward_eligible).toBe(true);
     }
@@ -224,6 +230,7 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
           asset_name: 'iPhone 16 Pro',
           asset_category: 'smartphone',
           gross_price_eur: 1300,
+          academic_usage_percent: 50,
         },
       },
     });
@@ -397,6 +404,7 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
       const content = JSON.parse((periph.result as any).content[0].text);
       expect(content.deductible_amount_eur).toBe(300); // 100%
       expect(content.bmf_2022_eligible).toBe(true);
+      expect(content.deductible_year).toMatch(/one-year useful life/i);
     }
 
     // 2. Software SaaS
@@ -414,6 +422,71 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
       },
     });
     expect('result' in saas).toBe(true);
+    if ('result' in saas) {
+      const content = JSON.parse((saas.result as any).content[0].text);
+      expect(content.status).toBe('manual_review');
+      expect(content.is_deductible).toBe(false);
+      expect(content.deductible_amount_eur).toBeNull();
+      expect(content.bmf_2022_eligible).toBe(false);
+      expect(content.deductible_year).toBeNull();
+      expect(content.sources).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ url: 'https://www.gesetze-im-internet.de/estg/__9.html' }),
+          expect.objectContaining({ url: 'https://stberh.bundesfinanzministerium.de/esth/2022/C-Anhaenge/Anhang-01/V/anhang-1-V.html' }),
+        ])
+      );
+    }
+
+    // Acquired software has its own input category and receives only the
+    // scoped one-year useful-life treatment, not a claim of instant deduction.
+    const acquiredSoftware = await dispatchJsonRpc({
+      jsonrpc: '2.0',
+      id: 'tax-acquired-software',
+      method: 'tools/call',
+      params: {
+        name: 'tax_deductibility_check',
+        arguments: {
+          asset_name: 'Acquired bookkeeping software',
+          asset_category: 'acquired_business_software',
+          gross_price_eur: 1200,
+          academic_usage_percent: 50,
+        },
+      },
+    });
+    expect('result' in acquiredSoftware).toBe(true);
+    if ('result' in acquiredSoftware) {
+      const content = JSON.parse(
+        (acquiredSoftware.result as any).content[0].text
+      );
+      expect(content.bmf_2022_eligible).toBe(true);
+      expect(content.depreciation_type).toBe('ONE_YEAR_USEFUL_LIFE_BMF');
+      expect(content.deductible_year).toMatch(/one-year useful life/i);
+      expect(content.deductible_year).not.toMatch(/sofortabschreibung/i);
+    }
+
+    // A likely streaming product carried through the generic software bucket
+    // must not produce an amount or positive deductibility assertion.
+    const streaming = await dispatchJsonRpc({
+      jsonrpc: '2.0',
+      id: 'tax-streaming-misclassified',
+      method: 'tools/call',
+      params: {
+        name: 'tax_deductibility_check',
+        arguments: {
+          asset_name: 'Spotify Premium',
+          asset_category: 'software_saas',
+          gross_price_eur: 120,
+        },
+      },
+    });
+    expect('result' in streaming).toBe(true);
+    if ('result' in streaming) {
+      const content = JSON.parse((streaming.result as any).content[0].text);
+      expect(content.status).toBe('manual_review');
+      expect(content.is_deductible).toBe(false);
+      expect(content.deductible_amount_eur).toBeNull();
+      expect(content.bmf_2022_eligible).toBe(false);
+    }
 
     // 3. Academic literature
     const lit = await dispatchJsonRpc({
@@ -450,6 +523,7 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
           asset_name: 'Desk',
           asset_category: 'office_furniture',
           gross_price_eur: 400,
+          academic_usage_percent: 50,
         },
       },
     });
@@ -470,6 +544,7 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
           asset_name: 'Executive Chair',
           asset_category: 'office_furniture',
           gross_price_eur: 1500,
+          academic_usage_percent: 50,
         },
       },
     });

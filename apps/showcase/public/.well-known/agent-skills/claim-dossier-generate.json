@@ -3,7 +3,7 @@
   "name": "claim-dossier-generate",
   "version": "1.0.0",
   "type": "skill-json",
-  "description": "Compile a deterministic German BGB § 437/439 statutory defect notice or § 312k contract termination letter with legal safe-harbor disclaimer.",
+  "description": "Draft a German goods-defect notice or an ordinary contract cancellation. The draft requires review before sending.",
   "invocation": {
     "type": "mcp",
     "endpoint": "https://rightsandrenewals.pages.dev/api/mcp",
@@ -15,24 +15,37 @@
     "properties": {
       "brand_slug": {
         "type": "string",
-        "description": "Brand identifier (e.g. 'apple', 'sony')"
+        "minLength": 1,
+        "description": "Brand or provider identifier"
       },
       "service_slug": {
         "type": "string",
+        "minLength": 1,
         "description": "Alias for brand_slug"
       },
       "item_name": {
         "type": "string",
-        "description": "Full product name (e.g. 'MacBook Air M2 13-inch')"
+        "minLength": 1,
+        "description": "Product name, or a legacy alias for contract_name"
+      },
+      "contract_name": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Name of the contract to cancel"
+      },
+      "contract_reference": {
+        "type": "string",
+        "description": "Optional contract reference"
       },
       "purchase_date": {
         "type": "string",
         "format": "date",
-        "description": "Purchase date in ISO 8601 format (YYYY-MM-DD)"
+        "description": "Purchase date for a goods-defect notice"
       },
       "defect_description": {
         "type": "string",
-        "description": "Factual description of defect or failure"
+        "minLength": 1,
+        "description": "Factual defect description for a goods-defect notice"
       },
       "issue_type": {
         "type": "string",
@@ -40,14 +53,57 @@
           "statutory_defect_claim",
           "contract_cancellation"
         ],
-        "description": "Legal claim type"
+        "default": "statutory_defect_claim"
       }
     },
-    "required": [
-      "brand_slug",
-      "item_name",
-      "purchase_date",
-      "defect_description"
+    "allOf": [
+      {
+        "anyOf": [
+          {
+            "required": [
+              "brand_slug"
+            ]
+          },
+          {
+            "required": [
+              "service_slug"
+            ]
+          }
+        ]
+      },
+      {
+        "if": {
+          "required": [
+            "issue_type"
+          ],
+          "properties": {
+            "issue_type": {
+              "const": "contract_cancellation"
+            }
+          }
+        },
+        "then": {
+          "anyOf": [
+            {
+              "required": [
+                "contract_name"
+              ]
+            },
+            {
+              "required": [
+                "item_name"
+              ]
+            }
+          ]
+        },
+        "else": {
+          "required": [
+            "item_name",
+            "purchase_date",
+            "defect_description"
+          ]
+        }
+      }
     ]
   },
   "examples": [
@@ -59,6 +115,14 @@
         "purchase_date": "2024-05-10",
         "defect_description": "Display backlight flickering intermittently after 6 months of use",
         "issue_type": "statutory_defect_claim"
+      }
+    },
+    {
+      "intent": "Draft ordinary cancellation of a synthetic streaming subscription",
+      "arguments": {
+        "service_slug": "netflix",
+        "contract_name": "Synthetic Netflix subscription",
+        "issue_type": "contract_cancellation"
       }
     }
   ]

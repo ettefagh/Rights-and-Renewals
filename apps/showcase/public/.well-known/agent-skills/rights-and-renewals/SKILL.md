@@ -1,6 +1,6 @@
 ---
 name: rights-and-renewals
-description: Progressive-disclosure workflow skill for German consumer statutory warranty rights, BGB § 477 12-month burden of proof cliffs, BGB § 312k subscription cancellations, and tax deductibility proofs under § 9 EStG & BMF 2022.
+description: Progressive-disclosure workflow skill for German consumer statutory warranty rights, BGB § 477 12-month burden of proof cliffs, BGB § 312k subscription cancellations, and preliminary tax screening under § 9 EStG.
 ---
 
 # Rights & Renewals Agent Skill
@@ -11,8 +11,8 @@ Use this skill when an autonomous AI agent needs to evaluate German consumer rig
 
 The Rights & Renewals MCP server provides 5 authoritative tools:
 
-1. **`policy_lookup`**: Query verified brand cancellation policies, statutory warranty terms (24m), commercial guarantees, and direct cancellation links.
-2. **`claim_dossier_generate`**: Compile a deterministic German BGB § 437/439 statutory defect notice or § 312k cancellation letter with LexFox disclaimer.
+1. **`policy_lookup`**: Look up goods or subscription policies with applicable statutory references and available provider sources.
+2. **`claim_dossier_generate`**: Draft a German goods-defect notice or an ordinary contract cancellation for review before sending.
 3. **`statutory_law_lookup`**: Access verbatim German Civil Code (BGB) articles:
    - § 434: Sachmangel (Material defect definition)
    - § 437: Rechte des Käufers bei Mängeln (Remedies catalogue)
@@ -24,7 +24,7 @@ The Rights & Renewals MCP server provides 5 authoritative tools:
    - § 312k: Kündigungsbutton im elektronischen Geschäftsverkehr
    - § 355: Widerrufsrecht bei Verbraucherverträgen (14-day cooling-off)
 4. **`subscription_category_rules`**: Query statutory maximum initial contract term (24m) and rolling 1-month cancellation notice windows under BGB § 309 Nr. 9 & § 312k.
-5. **`tax_deductibility_check`**: Evaluate German income tax deductibility as Werbungskosten under § 9 EStG and BMF 22.02.2022 digital asset Sofortabschreibung.
+5. **`tax_deductibility_check`**: Screen work or study expenses under § 9 EStG. Generic subscriptions require manual review. Specified computer equipment and acquired software may qualify for the BMF one-year useful life.
 
 ## Recommended Workflow
 
@@ -36,6 +36,6 @@ The Rights & Renewals MCP server provides 5 authoritative tools:
 3. For subscription cancellations:
    - Call `subscription_category_rules` with category (e.g. `"streaming"`, `"gym"`, `"telecom"`).
    - Check if contract started before or after 01.03.2022 (Gesetz für faire Verbraucherverträge).
-   - Direct user to brand's verified cancellation URL if available.
+   - Check the provider's cancellation instructions. To draft ordinary cancellation, use issue_type: contract_cancellation and contract_name.
 4. For tax write-offs:
    - Call `tax_deductibility_check` with asset name, gross price, and professional/academic usage percent.

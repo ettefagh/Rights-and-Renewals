@@ -113,6 +113,7 @@ export type {
 } from './media/pdfDossierCompiler.js';
 
 // 9. Open MCP Server JSON-RPC 2.0 Dispatcher
+export { getPolicyScope } from './mcp/policyScope.js';
 export {
   dispatchJsonRpc,
   listMcpTools,

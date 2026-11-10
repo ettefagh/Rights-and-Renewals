@@ -2,7 +2,8 @@
 // Cloudflare Pages Function providing JSON-RPC 2.0 Open MCP Server for Rights & Renewals
 // Full parity with apps/showcase/src/pages/api/mcp.ts (5 authoritative tools, strict Zod validation -32602)
 
-import { dispatchJsonRpc, policySeedData } from '@cmlab/core';
+import { dispatchJsonRpc, getPolicyScope, policySeedData } from '@cmlab/core';
+import { claimDossierDescription, claimDossierInputSchema, generateClaimDossier } from '../../src/mcp/claimDossier';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';
@@ -16,7 +17,7 @@ interface JsonRpcRequest {
 }
 
 // Canonical brand map for dual-slug and alias resolution
-const brandMap = new Map<string, any>();
+const brandMap = new Map<string, (typeof policySeedData)[number]>();
 for (const b of policySeedData) {
   const slug = (b.brandSlug || '').toLowerCase();
   if (slug) brandMap.set(slug, b);
@@ -126,7 +127,7 @@ export async function onRequest(context: { request: Request }): Promise<Response
             {
               name: 'policy_lookup',
               description:
-                'Look up German statutory warranty, 12m burden of proof cliff, and cancellation policies for a brand or service.',
+                'Look up scoped German goods or subscription policies, with statutory and available provider sources.',
               inputSchema: {
                 type: 'object',
                 properties: {
@@ -140,28 +141,13 @@ export async function onRequest(context: { request: Request }): Promise<Response
                   },
                   category: { type: 'string', enum: ['hardware', 'subscription'] },
                 },
-                required: ['service_slug'],
+                anyOf: [{ required: ['service_slug'] }, { required: ['brand_slug'] }],
               },
             },
             {
               name: 'claim_dossier_generate',
-              description:
-                'Compile a deterministic German BGB § 437/439 statutory defect notice or § 312k cancellation letter with LexFox safe-harbor disclaimer.',
-              inputSchema: {
-                type: 'object',
-                properties: {
-                  brand_slug: { type: 'string', description: "Brand identifier (e.g. 'apple', 'sony')" },
-                  service_slug: { type: 'string', description: 'Alias for brand_slug' },
-                  item_name: { type: 'string', description: 'Full product name' },
-                  purchase_date: { type: 'string', format: 'date', description: 'ISO 8601 YYYY-MM-DD' },
-                  defect_description: { type: 'string', description: 'Factual defect description' },
-                  issue_type: {
-                    type: 'string',
-                    enum: ['statutory_defect_claim', 'contract_cancellation'],
-                  },
-                },
-                required: ['brand_slug', 'item_name', 'purchase_date', 'defect_description'],
-              },
+              description: claimDossierDescription,
+              inputSchema: claimDossierInputSchema,
             },
             {
               name: 'statutory_law_lookup',
@@ -196,7 +182,7 @@ export async function onRequest(context: { request: Request }): Promise<Response
             {
               name: 'tax_deductibility_check',
               description:
-                'Evaluate German income tax deductibility as Werbungskosten under § 9 EStG and BMF 22.02.2022 digital asset Sofortabschreibung.',
+                'Screen German work or study expenses. Generic categories require manual review. BMF one-year useful life is limited to specified hardware and acquired software.',
               inputSchema: {
                 type: 'object',
                 properties: {
@@ -209,12 +195,15 @@ export async function onRequest(context: { request: Request }): Promise<Response
                       'computer_hardware',
                       'peripherals',
                       'software_saas',
+                      'subscription',
+                      'hardware',
+                      'acquired_business_software',
                       'academic_literature',
                       'smartphone',
                       'office_furniture',
                     ],
                   },
-                  gross_price_eur: { type: 'number' },
+                  gross_price_eur: { type: 'number', exclusiveMinimum: 0 },
                   professional_use_percent: { type: 'number', minimum: 0, maximum: 100 },
                   academic_usage_percent: { type: 'number', minimum: 0, maximum: 100 },
                   taxpayer_status: {
@@ -224,6 +213,10 @@ export async function onRequest(context: { request: Request }): Promise<Response
                   purchase_date: { type: 'string', format: 'date' },
                 },
                 required: ['gross_price_eur'],
+                allOf: [
+                  { anyOf: [{ required: ['asset_name'] }, { required: ['item_name'] }] },
+                  { anyOf: [{ required: ['asset_category'] }, { required: ['item_category'] }] },
+                ],
               },
             },
           ],
@@ -239,129 +232,15 @@ export async function onRequest(context: { request: Request }): Promise<Response
     const args = body.params?.arguments || {};
 
     if (toolName === 'claim_dossier_generate') {
-      const slug = (args.brand_slug || args.service_slug || '').toLowerCase().trim();
-      const itemName = args.item_name;
-      const purchaseDateStr = args.purchase_date;
-      const defectDesc = args.defect_description;
-
-      if (!slug || !itemName || !purchaseDateStr || !defectDesc) {
-        return new Response(
-          JSON.stringify({
-            jsonrpc: '2.0',
-            id: reqId,
-            error: {
-              code: -32602,
-              message:
-                'Missing required arguments: brand_slug, item_name, purchase_date, defect_description',
-            },
-          }),
-          { headers: CORS_HEADERS }
-        );
+      const generated = generateClaimDossier(args, brandMap);
+      if ('error' in generated) {
+        return new Response(JSON.stringify({ jsonrpc: '2.0', id: reqId, error: { code: -32602, message: generated.error } }), { headers: CORS_HEADERS });
       }
-
-      const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!isoDateRegex.test(purchaseDateStr) || isNaN(Date.parse(purchaseDateStr))) {
-        return new Response(
-          JSON.stringify({
-            jsonrpc: '2.0',
-            id: reqId,
-            error: {
-              code: -32602,
-              message: 'purchase_date must be in ISO 8601 YYYY-MM-DD format',
-            },
-          }),
-          { headers: CORS_HEADERS }
-        );
-      }
-
-      const brand = brandMap.get(slug);
-      const brandName =
-        brand?.brandName || brand?.brand_name || slug.charAt(0).toUpperCase() + slug.slice(1);
-
-      // Calculate BGB § 477 12-month reversed burden of proof cliff
-      const pDate = new Date(purchaseDateStr + 'T00:00:00Z');
-      const targetYear = pDate.getUTCFullYear() + 1;
-      const cliffDate = new Date(pDate);
-
-      // Leap year precision pursuant to BGB § 188 Abs. 3 (atomic UTC date clamping)
-      if (pDate.getUTCMonth() === 1 && pDate.getUTCDate() === 29) {
-        const isNextLeap =
-          (targetYear % 4 === 0 && targetYear % 100 !== 0) || targetYear % 400 === 0;
-        cliffDate.setUTCFullYear(targetYear, 1, isNextLeap ? 29 : 28);
-      } else {
-        cliffDate.setUTCFullYear(targetYear);
-      }
-
-      const now = new Date();
-      const isWithinCliff = now.getTime() <= cliffDate.getTime();
-      const burdenOfProof = isWithinCliff ? 'seller' : 'consumer';
-
-      const legalClause = isWithinCliff
-        ? 'Gemäß § 477 Abs. 1 BGB wird gesetzlich vermutet, dass der Mangel bereits bei Gefahrübergang vorhanden war (Auftreten innerhalb von 12 Monaten nach Übergabe).'
-        : 'Der gesetzliche Gewährleistungsanspruch besteht nach § 438 Abs. 1 Nr. 3 BGB für 24 Monate. Der Nachweis der vertragswidrigen Beschaffenheit bei Gefahrübergang wird hiermit vorgelegt.';
-
-      const formatDeDate = (d: Date) =>
-        `${String(d.getUTCDate()).padStart(2, '0')}.${String(d.getUTCMonth() + 1).padStart(2, '0')}.${d.getUTCFullYear()}`;
-
-      const germanDossier = [
-        'MÄNGELRÜGE GEMÄSS § 437 BGB',
-        '',
-        `Gegenstand: ${itemName} (${brandName})`,
-        `Kaufdatum: ${formatDeDate(pDate)}`,
-        `Datum der Mängelanzeige: ${formatDeDate(now)}`,
-        '',
-        'Mangelbeschreibung:',
-        defectDesc,
-        '',
-        'Rechtliche Grundlage:',
-        legalClause,
-        '',
-        'Aufforderung zur Nacherfüllung:',
-        'Hiermit fordere ich Sie auf, binnen angemessener Frist von 14 Tagen die Nacherfüllung durch Neulieferung oder Nachbesserung (§ 439 Abs. 1 BGB) zu veranlassen.',
-        '',
-        'Vorsorglich verweise ich auf die Ablaufhemmung nach § 475e Abs. 1 BGB.',
-        '',
-        '--------------------------------------------------------------------------------',
-        'Hinweis gem. BGH VIII ZR 285/18 (LexFox): Dieses Dokument wurde automatisiert',
-        'und deterministisch generiert. Keine Rechtsberatung im Sinne des RDG.',
-      ].join('\n');
-
-      return new Response(
-        JSON.stringify({
-          jsonrpc: '2.0',
-          id: reqId,
-          result: {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(
-                  {
-                    valid: true,
-                    item_name: itemName,
-                    brand_name: brandName,
-                    statutory_basis: [
-                      'BGB § 434',
-                      'BGB § 437',
-                      'BGB § 438',
-                      'BGB § 439',
-                      'BGB § 477',
-                    ],
-                    burden_of_proof: burdenOfProof,
-                    cliff_date: cliffDate.toISOString().split('T')[0],
-                    dossier_text_de: germanDossier,
-                    lexfox_safe_harbor_certified: true,
-                  },
-                  null,
-                  2
-                ),
-              },
-            ],
-          },
-        }),
-        { headers: CORS_HEADERS }
-      );
+      return new Response(JSON.stringify({
+        jsonrpc: '2.0', id: reqId,
+        result: { content: [{ type: 'text', text: JSON.stringify(generated.value, null, 2) }] },
+      }), { headers: CORS_HEADERS });
     }
-
     if (toolName === 'policy_lookup') {
       const rawSlug = args.service_slug || args.brand_slug;
       if (!rawSlug || typeof rawSlug !== 'string' || !rawSlug.trim()) {
@@ -376,6 +255,14 @@ export async function onRequest(context: { request: Request }): Promise<Response
           }),
           { headers: CORS_HEADERS }
         );
+      }
+
+      if (args.category !== undefined && !['hardware', 'subscription'].includes(args.category)) {
+        return Response.json({
+          jsonrpc: '2.0',
+          id: reqId,
+          error: { code: -32602, message: 'Invalid params: category must be hardware or subscription' },
+        }, { headers: CORS_HEADERS });
       }
 
       const normalized = rawSlug.trim().toLowerCase();
@@ -400,43 +287,23 @@ export async function onRequest(context: { request: Request }): Promise<Response
         );
       }
 
-      return new Response(
-        JSON.stringify({
-          jsonrpc: '2.0',
-          id: reqId,
-          result: {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(
-                  {
-                    brand_slug: match.brandSlug,
-                    brand_name: match.brandName,
-                    category: match.category,
-                    statutory_warranty_months: match.statutoryWarrantyMonths,
-                    commercial_guarantee_months: match.commercialGuaranteeMonths,
-                    cancellation_notice_months: match.cancellationNoticeMonths,
-                    cancellation_button_compliant: match.cancellationButtonCompliant,
-                    cancellation_url: match.cancellationUrl,
-                    support_email: match.supportEmail,
-                    legal_notes: match.legalNotes,
-                    verified_date: match.verifiedDate,
-                    statutory_basis: [
-                      match.category === 'subscription' ? 'BGB § 309 Nr. 9' : 'BGB § 438',
-                      'BGB § 312k',
-                    ],
-                  },
-                  null,
-                  2
-                ),
-              },
-            ],
-          },
-        }),
-        { headers: CORS_HEADERS }
-      );
+      const { notes, ...scope } = getPolicyScope(match.category, match);
+      const policy = {
+        ...scope,
+        brand_slug: match.brandSlug,
+        brand_name: match.brandName,
+        category: match.category,
+        cancellation_url: match.cancellationUrl,
+        support_email: match.supportEmail,
+        legal_notes: notes,
+        catalog_record_date: match.verifiedDate,
+      };
+      return Response.json({
+        jsonrpc: '2.0',
+        id: reqId,
+        result: { content: [{ type: 'text', text: JSON.stringify(policy, null, 2) }] },
+      }, { headers: CORS_HEADERS });
     }
-
     // 1. statutory_law_lookup
     if (toolName === 'statutory_law_lookup') {
       const section = args.statute_section;
@@ -612,17 +479,22 @@ export async function onRequest(context: { request: Request }): Promise<Response
         );
       }
 
-      let assetCategory = args.asset_category || args.item_category;
-      if (assetCategory === 'hardware') {
-        assetCategory = 'computer_hardware';
-      } else if (assetCategory === 'subscription') {
-        assetCategory = 'software_saas';
+      const assetCategory = args.asset_category ?? args.item_category;
+      if (args.item_category === 'subscription' && !['subscription', 'software_saas'].includes(assetCategory)) {
+        return Response.json({
+          jsonrpc: '2.0',
+          id: reqId,
+          error: { code: -32602, message: 'A subscription must use the subscription or software_saas category' },
+        }, { headers: CORS_HEADERS });
       }
 
       const validCategories = [
         'computer_hardware',
         'peripherals',
         'software_saas',
+        'subscription',
+        'hardware',
+        'acquired_business_software',
         'academic_literature',
         'smartphone',
         'office_furniture',
@@ -657,18 +529,10 @@ export async function onRequest(context: { request: Request }): Promise<Response
         );
       }
 
-      const usagePercent =
-        args.academic_usage_percent ??
-        (args.professional_use_percent !== undefined
-          ? Math.round(args.professional_use_percent)
-          : 50);
+      const usagePercent = args.academic_usage_percent ?? args.professional_use_percent;
 
-      if (
-        typeof usagePercent !== 'number' ||
-        usagePercent < 0 ||
-        usagePercent > 100 ||
-        isNaN(usagePercent)
-      ) {
+      if (usagePercent !== undefined &&
+          (typeof usagePercent !== 'number' || !Number.isFinite(usagePercent) || usagePercent < 0 || usagePercent > 100)) {
         return new Response(
           JSON.stringify({
             jsonrpc: '2.0',
@@ -710,15 +574,10 @@ export async function onRequest(context: { request: Request }): Promise<Response
           resultData.item_name = resultData.asset_name;
           resultData.item_category = args.item_category || resultData.asset_category;
           resultData.isDeductible = resultData.is_deductible;
-          resultData.legalBasis =
-            resultData.bmf_decree_reference ||
-            resultData.governing_statute ||
-            'BMF IV C 3 - S 2190/21/10002 :025 vom 22.02.2022';
+          resultData.legalBasis = resultData.bmf_decree_reference ?? resultData.governing_statute;
           resultData.deductibleAmountEur = resultData.deductible_amount_eur;
           resultData.depreciationType = resultData.depreciation_type?.toLowerCase();
-          resultData.write_off_method = resultData.depreciation_type?.includes('SOFORTABSCHREIBUNG')
-            ? '100% Sofortabschreibung (BMF 22.02.2022)'
-            : resultData.depreciation_type;
+          resultData.write_off_method = resultData.status === 'manual_review' ? null : resultData.depreciation_type;
 
           return new Response(
             JSON.stringify({
