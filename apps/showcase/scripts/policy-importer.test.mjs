@@ -36,7 +36,8 @@ function createFakeClient({ fields = policyFields, items = [] } = {}) {
         fields: state.fields.map((field) => ({ ...field })),
       };
     },
-    async *listAll(_slug, { status }) {
+    async *listAll(_slug, { status, limit }) {
+      if (limit > 100) throw new RangeError('EmDash content API allows at most 100 entries per page.');
       for (const item of state.items) {
         if (item.status === status) yield { slug: item.slug, status: item.status };
       }

@@ -767,7 +767,9 @@
         walletStore.setView('dashboard');
       }}
     ><LockKeyhole size={20} aria-hidden="true" /><span>Vault</span></button>
-    <a class="wallet-nav-link" href="https://rightsandrenewals.pages.dev/wiki" target="_blank" rel="noopener noreferrer"><BookOpen size={20} aria-hidden="true" /><span>Wiki</span></a>
+    {#if showcaseWikiUrl}
+      <a class="wallet-nav-link" href={showcaseWikiUrl} target="_blank" rel="noopener noreferrer"><BookOpen size={20} aria-hidden="true" /><span>Wiki</span></a>
+    {/if}
   </nav>
 
   <!-- Portable FAB Speed Dial -->

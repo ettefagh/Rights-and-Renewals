@@ -2,15 +2,18 @@ import { defineMiddleware } from 'astro:middleware';
 
 import { SHOWCASE_MARKDOWN } from './data/showcase-markdown';
 
+const rootDiscovery = '</.well-known/api-catalog>; rel="api-catalog", </auth.md>; rel="service-doc"';
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const request = context.request;
   const url = new URL(request.url);
   const accept = request.headers.get('Accept') || '';
+  const isHome = url.pathname === '/' || url.pathname === '/index.html';
 
   const markdownRequested = url.searchParams.get('format') === 'markdown';
 
   // Content negotiation for AI agents requesting Markdown
-  if ((url.pathname === '/' || url.pathname === '/index.html') && (markdownRequested || accept.includes('text/markdown'))) {
+  if (isHome && (markdownRequested || accept.includes('text/markdown'))) {
     let prefersMarkdown = true;
     if (!markdownRequested && accept.includes('text/html')) {
       let qMd = 1.0;
@@ -34,7 +37,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         headers: {
           'Content-Type': 'text/markdown; charset=utf-8',
           'Vary': 'Accept',
-          'Link': '</.well-known/api-catalog>; rel="api-catalog", </auth.md>; rel="service-doc"',
+          'Link': rootDiscovery,
           'Access-Control-Allow-Origin': '*',
           'x-markdown-tokens': '180'
         }
@@ -42,5 +45,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  return next();
+  const response = await next();
+  const isPublicPage = isHome || /^(?:\/agent-setup|\/wiki|\/machine\/view)(?:\/|$)/.test(url.pathname);
+  if (!isPublicPage || !response.headers.get('Content-Type')?.includes('text/html')) return response;
+
+  const page = new Response(response.body, response);
+  page.headers.set('X-Content-Type-Options', 'nosniff');
+  page.headers.set('X-Frame-Options', 'DENY');
+  page.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (isHome) {
+    if (!page.headers.get('Vary')?.split(',').some((value) => ['accept', '*'].includes(value.trim().toLowerCase()))) {
+      page.headers.append('Vary', 'Accept');
+    }
+    page.headers.append('Link', rootDiscovery);
+  }
+  return page;
 });

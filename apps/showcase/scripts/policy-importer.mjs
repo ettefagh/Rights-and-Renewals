@@ -64,7 +64,7 @@ export async function runPolicyImport({
 
   const existingItems = new Map();
   for (const status of ['draft', 'published', 'archived', 'scheduled', 'pending', 'private', 'future']) {
-    for await (const item of client.listAll(policyCollection.slug, { status, limit: 250 })) {
+    for await (const item of client.listAll(policyCollection.slug, { status, limit: 100 })) {
       if (item.slug) existingItems.set(item.slug, item.status || status);
     }
   }
@@ -165,7 +165,7 @@ export async function runPolicyImport({
   }
 
   const finalPublishedSlugs = new Set();
-  for await (const item of client.listAll(policyCollection.slug, { status: 'published', limit: 250 })) {
+  for await (const item of client.listAll(policyCollection.slug, { status: 'published', limit: 100 })) {
     if (item.slug) finalPublishedSlugs.add(item.slug);
   }
   const stillUnpublished = canonicalEntries
