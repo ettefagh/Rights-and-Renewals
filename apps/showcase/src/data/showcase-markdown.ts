@@ -1,5 +1,7 @@
 export const SHOWCASE_MARKDOWN = `# Rights & Renewals
 
+[Human view](/)
+
 Save receipts on your device and track the dates that matter for purchases and subscriptions in Germany.
 
 - [Open the wallet](https://rightsandrenewals-app.pages.dev/) to save a purchase, see upcoming dates, or prepare a notice draft.

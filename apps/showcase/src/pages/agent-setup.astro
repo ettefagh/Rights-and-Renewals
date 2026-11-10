@@ -347,61 +347,6 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
       font-weight: 700;
       color: var(--color-primary-text, #2563eb);
     }
-    .machine-view-intro {
-      text-align: center;
-      margin-bottom: var(--space-8, 32px);
-    }
-    .machine-view-intro .agent-setup-badge {
-      margin-bottom: var(--space-4, 16px);
-    }
-    .machine-view-intro .agent-setup-description {
-      margin-bottom: 0;
-    }
-    .machine-server-card {
-      padding: var(--space-6, 24px);
-      border: 1px solid var(--color-border-subtle, #e2e8f0);
-      border-radius: 12px;
-      background: var(--color-bg-surface, #ffffff);
-    }
-    .machine-server-card .agent-summary {
-      margin-bottom: var(--space-4, 16px);
-    }
-    .machine-endpoint-details {
-      display: grid;
-      gap: var(--space-3, 12px);
-      margin: 0;
-    }
-    .machine-endpoint-details dt {
-      color: var(--color-text-muted, #64748b);
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .machine-endpoint-details dd {
-      margin: 4px 0 0;
-      overflow-wrap: anywhere;
-    }
-    .machine-endpoint-details code,
-    .machine-discovery-links a {
-      color: var(--color-primary-default, #2563eb);
-      font-weight: 600;
-    }
-    .machine-endpoint-details code {
-      overflow-wrap: anywhere;
-    }
-    .machine-discovery-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: var(--space-5, 20px) 0 0;
-    }
-    .machine-request {
-      margin-top: var(--space-8, 32px);
-    }
-    .machine-request h2 {
-      margin-bottom: var(--space-2, 8px);
-    }
   </style>
 </head>
 <body class="showcase-shell">
@@ -437,7 +382,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
   </header>
 
   <main id="agent-setup-main">
-    <AudienceSwitch id="mcp-view">
+    <AudienceSwitch humanHref="/agent-setup" machineHref="/machine/agent-setup.md" />
     <!-- HERO SECTION -->
     <section class="agent-setup-hero">
       <div class="layout-container">
@@ -850,50 +795,6 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
       </section>
 
     </div>
-    <section slot="machine" aria-labelledby="machine-view-title" class="machine-view">
-      <div class="layout-container" style="padding-top: var(--space-10, 40px); padding-bottom: var(--space-16, 64px);">
-        <header class="machine-view-intro">
-          <p class="agent-setup-badge">Model Context Protocol · JSON-RPC 2.0</p>
-          <h1 class="agent-setup-title" id="machine-view-title">MCP endpoint</h1>
-          <p class="agent-setup-description">
-            Connect an MCP client to the public Rights &amp; Renewals server. Send JSON-RPC requests to the endpoint below.
-          </p>
-        </header>
-
-        <article class="machine-server-card" aria-labelledby="machine-server-name">
-          <div>
-            <p class="agent-meta-vendor">MCP server</p>
-            <h2 class="agent-title" id="machine-server-name">Rights &amp; Renewals</h2>
-            <p class="agent-summary">Remote HTTP endpoint · JSON-RPC 2.0 · 5 tools</p>
-          </div>
-          <dl class="machine-endpoint-details">
-            <div><dt>Endpoint</dt><dd><code>https://rightsandrenewals.pages.dev/api/mcp</code></dd></div>
-            <div><dt>Transport</dt><dd>HTTP POST · <code>application/json</code></dd></div>
-            <div><dt>Protocol</dt><dd>MCP over JSON-RPC 2.0</dd></div>
-          </dl>
-          <p class="machine-discovery-links">
-            <a href="/.well-known/mcp/server-card.json">Open MCP server card</a>
-            <span aria-hidden="true">·</span>
-            <a href="/.well-known/ai-catalog.json">Discover this server</a>
-          </p>
-        </article>
-
-        <section class="machine-request" aria-labelledby="machine-tools-list-title">
-          <h2 id="machine-tools-list-title">List available tools</h2>
-          <p class="text-secondary">POST this JSON-RPC request to the endpoint to discover the server’s tools.</p>
-          <div class="code-box">
-            <pre><code>{`{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "tools/list",
-  "params": {}
-}`}</code></pre>
-          </div>
-          <p class="text-secondary">The response includes <code>policy_lookup</code>, <code>claim_dossier_generate</code>, <code>statutory_law_lookup</code>, <code>subscription_category_rules</code>, and <code>tax_deductibility_check</code>, with their input schemas.</p>
-        </section>
-      </div>
-    </section>
-    </AudienceSwitch>
   </main>
 
   <!-- Accessible Screen Reader Announcer -->

@@ -240,7 +240,7 @@ const legacyDeepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${b
   </header>
 
   <main class="wiki-container">
-    <AudienceSwitch id="wiki-view">
+    <AudienceSwitch humanHref={`/wiki/${brand.brandSlug}`} machineHref={`/machine/wiki/${brand.brandSlug}.md`} />
     <!-- Breadcrumb -->
     <nav class="wiki-breadcrumb" aria-label="Breadcrumb">
       <a href="/">Home</a>
@@ -388,18 +388,6 @@ const legacyDeepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${b
       <strong>Gesetzlicher Hinweis gem. BGH VIII ZR 285/18 (LexFox):</strong>
       Die in diesem Brand Policy Wiki bereitgestellten Informationen wurden mit wissenschaftlicher Sorgfalt automatisiert zusammengestellt. Sie stellen allgemeine rechtliche Vorab-Informationen dar und begründen keine individuelle Rechtsberatung im Sinne des Rechtsdienstleistungsgesetzes (RDG §§ 2, 3). Alle Daten basieren auf den verifizierten Bestimmungen des deutschen Bürgerlichen Gesetzbuches (BGB).
     </footer>
-    <section slot="machine" aria-labelledby="brand-machine-title">
-      <h1 id="brand-machine-title">Machine-readable policy record</h1>
-      <p>Public record for <strong>{brand.brandName}</strong>, keyed by the canonical brand slug.</p>
-      <ul>
-        <li><a href="/data/policy_wiki_seed_v1.json">Policy dataset (JSON)</a></li>
-        <li>MCP requests use <code>POST /api/mcp</code>.</li>
-        <li><a href="/.well-known/mcp/server-card.json">MCP server card</a></li>
-      </ul>
-      <p>For MCP <code>policy_lookup</code>, pass <code>service_slug: "{brand.brandSlug}"</code>.</p>
-      <pre>{JSON.stringify(brand, null, 2)}</pre>
-    </section>
-    </AudienceSwitch>
   </main>
 
 </body>

@@ -3,7 +3,6 @@ import '../../styles/tokens.css';
 import '../../styles/main.css';
 import '../../styles/homepage.css';
 import AudienceSwitch from '../components/AudienceSwitch.astro';
-import { SHOWCASE_MARKDOWN } from '../data/showcase-markdown';
 import { ArrowUpRight, CalendarDays, ChevronRight, Menu, ReceiptText, RefreshCw, ShieldCheck } from 'lucide-svelte';
 
 export const prerender = false;
@@ -93,7 +92,7 @@ export const prerender = false;
        MAIN SHOWCASE CONTENT
        ======================================================================== -->
   <main id="showcase-main">
-    <AudienceSwitch id="home-view">
+    <AudienceSwitch humanHref="/" machineHref="/?format=markdown" />
 
     <section id="hero" class="home-hero" aria-labelledby="home-title">
       <div class="layout-container home-hero-grid">
@@ -292,18 +291,6 @@ export const prerender = false;
       </div>
     </section>
 
-      <section slot="machine" aria-labelledby="home-machine-title">
-        <h1 id="home-machine-title">Machine view</h1>
-        <p>Read the site summary in Markdown or find public resources for agents.</p>
-        <ul>
-          <li><a href="/?format=markdown">Open raw Markdown</a></li>
-          <li><a href="/.well-known/api-catalog">API catalog</a></li>
-          <li><a href="/.well-known/mcp/server-card.json">MCP server card</a></li>
-          <li><a href="/agent-setup">Agent setup</a></li>
-        </ul>
-        <pre><code>{SHOWCASE_MARKDOWN}</code></pre>
-      </section>
-    </AudienceSwitch>
   </main>
 
   <footer class="home-footer">

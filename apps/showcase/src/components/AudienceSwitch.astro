@@ -1,65 +1,26 @@
 ---
 interface Props {
-  id: string;
+  humanHref: string;
+  machineHref: string;
 }
 
-const { id } = Astro.props;
-const humanId = id + '-human';
-const machineId = id + '-machine';
+const { humanHref, machineHref } = Astro.props;
 ---
 
-<div class="audience-switch">
-  <fieldset class="audience-chips">
-    <legend>Content view</legend>
-    <label>
-      <input type="radio" name={id} value="human" aria-controls={humanId} checked />
-      <span>Human</span>
-    </label>
-    <label>
-      <input type="radio" name={id} value="machine" aria-controls={machineId} />
-      <span>Machine</span>
-    </label>
-  </fieldset>
-
-  <div id={humanId} class="audience-human"><slot /></div>
-  <div id={machineId} class="audience-machine"><slot name="machine" /></div>
-</div>
-
-<script>
-  document.addEventListener('click', (event) => {
-    if (!(event.target instanceof Element)) return;
-    const link = event.target.closest('a[href^="#"]');
-    if (!(link instanceof HTMLAnchorElement) || link.hash.length < 2) return;
-
-    const target = document.getElementById(link.hash.slice(1));
-    const switcher = target?.closest('.audience-human')?.parentElement;
-    const human = switcher?.querySelector<HTMLInputElement>('input[value="human"]');
-    if (human) human.checked = true;
-  });
-</script>
+<nav class="audience-chips" aria-label="Content format">
+  <a href={humanHref} aria-current="page">Human</a>
+  <a href={machineHref} type="text/markdown">Machine</a>
+</nav>
 
 <style>
   .audience-chips {
     display: flex;
     justify-content: center;
     gap: 6px;
-    min-inline-size: 0;
-    margin: 0;
     padding: 14px 12px;
-    border: 0;
   }
 
-  legend,
-  input {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  label span {
+  a {
     display: grid;
     place-items: center;
     min-height: 48px;
@@ -71,52 +32,16 @@ const machineId = id + '-machine';
     color: var(--color-text-primary, #182f2b);
     font-size: 14px;
     font-weight: 700;
-    cursor: pointer;
+    text-decoration: none;
   }
 
-  input:checked + span {
+  a[aria-current="page"] {
     background: #2f524c;
     color: #fff;
   }
 
-  input:focus-visible + span {
+  a:focus-visible {
     outline: 3px solid var(--color-border-focus, #2563eb);
     outline-offset: 3px;
   }
-
-  .audience-machine {
-    display: none;
-    box-sizing: border-box;
-    width: min(100%, 840px);
-    margin: 0 auto;
-    padding: 16px 16px 48px;
-    overflow-wrap: anywhere;
-  }
-
-  .audience-machine :global(section > *) + :global(*) {
-    margin-top: 12px;
-  }
-
-  .audience-machine :global(ul) {
-    padding-inline-start: 1.25rem;
-  }
-
-  .audience-machine :global(a) {
-    color: var(--color-text-primary, #182f2b);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .audience-machine :global(pre) {
-    padding: 16px;
-    border: 1px solid var(--color-border-subtle, #cbd5d1);
-    border-radius: 12px;
-    background: var(--color-surface-card, #fff);
-    max-width: 100%;
-    overflow: auto;
-    white-space: pre-wrap;
-  }
-
-  .audience-switch:has(input[value="machine"]:checked) > .audience-human { display: none; }
-  .audience-switch:has(input[value="machine"]:checked) > .audience-machine { display: block; }
 </style>
