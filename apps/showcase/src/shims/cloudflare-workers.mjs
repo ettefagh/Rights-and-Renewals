@@ -29,7 +29,6 @@ if (typeof globalThis !== 'undefined' && typeof globalThis.MessageChannel === 'u
   globalThis.MessagePort = MockMessagePort;
 }
 
-
 class MockD1Statement {
   constructor(sql, db) {
     this.sql = sql;
@@ -65,26 +64,25 @@ class MockD1Statement {
 
 class MockD1Database {
   constructor() {
+    this.reset();
+    if (typeof globalThis !== 'undefined') {
+      globalThis.__EMDASH_RESET__ = () => this.reset();
+    }
+  }
+
+  reset() {
     this.options = new Map([
-      ['emdash:setup_complete', JSON.stringify(true)],
       ['emdash:site_title', JSON.stringify('Rights & Renewals Sovereign Showcase')],
       ['emdash:site_tagline', JSON.stringify('Statutory EU & German Consumer Rights Engine')],
       ['emdash:site_url', JSON.stringify('https://rightsandrenewals.pages.dev')],
       ['emdash:locale', JSON.stringify('de-DE')],
+      ['emdash:seed_complete', JSON.stringify(true)],
       ['emdash:auto_seed_complete', JSON.stringify(true)],
       ['site:url', JSON.stringify('https://rightsandrenewals.pages.dev')]
     ]);
-    this.users = [
-      {
-        id: '01JADMIN0000000000000000',
-        email: 'admin@rightsandrenewals.org',
-        name: 'Rights & Renewals Sovereign Admin',
-        role: 1,
-        email_verified: 1,
-        created_at: '2026-11-10T00:00:00.000Z',
-        updated_at: '2026-11-10T00:00:00.000Z'
-      }
-    ];
+    this.users = [];
+    this.passkeys = [];
+    this.challenges = new Map();
     this.migrations = [
       { name: '0001_initial.sql', executed_at: '2026-11-10T00:00:00.000Z' }
     ];
@@ -135,7 +133,67 @@ class MockD1Database {
       };
     }
 
-    // 2. Users table checks
+    // 2. Auth challenges (WebAuthn / Passkey challenge storage)
+    if (lower.includes('auth_challenges')) {
+      if (lower.startsWith('insert')) {
+        const challenge = String(params[0] || 'default_challenge');
+        this.challenges.set(challenge, {
+          challenge,
+          type: params[1] || 'registration',
+          user_id: params[2] ?? null,
+          data: params[3] ?? null,
+          expires_at: params[4] || new Date(Date.now() + 600000).toISOString()
+        });
+        return { results: [], meta: { changes: 1, last_row_id: 1, duration: 0 } };
+      }
+      if (lower.startsWith('select')) {
+        if (params.length > 0) {
+          const ch = params[0];
+          const entry = this.challenges.get(ch);
+          return {
+            results: entry ? [entry] : [],
+            meta: { changes: 0, last_row_id: null, duration: 0 }
+          };
+        }
+        return {
+          results: Array.from(this.challenges.values()),
+          meta: { changes: 0, last_row_id: null, duration: 0 }
+        };
+      }
+      if (lower.startsWith('delete')) {
+        if (params.length > 0) {
+          this.challenges.delete(params[0]);
+        } else {
+          this.challenges.clear();
+        }
+        return { results: [], meta: { changes: 1, last_row_id: null, duration: 0 } };
+      }
+    }
+
+    // 3. Passkeys storage
+    if (lower.includes('passkeys')) {
+      if (lower.startsWith('insert')) {
+        const passkey = {
+          id: params[0] || `passkey_${Date.now()}`,
+          user_id: params[1] || '',
+          credential_id: params[2] || '',
+          public_key: params[3] || '',
+          counter: params[4] || 0,
+          name: params[5] || 'Passkey',
+          created_at: new Date().toISOString()
+        };
+        this.passkeys.push(passkey);
+        return { results: [], meta: { changes: 1, last_row_id: 1, duration: 0 } };
+      }
+      if (lower.startsWith('select')) {
+        return {
+          results: [...this.passkeys],
+          meta: { changes: 0, last_row_id: null, duration: 0 }
+        };
+      }
+    }
+
+    // 4. Users table
     if (lower.includes('users')) {
       if (lower.includes('count')) {
         return {
@@ -144,23 +202,44 @@ class MockD1Database {
         };
       }
       if (lower.startsWith('select')) {
+        if (params.length > 0 && typeof params[0] === 'string') {
+          const emailMatch = this.users.filter((u) => u.email === params[0].toLowerCase());
+          return { results: emailMatch, meta: { changes: 0, last_row_id: null, duration: 0 } };
+        }
         return {
           results: [...this.users],
           meta: { changes: 0, last_row_id: null, duration: 0 }
         };
       }
       if (lower.startsWith('insert')) {
+        const id = params[0] || `user_${Date.now()}`;
+        const email = (params[1] || 'admin@rightsandrenewals.org').toLowerCase();
+        const name = params[2] || 'Admin';
+        const role = params[3] || 50;
+        const newUser = {
+          id,
+          email,
+          name,
+          role,
+          email_verified: 1,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        this.users.push(newUser);
         return {
-          results: [{ id: params[0] || '01JADMIN0000000000000000' }],
+          results: [{ id }],
           meta: { changes: 1, last_row_id: 1, duration: 0 }
         };
       }
+      if (lower.startsWith('delete')) {
+        this.users = [];
+        return { results: [], meta: { changes: 1, last_row_id: null, duration: 0 } };
+      }
     }
 
-    // 3. Options table
+    // 5. Options table
     if (lower.includes('options')) {
       if (lower.startsWith('select')) {
-        // If specific param passed: e.g. name = ? or name in (?, ?)
         if (params.length > 0) {
           const matched = [];
           for (const p of params) {
@@ -188,9 +267,16 @@ class MockD1Database {
         }
         return { results: [], meta: { changes: 1, last_row_id: 1, duration: 0 } };
       }
+
+      if (lower.startsWith('delete')) {
+        if (params.length > 0) {
+          this.options.delete(params[0]);
+        }
+        return { results: [], meta: { changes: 1, last_row_id: null, duration: 0 } };
+      }
     }
 
-    // 4. Default safe fallback for other statements (e.g. pragma, collections, plugin state)
+    // 6. Default safe fallback for other statements
     return {
       results: [],
       meta: { changes: 0, last_row_id: null, duration: 0 }
