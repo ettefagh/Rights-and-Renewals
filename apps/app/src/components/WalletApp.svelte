@@ -33,11 +33,31 @@
     Sun,
     Moon,
     BookOpen,
-    RefreshCw
+    RefreshCw,
+    CalendarDays,
+    LockKeyhole,
+    ChevronRight
   } from 'lucide-svelte';
 
   let isDarkTheme = $state(false);
   let isNotifCenterOpen = $state(false);
+  let activeWorkspace = $state<'deadlines' | 'vault'>('deadlines');
+  let selectedDeadlineId = $state<string | null>(null);
+
+  let deadlineItems = $derived.by(() =>
+    walletStore.items
+      .filter((item) => item.status === 'active' || item.status === 'expiring_soon' || item.status === 'cancellation_pending')
+      .filter((item) => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(item.expiryDate)) return false;
+        const date = new Date(`${item.expiryDate}T00:00:00.000Z`);
+        return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === item.expiryDate;
+      })
+      .filter((item) => walletStore.computeDaysRemaining(item.expiryDate) >= 0)
+      .sort((a, b) => a.expiryDate.localeCompare(b.expiryDate))
+  );
+  let selectedDeadline = $derived(
+    deadlineItems.find((item) => item.id === selectedDeadlineId) ?? deadlineItems[0] ?? null
+  );
 
   const DONUT_COLORS = ['#2F524C', '#D96B4B', '#0D9488', '#D97706', '#4F46E5'];
 
@@ -261,6 +281,73 @@
     </section>
 
     {#if walletStore.currentView === 'dashboard'}
+      {#if activeWorkspace === 'deadlines'}
+        <section class="col-12 deadlines-workspace" aria-labelledby="deadlines-title">
+          <div class="deadlines-heading">
+            <div>
+              <p class="workspace-eyebrow">On this device</p>
+              <h1 id="deadlines-title">Deadlines</h1>
+              <p class="workspace-subtitle">What needs your attention</p>
+            </div>
+            <span class="today-date">{new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date())}</span>
+          </div>
+
+          <div class="deadlines-master-detail">
+            <section class="deadline-list" aria-label="Upcoming deadlines">
+              {#if deadlineItems.length === 0}
+                <div class="deadline-empty">
+                  <CalendarDays size={24} aria-hidden="true" />
+                  <h2>No upcoming deadlines</h2>
+                  <p>Items saved in your wallet with a future date will appear here.</p>
+                  <button type="button" class="deadline-primary-action" onclick={() => walletStore.setView('capture')}>Add an item</button>
+                </div>
+              {:else}
+                {#each deadlineItems as item (item.id)}
+                  {@const days = walletStore.computeDaysRemaining(item.expiryDate)}
+                  <button
+                    type="button"
+                    class="deadline-row"
+                    class:selected={selectedDeadline?.id === item.id}
+                    aria-pressed={selectedDeadline?.id === item.id}
+                    onclick={() => (selectedDeadlineId = item.id)}
+                  >
+                    <CalendarDays size={22} aria-hidden="true" />
+                    <span class="deadline-row-copy">
+                      <strong>{item.title}</strong>
+                      <span>{item.category === 'subscription' ? 'Renewal' : 'Warranty ends'} · {formatFriendlyDate(item.expiryDate, 'short')}</span>
+                    </span>
+                    <span class="deadline-countdown" class:critical={days <= 7}>{days === 0 ? 'Today' : `${days} days`}</span>
+                    <ChevronRight size={18} aria-hidden="true" />
+                  </button>
+                {/each}
+              {/if}
+            </section>
+
+            {#if selectedDeadline}
+              <aside class="deadline-detail" aria-label={`Details for ${selectedDeadline.title}`}>
+                <div class="deadline-detail-heading">
+                  <CalendarDays size={30} aria-hidden="true" />
+                  <div>
+                    <h2>{selectedDeadline.title}</h2>
+                    <p>{selectedDeadline.category === 'subscription' ? 'Subscription' : 'Purchase protection'}</p>
+                  </div>
+                </div>
+                <p class="deadline-date-panel">
+                  <strong>{selectedDeadline.category === 'subscription' ? 'Next renewal' : 'Warranty end'}</strong>
+                  <span>{formatFriendlyDate(selectedDeadline.expiryDate, 'long')}</span>
+                </p>
+                <p class="deadline-merchant">{selectedDeadline.merchantOrProvider}</p>
+                {#if selectedDeadline.category === 'subscription'}
+                  <button type="button" class="deadline-primary-action" onclick={() => walletStore.openCancellationModal(selectedDeadline!)}>Prepare cancellation</button>
+                {:else if selectedDeadline.hasProofOfPurchase}
+                  <button type="button" class="deadline-primary-action" onclick={() => walletStore.openReceiptZoom(selectedDeadline!)}>View receipt</button>
+                {/if}
+                <button type="button" class="deadline-secondary-action" onclick={() => walletStore.selectItem(selectedDeadline)}>Open wallet item</button>
+              </aside>
+            {/if}
+          </div>
+        </section>
+      {:else}
       <!-- Smart Visual Pulse Row: SVG Spend Donut + Action Radar (Less Text, Zero "Protected Capital" / "Tax Deductible") -->
       <section class="col-12 bento-col-5 visual-pulse-card">
         <div class="donut-widget-layout">
@@ -603,10 +690,31 @@
           </div>
         </div>
       </footer>
+      {/if}
 
     {:else if walletStore.currentView === 'capture'}
       <section class="col-12">
-        <QuickCaptureModal />
+        <div class="capture-workspace">
+          <QuickCaptureModal />
+          {#if selectedDeadline}
+            <aside class="capture-deadline-support" aria-label="Next upcoming deadline">
+              <div class="capture-support-icon"><CalendarDays size={21} aria-hidden="true" /></div>
+              <div>
+                <p>Next deadline</p>
+                <strong>{selectedDeadline.title}</strong>
+                <span>{selectedDeadline.category === 'subscription' ? 'Renewal' : 'Warranty ends'} · {formatFriendlyDate(selectedDeadline.expiryDate, 'short')}</span>
+              </div>
+              <button
+                type="button"
+                aria-label={`Open deadline for ${selectedDeadline.title}`}
+                onclick={() => {
+                  activeWorkspace = 'deadlines';
+                  walletStore.setView('dashboard');
+                }}
+              ><ChevronRight size={20} aria-hidden="true" /></button>
+            </aside>
+          {/if}
+        </div>
       </section>
 
     {:else if walletStore.currentView === 'claim'}
@@ -633,6 +741,30 @@
 
   <!-- 520px Responsive Detail & Edit Drawer -->
   <ItemDetailDrawer />
+
+  <nav class="wallet-bottom-nav" aria-label="Wallet navigation">
+    <button
+      type="button"
+      class="wallet-nav-link"
+      class:active={walletStore.currentView === 'dashboard' && activeWorkspace === 'deadlines'}
+      aria-current={walletStore.currentView === 'dashboard' && activeWorkspace === 'deadlines' ? 'page' : undefined}
+      onclick={() => {
+        activeWorkspace = 'deadlines';
+        walletStore.setView('dashboard');
+      }}
+    ><CalendarDays size={20} aria-hidden="true" /><span>Deadlines</span></button>
+    <button
+      type="button"
+      class="wallet-nav-link"
+      class:active={walletStore.currentView === 'dashboard' && activeWorkspace === 'vault'}
+      aria-current={walletStore.currentView === 'dashboard' && activeWorkspace === 'vault' ? 'page' : undefined}
+      onclick={() => {
+        activeWorkspace = 'vault';
+        walletStore.setView('dashboard');
+      }}
+    ><LockKeyhole size={20} aria-hidden="true" /><span>Vault</span></button>
+    <a class="wallet-nav-link" href="https://rightsandrenewals.pages.dev/wiki" target="_blank" rel="noopener noreferrer"><BookOpen size={20} aria-hidden="true" /><span>Wiki</span></a>
+  </nav>
 
   <!-- Portable FAB Speed Dial -->
   <FloatingActionMenu />
@@ -676,6 +808,106 @@
     display: flex;
     flex-direction: column;
     background-color: var(--color-surface-canvas, #F4F7F6);
+    padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .deadlines-workspace {
+    --workspace-gutter: clamp(18px, 3vw, 42px);
+    padding: var(--workspace-gutter) var(--workspace-gutter) 28px;
+  }
+
+  .deadlines-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 0 0 24px;
+  }
+
+  .workspace-eyebrow { margin: 0 0 5px; color: var(--color-ink-secondary, #526561); font-size: 14px; }
+  .deadlines-heading h1 { margin: 0; font-size: clamp(30px, 4vw, 44px); letter-spacing: -0.04em; color: var(--color-ink-primary, #10201d); }
+  .workspace-subtitle { margin: 5px 0 0; font-size: 17px; color: var(--color-ink-secondary, #526561); }
+  .today-date { color: var(--color-ink-secondary, #526561); white-space: nowrap; }
+
+  .deadlines-master-detail { display: grid; grid-template-columns: minmax(300px, 1.2fr) minmax(300px, 0.9fr); gap: clamp(18px, 3vw, 36px); align-items: stretch; }
+  .deadline-list { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .deadline-row { min-height: 78px; width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 18px; text-align: left; color: var(--color-ink-primary, #10201d); border: 1px solid var(--color-border-subtle, #cbd5d1); border-radius: 14px; background: var(--color-card-white, #fff); cursor: pointer; }
+  .deadline-row > :first-child { color: #b95c15; flex-shrink: 0; }
+  .deadline-row.selected { border-color: var(--color-pine-teal, #18765f); background: rgba(20, 137, 106, 0.07); box-shadow: inset 0 0 0 1px var(--color-pine-teal, #18765f); }
+  .deadline-row-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .deadline-row-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 17px; }
+  .deadline-row-copy span { color: var(--color-ink-secondary, #526561); font-size: 14px; }
+  .deadline-countdown { white-space: nowrap; padding: 7px 10px; border-radius: 999px; background: #fff0dc; color: #a84f0c; font-weight: 700; font-size: 13px; }
+  .deadline-countdown.critical { background: #ffeadb; color: #b9470b; }
+  .deadline-detail { min-height: 300px; padding: clamp(20px, 3vw, 32px); border-left: 1px solid var(--color-border-subtle, #d1d9d6); display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
+  .deadline-detail-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .deadline-detail-heading > :first-child { color: #bd5b16; }
+  .deadline-detail-heading h2 { margin: 0; font-size: 28px; letter-spacing: -0.03em; }
+  .deadline-detail-heading p { margin: 3px 0 0; color: var(--color-ink-secondary, #526561); }
+  .deadline-date-panel { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 18px; border-radius: 14px; background: #fff0df; color: #7a380c; }
+  .deadline-merchant { margin: 0; color: var(--color-ink-secondary, #526561); }
+  .deadline-primary-action, .deadline-secondary-action { min-height: 50px; padding: 12px 18px; border-radius: 12px; font: inherit; font-weight: 700; cursor: pointer; }
+  .deadline-primary-action { border: 1px solid var(--color-pine-teal, #126b56); background: var(--color-pine-teal, #126b56); color: #fff; }
+  .deadline-secondary-action { border: 1px solid var(--color-pine-teal, #126b56); background: transparent; color: var(--color-pine-teal, #126b56); }
+  .deadline-empty { display: grid; justify-items: start; gap: 8px; padding: 28px; border: 1px solid var(--color-border-subtle, #cbd5d1); border-radius: 16px; background: var(--color-card-white, #fff); }
+  .deadline-empty h2, .deadline-empty p { margin: 0; }
+  .deadline-empty p { color: var(--color-ink-secondary, #526561); }
+
+  .wallet-bottom-nav { position: fixed; z-index: var(--z-index-navbar, 200); left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; align-items: center; gap: 4px; padding: 7px; border: 1px solid var(--color-border-subtle, rgba(180, 196, 190, 0.82)); border-radius: 999px; background: var(--color-card-white, #fff); backdrop-filter: blur(16px); box-shadow: 0 8px 28px rgba(22, 51, 44, 0.14); }
+  .wallet-nav-link { min-width: 92px; min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 13px; border: 0; border-radius: 999px; color: var(--color-ink-primary, #10201d); background: transparent; text-decoration: none; font: inherit; font-size: 12px; cursor: pointer; }
+  .wallet-nav-link.active { background: rgba(29, 153, 116, 0.12); color: #086849; font-weight: 700; }
+  .wallet-nav-link:focus-visible { outline: 3px solid #16765e; outline-offset: 2px; }
+
+  @supports (background: color-mix(in srgb, white 90%, transparent)) {
+    .wallet-bottom-nav { background: color-mix(in srgb, var(--color-card-white, #fff) 88%, transparent); }
+  }
+
+  :global([data-theme="dark"]) .wallet-nav-link.active { background: #1f4038; color: #c5f5e8; }
+
+  @media (min-width: 768px) {
+    .wallet-bottom-nav { left: calc(50% - 185px); right: auto; transform: none; }
+  }
+
+  .capture-workspace { display: flex; flex-direction: column; gap: 16px; max-width: 1160px; margin: 0 auto; }
+  .capture-deadline-support { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--color-border-subtle, #cbd5d1); border-radius: 14px; background: var(--color-card-white, #fff); }
+  .capture-support-icon { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border-radius: 12px; color: #b95c15; background: #fff0df; }
+  .capture-deadline-support > div:nth-child(2) { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  .capture-deadline-support p, .capture-deadline-support strong, .capture-deadline-support span { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .capture-deadline-support p, .capture-deadline-support span { color: var(--color-ink-secondary, #526561); font-size: 13px; }
+  .capture-deadline-support strong { font-size: 16px; }
+  .capture-deadline-support button { width: 48px; height: 48px; flex: 0 0 48px; display: grid; place-items: center; border: 0; border-radius: 12px; color: var(--color-pine-teal, #126b56); background: transparent; cursor: pointer; }
+  .capture-deadline-support button:focus-visible { outline: 3px solid #16765e; }
+
+  @media (max-width: 767px) {
+    .deadlines-workspace { padding: 20px 16px 26px; }
+    .deadlines-heading { align-items: flex-start; }
+    .today-date { padding-top: 7px; font-size: 13px; }
+    .deadlines-master-detail { grid-template-columns: minmax(0, 1fr); }
+    .deadline-detail { border-left: 0; border-top: 1px solid var(--color-border-subtle, #d1d9d6); min-height: 0; padding: 20px 4px 4px; }
+    .deadline-row { padding: 12px; gap: 9px; }
+    .deadline-row-copy strong { font-size: 15px; }
+    .deadline-row-copy span { font-size: 12px; }
+    .deadline-countdown { font-size: 11px; padding: 6px 8px; }
+    .wallet-bottom-nav { left: 12px; right: 82px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); transform: none; justify-content: space-around; padding: 5px; }
+    .wallet-nav-link { flex: 1; min-width: 0; min-height: 52px; }
+    .wallet-shell { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+    .capture-workspace { gap: 12px; }
+  }
+
+  @media (horizontal-viewport-segments: 2) {
+    .deadlines-master-detail { grid-template-columns: minmax(0, calc(env(viewport-segment-width 0 0, 50vw) - var(--workspace-gutter) - 24px)) minmax(0, calc(env(viewport-segment-width 1 0, 50vw) - var(--workspace-gutter) - 24px)); gap: calc(env(viewport-segment-left 1 0, 50vw) - env(viewport-segment-right 0 0, 50vw) + 48px); }
+    .deadline-list { padding-right: 18px; }
+    .deadline-detail { padding-left: 24px; }
+    .wallet-bottom-nav { left: calc(env(viewport-segment-left 0 0, 0px) + max(12px, (env(viewport-segment-width 0 0, 50vw) - 286px) / 2)); right: auto; transform: none; width: max-content; justify-content: space-around; }
+    .wallet-nav-link { min-width: 64px; padding-inline: 4px; font-size: 10px; }
+    .capture-workspace { max-width: none; display: grid; grid-template-columns: minmax(0, calc(env(viewport-segment-width 0 0, 50vw) - 24px)) minmax(0, calc(env(viewport-segment-width 1 0, 50vw) - 24px)); gap: calc(env(viewport-segment-left 1 0, 50vw) - env(viewport-segment-right 0 0, 50vw) + 48px); align-items: start; }
+    .capture-workspace :global(.capture-panel) { grid-column: 1; }
+    .capture-deadline-support { grid-column: 2; margin-top: 64px; }
+  }
+
+  @media (max-width: 360px) {
+    .wallet-bottom-nav { right: 78px; }
+    .wallet-nav-link { padding-inline: 4px; font-size: 10px; white-space: nowrap; }
   }
 
   /* Clean Header: Only App Icon + Name on Left, Notification Center Button on Right */

@@ -1,18 +1,18 @@
 ---
-import ShowcaseVaultScene from '../components/3d/ShowcaseVaultScene.svelte';
 import '../../styles/tokens.css';
 import '../../styles/main.css';
+import { CalendarDays, ChevronRight, Menu, RefreshCw } from 'lucide-svelte';
 
 export const prerender = true;
 ---
 
 <!DOCTYPE html>
-<html lang="de" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Rights &amp; Renewals · CM-LAB · MCP Server &amp; Consumer Wallet Showcase</title>
-  <meta name="description" content="Rights & Renewals: Showcase webpage demonstrating the Model Context Protocol (MCP 2024-11-05) interface and the offline-first German consumer warranty & subscription wallet." />
+  <meta name="description" content="Track purchases and subscriptions in an offline-first wallet. Explore practical consumer policy information and a public MCP playground." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -58,27 +58,31 @@ export const prerender = true;
       </a>
 
       <nav class="nav-links" aria-label="Main Navigation">
-        <a href="#hero" class="nav-item">Überblick</a>
+        <a href="#wallet-demo" class="nav-item">Wallet demo</a>
+        <a href="/wiki" class="nav-item">Policy Wiki</a>
         <a href="#mcp-playground" class="nav-item">MCP Playground</a>
-        <a href="#omnibar-section" class="nav-item">Omnibar Suche</a>
-        <a href="#calendars-section" class="nav-item">Fristen-Kalender</a>
-        <a href="#dashboard-widgets" class="nav-item">Widgets &amp; GoBD</a>
-        <a href="/wiki" class="nav-item">Brand Policy Wiki</a>
         <a href="/emdash" class="nav-item">EmDash CMS</a>
-        <a href="/agent-setup" class="nav-item">Agent Setup</a>
+        <a href="/agent-setup" class="nav-item" data-action="open-quick-connect" id="header-connect-btn">Agent setup</a>
       </nav>
 
       <div class="nav-actions">
-        <a href="/agent-setup" class="btn-compact btn-outline" data-action="open-quick-connect" id="header-connect-btn">
-          ⚡ Agent anbinden
-        </a>
-        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Theme umschalten" title="Theme umschalten">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Toggle theme" title="Toggle theme">
           <span class="theme-icon" aria-hidden="true">🌙</span>
         </button>
         <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
-          📱 Zur App ↗
+          Open wallet ↗
         </a>
       </div>
+      <details class="mobile-nav">
+        <summary aria-label="Menu"><Menu size={24} aria-hidden="true" /><span class="sr-only">Menu</span></summary>
+        <nav class="mobile-nav-panel" aria-label="Mobile navigation">
+          <a href="#wallet-demo">Wallet demo</a>
+          <a href="/wiki">Policy Wiki</a>
+          <a href="#mcp-playground">MCP Playground</a>
+          <a href="/emdash">EmDash CMS</a>
+          <a href="/agent-setup">Agent setup</a>
+        </nav>
+      </details>
     </div>
   </header>
 
@@ -87,75 +91,50 @@ export const prerender = true;
        ======================================================================== -->
   <main id="showcase-main">
 
-    <!-- HERO SECTION: TWO FACES OF GROUND TRUTH -->
+    <!-- PUBLIC INTRO AND FICTIONAL SAMPLE PREVIEW -->
     <section id="hero" class="hero-section">
-      <div class="layout-container hero-inner">
-        <div class="hero-pill-badge">
-          <span>🏛️ BGB §§ 437, 477, 312k</span> · <span>MCP 2024-11-05</span> · <span>GoBD Rn. 108–110</span>
+      <div class="layout-container showcase-landing">
+        <div class="showcase-lead">
+          <h1 class="hero-title">Keep the receipt.<br />Know the deadline.</h1>
+          <p class="hero-subtitle">Track purchases and subscriptions in a wallet that keeps your receipts on your device.</p>
+          <div class="hero-ctas">
+            <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Open wallet ↗</a>
+            <a href="#wallet-demo" class="btn btn-outline">Try the demo</a>
+          </div>
         </div>
 
-        <h1 class="hero-title">
-          Two Faces of the Same <span class="text-gradient">Ground Truth</span>
-        </h1>
-
-        <p class="hero-subtitle">
-          Statutarische deutsche Verbraucherrechte, GoBD-konforme Belegintegrität und Steuerintelligenz —
-          symmetrisch erschließbar für <strong>menschliche Verbraucher</strong> via Offline-First-Web-App und
-          <strong>autonome KI-Agenten</strong> via Model Context Protocol (MCP JSON-RPC 2.0).
-        </p>
-
-        <!-- Threlte 8 3D Vault Card Interactive Hero Canvas -->
-        <div class="hero-3d-scene-container" style="max-width: 580px; margin: var(--space-6, 24px) auto;">
-          <ShowcaseVaultScene client:load />
-        </div>
-
-        <div class="hero-ctas">
-          <a href="#mcp-playground" class="btn btn-primary">
-            ⚡ MCP Console testen ↓
-          </a>
-          <a href="https://rightsandrenewals-app.pages.dev/#action=quick-add&brand=Sony&name=Sony+WH-1000XM5&price=279&category=hardware" data-legacy-url="https://app.cm-lab.pages.dev/#action=quick-add&brand=Sony&name=Sony+WH-1000XM5&price=279&category=hardware" class="btn btn-accent" target="_blank" rel="noopener noreferrer">
-            📱 Standalone Web-App öffnen ↗
-          </a>
-          <a href="/wiki" class="btn btn-outline">
-            📖 Brand Policy Wiki (Top 20) →
-          </a>
-        </div>
-
-        <div class="hero-pillars-grid">
-          <div class="pillar-card pillar-card-primary">
-            <div>
-              <span class="pillar-kicker">01 · SYMMETRIC PROTOCOL ENGINE · MCP 2024-11-05</span>
-              <h3 class="pillar-title" style="font-size: 18px; margin-top: 6px;">Dual-Surface Consumer Ground Truth</h3>
-              <p class="pillar-desc" style="margin-top: 6px;">
-                Dieselbe deterministische BGB-Engine speist sowohl die lokale <strong>100dvh Offline-First Wallet PWA</strong> (Dexie.js v4 + WebCrypto AES-GCM-256) als auch autonome KI-Agenten über JSON-RPC 2.0 (<code>policy_lookup</code>, <code>claim_dossier_generate</code>) mit &lt;30ms Edge-Latenz.
-              </p>
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
-              <span class="hero-pill-badge" style="margin: 0;">Zero Cloud Plaintext (Art. 25 DSGVO)</span>
-              <span class="hero-pill-badge" style="margin: 0;">Dual RFC 5545 iCal Feeds</span>
-            </div>
+        <section id="wallet-demo" class="sample-preview" aria-labelledby="sample-preview-title">
+          <div class="sample-preview-heading">
+            <h2 id="sample-preview-title">Interactive demo</h2>
+            <span class="sample-data-label">Fictional sample data</span>
           </div>
-          <div class="pillar-card">
-            <span class="pillar-kicker">02 · CONSUMER WALLET SHELL</span>
-            <h3 class="pillar-title">Omnibar, 3 Kalender &amp; § 312k Guard</h3>
-            <p class="pillar-desc">
-              Manuelle &lt;15s Belegerfassung ohne Cloud-OCR, 3 spezialisierte Fristen-Kalender und direkter 1-Tap Kündigungsbutton.
-            </p>
-          </div>
-          <div class="pillar-card">
-            <span class="pillar-kicker">03 · SAFE-HARBOR RECHTSLOGIK</span>
-            <h3 class="pillar-title">§ 477 Beweislast &amp; LexFox-Schutz</h3>
-            <p class="pillar-desc">
-              Taggenaue Berechnung der 12-Monats-Beweislastumkehr (§ 477 Abs. 1 BGB) und 5 verifizierte BGB-Mustervorlagen (RDG §§ 2, 3).
-            </p>
-          </div>
+          <p class="sample-preview-date">Upcoming dates · 10 Nov 2026</p>
+          <details class="sample-item">
+            <summary><span class="sample-icon sample-icon-deadline"><CalendarDays size={30} aria-hidden="true" /></span><span><strong>FitX</strong><small>Cancel by 12 Nov</small></span><ChevronRight class="sample-chevron" size={22} aria-hidden="true" /></summary>
+            <p>This example is fictional and for demonstration only. Open the wallet to track your own subscriptions.</p>
+          </details>
+          <details class="sample-item">
+            <summary><span class="sample-icon sample-icon-renewal"><RefreshCw size={30} aria-hidden="true" /></span><span><strong>Spotify Premium</strong><small>Renews 1 Dec</small></span><ChevronRight class="sample-chevron" size={22} aria-hidden="true" /></summary>
+            <p>This example is fictional and for demonstration only. Your wallet data stays on your device.</p>
+          </details>
+        </section>
+
+        <div class="showcase-resource-links">
+          <a class="resource-link" href="/wiki">
+            <strong>Browse the Policy Wiki <span aria-hidden="true">›</span></strong>
+            <span>Public information on German consumer policies and brands; not individual legal advice.</span>
+          </a>
+          <a class="resource-link" href="#mcp-playground">
+            <strong>Explore the MCP Playground <span aria-hidden="true">›</span></strong>
+            <span>Explore public MCP examples using fictional sample data.</span>
+          </a>
         </div>
       </div>
     </section>
 
     <!-- URGENT ATTENTION NOTIFICATION BANNER -->
     <div class="layout-container" style="margin-top: var(--space-8);">
-      <div id="urgent-attention-widget" role="region" aria-label="Dringender Handlungsbedarf"></div>
+      <div id="urgent-attention-widget" role="region" aria-label="Upcoming reminders"></div>
     </div>
 
     <!-- SPLIT-SCREEN MCP PLAYGROUND (FEATURE 5) -->
@@ -165,8 +144,8 @@ export const prerender = true;
           <span class="section-tag">FEATURE 5 · INTERACTIVE BENCHMARK</span>
           <h2 class="section-title">Split-Screen MCP Protocol Playground</h2>
           <p class="section-subtitle text-muted">
-            Testen Sie Live-Toolaufrufe über den clientseitigen Mock MCP Transport oder Cloudflare Edge Worker.
-            Aktionen im rechten App-Simulator spiegeln sich in Echtzeit im linken Protokoll-Streamer wider.
+            Explore tool calls through the client-side mock MCP transport or Cloudflare edge worker.
+            Actions in the app simulator appear in the protocol stream. The simulator uses sample data.
           </p>
         </div>
 
@@ -176,40 +155,40 @@ export const prerender = true;
             <div class="panel-header-row">
               <div class="font-bold">⚡ MCP Wire Protocol Console</div>
               <div id="mcp-latency-badge" class="latency-badge status-protected">
-                🟢 <strong>4.2ms</strong> <span class="badge-label">(SLA Pass &lt;30ms)</span>
+                🟢 <strong>4.2ms</strong> <span class="badge-label">(sample latency)</span>
               </div>
             </div>
 
             <div class="controls-row">
               <div class="form-group">
-                <label for="mcp-tool-select">MCP TOOL AUSWÄHLEN</label>
+                <label for="mcp-tool-select">SELECT AN MCP TOOL</label>
                 <select id="mcp-tool-select" class="form-select">
                   <option value="policy_lookup">policy_lookup (BGB Policy &amp; § 312k Button)</option>
-                  <option value="claim_dossier_generate">claim_dossier_generate (§ 437 Mängelrüge)</option>
+                  <option value="claim_dossier_generate">claim_dossier_generate (§ 437 defect notice)</option>
                   <option value="tools/list">tools/list (MCP Introspection)</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label for="mcp-preset-select">BEISPIEL-SZENARIO LADEN</label>
+                <label for="mcp-preset-select">LOAD AN EXAMPLE SCENARIO</label>
                 <select id="mcp-preset-select" class="form-select">
-                  <option value="spotify">Spotify Student Kündigung (§ 312k)</option>
-                  <option value="apple_macbook">Apple MacBook Pro 16 M3 Mängelrüge (§ 437)</option>
-                  <option value="sony_headphones">Sony WH-1000XM5 Monat 11 Klippe (§ 477)</option>
-                  <option value="tools_list">tools/list Introspektion</option>
+                  <option value="spotify">Spotify Student cancellation (§ 312k)</option>
+                  <option value="apple_macbook">Apple MacBook Pro 16 M3 defect notice (§ 437)</option>
+                  <option value="sony_headphones">Sony WH-1000XM5 month 11 (§ 477)</option>
+                  <option value="tools_list">tools/list inspection</option>
                 </select>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="mcp-args-editor">JSON-RPC ARGUMENT EDITOR</label>
+              <label for="mcp-args-editor">JSON-RPC ARGUMENTS</label>
               <textarea id="mcp-args-editor" class="form-textarea" spellcheck="false"></textarea>
             </div>
 
             <div class="actions-bar">
               <div class="actions-left">
                 <button id="mcp-run-btn" class="btn-compact btn-primary">
-                  ▶ Tool Call ausführen
+                  ▶ Run tool call
                 </button>
                 <button id="mcp-copy-curl-btn" class="btn-compact btn-outline">
                   📋 cURL kopieren
@@ -217,17 +196,17 @@ export const prerender = true;
               </div>
               <div class="actions-right">
                 <button id="mcp-open-claude-btn" class="btn-compact btn-outline">
-                  ⚙ In Claude Desktop
+                  ⚙ Open in Claude Desktop
                 </button>
-                <button id="mcp-clear-stream-btn" class="btn-compact btn-outline" title="Stream leeren">
-                  🧹 Leeren
+                <button id="mcp-clear-stream-btn" class="btn-compact btn-outline" title="Clear stream">
+                  🧹 Clear
                 </button>
               </div>
             </div>
 
             <!-- Wire Protocol Streamer -->
             <div class="stream-output-wrapper" id="mcp-stream-output" aria-live="polite">
-              <div class="stream-empty">Bereit für JSON-RPC 2.0 Aufrufe. Klicken Sie auf "Tool Call ausführen".</div>
+              <div class="stream-empty">Ready for JSON-RPC 2.0 calls. Select a tool and run it to see the sample exchange.</div>
             </div>
           </div>
 
@@ -242,10 +221,9 @@ export const prerender = true;
       <div class="layout-container">
         <div class="section-header">
           <span class="section-tag">FEATURE 10 · UNIVERSAL OMNIBAR</span>
-          <h2 class="section-title">Multi-Domain Omnibar Such-Sandbox</h2>
+          <h2 class="section-title">Multi-domain search sandbox</h2>
           <p class="section-subtitle text-muted">
-            Durchsuchen Sie in &lt;5ms 20 kuratierte Marken-Policies, gespeicherte Wallet-Belege
-            oder tippen Sie <code>&gt;</code> für Sofortbefehle (z. B. <code>&gt;claim</code>, <code>&gt;cancel</code>, <code>&gt;tax</code>).
+            Search 20 curated brand policies and sample wallet receipts, or type <code>&gt;</code> for commands such as <code>&gt;claim</code>, <code>&gt;cancel</code>, and <code>&gt;tax</code>.
           </p>
         </div>
 
@@ -265,9 +243,9 @@ export const prerender = true;
       <div class="layout-container">
         <div class="section-header">
           <span class="section-tag">FEATURES 6 &amp; 18 · MODULAR DASHBOARD</span>
-          <h2 class="section-title">Finanz-, Steuer- &amp; GoBD-Kryptonachweise</h2>
+          <h2 class="section-title">Spending, tax, and GoBD receipt records</h2>
           <p class="section-subtitle text-muted">
-            Revisionssichere Beleg-Hashes nach GoBD Rn. 108–110 und automatisierte Sofortabschreibungs-Übersicht.
+            Receipt hashes and an overview of eligible immediate deductions.
           </p>
         </div>
 
@@ -292,11 +270,11 @@ export const prerender = true;
     <div class="modal-content card">
       <div class="modal-header">
         <h3 class="modal-title">⚡ AI Agent Quick-Connect Configuration</h3>
-        <button class="modal-close-btn" data-action="close-modal" aria-label="Schließen">✕</button>
+        <button class="modal-close-btn" data-action="close-modal" aria-label="Close">✕</button>
       </div>
       <div class="modal-body">
         <p class="text-muted text-sm">
-          Binden Sie diesen Rights & Renewals Model Context Protocol (MCP) Server direkt an Ihre bevorzugten KI-Entwicklungsumgebungen an.
+          Connect the Rights &amp; Renewals Model Context Protocol (MCP) server to your preferred AI development environment.
         </p>
 
         <div class="config-tabs">
@@ -325,8 +303,8 @@ export const prerender = true;
         </div>
       </div>
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="/agent-setup" class="btn btn-primary" style="font-size: 0.88rem;">Alle 6 Agenten konfigurieren →</a>
-        <button class="btn btn-outline" data-action="close-modal">Schließen</button>
+        <a href="/agent-setup" class="btn btn-primary" style="font-size: 0.88rem;">View agent setup →</a>
+        <button class="btn btn-outline" data-action="close-modal">Close</button>
       </div>
     </div>
   </dialog>
@@ -335,6 +313,13 @@ export const prerender = true;
   <script>
     import '../main.js';
     import '../components/webmcp.ts';
+
+    document.querySelectorAll('.mobile-nav-panel a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const menu = link.closest('details');
+        if (menu) menu.open = false;
+      });
+    });
   </script>
 </body>
 </html>
