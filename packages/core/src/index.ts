@@ -21,6 +21,7 @@ export type {
 } from './types/contracts.js';
 
 export { policySeedData } from './data/policyWikiSeed.js';
+export { getPolicyScope } from './mcp/policyScope.js';
 
 // 2. Cryptographic Vault & GoBD Hashing
 export {

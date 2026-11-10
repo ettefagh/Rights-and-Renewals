@@ -385,11 +385,11 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
     <section class="agent-setup-hero">
       <div class="layout-container">
         <div class="agent-setup-badge">
-          <span>⚡ Model Context Protocol</span> · <span>JSON-RPC 2.0</span> · <span>5 Tools</span>
+          <span>⚡ Model Context Protocol</span> · <span>JSON-RPC 2.0</span> · <span>3 Read-Only Tools</span>
         </div>
         <h1 class="agent-setup-title">Agent Setup</h1>
         <p class="agent-setup-description">
-          Connect your AI coding agent to <strong>Rights &amp; Renewals</strong>. Query German consumer statutory law (BGB §§ 437, 477, 312k), warranty burden-of-proof cliffs, and tax deductibility proofs in real-time.
+          Connect your AI coding agent to <strong>Rights &amp; Renewals</strong>. Query published German consumer policies, dated statutory references, and scoped subscription rules.
         </p>
 
         <div class="hero-actions">
@@ -563,7 +563,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
 
           <div class="step-item">
             <div class="step-label"><span class="step-num">2</span> Verify Connection</div>
-            <p class="text-secondary text-sm">Launch Claude Code and run <code>/mcp</code> to verify all 5 tools are connected.</p>
+            <p class="text-secondary text-sm">Launch Claude Code and run <code>/mcp</code> to verify all 3 read-only tools are connected.</p>
           </div>
         </div>
 
@@ -764,29 +764,21 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
       <section class="tools-accordion">
         <details>
           <summary class="accordion-header">
-            <span>Available MCP Tools &amp; Capabilities (5 Tools)</span>
+            <span>Available MCP Tools &amp; Capabilities (3 Read-Only Tools)</span>
             <span>▼</span>
           </summary>
           <div class="accordion-body">
             <div class="tool-entry">
               <div class="tool-name">policy_lookup</div>
-              <p class="text-sm text-secondary">Query verified brand cancellation policies, statutory warranty periods (24m), commercial guarantees, and direct cancellation URLs.</p>
-            </div>
-            <div class="tool-entry">
-              <div class="tool-name">claim_dossier_generate</div>
-              <p class="text-sm text-secondary">Deterministic German BGB § 437/439 defect notice or § 312k cancellation letter with LexFox disclaimer and § 477 burden of proof calculation.</p>
+              <p class="text-sm text-secondary">Query published brand policy records, their last-verified dates, and available provider links.</p>
             </div>
             <div class="tool-entry">
               <div class="tool-name">statutory_law_lookup</div>
-              <p class="text-sm text-secondary">Verbatim German Civil Code (BGB §§ 434, 437, 438, 439, 475e, 477, 309 Nr. 9, 312k, 355) text and consumer summaries.</p>
+              <p class="text-sm text-secondary">Read dated German Civil Code references with official sources and scope notes.</p>
             </div>
             <div class="tool-entry">
               <div class="tool-name">subscription_category_rules</div>
-              <p class="text-sm text-secondary">Statutory maximum initial contract term (24m) and rolling 1-month cancellation notice windows under BGB § 309 Nr. 9 &amp; § 312k.</p>
-            </div>
-            <div class="tool-entry">
-              <div class="tool-name">tax_deductibility_check</div>
-              <p class="text-sm text-secondary">German income tax deductibility as Werbungskosten under § 9 EStG and BMF 22.02.2022 digital asset Sofortabschreibung.</p>
+              <p class="text-sm text-secondary">Explain when German standard-term and online cancellation rules may apply to consumer subscriptions.</p>
             </div>
           </div>
         </details>

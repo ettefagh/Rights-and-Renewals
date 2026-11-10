@@ -1,80 +1,25 @@
-# Rights & Renewals AI Agent Setup Instructions
+# Rights & Renewals MCP Setup
 
-> **Directive for AI Agents**: Complete all of the following steps yourself by running the commands or modifying the configuration files directly. Do not ask the user to run these commands unless permissions prevent autonomous execution.
+Use this guide to connect an AI coding environment to the Rights & Renewals MCP server:
 
-This document configures your AI assistant or coding environment to communicate directly with the **Rights & Renewals** Model Context Protocol (MCP) server at:
 `https://rightsandrenewals.pages.dev/api/mcp`
 
----
+The public MCP endpoint does not require OAuth sign-in. Any OAuth sign-in offered for the separate EmDash CMS applies only to EmDash and does not authenticate this endpoint.
 
-## 1. Claude Code (CLI)
+## Safe setup and verification
 
-Run the following terminal command in your workspace:
+1. Identify the current client and consult its official documentation if a command, configuration format, or UI label below does not match the installed version.
+2. Review the server URL and the requested configuration change with the user. MCP tools can provide data or take actions; only connect to a server the user intends to trust.
+3. Before editing configuration or running a setup command, show the exact change and ask the user to approve it. Preserve existing entries in shared configuration files. Never overwrite a file, expose credentials, or add secrets to a snippet.
+4. After the user approves setup, make only the approved change. Restart or reload the client if required.
+5. Verify the live connection using the client's status or server list. Run the read-only tool `policy_lookup` with `{"service_slug":"spotify"}`. Confirm the result contains Spotify policy data.
+6. Report the configuration location, connection status, tool-call result, and any limitation separately. A copied command or saved configuration is not proof that the server connected. Do not claim verification unless the live checks succeeded.
 
-```bash
-claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp
-```
+## Recommended clients
 
-Verify connection inside Claude Code by running:
-```bash
-/mcp
-```
+### Antigravity
 
----
-
-## 2. Claude Desktop
-
-Locate or create your Claude Desktop configuration file:
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **Linux**: `~/.config/Claude/claude_desktop_config.json`
-
-Add the `rights-and-renewals` server entry using `mcp-remote` as the stdio bridge:
-
-```json
-{
-  "mcpServers": {
-    "rights-and-renewals": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://rightsandrenewals.pages.dev/api/mcp"
-      ]
-    }
-  }
-}
-```
-
-Restart Claude Desktop to load the tools.
-
----
-
-## 3. Cursor IDE
-
-In your project root, create or edit `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "rights-and-renewals": {
-      "url": "https://rightsandrenewals.pages.dev/api/mcp"
-    }
-  }
-}
-```
-
-Or configure via Cursor Settings > Features > MCP > Add New MCP Server with Server Name `rights-and-renewals` and Type `sse`/`http`.
-
----
-
-## 4. Windsurf (Codeium)
-
-Edit your Windsurf configuration file:
-- **macOS / Linux**: `~/.codeium/windsurf/mcp_config.json`
-- **Windows**: `%USERPROFILE%\.codeium\windsurf\mcp_config.json`
-
-Add the server definition using the mandatory `serverUrl` key:
+Add a remote Streamable HTTP server in Antigravity's MCP Servers UI or configure it in the workspace file `.agents/mcp_config.json` (global file: `~/.gemini/config/mcp_config.json`):
 
 ```json
 {
@@ -86,67 +31,99 @@ Add the server definition using the mandatory `serverUrl` key:
 }
 ```
 
-Click Refresh in the Windsurf Cascade MCP panel.
+In the agent panel, open **⋯ > MCP Servers**. Confirm the server is connected and its tools are listed, then call a read-only tool.
 
----
+### Claude Code
 
-## 5. VS Code / Continue.dev
+Add the HTTP server with:
 
-Edit your Continue configuration in `~/.continue/config.json`:
+```sh
+claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp
+```
+
+Run `/mcp` in Claude Code to check the server status and available tools. Then call a read-only tool and inspect the response.
+
+### Codex
+
+Add the server with the Codex CLI:
+
+```sh
+codex mcp add rights-and-renewals --url https://rightsandrenewals.pages.dev/api/mcp
+```
+
+Check the saved server entry with `codex mcp list`. In a Codex session, verify the server tools are available and call one read-only tool. Confirm its result before reporting success.
+
+### VS Code with GitHub Copilot
+
+For Copilot Agent mode, create `.vscode/mcp.json` in the workspace using VS Code's `servers` format:
 
 ```json
 {
-  "mcpServers": [
-    {
-      "name": "rights-and-renewals",
-      "transport": {
-        "type": "sse",
-        "url": "https://rightsandrenewals.pages.dev/api/mcp"
-      }
-    }
-  ]
-}
-```
-
-Ensure **Agent Mode** is selected in the Continue chat dropdown.
-
----
-
-## 6. Google Gemini CLI
-
-Run the 1-click CLI installer:
-
-```bash
-gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp
-```
-
-Or add to `~/.gemini/settings.json` (or `.gemini/settings.json` in your project root):
-
-```json
-{
-  "mcpServers": {
+  "servers": {
     "rights-and-renewals": {
-      "httpUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+      "type": "http",
+      "url": "https://rightsandrenewals.pages.dev/api/mcp"
     }
   }
 }
 ```
 
----
+Open Copilot Chat in **Agent** mode. Run **MCP: List Servers** from the Command Palette, confirm the server is enabled, and invoke a read-only tool.
 
-## Available MCP Tools
+### Cursor
 
-Once connected, the following 5 authoritative tools are available:
+Create `.cursor/mcp.json` in the project (or `~/.cursor/mcp.json` for global setup):
 
-1. `policy_lookup`: Query brand cancellation policies, statutory warranty periods (24m), commercial guarantees, and direct cancellation URLs.
-2. `claim_dossier_generate`: Compile a deterministic German BGB § 437/439 statutory defect notice or § 312k cancellation letter with LexFox disclaimer.
-3. `statutory_law_lookup`: Access verbatim German Civil Code (BGB §§ 434, 437, 438, 439, 475e, 477, 309 Nr. 9, 312k, 355) text and consumer summaries.
-4. `subscription_category_rules`: Query statutory maximum initial term (24m) and rolling 1-month cancellation notice under BGB § 309 Nr. 9 & § 312k.
-5. `tax_deductibility_check`: Evaluate German income tax deductibility as Werbungskosten under § 9 EStG and BMF 22.02.2022 digital asset Sofortabschreibung.
+```json
+{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}
+```
 
----
+Open Cursor Settings > Tools & MCP. Confirm the server and tools are available, then call a read-only tool and inspect its response.
 
-## Quick Verification Prompt
+### Claude Desktop
 
-Test your configuration by asking your agent:
-> *"Query the Rights & Renewals MCP server for Apple MacBook warranty terms and check BGB § 477 burden of proof cliff."*
+In **Customize → Connectors**, add a custom connector named **Rights & Renewals** using the server URL above. The public endpoint does not require OAuth sign-in; if the client offers an authentication choice, configure it without OAuth. Enable it in a conversation and run the Spotify lookup. See the [Claude connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+
+### Windsurf
+
+In the Cascade MCP settings, open the raw configuration and merge this entry under `mcpServers`. Refresh the MCP tools and run the Spotify lookup.
+
+```json
+{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}
+```
+
+### Gemini CLI
+
+Add the Streamable HTTP server with:
+
+```sh
+gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp
+```
+
+Restart Gemini CLI and run `/mcp list`. Confirm the server is Connected and its tools are listed, then call a read-only tool.
+
+## Available read-only check
+
+Use `policy_lookup` to query a brand's published cancellation policy or warranty information. Report the returned data as server output rather than treating it as legal advice.
+
+## Official client references
+
+- [Google Antigravity MCP documentation](https://antigravity.google/docs/mcp)
+- [Anthropic Claude Code MCP documentation](https://docs.anthropic.com/en/docs/claude-code/mcp)
+- [OpenAI Codex MCP documentation](https://developers.openai.com/resources/docs-mcp)
+- [VS Code MCP configuration reference](https://code.visualstudio.com/docs/agents/reference/mcp-configuration)
+- [Cursor MCP documentation](https://docs.cursor.com/context/model-context-protocol)
+- [Windsurf MCP configuration](https://docs.devin.ai/desktop/devin-local/customizations)
+- [Gemini CLI MCP documentation](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md)

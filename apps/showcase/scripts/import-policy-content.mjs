@@ -57,6 +57,16 @@ if (detailedCollection.supports.includes('scheduling')) {
 }
 
 const existingFields = new Map(detailedCollection.fields.map((field) => [field.slug, field]));
+const expectedFieldSlugs = new Set(policyFields.map((field) => field.slug));
+const unexpectedRequiredFields = detailedCollection.fields
+  .filter((field) => field.required && !expectedFieldSlugs.has(field.slug))
+  .map((field) => field.slug);
+if (unexpectedRequiredFields.length > 0) {
+  throw new Error(
+    `EmDash collection ${policyCollection.slug} has unexpected required fields that canonical records cannot populate: ${unexpectedRequiredFields.join(', ')}. Review Content Types before importing.`,
+  );
+}
+
 for (const field of policyFields) {
   const existing = existingFields.get(field.slug);
   if (!existing) continue;
@@ -129,6 +139,15 @@ if (currentCollection.supports.includes('scheduling')) {
   );
 }
 const fieldMap = new Map(currentCollection.fields.map((field) => [field.slug, field]));
+const currentUnexpectedRequiredFields = currentCollection.fields
+  .filter((field) => field.required && !expectedFieldSlugs.has(field.slug))
+  .map((field) => field.slug);
+if (currentUnexpectedRequiredFields.length > 0) {
+  throw new Error(
+    `EmDash collection ${policyCollection.slug} has unexpected required fields that canonical records cannot populate: ${currentUnexpectedRequiredFields.join(', ')}. No content was imported.`,
+  );
+}
+
 for (const field of policyFields) {
   const actual = fieldMap.get(field.slug);
   if (
