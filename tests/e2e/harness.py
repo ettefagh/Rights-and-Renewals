@@ -594,7 +594,7 @@ class MCPServerEngine:
                 "id": req_id,
                 "result": {
                     "protocolVersion": "2024-11-05",
-                    "serverInfo": {"name": "cmlab-warranty-mcp", "version": "1.0.0"},
+                    "serverInfo": {"name": "rights-and-renewals", "version": "1.0.0"},
                     "capabilities": {"tools": {}}
                 }
             }

@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "description": "CM-LAB Public Showcase, Static Brand Policy Wiki & Open MCP Server",
+  "emdash": {
+    "label": "Rights & Renewals",
+    "seed": "seed/seed.json"
+  },
   "scripts": {
     "dev": "astro dev --port 3000 --host",
     "build": "astro build",
@@ -14,14 +18,19 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.2.0",
+    "@astrojs/react": "^7.1.4",
     "@astrojs/svelte": "^7.0.0",
     "@cmlab/core": "workspace:*",
     "@cmlab/design-tokens": "workspace:*",
+    "@emdash-cms/cloudflare": "^1.4.0",
     "@iconify-json/simple-icons": "^1.2.101",
     "@threlte/core": "^8.0.0",
     "@threlte/extras": "^9.0.0",
     "astro": "^5.4.0",
+    "emdash": "^1.4.0",
     "lucide-svelte": "^1.0.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "svelte": "^5.0.0",
     "three": "^0.170.0",
     "unplugin-icons": "^24.0.0",

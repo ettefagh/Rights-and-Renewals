@@ -17,6 +17,12 @@ export const prerender = true;
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
+  <!-- AI-Agent Discovery Standards Links (RFC 8288 / ARD / SEP-2127 / AgentSkills) -->
+  <link rel="ai-catalog" href="/.well-known/ai-catalog.json" />
+  <link rel="mcp-server-card" href="/.well-known/mcp/server-card.json" />
+  <link rel="agent-skills" href="/.well-known/agent-skills/index.json" />
+  <link rel="service-desc" href="/api/mcp" />
+
   <!-- Zero-FOUC Theme Initialization -->
   <script is:inline>
     (function() {
@@ -59,12 +65,13 @@ export const prerender = true;
         <a href="#dashboard-widgets" class="nav-item">Widgets &amp; GoBD</a>
         <a href="/wiki" class="nav-item">Brand Policy Wiki</a>
         <a href="/emdash" class="nav-item">EmDash CMS</a>
+        <a href="/agent-setup" class="nav-item">Agent Setup</a>
       </nav>
 
       <div class="nav-actions">
-        <button class="btn-compact btn-outline" data-action="open-quick-connect" id="header-connect-btn">
+        <a href="/agent-setup" class="btn-compact btn-outline" data-action="open-quick-connect" id="header-connect-btn">
           ⚡ Agent anbinden
-        </button>
+        </a>
         <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Theme umschalten" title="Theme umschalten">
           <span class="theme-icon" aria-hidden="true">🌙</span>
         </button>
@@ -289,7 +296,7 @@ export const prerender = true;
       </div>
       <div class="modal-body">
         <p class="text-muted text-sm">
-          Binden Sie diesen CM-LAB Model Context Protocol (MCP) Server direkt an Ihre bevorzugten KI-Entwicklungsumgebungen an.
+          Binden Sie diesen Rights & Renewals Model Context Protocol (MCP) Server direkt an Ihre bevorzugten KI-Entwicklungsumgebungen an.
         </p>
 
         <div class="config-tabs">
@@ -297,9 +304,9 @@ export const prerender = true;
             <h4 class="font-bold">Claude Desktop</h4>
             <pre class="code-block"><code>{`{
   "mcpServers": {
-    "cmlab-warranty": {
+    "rights-and-renewals": {
       "command": "npx",
-      "args": ["-y", "@cmlab/warranty-mcp-server"]
+      "args": ["-y", "mcp-remote", "https://rightsandrenewals.pages.dev/api/mcp"]
     }
   }
 }`}</code></pre>
@@ -309,15 +316,16 @@ export const prerender = true;
             <h4 class="font-bold">Cursor IDE</h4>
             <pre class="code-block"><code>{`{
   "mcpServers": {
-    "cmlab-warranty": {
-      "url": "https://cm-lab.pages.dev/api/mcp"
+    "rights-and-renewals": {
+      "url": "https://rightsandrenewals.pages.dev/api/mcp"
     }
   }
 }`}</code></pre>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="/agent-setup" class="btn btn-primary" style="font-size: 0.88rem;">Alle 6 Agenten konfigurieren →</a>
         <button class="btn btn-outline" data-action="close-modal">Schließen</button>
       </div>
     </div>
@@ -326,6 +334,7 @@ export const prerender = true;
   <!-- Initialize Client Controllers -->
   <script>
     import '../main.js';
+    import '../components/webmcp.ts';
   </script>
 </body>
 </html>

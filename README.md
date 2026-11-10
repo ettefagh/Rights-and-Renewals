@@ -5,7 +5,7 @@
 [![Live App](https://img.shields.io/badge/Live%20App-rightsandrenewals--app.pages.dev-2F524C?style=for-the-badge&logo=cloudflare)](https://rightsandrenewals-app.pages.dev)
 [![Policy Wiki](https://img.shields.io/badge/Policy%20Wiki-rightsandrenewals.pages.dev%2Fwiki-D96B4B?style=for-the-badge&logo=wikipedia)](https://rightsandrenewals.pages.dev/wiki)
 [![Unit Tests](https://img.shields.io/badge/Vitest%20Unit-88%2F88%20Passed-059669?style=for-the-badge&logo=vitest)](https://github.com/ettefagh/CM-LAB)
-[![E2E Tests](https://img.shields.io/badge/Python%20E2E-60%2F60%20Passed-2563EB?style=for-the-badge&logo=python)](https://github.com/ettefagh/CM-LAB)
+[![E2E Tests](https://img.shields.io/badge/Python%20E2E-61%2F61%20Passed-2563EB?style=for-the-badge&logo=python)](https://github.com/ettefagh/CM-LAB)
 [![Edge Checks](https://img.shields.io/badge/Cloudflare%20Edge-48%2F48%20Verified-0D9488?style=for-the-badge&logo=cloudflare)](https://rightsandrenewals-app.pages.dev)
 [![Svelte 5](https://img.shields.io/badge/Svelte%205-Runes%20Native-FF3E00?style=for-the-badge&logo=svelte)](https://svelte.dev)
 
@@ -58,9 +58,11 @@ The application and showcase are deployed across Cloudflare Pages edge infrastru
 | Surface | Canonical URL | Alternative / Mirror URLs | Purpose & Features |
 | :--- | :--- | :--- | :--- |
 | 📱 **Sovereign Wallet App (PWA)** | [**`rightsandrenewals-app.pages.dev`**](https://rightsandrenewals-app.pages.dev) | [`rights-and-renewals-app.pages.dev`](https://rights-and-renewals-app.pages.dev)<br>[`cm-lab-app.pages.dev`](https://cm-lab-app.pages.dev) | Primary user application: offline-first vault, daily dashboard, spend donut chart, 1-click cancel, in-store return pass, full entry editing. |
+| 🤖 **AI Agent Setup Guide** | [**`rightsandrenewals.pages.dev/agent-setup`**](https://rightsandrenewals.pages.dev/agent-setup) | [`rightsandrenewals.pages.dev/setup`](https://rightsandrenewals.pages.dev/setup) | Cloudflare-styled agent setup desk with 1-click prompt, tabbed configurations for 6 major AI agents, and copyable CLI commands. |
 | 🌐 **Brand Policy Wiki** | [**`rightsandrenewals.pages.dev/wiki`**](https://rightsandrenewals.pages.dev/wiki) | [`rights-and-renewals.pages.dev/wiki`](https://rights-and-renewals.pages.dev/wiki)<br>[`cm-lab-showcase.pages.dev/wiki`](https://cm-lab-showcase.pages.dev/wiki) | Static encyclopedia covering statutory cancellation pathways, return addresses, and retention dark patterns across 20 major consumer brands. |
-| 📰 **EmDash Editorial Desk** | [**`rightsandrenewals.pages.dev/emdash`**](https://rightsandrenewals.pages.dev/emdash) | [`rights-and-renewals.pages.dev/emdash`](https://rights-and-renewals.pages.dev/emdash) | Real-time policy monitoring desk, policy diffing, and live terms & conditions (AGB) SHA-256 audit seal generator. |
-| 🤖 **Open MCP Server** | [**`rightsandrenewals.pages.dev/api/mcp`**](https://rightsandrenewals.pages.dev/api/mcp) | POST endpoint | Model Context Protocol JSON-RPC 2.0 server enabling external AI agents to query policies and compile statutory legal notices. |
+| 📰 **EmDash CMS & Telemetry Desk** | [**`rightsandrenewals.pages.dev/emdash`**](https://rightsandrenewals.pages.dev/emdash) | [`/_emdash/admin`](https://rightsandrenewals.pages.dev/_emdash/admin) | Real EmDash v1.4.0 headless CMS integration on Cloudflare D1/R2, real-time AGB change telemetry, and SHA-256 audit seal ledger. |
+| 🔌 **Rights & Renewals MCP Server** | [**`rightsandrenewals.pages.dev/api/mcp`**](https://rightsandrenewals.pages.dev/api/mcp) | POST endpoint (`rights-and-renewals`) | Rebranded Model Context Protocol server exposing 5 statutory tools for autonomous AI agents (Claude, Cursor, Windsurf, Gemini). |
+| 📡 **AI Discovery Manifests** | [`/.well-known/mcp/server-card.json`](https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json)<br>[`/.well-known/agent-skills/index.json`](https://rightsandrenewals.pages.dev/.well-known/agent-skills/index.json) | [`/.well-known/ai-catalog.json`](https://rightsandrenewals.pages.dev/.well-known/ai-catalog.json)<br>[`/agent-setup/prompt.md`](https://rightsandrenewals.pages.dev/agent-setup/prompt.md) | Standardized AI agent discovery cards (SEP-2127, agentskills.io, ARD v1.0, RFC 8288 Link headers, WebMCP). |
 | 📅 **Dual iCal Feeds** | [`/api/calendar/subscriptions.ics`](https://rightsandrenewals-app.pages.dev/api/calendar/subscriptions.ics)<br>[`/api/calendar/warranties.ics`](https://rightsandrenewals-app.pages.dev/api/calendar/warranties.ics) | Direct URL import | Universal `.ics` subscription renewal and warranty expiration calendar feeds compatible with Apple, Google, and Outlook calendars. |
 
 ---
@@ -128,11 +130,38 @@ flowchart LR
 * All user records, receipt images, and alarm schedules are encrypted on-device via **AES-GCM-256** with keys derived using **PBKDF2** (100,000 iterations, SHA-256).
 * Zero unencrypted user data ever touches a remote server or database.
 
-### 🤖 Open MCP Server (Model Context Protocol)
-* Exposes a standardized JSON-RPC 2.0 interface (`/api/mcp`) supporting:
-  * `tools/list`: Introspects available agent tools.
-  * `policy_lookup`: Returns brand-specific warranty terms, cancellation URLs, and retention policies.
-  * `claim_dossier_generate`: Programmatically compiles formal PDF/text claim dossiers based on contract items and statutory citations.
+### 🤖 Rights & Renewals MCP Server & AI Agent Readiness
+* **Server Identity:** Rebranded from legacy naming to `rights-and-renewals` (`v1.0.0`) operating with 100% parity across edge functions and SSR endpoints (`POST /api/mcp`).
+* **Cloudflare-Style Agent Setup Desk ([`/agent-setup`](https://rightsandrenewals.pages.dev/agent-setup)):**
+  * Modeled after [Cloudflare's Agent Setup](https://developers.cloudflare.com/agent-setup/) with a single, copyable setup prompt:
+    ```bash
+    Fetch and execute the appropriate instructions to set me up for Rights & Renewals from https://rightsandrenewals.pages.dev/agent-setup/prompt.md
+    ```
+  * Tabbed installation instructions and 1-click configuration snippets for **6 major AI agents**:
+    * **Claude Code:** `claude mcp add rights-and-renewals -- transport=http url=https://rightsandrenewals.pages.dev/api/mcp`
+    * **Claude Desktop:** Configuration snippet using `mcp-remote` with streamable HTTP transport.
+    * **Cursor:** Direct `.cursor/mcp.json` definition for the IDE composer.
+    * **Windsurf:** `mcp_config.json` integration targeting the edge endpoint.
+    * **VS Code / Continue:** `config.json` entry with SSE fallback.
+    * **Gemini CLI:** `gemini mcp add rights-and-renewals --url https://rightsandrenewals.pages.dev/api/mcp`
+* **Full 5-Tool Legal & Policy Toolset:**
+  1. `policy_lookup`: Returns verified BGB warranty terms, return windows, and § 312k cancellation URLs for 20 major consumer brands.
+  2. `claim_dossier_generate`: Programmatically generates DIN 5008 formal legal notice letters with statutory citations.
+  3. `statutory_law_lookup`: Direct statutory text retrieval for BGB §§ 437, 438, 477, 309 Nr. 9, and 312k.
+  4. `subscription_category_rules`: Returns category-specific legal cancellation rules and statutory notice ceilings.
+  5. `tax_deductibility_check`: Evaluates Sofortabschreibung eligibility under BMF 22.02.2022 and § 9 EStG.
+* **AI-Agent Discovery Standards:**
+  * **MCP Server Card:** SEP-2127 manifest at [`/.well-known/mcp/server-card.json`](https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json)
+  * **Agent Skills Discovery:** agentskills.io format at [`/.well-known/agent-skills/index.json`](https://rightsandrenewals.pages.dev/.well-known/agent-skills/index.json) and [`SKILL.md`](https://rightsandrenewals.pages.dev/.well-known/agent-skills/rights-and-renewals/SKILL.md)
+  * **Agent Resource Discovery (ARD):** [`/.well-known/ai-catalog.json`](https://rightsandrenewals.pages.dev/.well-known/ai-catalog.json)
+  * **RFC 8288 Link Headers:** Emitted across all responses linking to `api-catalog` and `service-doc`.
+  * **In-Browser WebMCP Helper:** Client-side tool registration via `src/components/webmcp.ts`.
+
+### 📰 Real EmDash CMS (v1.4.0) & Telemetry Desk
+* **Open-Source Astro Integration:** Built directly with the official [`emdash@1.4.0`](https://github.com/emdash-cms/emdash) package and `@emdash-cms/cloudflare`.
+* **Edge Architecture:** Integrated into `@cmlab/showcase` with Cloudflare D1 (`DB`), R2 bucket (`MEDIA`), and KV session storage (`SESSION`).
+* **Visual Admin Studio ([`/_emdash/admin`](https://rightsandrenewals.pages.dev/_emdash/admin)):** React-based editorial studio with passkey authentication, Portable Text editing, media management, and dev-bypass login for local development.
+* **Live Telemetry & Policy Diffing ([`/emdash`](https://rightsandrenewals.pages.dev/emdash)):** High-density desk displaying real-time AGB SHA-256 cryptographic fingerprints, 90-day SLA freshness counters (20/20 Fresh), and interactive click-to-load brand inspection.
 
 ---
 
@@ -226,9 +255,9 @@ cmd /c pnpm test
 ```powershell
 cmd /c python tests/e2e/runner.py --all
 ```
-* **60/60 tests passed** covering:
-  * **Tier 1:** DOM & accessibility contracts (`#app-header`, `#omnibar-root`, `#app-dashboard-grid`).
-  * **Tier 2:** Data & schema integrity (Dexie schema v1/v2, Web App Manifest, JSON-RPC schemas).
+* **61/61 tests passed** (100.0%) covering:
+  * **Tier 1:** DOM & accessibility contracts (`#app-header`, `#omnibar-root`, `#app-dashboard-grid`, `/agent-setup` tabs, ARIA roles, copy contracts).
+  * **Tier 2:** Data & schema integrity (Dexie schema v1/v2, Web App Manifest, JSON-RPC schemas, SEP-2127 server card).
   * **Tier 3:** Finite state machines & cross-feature workflows (OmniBar $\to$ Drawer $\to$ Notice Compiler).
   * **Tier 4:** End-to-end student journeys (Spotify cancellation, MacBook 12m cliff, unlisted purchase capture, Werbungskosten export).
 

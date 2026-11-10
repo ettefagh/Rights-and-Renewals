@@ -1,18 +1,27 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  "version": "1.0",
   "serverInfo": {
-    "name": "cmlab-warranty-mcp",
+    "name": "rights-and-renewals",
     "version": "1.0.0",
+    "title": "Rights & Renewals MCP Server",
     "description": "Sovereign consumer rights lookup, statutory warranty defense, contract renewal tracking, and automated cancellation letter generation."
   },
-  "title": "CM-LAB Rights & Renewals MCP Server",
-  "description": "Sovereign consumer rights lookup, statutory warranty defense, contract renewal tracking, and automated cancellation letter generation.",
+  "title": "Rights & Renewals MCP Server",
+  "description": "Authoritative Model Context Protocol server for German statutory consumer warranty rights (BGB §§ 434, 437, 438, 477), subscription cancellation laws (BGB § 309 Nr. 9, § 312k), and tax deductibility evaluation (BMF 2022).",
   "url": "https://rightsandrenewals.pages.dev/api/mcp",
-  "websiteUrl": "https://rightsandrenewals.pages.dev/docs",
+  "websiteUrl": "https://rightsandrenewals.pages.dev/agent-setup",
   "transport": {
     "type": "streamable-http",
     "endpoint": "https://rightsandrenewals.pages.dev/api/mcp"
   },
+  "transports": [
+    {
+      "type": "streamable-http",
+      "url": "https://rightsandrenewals.pages.dev/api/mcp",
+      "formats": ["application/json"]
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",
@@ -71,114 +80,91 @@
         "properties": {
           "brand_slug": {
             "type": "string",
-            "description": "Brand identifier (e.g. 'apple', 'sony')"
-          },
-          "service_slug": {
-            "type": "string",
-            "description": "Alias for brand_slug"
-          },
-          "item_name": {
-            "type": "string",
-            "description": "Full product name"
-          },
-          "purchase_date": {
-            "type": "string",
-            "format": "date",
-            "description": "ISO 8601 YYYY-MM-DD"
+            "description": "Slug of the vendor or service"
           },
           "defect_description": {
             "type": "string",
-            "description": "Factual defect description"
+            "description": "Description of the defect or cancellation rationale"
           },
-          "issue_type": {
+          "purchase_date": {
+            "type": "string",
+            "description": "ISO 8601 date string (YYYY-MM-DD)"
+          },
+          "remedy_type": {
             "type": "string",
             "enum": [
-              "statutory_defect_claim",
-              "contract_cancellation"
+              "repair",
+              "replacement",
+              "cancellation"
             ]
           }
         },
         "required": [
           "brand_slug",
-          "item_name",
-          "purchase_date",
           "defect_description"
         ]
       }
     },
     {
       "name": "statutory_law_lookup",
-      "description": "Look up statutory text and consumer rights summaries for German civil code sections (BGB §§ 434, 437, 438, 439, 475e, 477, 309 Nr. 9, 312k, 355).",
+      "description": "Look up verbatim German statutory consumer law clauses (BGB §§ 437, 438, 477, 309 Nr. 9, 312k) and legal guidance.",
       "inputSchema": {
         "type": "object",
         "properties": {
-          "statute_section": {
+          "section": {
+            "type": "string",
+            "description": "Statutory section code, e.g. '477', '312k', '309', '437', '438'"
+          }
+        },
+        "required": [
+          "section"
+        ]
+      }
+    },
+    {
+      "name": "subscription_category_rules",
+      "description": "Retrieve legal renewal rules, maximum statutory notice periods, and mandatory cancellation button requirements for a subscription category.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Category name, e.g. 'streaming', 'telecom', 'software', 'fitness'"
+          }
+        },
+        "required": [
+          "category"
+        ]
+      }
+    },
+    {
+      "name": "tax_deductibility_check",
+      "description": "Evaluate digital equipment or subscription tax deductibility under German law (§ 9 EStG, BMF 22.02.2022 Sofortabschreibung).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "item_name": {
+            "type": "string",
+            "description": "Name or model of the device or software"
+          },
+          "price_eur": {
+            "type": "number",
+            "description": "Gross purchase price in EUR"
+          },
+          "category": {
             "type": "string",
             "enum": [
-              "434",
-              "437",
-              "438",
-              "439",
-              "475e",
-              "477",
-              "309_nr_9",
-              "312k",
-              "355"
+              "hardware",
+              "software",
+              "subscription"
             ]
           }
         },
         "required": [
-          "statute_section"
+          "item_name",
+          "price_eur"
         ]
       }
-    }
-  ],
-  "resources": [
-    {
-      "uri": "rights://germany/bgb-civil-code",
-      "name": "German Civil Code (BGB) Consumer Protection Statutes",
-      "description": "Full text and commentary on BGB §§ 434, 437, 438, 439, 477, 309 Nr. 9, 312k",
-      "mimeType": "application/json"
-    },
-    {
-      "uri": "rights://wiki/brands-catalog",
-      "name": "Canonical Brand Cancellation & Warranty Wiki Seed",
-      "description": "Directory of 20 canonical student brands with customer service endpoints, cancellation buttons, and statutory dispute addresses",
-      "mimeType": "application/json"
-    }
-  ],
-  "prompts": [
-    {
-      "name": "analyze_defect_claim",
-      "description": "Analyze whether a consumer's purchased product defect falls within the 12-month statutory burden-of-proof reversal window under BGB § 477.",
-      "arguments": [
-        {
-          "name": "purchase_date",
-          "description": "Date of item purchase (YYYY-MM-DD)",
-          "required": true
-        },
-        {
-          "name": "brand",
-          "description": "Manufacturer or merchant name",
-          "required": true
-        }
-      ]
-    },
-    {
-      "name": "draft_cancellation_letter",
-      "description": "Draft a legally binding subscription cancellation notice invoking German BGB § 312k Kündigungsbutton legislation.",
-      "arguments": [
-        {
-          "name": "service_name",
-          "description": "Name of the subscription provider",
-          "required": true
-        },
-        {
-          "name": "contract_id",
-          "description": "Customer account or contract number",
-          "required": true
-        }
-      ]
     }
   ]
 }

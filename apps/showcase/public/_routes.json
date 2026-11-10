@@ -1,8 +1,10 @@
 {
   "version": 1,
   "include": [
+    "/_emdash/*",
     "/api/*",
-    "/sse"
+    "/sse",
+    "/setup"
   ],
   "exclude": [
     "/_astro/*",

@@ -1,6 +1,9 @@
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import svelte from '@astrojs/svelte';
+import react from '@astrojs/react';
+import emdash from 'emdash/astro';
+import { d1, r2 } from '@emdash-cms/cloudflare';
 import Icons from 'unplugin-icons/vite';
 import { fileURLToPath } from 'node:url';
 
@@ -14,7 +17,12 @@ export default defineConfig({
     }
   }),
   integrations: [
-    svelte()
+    svelte(),
+    react(),
+    emdash({
+      database: d1({ binding: 'DB' }),
+      storage: r2({ binding: 'MEDIA' }),
+    }),
   ],
   server: {
     port: 3000,
@@ -28,10 +36,51 @@ export default defineConfig({
       Icons({
         compiler: 'svelte',
         autoInstall: false
-      })
+      }),
+      {
+        name: 'emdash-astro-compat',
+        enforce: 'pre',
+        resolveId(id) {
+          if (id === 'virtual:astro:assets/fonts/internal') {
+            return '\0virtual:astro:assets/fonts/internal';
+          }
+          if (id === 'astro/zod' || id.endsWith('astro/dist/zod.js') || id.endsWith('astro\\dist\\zod.js')) {
+            return fileURLToPath(new URL('./src/shims/astro-zod.mjs', import.meta.url));
+          }
+          if (id === 'cloudflare:workers') {
+            return fileURLToPath(new URL('./src/shims/cloudflare-workers.mjs', import.meta.url));
+          }
+        },
+        load(id) {
+          if (id === '\0virtual:astro:assets/fonts/internal') {
+            return 'export const componentDataByCssVariable = new Map(); export default {};';
+          }
+        },
+        config(config) {
+          if (config.ssr?.optimizeDeps) {
+            config.ssr.optimizeDeps.noDiscovery = true;
+            config.ssr.optimizeDeps.include = [];
+          }
+          if (config.ssr?.external && Array.isArray(config.ssr.external)) {
+            config.ssr.external = config.ssr.external.filter(x => x !== 'cloudflare:workers');
+          }
+        }
+      }
     ],
+    build: {
+      minify: false,
+      reportCompressedSize: false,
+    },
     resolve: {
       alias: [
+        {
+          find: 'astro/zod',
+          replacement: fileURLToPath(new URL('./src/shims/astro-zod.mjs', import.meta.url))
+        },
+        {
+          find: 'cloudflare:workers',
+          replacement: fileURLToPath(new URL('./src/shims/cloudflare-workers.mjs', import.meta.url))
+        },
         {
           find: '@cmlab/core',
           replacement: fileURLToPath(new URL('../../packages/core/src/index.ts', import.meta.url))
@@ -47,6 +96,18 @@ export default defineConfig({
         {
           find: '@cmlab/design-tokens',
           replacement: fileURLToPath(new URL('../../packages/design-tokens/tokens.css', import.meta.url))
+        },
+        {
+          find: 'astro/app/entrypoint',
+          replacement: fileURLToPath(new URL('./node_modules/astro/dist/core/app/index.js', import.meta.url))
+        },
+        {
+          find: 'astro/app/manifest',
+          replacement: fileURLToPath(new URL('./node_modules/astro/dist/core/app/index.js', import.meta.url))
+        },
+        {
+          find: '@astrojs/cloudflare/image-transform-endpoint',
+          replacement: fileURLToPath(new URL('./node_modules/@astrojs/cloudflare/dist/entrypoints/image-endpoint.js', import.meta.url))
         }
       ]
     },
@@ -58,7 +119,11 @@ export default defineConfig({
         '@threlte/core',
         '@threlte/extras',
         'three',
-        'zod'
+        'zod',
+        'emdash',
+        '@emdash-cms/admin',
+        '@emdash-cms/cloudflare',
+        'cloudflare:workers'
       ]
     }
   }

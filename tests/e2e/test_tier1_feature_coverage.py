@@ -156,7 +156,7 @@ class TestTier1CategoryB_ShowcaseWebpage(unittest.TestCase):
             "params": {}
         })
         self.assertEqual(init_resp["result"]["protocolVersion"], "2024-11-05")
-        self.assertEqual(init_resp["result"]["serverInfo"]["name"], "cmlab-warranty-mcp")
+        self.assertIn(init_resp["result"]["serverInfo"]["name"], ["rights-and-renewals", "cmlab-warranty-mcp"])
 
         tools_resp = self.mcp_server.handle_request({
             "jsonrpc": "2.0",
@@ -257,28 +257,112 @@ class TestTier1CategoryB_ShowcaseWebpage(unittest.TestCase):
         self.assertEqual(capital_at_risk, 1550.0)
 
     def test_07_ai_agent_quick_connect_config_contracts(self):
-        """TC-SHOWCASE-07: Verify AI quick-connect configs for Claude Desktop and Cursor IDE."""
-        # Claude Desktop configuration schema
-        claude_config = {
-            "mcpServers": {
-                "cmlab-warranty": {
-                    "command": "npx",
-                    "args": ["-y", "@cmlab/warranty-mcp-server"]
-                }
-            }
-        }
-        self.assertIn("cmlab-warranty", claude_config["mcpServers"])
-        self.assertEqual(claude_config["mcpServers"]["cmlab-warranty"]["command"], "npx")
+        """TC-SHOWCASE-07: Verify all 6 AI agent quick-connect configurations target Rights & Renewals."""
+        # 1. Claude Code CLI Command
+        claude_code_cmd = "claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp"
+        self.assertIn("rights-and-renewals", claude_code_cmd)
+        self.assertIn("--transport http", claude_code_cmd)
+        self.assertTrue(claude_code_cmd.endswith("/api/mcp"))
 
-        # Cursor configuration schema
-        cursor_config = {
+        # 2. Claude Desktop (mcp-remote stdio bridge)
+        claude_desktop_cfg = {
             "mcpServers": {
-                "cmlab-warranty": {
-                    "url": "https://[project].page.dev/api/mcp/sse"
+                "rights-and-renewals": {
+                    "command": "npx",
+                    "args": ["-y", "mcp-remote", "https://rightsandrenewals.pages.dev/api/mcp"]
                 }
             }
         }
-        self.assertTrue(cursor_config["mcpServers"]["cmlab-warranty"]["url"].endswith("/api/mcp/sse"))
+        self.assertIn("rights-and-renewals", claude_desktop_cfg["mcpServers"])
+        self.assertEqual(claude_desktop_cfg["mcpServers"]["rights-and-renewals"]["args"][1], "mcp-remote")
+
+        # 3. Cursor IDE (.cursor/mcp.json)
+        cursor_cfg = {
+            "mcpServers": {
+                "rights-and-renewals": {
+                    "url": "https://rightsandrenewals.pages.dev/api/mcp"
+                }
+            }
+        }
+        self.assertEqual(cursor_cfg["mcpServers"]["rights-and-renewals"]["url"], "https://rightsandrenewals.pages.dev/api/mcp")
+
+        # 4. Windsurf (mcp_config.json with serverUrl)
+        windsurf_cfg = {
+            "mcpServers": {
+                "rights-and-renewals": {
+                    "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+                }
+            }
+        }
+        self.assertIn("serverUrl", windsurf_cfg["mcpServers"]["rights-and-renewals"])
+        self.assertNotIn("url", windsurf_cfg["mcpServers"]["rights-and-renewals"])
+
+        # 5. VS Code / Continue (config.json)
+        continue_cfg = {
+            "mcpServers": [
+                {
+                    "name": "rights-and-renewals",
+                    "transport": {
+                        "type": "sse",
+                        "url": "https://rightsandrenewals.pages.dev/api/mcp"
+                    }
+                }
+            ]
+        }
+        self.assertEqual(continue_cfg["mcpServers"][0]["name"], "rights-and-renewals")
+        self.assertEqual(continue_cfg["mcpServers"][0]["transport"]["url"], "https://rightsandrenewals.pages.dev/api/mcp")
+
+        # 6. Gemini CLI (gemini mcp add & settings.json)
+        gemini_cmd = "gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp"
+        gemini_cfg = {
+            "mcpServers": {
+                "rights-and-renewals": {
+                    "httpUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+                }
+            }
+        }
+        self.assertIn("--transport http", gemini_cmd)
+        self.assertIn("httpUrl", gemini_cfg["mcpServers"]["rights-and-renewals"])
+
+    def test_08_agent_setup_page_dom_and_a11y_contracts(self):
+        """TC-SHOWCASE-08: Verify Agent Setup page and discovery contracts."""
+        import os
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        agent_setup_path = os.path.join(base_dir, "apps", "showcase", "src", "pages", "agent-setup.astro")
+        self.assertTrue(os.path.exists(agent_setup_path), "agent-setup.astro must exist")
+
+        with open(agent_setup_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Invariants from Cloudflare reference & discovery contracts
+        self.assertIn("Rights &amp; Renewals · Agent Setup", content)
+        self.assertIn("hero-copy-prompt-btn", content)
+        self.assertIn("agent-card-claude-code", content)
+        self.assertIn("agent-card-claude-desktop", content)
+        self.assertIn("agent-card-cursor", content)
+        self.assertIn("agent-card-windsurf", content)
+        self.assertIn("agent-card-continue", content)
+        self.assertIn("agent-card-gemini", content)
+        self.assertIn('role="tablist"', content)
+        self.assertIn('role="tab"', content)
+        self.assertIn('role="tabpanel"', content)
+        self.assertIn('rel="ai-catalog"', content)
+        self.assertIn('rel="mcp-server-card"', content)
+        self.assertIn('rel="agent-skills"', content)
+
+        # Discovery files verification
+        prompt_md_path = os.path.join(base_dir, "apps", "showcase", "public", "agent-setup", "prompt.md")
+        self.assertTrue(os.path.exists(prompt_md_path), "prompt.md must exist")
+
+        server_card_path = os.path.join(base_dir, "apps", "showcase", "public", ".well-known", "mcp", "server-card.json")
+        self.assertTrue(os.path.exists(server_card_path), "server-card.json must exist")
+
+        ai_catalog_path = os.path.join(base_dir, "apps", "showcase", "public", ".well-known", "ai-catalog.json")
+        self.assertTrue(os.path.exists(ai_catalog_path), "ai-catalog.json must exist")
+
+        skills_index_path = os.path.join(base_dir, "apps", "showcase", "public", ".well-known", "agent-skills", "index.json")
+        self.assertTrue(os.path.exists(skills_index_path), "agent-skills/index.json must exist")
+
 
 
 # ============================================================================

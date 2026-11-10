@@ -1,6 +1,6 @@
 /**
  * apps/showcase/src/pages/api/mcp.ts
- * Cloudflare Worker JSON-RPC 2.0 Open MCP Server Endpoint for CM-LAB Showcase
+ * Cloudflare Worker JSON-RPC 2.0 Open MCP Server Endpoint for Rights & Renewals
  * Supports policy_lookup, statutory_law_lookup, subscription_category_rules,
  * tax_deductibility_check, and claim_dossier_generate with strict Zod validation (-32602).
  */
@@ -90,7 +90,7 @@ export const POST: APIRoute = async ({ request }) => {
         result: {
           protocolVersion: '2024-11-05',
           capabilities: { tools: {} },
-          serverInfo: { name: 'cmlab-warranty-mcp', version: '1.0.0' },
+          serverInfo: { name: 'rights-and-renewals', version: '1.0.0' },
         },
       }),
       { headers: CORS_HEADERS }

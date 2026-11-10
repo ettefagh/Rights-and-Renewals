@@ -8,5 +8,24 @@
   "pages_build_output_dir": "./dist",
   "observability": {
     "enabled": true
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rightsandrenewals-db",
+      "database_id": "rightsandrenewals-d1-local"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "rightsandrenewals-media"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+      "id": "rightsandrenewals-session-local"
+    }
+  ]
 }
