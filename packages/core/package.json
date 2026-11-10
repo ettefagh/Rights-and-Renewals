@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Headless TypeScript Domain Engine for CM-LAB Sovereign Consumer Wallet",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js",
       "default": "./src/index.ts"
     },
     "./data/policy_wiki_seed_v1.json": "./data/policy_wiki_seed_v1.json"

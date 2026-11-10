@@ -1,10 +1,7 @@
 {
   "version": 1,
   "include": [
-    "/_emdash/*",
-    "/api/*",
-    "/sse",
-    "/setup"
+    "/*"
   ],
   "exclude": [
     "/_astro/*",
@@ -12,6 +9,10 @@
     "/data/*",
     "/wiki/*",
     "/emdash/*",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/auth.md",
+    "/.well-known/*",
     "/favicon.svg",
     "/favicon.png",
     "/apple-touch-icon.png",

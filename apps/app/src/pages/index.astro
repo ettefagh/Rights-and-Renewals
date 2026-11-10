@@ -1,7 +1,56 @@
 ---
 import WalletApp from '../components/WalletApp.svelte';
 
-export const prerender = true;
+export const prerender = false;
+
+const accept = Astro.request.headers.get('accept') || '';
+let prefersMarkdown = false;
+if (accept.includes('text/markdown')) {
+  prefersMarkdown = true;
+  if (accept.includes('text/html')) {
+    let qMd = 1.0;
+    let qHtml = 1.0;
+    for (const part of accept.split(',')) {
+      const p = part.trim();
+      if (p.startsWith('text/markdown')) {
+        const m = p.match(/q=([0-9.]+)/);
+        if (m) qMd = parseFloat(m[1]);
+      } else if (p.startsWith('text/html')) {
+        const m = p.match(/q=([0-9.]+)/);
+        if (m) qHtml = parseFloat(m[1]);
+      }
+    }
+    if (qHtml > qMd) prefersMarkdown = false;
+  }
+}
+
+if (prefersMarkdown) {
+  return new Response(`# Rights & Renewals Sovereign App
+
+> Offline-first, encrypted consumer rights vault, warranty countdown tracker, and § 312k cancellation generator.
+
+## Core Capabilities
+- **Encrypted Local Vault**: Client-side AES-GCM-256 storage for purchase receipts and warranties.
+- **Statutory Deadlines**: 12-month Beweislastumkehr (§ 477 Abs. 1 BGB) & 24-month Gewährleistung (§ 438 BGB).
+- **Dual-Rail Cancellation**: Deterministic DIN 5008 PDF dossier compilation and verified cancellation button links (§ 312k BGB).
+- **WebMCP Integration**: In-browser tools \`vault_lookup\` and \`notice_generate\` exposed via \`document.modelContext\`.
+
+## Discovery Resources
+- API Catalog: \`/.well-known/api-catalog\`
+- MCP Server Card: \`/.well-known/mcp/server-card.json\`
+- OAuth Metadata: \`/.well-known/oauth-protected-resource\`
+- Agent Registration: \`/auth.md\`
+`, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'Vary': 'Accept',
+      'Link': '</.well-known/api-catalog>; rel="api-catalog", </auth.md>; rel="service-doc"',
+      'Access-Control-Allow-Origin': '*',
+      'x-markdown-tokens': '195'
+    }
+  });
+}
 ---
 
 <!DOCTYPE html>

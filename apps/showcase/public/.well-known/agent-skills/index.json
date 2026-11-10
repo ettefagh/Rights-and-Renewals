@@ -8,7 +8,9 @@
       "description": "Progressive-disclosure workflow skill for German consumer statutory warranty rights, BGB § 477 12-month burden of proof cliffs, BGB § 312k subscription cancellations, and tax deductibility proofs under § 9 EStG & BMF 2022.",
       "url": "https://rightsandrenewals.pages.dev/.well-known/agent-skills/rights-and-renewals/SKILL.md",
       "author": "Rights & Renewals Team",
-      "license": "Apache-2.0"
+      "license": "Apache-2.0",
+      "sha256": "e55c822ea2ad68ff834aa20b7918f4691f6dda79b11b28902200921a47043af9",
+      "digest": "sha256:e55c822ea2ad68ff834aa20b7918f4691f6dda79b11b28902200921a47043af9"
     },
     {
       "name": "policy-lookup",

@@ -137,7 +137,8 @@ class TestTier3CrossFeature(unittest.TestCase):
                 if url.startswith("/") or not url.startswith("http"):
                     skill_file = acc.base_dir / "public" / url.lstrip("/")
                     if skill_file.exists():
-                        computed = sha256(skill_file.read_bytes()).hexdigest()
+                        raw = skill_file.read_bytes().replace(b"\r\n", b"\n")
+                        computed = sha256(raw).hexdigest()
                         clean_digest = digest.split(":")[-1].lower()
                         self.assertEqual(
                             computed.lower(), clean_digest,
