@@ -241,6 +241,26 @@
 .home-lab .section-subtitle { margin-inline: 0; }
 .home-lab .form-group, .home-lab .playground-grid > * { min-width: 0; }
 
+.home-lab .calendar-suite-intro {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.home-lab .calendar-view-tabs {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.home-lab .omnibar-input { min-width: 0; }
+
+@media (max-width: 899px) {
+  .home-lab .widgets-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .home-lab #gobd-feed-widget { grid-column: span 2; }
+}
+
 .home-footer {
   border-top: 1px solid var(--home-rule);
   background: var(--home-paper);
