@@ -210,8 +210,8 @@ class TestTier4StudentJourneys(unittest.TestCase):
         self.assertIn("JetBrains All Products Pack", csv_export)
         self.assertIn("§ 2 StBerG", csv_export)
 
-    def test_journey_05_autonomous_ai_mcp_agent_dossier_compilation(self):
-        """Journey 5: Autonomous AI agent executes policy_lookup and claim_dossier_generate."""
+    def test_journey_05_public_policy_lookup_and_local_dossier(self):
+        """Journey 5: Look up a brand over MCP and prepare a draft locally."""
         # 1. Agent queries policy for Sony
         lookup_res = self.mcp_server.handle_request({
             "jsonrpc": "2.0",
@@ -225,23 +225,14 @@ class TestTier4StudentJourneys(unittest.TestCase):
         self.assertEqual(sony_policy.get("statutory_warranty_months"), 24)
         self.assertEqual(sony_policy.get("reversed_burden_months"), 12)
 
-        # 2. Agent compiles formal defect notice
-        dossier_res = self.mcp_server.handle_request({
-            "jsonrpc": "2.0",
-            "id": "agent-step-2",
-            "method": "tools/call",
-            "params": {
-                "name": "claim_dossier_generate",
-                "arguments": {
-                    "brand_slug": "sony",
-                    "item_name": "Sony WH-1000XM5 Headphones",
-                    "purchase_date": "2026-05-01",
-                    "defect_description": "Active Noise Canceling microphone feedback loop"
-                }
-            }
-        })
-        self.assertNotIn("error", dossier_res)
-        dossier = json.loads(dossier_res["result"]["content"][0]["text"])
+        # 2. Prepare the defect draft in the local wallet model.
+        dossier = BGBTimelineCalculator.generate_statutory_notice(
+            brand_name=sony_policy["brand_name"],
+            item_name="Sony WH-1000XM5 Headphones",
+            purchase_date=datetime.date(2026, 5, 1),
+            defect_date=datetime.date(2026, 11, 1),
+            defect_description="Active Noise Canceling microphone feedback loop",
+        )
         self.assertTrue(dossier["valid"])
         self.assertIn("Sony WH-1000XM5 Headphones", dossier["dossier_text_de"])
         self.assertIn("BGB § 437", dossier["statutory_basis"])

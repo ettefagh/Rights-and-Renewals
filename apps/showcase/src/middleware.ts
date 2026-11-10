@@ -1,33 +1,18 @@
 import { defineMiddleware } from 'astro:middleware';
 
-function getShowcaseMarkdown(origin: string): string {
-  return `# Rights & Renewals (Showcase)
-
-> Sovereign Consumer Rights, Subscription & Warranty Wallet with Brand Policy Wiki and Open MCP Server.
-
-## Features & Capabilities
-- **Brand Policy Wiki**: Verified BGB §§ 437, 438, 477 warranty terms & § 312k cancellation rules for top 20 brands.
-- **Model Context Protocol (MCP)**: Public, read-only JSON-RPC tools over Streamable HTTP at ${origin}/api/mcp.
-- **Agent Discovery**: API Catalog (RFC 9727), ARD AI Catalog, MCP Server Card, and Agent Skills.
-
-## Discovery Resources
-- API Catalog: \`/.well-known/api-catalog\`
-- MCP Server Card: \`/.well-known/mcp/server-card.json\`
-- Agent Skills: \`/.well-known/agent-skills/index.json\`
-- Service details: \`/auth.md\`
-- Setup guide: \`/agent-setup\`
-`;
-}
+import { SHOWCASE_MARKDOWN } from './data/showcase-markdown';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const request = context.request;
   const url = new URL(request.url);
   const accept = request.headers.get('Accept') || '';
 
+  const markdownRequested = url.searchParams.get('format') === 'markdown';
+
   // Content negotiation for AI agents requesting Markdown
-  if ((url.pathname === '/' || url.pathname === '/index.html') && accept.includes('text/markdown')) {
+  if ((url.pathname === '/' || url.pathname === '/index.html') && (markdownRequested || accept.includes('text/markdown'))) {
     let prefersMarkdown = true;
-    if (accept.includes('text/html')) {
+    if (!markdownRequested && accept.includes('text/html')) {
       let qMd = 1.0;
       let qHtml = 1.0;
       for (const part of accept.split(',')) {
@@ -44,7 +29,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     if (prefersMarkdown) {
-      return new Response(getShowcaseMarkdown(url.origin), {
+      return new Response(SHOWCASE_MARKDOWN, {
         status: 200,
         headers: {
           'Content-Type': 'text/markdown; charset=utf-8',

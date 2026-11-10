@@ -10,7 +10,7 @@ const emdash = vi.hoisted(() => ({
 
 vi.mock('emdash', () => emdash);
 
-import { getPublishedPolicies, POLICY_COLLECTION } from './policy-cms.js';
+import { getPublishedPolicies, getPublishedPolicy, POLICY_COLLECTION } from './policy-cms.js';
 
 function policyEntry(slug: string, overrides: Record<string, unknown> = {}, status = 'published') {
   return {
@@ -100,5 +100,15 @@ describe('getPublishedPolicies', () => {
     await getPublishedPolicies();
 
     expect(emdash.runWithContext).not.toHaveBeenCalled();
+  });
+
+  it('reads machine-view details outside the editor preview context', async () => {
+    emdash.getRequestContext.mockReturnValue({ editMode: true, preview: { id: 'draft' } });
+    emdash.getEmDashEntry.mockResolvedValue({ entry: policyEntry('spotify'), error: null });
+
+    await expect(getPublishedPolicy('spotify')).resolves.toMatchObject({ brandSlug: 'spotify' });
+
+    expect(emdash.runWithContext).toHaveBeenCalledWith({ editMode: false }, expect.any(Function));
+    expect(emdash.getEmDashEntry).toHaveBeenCalledWith(POLICY_COLLECTION, 'spotify');
   });
 });

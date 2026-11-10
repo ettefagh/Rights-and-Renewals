@@ -2,10 +2,14 @@
 import type { PolicyWikiEntry } from '@cmlab/core';
 import { getPublishedPolicies } from '../../lib/policy-cms';
 import BrandIcon from '../../components/BrandIcon.svelte';
+import AudienceSwitch from '../../components/AudienceSwitch.astro';
+import { Menu } from 'lucide-svelte';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
 
 export const prerender = false;
+
+Astro.response.headers.set('Cache-Control', 'no-store');
 
 let policies: PolicyWikiEntry[] = [];
 let cmsUnavailable = false;
@@ -22,7 +26,7 @@ const hardware = policies.filter((b) => b.category === 'hardware');
 ---
 
 <!DOCTYPE html>
-<html lang="de" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -167,20 +171,31 @@ const hardware = policies.filter((b) => b.category === 'hardware');
 
       <div class="nav-actions">
         <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
-          📱 Zur Wallet-App ↗
+          Open wallet ↗
         </a>
       </div>
+      <details class="mobile-nav">
+        <summary aria-label="Menu"><Menu size={24} aria-hidden="true" /><span class="sr-only">Menu</span></summary>
+        <nav class="mobile-nav-panel" aria-label="Mobile navigation">
+          <a href="/">Showcase</a>
+          <a href="/wiki">Brand Policy Wiki</a>
+          <a href="/emdash">EmDash CMS</a>
+          <a href="/#mcp-playground">MCP Playground</a>
+          <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" target="_blank" rel="noopener noreferrer">Open wallet</a>
+        </nav>
+      </details>
     </div>
   </header>
 
   <main class="wiki-container">
+    <AudienceSwitch humanHref="/wiki/" machineHref="/machine/view/wiki" />
     <div class="wiki-hero">
       <div class="hero-pill-badge" style="margin-bottom: var(--space-4, 16px);">
         <span>🏛️ BGB §§ 309, 312k, 438, 477</span> · <span>{policies.length} veröffentlichte Marken</span> · <span>EmDash CMS</span>
       </div>
       <h1>Brand Policy Wiki</h1>
       <p>
-        Deterministische Rechtsfakten, Kündigungsfristen und gesetzliche Gewährleistungsregeln für Studierende und Verbraucher in Deutschland — ohne Tracking, ohne Cookies und ohne Login.
+        Public information about cancellation periods and statutory warranty rules for students and consumers in Germany. Browse the brand records below; this directory does not provide individual legal advice.
       </p>
     </div>
 
@@ -192,7 +207,7 @@ const hardware = policies.filter((b) => b.category === 'hardware');
     )}
 
     <!-- Subscriptions Section -->
-    <h2 class="category-section-title">🔄 Abonnements &amp; Digitale Dienste ({subscriptions.length})</h2>
+    <h2 class="category-section-title">🔄 Subscriptions &amp; digital services ({subscriptions.length})</h2>
     <div class="brand-grid">
       {subscriptions.map((brand: PolicyWikiEntry) => (
         <a href={`/wiki/${brand.brandSlug}`} class="brand-card">
@@ -202,14 +217,14 @@ const hardware = policies.filter((b) => b.category === 'hardware');
             </div>
             <div>
               <h3 class="brand-card-name">{brand.brandName}</h3>
-              <span class="brand-card-category">Kündigungsfrist: Max. {brand.cancellationNoticeMonths} Monat</span>
+              <span class="brand-card-category">Cancellation notice: up to {brand.cancellationNoticeMonths} month(s)</span>
             </div>
           </div>
           <div class="brand-card-meta">
-            {brand.cancellationButtonCompliant ? '✓ § 312k Kündigungsbutton konform' : 'Kündigungsprüfung ausstehend'}
+            {brand.cancellationButtonCompliant ? '✓ § 312k cancellation button compliant' : 'Cancellation status pending review'}
           </div>
           <div class="brand-card-action">
-            <span>Rechte &amp; Button prüfen</span>
+            <span>View policy &amp; cancellation details</span>
             <span>→</span>
           </div>
         </a>
@@ -217,7 +232,7 @@ const hardware = policies.filter((b) => b.category === 'hardware');
     </div>
 
     <!-- Hardware Section -->
-    <h2 class="category-section-title" style="margin-top: var(--space-12, 48px);">📦 Hardware &amp; Elektronik ({hardware.length})</h2>
+    <h2 class="category-section-title" style="margin-top: var(--space-12, 48px);">📦 Hardware &amp; electronics ({hardware.length})</h2>
     <div class="brand-grid">
       {hardware.map((brand: PolicyWikiEntry) => (
         <a href={`/wiki/${brand.brandSlug}`} class="brand-card">
@@ -227,14 +242,14 @@ const hardware = policies.filter((b) => b.category === 'hardware');
             </div>
             <div>
               <h3 class="brand-card-name">{brand.brandName}</h3>
-              <span class="brand-card-category">{brand.statutoryWarrantyMonths}m Mängelhaftung (§ 438)</span>
+              <span class="brand-card-category">{brand.statutoryWarrantyMonths} month statutory warranty (§ 438)</span>
             </div>
           </div>
           <div class="brand-card-meta">
-            12m Beweislastumkehr (§ 477 Abs. 1 BGB) {brand.commercialGuaranteeMonths > 0 ? `+ ${brand.commercialGuaranteeMonths}m Garantie` : ''}
+            12 month reversal of the burden of proof (§ 477(1) BGB) {brand.commercialGuaranteeMonths > 0 ? `+ ${brand.commercialGuaranteeMonths} month commercial guarantee` : ''}
           </div>
           <div class="brand-card-action">
-            <span>Garantie &amp; BGB Details</span>
+            <span>View guarantee &amp; BGB details</span>
             <span>→</span>
           </div>
         </a>

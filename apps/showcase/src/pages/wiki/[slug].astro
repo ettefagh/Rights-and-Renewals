@@ -2,10 +2,13 @@
 import { getPolicyForPage } from '../../lib/policy-cms';
 import type { PolicyWikiEntry } from '@cmlab/core';
 import BrandIcon from '../../components/BrandIcon.svelte';
+import AudienceSwitch from '../../components/AudienceSwitch.astro';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
 
 export const prerender = false;
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
 
 let brand: PolicyWikiEntry | null = null;
 let cmsUnavailable = false;
@@ -14,7 +17,6 @@ try {
   const result = await getPolicyForPage(Astro.params.slug ?? '');
   brand = result.policy;
   isPreview = result.isPreview;
-  if (isPreview) Astro.response.headers.set('Cache-Control', 'private, no-store');
 } catch (error) {
   console.error('[policy-wiki] EmDash published content is unavailable.', error);
   Astro.response.status = 503;
@@ -255,6 +257,7 @@ const legacyDeepLinkWallet = brand ? `https://app.cm-lab.pages.dev/#action=view&
         EmDash editor preview: this private view is not public until the policy is published.
       </p>
     )}
+    {!isPreview && <AudienceSwitch humanHref={`/wiki/${brand.brandSlug}`} machineHref={`/machine/view/wiki/${brand.brandSlug}`} />}
     <!-- Breadcrumb -->
     <nav class="wiki-breadcrumb" aria-label="Breadcrumb">
       <a href="/">Home</a>

@@ -136,7 +136,13 @@ export async function getPublishedPolicy(slug: string): Promise<PolicyWikiEntry 
       slug,
     );
     if (error) throw error;
-    return entry ? mapPolicyEntry(entry) : null;
+    if (!entry) return null;
+    try {
+      return mapPolicyEntry(entry);
+    } catch (error) {
+      console.warn('[policy-cms] Skipping one malformed published policy entry.', error);
+      return null;
+    }
   });
 }
 

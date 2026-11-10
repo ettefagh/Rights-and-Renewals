@@ -98,8 +98,8 @@
 
   .fab-container {
     position: fixed;
-    right: 20px;
-    bottom: calc(20px + var(--padding-safe-bottom));
+    right: var(--wallet-dock-right, 14px);
+    bottom: var(--wallet-dock-bottom, 12px);
     z-index: var(--z-index-popover);
     display: flex;
     flex-direction: column;

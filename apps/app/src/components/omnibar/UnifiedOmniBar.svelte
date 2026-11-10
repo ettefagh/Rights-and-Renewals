@@ -206,7 +206,8 @@
           bind:this={inputElement}
           type="text"
           class="omnibar-input"
-          placeholder="Search items, brands, policies or type >command (e.g. >tax, >claim)..."
+          aria-label="Search items and policies"
+          placeholder="Search items and policies"
           bind:value={query}
           onfocus={() => (isFocused = true)}
           onblur={() => (isFocused = false)}
@@ -438,6 +439,7 @@
 
   .omnibar-input {
     flex: 1;
+    min-width: 0;
     border: none;
     outline: none;
     font-size: var(--font-size-base, 16px);

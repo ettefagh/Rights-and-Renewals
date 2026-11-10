@@ -99,25 +99,13 @@ export class PlaygroundController {
         tool: 'policy_lookup',
         args: { service_slug: 'spotify', category: 'subscription' }
       },
-      apple_macbook: {
-        tool: 'claim_dossier_generate',
-        args: {
-          brand_slug: 'apple',
-          item_name: 'MacBook Pro 16 M3',
-          purchase_date: '2026-01-15',
-          defect_description: 'Flickering mini-LED backlight and intermittent USB-C charging failure',
-          issue_type: 'statutory_defect_claim'
-        }
+      law_477: {
+        tool: 'statutory_law_lookup',
+        args: { statute_section: '477', language: 'de' }
       },
-      sony_headphones: {
-        tool: 'claim_dossier_generate',
-        args: {
-          brand_slug: 'sony',
-          item_name: 'Sony WH-1000XM5 ANC Headphones',
-          purchase_date: '2025-12-15',
-          defect_description: 'Active Noise Canceling microphone feedback squeal',
-          issue_type: 'statutory_defect_claim'
-        }
+      subscription_rules: {
+        tool: 'subscription_category_rules',
+        args: { subscription_type: 'streaming' }
       },
       tools_list: {
         tool: 'tools/list',
@@ -142,14 +130,10 @@ export class PlaygroundController {
     } else if (this.activeTool === 'policy_lookup') {
       const defaultArgs = customArgs || { service_slug: 'spotify' };
       this.argsEditor.value = JSON.stringify(defaultArgs, null, 2);
-    } else if (this.activeTool === 'claim_dossier_generate') {
-      const defaultArgs = customArgs || {
-        brand_slug: 'apple',
-        item_name: 'MacBook Pro 16 M3',
-        purchase_date: '2026-01-15',
-        defect_description: 'Flickering mini-LED backlight and intermittent charging failure'
-      };
-      this.argsEditor.value = JSON.stringify(defaultArgs, null, 2);
+    } else if (this.activeTool === 'statutory_law_lookup') {
+      this.argsEditor.value = JSON.stringify(customArgs || { statute_section: '477', language: 'de' }, null, 2);
+    } else if (this.activeTool === 'subscription_category_rules') {
+      this.argsEditor.value = JSON.stringify(customArgs || { subscription_type: 'streaming' }, null, 2);
     }
   }
 
@@ -178,7 +162,7 @@ export class PlaygroundController {
 
     // 1. Log Outbound Frame
     this.appendStreamFrame('outbound', {
-      title: `--> Client-side Mock [JSON-RPC 2.0 Request #${reqId}]`,
+      title: `--> LOCAL MOCK · JSON-RPC sample request #${reqId}`,
       payload: requestPayload
     });
 
@@ -192,25 +176,16 @@ export class PlaygroundController {
     // 4. Log Inbound Frame
     const statusLine = response.error ? 'HTTP/1.1 400 Bad Request' : 'HTTP/1.1 200 OK';
     this.appendStreamFrame('inbound', {
-      title: `<-- Mock response (${elapsed}ms simulated)`,
+      title: `<-- LOCAL SAMPLE · ${statusLine} (${elapsed}ms mock latency)`,
       payload: response
     });
   }
 
   updateLatencyBadge(ms) {
     if (!this.latencyBadge) return;
-    this.latencyBadge.classList.remove('status-urgent', 'status-warning', 'status-protected');
-
-    if (ms <= 30.0) {
-      this.latencyBadge.classList.add('status-protected');
-      this.latencyBadge.innerHTML = `🟢 <strong>${ms}ms</strong> <span class="badge-label">(SLA Pass &lt;30ms)</span>`;
-    } else if (ms <= 100.0) {
-      this.latencyBadge.classList.add('status-warning');
-      this.latencyBadge.innerHTML = `🟡 <strong>${ms}ms</strong> <span class="badge-label">(Acceptable)</span>`;
-    } else {
-      this.latencyBadge.classList.add('status-urgent');
-      this.latencyBadge.innerHTML = `🔴 <strong>${ms}ms</strong> <span class="badge-label">(Exceeds SLA)</span>`;
-    }
+    this.latencyBadge.classList.remove('status-urgent', 'status-warning');
+    this.latencyBadge.classList.add('status-protected');
+    this.latencyBadge.innerHTML = `🧪 <strong>${ms}ms</strong> <span class="badge-label">(local mock, not live timing)</span>`;
   }
 
   appendStreamFrame(direction, { title, payload, content }) {
@@ -242,19 +217,6 @@ export class PlaygroundController {
   }
 
   copyCurlCommand() {
-    const publicReadOnlyTools = new Set([
-      'policy_lookup',
-      'statutory_law_lookup',
-      'subscription_category_rules',
-    ]);
-    if (this.activeTool !== 'tools/list' && !publicReadOnlyTools.has(this.activeTool)) {
-      this.appendStreamFrame('error', {
-        title: 'Local demo only',
-        content: `${this.activeTool} is simulated in this browser and is not available on the public MCP endpoint.`,
-      });
-      return;
-    }
-
     let args = {};
     try {
       args = JSON.parse(this.argsEditor?.value || '{}');
@@ -272,7 +234,7 @@ export class PlaygroundController {
       }
     };
 
-    const curl = `curl -s -X POST "https://[project].page.dev/api/mcp" \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(payload)}' | jq .`;
+    const curl = `curl -s -X POST "${window.location.origin}/api/mcp" \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(payload)}' | jq .`;
 
     navigator.clipboard.writeText(curl).then(() => {
       if (this.copyCurlBtn) {

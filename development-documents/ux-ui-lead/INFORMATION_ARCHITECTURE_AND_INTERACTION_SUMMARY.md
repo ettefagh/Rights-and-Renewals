@@ -47,6 +47,12 @@ flowchart TD
     S_Home ==>|"Open Protected Vault CTA"| A_Root
 ```
 
+### Responsive wallet and showcase navigation
+
+The English wallet opens on **Deadlines**. At wider widths, a selected deadline opens its details beside the list. At narrow widths, details follow the list. The floating **Deadlines**, **Vault**, and **Wiki** pill is paired with a separate quick-action button. The **Vault** destination keeps the existing wallet and calendar tools available. **Wiki** opens the public reference directory.
+
+The English showcase stacks the introduction and sample demo on mobile and places them side by side on desktop. The sample is labeled as fictional. **Open wallet** opens the personal app. The **Policy Wiki** and **MCP Playground** are public entry points.
+
 ### 1.1 Sitemap & Execution Boundary Matrix
 
 | Domain | Route / State | Astro / Svelte Boundary | Network & Data Dependency | Primary User Task |

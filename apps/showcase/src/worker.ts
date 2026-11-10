@@ -34,7 +34,7 @@ const fetchWithRequestOrigin: ExportedHandlerFetchHandler<Env> = async (request,
   const response = await workerFetch(assetRequest, env, context);
   if (!shouldTemplate || request.method !== 'GET' || !response.ok) return response;
 
-  const body = await response.text();
+  const body = await response.clone().text();
   const renderedBody = body
     .replaceAll('{{ORIGIN}}', url.origin)
     .replaceAll('{{HOST}}', url.host);

@@ -27,7 +27,7 @@
         id: res.itemId,
         title: orig?.title ?? 'Unknown',
         taxCategory: res.taxCategory,
-        purchaseDate: orig?.purchaseDate ?? `${taxYear}-01-01`,
+        purchaseDate: orig?.purchaseDate ?? '',
         priceGrossEur: res.grossPriceEur,
         beruflicheNutzungProzent: res.workUsagePercent,
         deductibleEur: res.deductibleAmountEur,
@@ -67,9 +67,9 @@
       <span>Back</span>
     </button>
     <div class="header-titles">
-      <h2 class="page-title">§ 9 EStG Werbungskosten & ELSTER Tax Summary</h2>
+      <h2 class="page-title">Tax export</h2>
       <p class="page-subtitle">
-        Tax year {taxYear} • 100% 1-year digital Sofortabschreibung per BMF 22.02.2022 & GWG &le;€952 gross.
+        Review your records for tax year {taxYear} before filing.
       </p>
     </div>
   </div>
@@ -77,15 +77,15 @@
   <!-- Summary Metric Banner -->
   <div class="metrics-banner">
     <div class="metric-block">
-      <span class="m-label">Total Deductible Werbungskosten</span>
+      <span class="m-label">Deductible expenses*</span>
       <span class="m-val text-pine">€{summary.totalDeductibleEur.toFixed(2)}</span>
     </div>
     <div class="metric-block">
-      <span class="m-label">1-Year Sofortabschreibung (BMF 2022)</span>
+      <span class="m-label">Immediate depreciation*</span>
       <span class="m-val">€{sofortabschreibungTotalEur.toFixed(2)}</span>
     </div>
     <div class="metric-block">
-      <span class="m-label">Tax Eligible Items</span>
+      <span class="m-label">Tagged items</span>
       <span class="m-val">{lineItems.length}</span>
     </div>
   </div>
@@ -95,7 +95,7 @@
     <div class="table-header-bar">
       <div class="title-wrap">
         <Receipt size={18} />
-        <h3 class="table-title">Tax Year {taxYear} Expense Ledger (Anlage N)</h3>
+        <h3 class="table-title">Tax year {taxYear} expense summary</h3>
       </div>
       <button
         type="button"
@@ -127,11 +127,11 @@
             </tr>
           </thead>
           <tbody>
-            {#each lineItems as row}
+            {#each lineItems as row (row.id)}
               <tr>
                 <td class="font-semibold">{row.title}</td>
                 <td><span class="tax-badge">{row.taxCategory}</span></td>
-                <td>{row.purchaseDate}</td>
+                <td>{row.purchaseDate || '—'}</td>
                 <td>€{row.priceGrossEur.toFixed(2)}</td>
                 <td>{row.beruflicheNutzungProzent}%</td>
                 <td class="font-bold text-pine">€{row.deductibleEur.toFixed(2)}</td>
@@ -169,6 +169,49 @@
     display: flex;
     align-items: center;
     gap: var(--space-3, 12px);
+  }
+
+  .metrics-banner {
+    gap: 16px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .metric-block {
+    flex: 1 1 150px;
+    min-width: 0;
+  }
+
+  .table-header-bar {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 600px) {
+    .view-header {
+      align-items: flex-start;
+    }
+
+    .back-btn {
+      min-height: 48px;
+      flex: 0 0 auto;
+    }
+
+    .page-title {
+      font-size: 24px;
+    }
+
+    .metrics-banner {
+      gap: 12px;
+    }
+
+    .metric-block {
+      flex-basis: calc(50% - 6px);
+    }
+
+    .csv-export-btn {
+      min-height: 48px;
+    }
   }
 
   .back-btn {

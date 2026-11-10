@@ -1,69 +1,23 @@
 ---
-import ShowcaseVaultScene from '../components/3d/ShowcaseVaultScene.svelte';
 import '../../styles/tokens.css';
 import '../../styles/main.css';
+import '../../styles/homepage.css';
+import AudienceSwitch from '../components/AudienceSwitch.astro';
+import { ArrowUpRight, CalendarDays, ChevronRight, Menu, ReceiptText, RefreshCw, ShieldCheck } from 'lucide-svelte';
 
 export const prerender = false;
 
-const mcpUrl = new URL('/api/mcp', Astro.url.origin).toString();
+const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
 
-const accept = Astro.request.headers.get('accept') || '';
-let prefersMarkdown = false;
-if (accept.includes('text/markdown')) {
-  prefersMarkdown = true;
-  if (accept.includes('text/html')) {
-    let qMd = 1.0;
-    let qHtml = 1.0;
-    for (const part of accept.split(',')) {
-      const p = part.trim();
-      if (p.startsWith('text/markdown')) {
-        const m = p.match(/q=([0-9.]+)/);
-        if (m) qMd = parseFloat(m[1]);
-      } else if (p.startsWith('text/html')) {
-        const m = p.match(/q=([0-9.]+)/);
-        if (m) qHtml = parseFloat(m[1]);
-      }
-    }
-    if (qHtml > qMd) prefersMarkdown = false;
-  }
-}
-
-if (prefersMarkdown) {
-  return new Response(`# Rights & Renewals (Showcase)
-
-> Sovereign Consumer Rights, Subscription & Warranty Wallet with Brand Policy Wiki and Open MCP Server.
-
-## Features & Capabilities
-- **Brand Policy Wiki**: Verified BGB §§ 437, 438, 477 warranty terms & § 312k cancellation rules for top 20 brands.
-- **Model Context Protocol (MCP)**: Public, read-only JSON-RPC tools over Streamable HTTP at ${mcpUrl}.
-- **Agent Discovery**: API Catalog (RFC 9727), ARD AI Catalog, MCP Server Card, and Agent Skills.
-
-## Discovery Resources
-- API Catalog: \`/.well-known/api-catalog\`
-- MCP Server Card: \`/.well-known/mcp/server-card.json\`
-- Agent Skills: \`/.well-known/agent-skills/index.json\`
-- Service details: \`/auth.md\`
-- Setup guide: \`/agent-setup\`
-`, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-      'Vary': 'Accept',
-      'Link': '</.well-known/api-catalog>; rel="api-catalog", </auth.md>; rel="service-doc"',
-      'Access-Control-Allow-Origin': '*',
-      'x-markdown-tokens': '180'
-    }
-  });
-}
 ---
 
 <!DOCTYPE html>
-<html lang="de" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Rights &amp; Renewals · CM-LAB · MCP Server &amp; Consumer Wallet Showcase</title>
-  <meta name="description" content="Rights & Renewals: Showcase webpage demonstrating the Model Context Protocol (MCP 2025-11-25) Streamable HTTP interface and the offline-first German consumer warranty & subscription wallet." />
+  <title>Rights &amp; Renewals · Receipts, subscriptions and consumer policies</title>
+  <meta name="description" content="Save receipts on your device, track warranty and renewal dates, and look up consumer policies for purchases and subscriptions in Germany." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -96,7 +50,8 @@ if (prefersMarkdown) {
   <link rel="stylesheet" href="/styles/tokens.css" />
   <link rel="stylesheet" href="/styles/main.css" />
 </head>
-<body class="showcase-shell">
+<body class="showcase-shell showcase-home">
+  <a class="home-skip" href="#showcase-main">Skip to content</a>
 
   <!-- ========================================================================
        STICKY UTILITY HEADER
@@ -109,27 +64,29 @@ if (prefersMarkdown) {
       </a>
 
       <nav class="nav-links" aria-label="Main Navigation">
-        <a href="#hero" class="nav-item">Überblick</a>
+        <a href="#wallet-demo" class="nav-item">Wallet demo</a>
+        <a href="/wiki" class="nav-item">Policy Wiki</a>
         <a href="#mcp-playground" class="nav-item">MCP Playground</a>
-        <a href="#omnibar-section" class="nav-item">Omnibar Suche</a>
-        <a href="#calendars-section" class="nav-item">Fristen-Kalender</a>
-        <a href="#dashboard-widgets" class="nav-item">Widgets &amp; GoBD</a>
-        <a href="/wiki" class="nav-item">Brand Policy Wiki</a>
-        <a href="/emdash" class="nav-item">EmDash CMS</a>
-        <a href="/agent-setup" class="nav-item">Agent Setup</a>
+        <a href="/agent-setup" class="nav-item" data-action="open-quick-connect" id="header-connect-btn">Agent setup</a>
       </nav>
 
       <div class="nav-actions">
-        <a href="/agent-setup" class="btn-compact btn-outline" data-action="open-quick-connect" id="header-connect-btn">
-          ⚡ Agent anbinden
-        </a>
-        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Theme umschalten" title="Theme umschalten">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Toggle theme" title="Toggle theme">
           <span class="theme-icon" aria-hidden="true">🌙</span>
         </button>
         <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
-          📱 Zur App ↗
+          Open wallet ↗
         </a>
       </div>
+      <details class="mobile-nav">
+        <summary aria-label="Menu"><Menu size={24} aria-hidden="true" /><span class="sr-only">Menu</span></summary>
+        <nav class="mobile-nav-panel" aria-label="Mobile navigation">
+          <a href="#wallet-demo">Wallet demo</a>
+          <a href="/wiki">Policy Wiki</a>
+          <a href="#mcp-playground">MCP Playground</a>
+          <a href="/agent-setup">Agent setup</a>
+        </nav>
+      </details>
     </div>
   </header>
 
@@ -137,87 +94,88 @@ if (prefersMarkdown) {
        MAIN SHOWCASE CONTENT
        ======================================================================== -->
   <main id="showcase-main">
+    <AudienceSwitch humanHref="/" machineHref="/machine/view/home" />
 
-    <!-- HERO SECTION: TWO FACES OF GROUND TRUTH -->
-    <section id="hero" class="hero-section">
-      <div class="layout-container hero-inner">
-        <div class="hero-pill-badge">
-          <span>🏛️ BGB §§ 437, 477, 312k</span> · <span>MCP 2025-11-25 · Streamable HTTP</span> · <span>GoBD Rn. 108–110</span>
-        </div>
-
-        <h1 class="hero-title">
-          Two Faces of the Same <span class="text-gradient">Ground Truth</span>
-        </h1>
-
-        <p class="hero-subtitle">
-          Statutarische deutsche Verbraucherrechte, GoBD-konforme Belegintegrität und Steuerintelligenz —
-          symmetrisch erschließbar für <strong>menschliche Verbraucher</strong> via Offline-First-Web-App und
-          <strong>autonome KI-Agenten</strong> via Model Context Protocol (MCP JSON-RPC 2.0).
-        </p>
-
-        <!-- Threlte 8 3D Vault Card Interactive Hero Canvas -->
-        <div class="hero-3d-scene-container" style="max-width: 580px; margin: var(--space-6, 24px) auto;">
-          <ShowcaseVaultScene client:load />
-        </div>
-
-        <div class="hero-ctas">
-          <a href="#mcp-playground" class="btn btn-primary">
-            ⚡ MCP Console testen ↓
-          </a>
-          <a href="https://rightsandrenewals-app.pages.dev/#action=quick-add&brand=Sony&name=Sony+WH-1000XM5&price=279&category=hardware" data-legacy-url="https://app.cm-lab.pages.dev/#action=quick-add&brand=Sony&name=Sony+WH-1000XM5&price=279&category=hardware" class="btn btn-accent" target="_blank" rel="noopener noreferrer">
-            📱 Standalone Web-App öffnen ↗
-          </a>
-          <a href="/wiki" class="btn btn-outline">
-            📖 Brand Policy Wiki (Top 20) →
-          </a>
-        </div>
-
-        <div class="hero-pillars-grid">
-          <div class="pillar-card pillar-card-primary">
-            <div>
-              <span class="pillar-kicker">01 · SYMMETRIC PROTOCOL ENGINE · MCP 2025-11-25</span>
-              <h3 class="pillar-title" style="font-size: 18px; margin-top: 6px;">Dual-Surface Consumer Ground Truth</h3>
-              <p class="pillar-desc" style="margin-top: 6px;">
-                Die lokale <strong>100dvh Offline-First Wallet PWA</strong> (Dexie.js v4 + WebCrypto AES-GCM-256) unterstützt die persönliche Fallverwaltung. Die öffentliche MCP-API bietet separat schreibgeschützte Policy- und Rechtsquellenabfragen.
-              </p>
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
-              <span class="hero-pill-badge" style="margin: 0;">Zero Cloud Plaintext (Art. 25 DSGVO)</span>
-              <span class="hero-pill-badge" style="margin: 0;">Dual RFC 5545 iCal Feeds</span>
-            </div>
+    <section id="hero" class="home-hero" aria-labelledby="home-title">
+      <div class="layout-container home-hero-grid">
+        <div class="home-intro">
+          <p class="home-kicker">Your purchase and subscription wallet</p>
+          <h1 id="home-title">Keep track of what you buy and what renews.</h1>
+          <p class="home-deck">Save receipts, see upcoming dates, and find out what to do when you need to cancel a subscription or report a faulty purchase.</p>
+          <div class="home-actions">
+            <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Open the wallet <ArrowUpRight size={18} aria-hidden="true" /></a>
+            <a href="#wallet-demo" class="btn btn-outline">Explore the demo</a>
           </div>
-          <div class="pillar-card">
-            <span class="pillar-kicker">02 · CONSUMER WALLET SHELL</span>
-            <h3 class="pillar-title">Omnibar, 3 Kalender &amp; § 312k Guard</h3>
-            <p class="pillar-desc">
-              Manuelle &lt;15s Belegerfassung ohne Cloud-OCR, 3 spezialisierte Fristen-Kalender und direkter 1-Tap Kündigungsbutton.
-            </p>
-          </div>
-          <div class="pillar-card">
-            <span class="pillar-kicker">03 · SAFE-HARBOR RECHTSLOGIK</span>
-            <h3 class="pillar-title">§ 477 Beweislast &amp; LexFox-Schutz</h3>
-            <p class="pillar-desc">
-              Taggenaue Berechnung der 12-Monats-Beweislastumkehr (§ 477 Abs. 1 BGB) und 5 verifizierte BGB-Mustervorlagen (RDG §§ 2, 3).
-            </p>
-          </div>
+          <p class="home-note"><ShieldCheck size={19} aria-hidden="true" /> Your receipts stay on your device.</p>
         </div>
+
+        <section id="wallet-demo" class="home-demo" aria-labelledby="sample-preview-title">
+          <div class="home-demo-head">
+            <span class="home-demo-label">Wallet preview</span>
+            <span class="home-demo-badge">Sample data</span>
+          </div>
+          <h2 id="sample-preview-title">What’s coming up</h2>
+          <div class="home-demo-list">
+            <details class="home-event">
+              <summary><CalendarDays size={22} aria-hidden="true" /><span><strong>Gym membership</strong><small>Cancellation deadline in 3 days</small></span><ChevronRight size={18} aria-hidden="true" /></summary>
+              <p>Check the deadline before you decide whether to keep or cancel a membership.</p>
+            </details>
+            <details class="home-event">
+              <summary><RefreshCw size={22} aria-hidden="true" /><span><strong>Music subscription</strong><small>Renews in 5 days</small></span><ChevronRight size={18} aria-hidden="true" /></summary>
+              <p>See when the next billing period starts so you can review the subscription in time.</p>
+            </details>
+            <details class="home-event">
+              <summary><ReceiptText size={22} aria-hidden="true" /><span><strong>Headphones</strong><small>Warranty date in 3 weeks</small></span><ChevronRight size={18} aria-hidden="true" /></summary>
+              <p>Open the purchase to find its receipt and review the dates you saved.</p>
+            </details>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="home-guide" aria-labelledby="home-guide-title">
+      <div class="layout-container">
+        <p class="home-kicker">How the wallet works</p>
+        <h2 id="home-guide-title">Find the receipt and decide what to do next</h2>
+        <ol class="home-steps">
+          <li><span class="home-step-number" aria-hidden="true">01</span><h3>Save a purchase</h3><p>Add a purchase or subscription and attach a photo of the receipt if you have one.</p></li>
+          <li><span class="home-step-number" aria-hidden="true">02</span><h3>See what’s coming up</h3><p>Review upcoming dates alongside the purchases and subscriptions they belong to.</p></li>
+          <li><span class="home-step-number" aria-hidden="true">03</span><h3>Prepare your next step</h3><p>Find the provider’s information or prepare a cancellation or claim draft to review before sending.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="home-reference" aria-label="Public tools and resources">
+      <div class="layout-container home-reference-grid">
+        <article class="home-reference-item">
+          <p class="home-kicker">Policy Wiki</p>
+          <h2>Look up a brand’s policy</h2>
+          <p>Find cancellation and warranty information for brands and services in Germany.</p>
+          <a href="/wiki">Browse the Policy Wiki <ChevronRight size={18} aria-hidden="true" /></a>
+        </article>
+        <article class="home-reference-item">
+          <p class="home-kicker">Developer tools</p>
+          <h2>Try the MCP server</h2>
+          <p>Run a policy lookup or draft a sample notice. The playground shows the JSON-RPC request and response.</p>
+          <a href="#mcp-playground">Open the MCP Playground <ChevronRight size={18} aria-hidden="true" /></a>
+          <a href="/agent-setup">Set up your agent <ChevronRight size={18} aria-hidden="true" /></a>
+        </article>
       </div>
     </section>
 
     <!-- URGENT ATTENTION NOTIFICATION BANNER -->
     <div class="layout-container" style="margin-top: var(--space-8);">
-      <div id="urgent-attention-widget" role="region" aria-label="Dringender Handlungsbedarf"></div>
+      <div id="urgent-attention-widget" role="region" aria-label="Upcoming reminders"></div>
     </div>
 
     <!-- SPLIT-SCREEN MCP PLAYGROUND (FEATURE 5) -->
-    <section id="mcp-playground" class="playground-section">
+    <section id="mcp-playground" class="playground-section home-lab">
       <div class="layout-container">
         <div class="section-header">
-          <span class="section-tag">FEATURE 5 · INTERACTIVE BENCHMARK</span>
-          <h2 class="section-title">Split-Screen MCP Protocol Playground</h2>
+          <span class="section-tag">Developer sandbox</span>
+          <h2 class="section-title">MCP Playground</h2>
           <p class="section-subtitle text-muted">
-            Testen Sie den clientseitigen MCP-Demo-Transport mit Beispieldaten.
-            Die öffentliche MCP-API stellt drei schreibgeschützte Tools für veröffentlichte Policies, Rechtsquellen und Abo-Regeln bereit.
+            Run a simulated request with sample data and inspect the exchange. Copy the cURL command to try the live endpoint.
           </p>
         </div>
 
@@ -225,60 +183,61 @@ if (prefersMarkdown) {
           <!-- Left Sub-Panel: MCP Protocol Console -->
           <div class="mcp-console-panel card">
             <div class="panel-header-row">
-              <div class="font-bold">⚡ MCP Wire Protocol Console</div>
+              <div class="font-bold">Request console · local mock</div>
               <div id="mcp-latency-badge" class="latency-badge status-protected">
-                🟢 <strong>4.2ms</strong> <span class="badge-label">(SLA Pass &lt;30ms)</span>
+                Ready to run
               </div>
             </div>
 
             <div class="controls-row">
               <div class="form-group">
-                <label for="mcp-tool-select">MCP TOOL AUSWÄHLEN</label>
+                <label for="mcp-tool-select">Tool</label>
                 <select id="mcp-tool-select" class="form-select">
-                  <option value="policy_lookup">policy_lookup (BGB Policy &amp; § 312k Button)</option>
-                  <option value="claim_dossier_generate">claim_dossier_generate (Local Demo Only)</option>
+                  <option value="policy_lookup">policy_lookup (sample catalog)</option>
+                  <option value="statutory_law_lookup">statutory_law_lookup (sample statute reference)</option>
+                  <option value="subscription_category_rules">subscription_category_rules (sample rules)</option>
                   <option value="tools/list">tools/list (MCP Introspection)</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label for="mcp-preset-select">BEISPIEL-SZENARIO LADEN</label>
+                <label for="mcp-preset-select">Example</label>
                 <select id="mcp-preset-select" class="form-select">
-                  <option value="spotify">Spotify Student Kündigung (§ 312k)</option>
-                  <option value="apple_macbook">Apple MacBook Pro 16 M3 Mängelrüge (Local Demo)</option>
-                  <option value="sony_headphones">Sony WH-1000XM5 Monat 11 Klippe (Local Demo)</option>
-                  <option value="tools_list">tools/list Introspektion</option>
+                  <option value="spotify">Spotify policy sample (local data)</option>
+                  <option value="law_477">BGB § 477 reference (sample)</option>
+                  <option value="subscription_rules">Subscription rules (sample)</option>
+                  <option value="tools_list">tools/list inspection</option>
                 </select>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="mcp-args-editor">JSON-RPC ARGUMENT EDITOR</label>
+              <label for="mcp-args-editor">Arguments (JSON)</label>
               <textarea id="mcp-args-editor" class="form-textarea" spellcheck="false"></textarea>
             </div>
 
             <div class="actions-bar">
               <div class="actions-left">
                 <button id="mcp-run-btn" class="btn-compact btn-primary">
-                  ▶ Tool Call ausführen
+                  Run request
                 </button>
                 <button id="mcp-copy-curl-btn" class="btn-compact btn-outline">
-                  📋 cURL kopieren
+                  Copy cURL
                 </button>
               </div>
               <div class="actions-right">
                 <button id="mcp-open-claude-btn" class="btn-compact btn-outline">
-                  ⚙ In Claude Desktop
+                  Open in Claude Desktop
                 </button>
-                <button id="mcp-clear-stream-btn" class="btn-compact btn-outline" title="Stream leeren">
-                  🧹 Leeren
+                <button id="mcp-clear-stream-btn" class="btn-compact btn-outline" title="Clear stream">
+                  Clear results
                 </button>
               </div>
             </div>
 
             <!-- Wire Protocol Streamer -->
             <div class="stream-output-wrapper" id="mcp-stream-output" aria-live="polite">
-              <div class="stream-empty">Bereit für JSON-RPC 2.0 Aufrufe. Klicken Sie auf "Tool Call ausführen".</div>
+              <div class="stream-empty">Local mock only · sample data, not a live response. Select a tool to inspect the exchange.</div>
             </div>
           </div>
 
@@ -289,14 +248,13 @@ if (prefersMarkdown) {
     </section>
 
     <!-- SHOWCASE UNIFIED OMNIBAR SEARCH (FEATURE 10) -->
-    <section id="omnibar-section" class="omnibar-section">
+    <section id="omnibar-section" class="omnibar-section home-lab">
       <div class="layout-container">
         <div class="section-header">
-          <span class="section-tag">FEATURE 10 · UNIVERSAL OMNIBAR</span>
-          <h2 class="section-title">Multi-Domain Omnibar Such-Sandbox</h2>
+          <span class="section-tag">Sample wallet tools</span>
+          <h2 class="section-title">Search the sample wallet</h2>
           <p class="section-subtitle text-muted">
-            Durchsuchen Sie in &lt;5ms 20 kuratierte Marken-Policies, gespeicherte Wallet-Belege
-            oder tippen Sie <code>&gt;</code> für Sofortbefehle (z. B. <code>&gt;claim</code>, <code>&gt;cancel</code>, <code>&gt;tax</code>).
+            Search brand policies and example entries, or try a command such as <code>&gt;cancel</code>.
           </p>
         </div>
 
@@ -305,26 +263,26 @@ if (prefersMarkdown) {
     </section>
 
     <!-- THREE DISTINCT CALENDAR ARCHITECTURES (FEATURES 7, 8, 9) -->
-    <section id="calendars-section" class="calendar-section">
+    <section id="calendars-section" class="calendar-section home-lab">
       <div class="layout-container">
         <div id="calendar-suite-root"></div>
       </div>
     </section>
 
     <!-- MODULAR DASHBOARD WIDGETS (FEATURE 6, 18) -->
-    <section id="dashboard-widgets" class="widgets-section">
+    <section id="dashboard-widgets" class="widgets-section home-lab">
       <div class="layout-container">
         <div class="section-header">
-          <span class="section-tag">FEATURES 6 &amp; 18 · MODULAR DASHBOARD</span>
-          <h2 class="section-title">Finanz-, Steuer- &amp; GoBD-Kryptonachweise</h2>
+          <span class="section-tag">Sample wallet tools</span>
+          <h2 class="section-title">Review spending and receipt records</h2>
           <p class="section-subtitle text-muted">
-            Revisionssichere Beleg-Hashes nach GoBD Rn. 108–110 und automatisierte Sofortabschreibungs-Übersicht.
+            See how the wallet can organize spending and receipt records for your own review.
           </p>
         </div>
 
         <div class="widgets-grid">
           <div id="spend-radar-widget"></div>
-          <div id="gobd-feed-widget" style="grid-column: span 2;"></div>
+          <div id="gobd-feed-widget"></div>
         </div>
       </div>
     </section>
@@ -338,16 +296,27 @@ if (prefersMarkdown) {
 
   </main>
 
+  <footer class="home-footer">
+    <div class="layout-container home-footer-inner">
+      <a href="/">Rights &amp; Renewals</a>
+      <nav aria-label="Footer navigation">
+        <a href="/wiki">Policy Wiki</a>
+        <a href="/agent-setup">Agent setup</a>
+        <a href="/emdash">EmDash CMS</a>
+      </nav>
+    </div>
+  </footer>
+
   <!-- QUICK-CONNECT MODAL DIALOG -->
   <dialog id="quick-connect-modal" class="modal-dialog">
     <div class="modal-content card">
       <div class="modal-header">
-        <h3 class="modal-title">⚡ AI Agent Quick-Connect Configuration</h3>
-        <button class="modal-close-btn" data-action="close-modal" aria-label="Schließen">✕</button>
+        <h3 class="modal-title">Connect an agent</h3>
+        <button class="modal-close-btn" data-action="close-modal" aria-label="Close">✕</button>
       </div>
       <div class="modal-body">
         <p class="text-muted text-sm">
-          Binden Sie diesen Rights & Renewals Model Context Protocol (MCP) Server direkt an Ihre bevorzugten KI-Entwicklungsumgebungen an.
+          Connect the Rights &amp; Renewals Model Context Protocol (MCP) server to your preferred AI development environment.
         </p>
 
         <div class="config-tabs">
@@ -357,7 +326,7 @@ if (prefersMarkdown) {
   "mcpServers": {
     "rights-and-renewals": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "${mcpUrl}"]
+      "args": ["-y", "mcp-remote", "${mcpEndpoint}"]
     }
   }
 }`}</code></pre>
@@ -368,7 +337,7 @@ if (prefersMarkdown) {
             <pre class="code-block"><code>{`{
   "mcpServers": {
     "rights-and-renewals": {
-      "url": "${mcpUrl}"
+      "url": "${mcpEndpoint}"
     }
   }
 }`}</code></pre>
@@ -376,8 +345,8 @@ if (prefersMarkdown) {
         </div>
       </div>
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="/agent-setup" class="btn btn-primary" style="font-size: 0.88rem;">Alle 6 Agenten konfigurieren →</a>
-        <button class="btn btn-outline" data-action="close-modal">Schließen</button>
+        <a href="/agent-setup" class="btn btn-primary" style="font-size: 0.88rem;">View agent setup →</a>
+        <button class="btn btn-outline" data-action="close-modal">Close</button>
       </div>
     </div>
   </dialog>
@@ -386,6 +355,13 @@ if (prefersMarkdown) {
   <script>
     import '../main.js';
     import '../components/webmcp.ts';
+
+    document.querySelectorAll('.mobile-nav-panel a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const menu = link.closest('details');
+        if (menu) menu.open = false;
+      });
+    });
   </script>
 </body>
 </html>
