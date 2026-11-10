@@ -46,5 +46,26 @@
       "binding": "SESSION",
       "id": "42693ee204b84807862e170724721f57"
     }
-  ]
+  ],
+  "previews": {
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "rightsandrenewals-issue35-preview",
+        "database_id": "5cd616d4-a667-491d-99bb-64f98d797334"
+      }
+    ],
+    "r2_buckets": [
+      {
+        "binding": "MEDIA",
+        "bucket_name": "rightsandrenewals-issue35-preview-media"
+      }
+    ],
+    "kv_namespaces": [
+      {
+        "binding": "SESSION",
+        "id": "9b41215bc3864481b5e52bfa802a3af8"
+      }
+    ]
+  }
 }
