@@ -9,14 +9,13 @@ const SHOWCASE_MARKDOWN = `# Rights & Renewals (Showcase)
 ## Features & Capabilities
 - **Brand Policy Wiki**: Verified BGB §§ 437, 438, 477 warranty terms & § 312k cancellation rules for top 20 brands.
 - **Model Context Protocol (MCP)**: Native JSON-RPC 2.0 endpoints for AI agents.
-- **Agent Discovery**: API Catalog (RFC 9727), OAuth Protected Resource Metadata (RFC 9728), ARD AI Catalog, and WebMCP tools.
+- **Agent Discovery**: API Catalog, MCP server card, and agent skills.
 
 ## Discovery Resources
 - API Catalog: \`/.well-known/api-catalog\`
 - MCP Server Card: \`/.well-known/mcp/server-card.json\`
-- OAuth Metadata: \`/.well-known/oauth-protected-resource\`
 - Agent Skills: \`/.well-known/agent-skills/index.json\`
-- Agent Registration: \`/auth.md\`
+- Public access: \`/auth.md\`
 `;
 
 export async function onRequest(context: any) {

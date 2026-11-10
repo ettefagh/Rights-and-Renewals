@@ -3,12 +3,12 @@
   "version": "1.0",
   "serverInfo": {
     "name": "rights-and-renewals",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "title": "Rights & Renewals MCP Server",
-    "description": "Sovereign consumer rights lookup, statutory warranty defense, contract renewal tracking, and automated cancellation letter generation."
+    "description": "Public read-only German consumer policy and law lookups."
   },
   "title": "Rights & Renewals MCP Server",
-  "description": "Authoritative Model Context Protocol server for German statutory consumer warranty rights (BGB §§ 434, 437, 438, 477), subscription cancellation laws (BGB § 309 Nr. 9, § 312k), and tax deductibility evaluation (BMF 2022).",
+  "description": "Public MCP for German brand policy, statutory sources, and scoped subscription rules.",
   "url": "https://rightsandrenewals.pages.dev/api/mcp",
   "websiteUrl": "https://rightsandrenewals.pages.dev/agent-setup",
   "transport": {
@@ -29,44 +29,44 @@
       "type": "streamable-http",
       "url": "https://rightsandrenewals.pages.dev/api/mcp",
       "protocolVersions": [
-        "2024-11-05",
-        "2025-11-25"
+        "2025-11-25",
+        "2025-06-18",
+        "2025-03-26"
       ]
     }
   ],
   "capabilities": {
     "tools": {
       "listChanged": false
-    },
-    "resources": {
-      "subscribe": false,
-      "listChanged": false
-    },
-    "prompts": {
-      "listChanged": false
     }
   },
   "tools": [
     {
       "name": "policy_lookup",
-      "description": "Look up scoped German goods or subscription policies, with statutory and available provider sources.",
+      "description": "Look up cataloged German goods or subscription policies with statutory and available provider sources.",
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      },
       "inputSchema": {
         "type": "object",
         "properties": {
           "service_slug": {
             "type": "string",
-            "description": "Brand or service slug (e.g. 'spotify', 'apple', 'mediamarkt')"
+            "minLength": 1
           },
           "brand_slug": {
             "type": "string",
-            "description": "Alias for service_slug for dual-slug compatibility"
+            "minLength": 1,
+            "description": "Alias for service_slug"
           },
           "category": {
             "type": "string",
             "enum": [
               "hardware",
               "subscription"
-            ]
+            ],
+            "description": "Optional assertion of the catalog category"
           }
         },
         "anyOf": [
@@ -80,235 +80,365 @@
               "brand_slug"
             ]
           }
-        ]
-      }
-    },
-    {
-      "name": "claim_dossier_generate",
-      "description": "Draft a German goods-defect notice or an ordinary contract cancellation. The draft requires review before sending.",
-      "inputSchema": {
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
         "type": "object",
         "properties": {
           "brand_slug": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Brand or provider identifier"
+            "type": "string"
           },
-          "service_slug": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Alias for brand_slug"
+          "brand_name": {
+            "type": "string"
           },
-          "item_name": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Product name, or a legacy alias for contract_name"
-          },
-          "contract_name": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Name of the contract to cancel"
-          },
-          "contract_reference": {
-            "type": "string",
-            "description": "Optional contract reference"
-          },
-          "purchase_date": {
-            "type": "string",
-            "format": "date",
-            "description": "Purchase date for a goods-defect notice"
-          },
-          "defect_description": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Factual defect description for a goods-defect notice"
-          },
-          "issue_type": {
-            "type": "string",
-            "enum": [
-              "statutory_defect_claim",
-              "contract_cancellation"
-            ],
-            "default": "statutory_defect_claim"
-          }
-        },
-        "allOf": [
-          {
-            "anyOf": [
-              {
-                "required": [
-                  "brand_slug"
-                ]
-              },
-              {
-                "required": [
-                  "service_slug"
-                ]
-              }
-            ]
-          },
-          {
-            "if": {
-              "required": [
-                "issue_type"
-              ],
-              "properties": {
-                "issue_type": {
-                  "const": "contract_cancellation"
-                }
-              }
-            },
-            "then": {
-              "anyOf": [
-                {
-                  "required": [
-                    "contract_name"
-                  ]
-                },
-                {
-                  "required": [
-                    "item_name"
-                  ]
-                }
-              ]
-            },
-            "else": {
-              "required": [
-                "item_name",
-                "purchase_date",
-                "defect_description"
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "statutory_law_lookup",
-      "description": "Look up verbatim German statutory consumer law clauses (BGB §§ 437, 438, 477, 309 Nr. 9, 312k) and legal guidance.",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "section": {
-            "type": "string",
-            "description": "Statutory section code, e.g. '477', '312k', '309', '437', '438'"
-          }
-        },
-        "required": [
-          "section"
-        ]
-      }
-    },
-    {
-      "name": "subscription_category_rules",
-      "description": "Retrieve legal renewal rules, maximum statutory notice periods, and mandatory cancellation button requirements for a subscription category.",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
           "category": {
-            "type": "string",
-            "description": "Category name, e.g. 'streaming', 'telecom', 'software', 'fitness'"
-          }
-        },
-        "required": [
-          "category"
-        ]
-      }
-    },
-    {
-      "name": "tax_deductibility_check",
-      "description": "Screen German work or study expenses. Generic categories require manual review. BMF one-year useful life is limited to specified hardware and acquired software.",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "item_name": {
-            "type": "string",
-            "description": "Name of the item or asset"
-          },
-          "asset_name": {
-            "type": "string",
-            "description": "Canonical asset name"
-          },
-          "item_category": {
             "type": "string",
             "enum": [
               "hardware",
               "subscription"
             ]
           },
-          "asset_category": {
+          "jurisdiction": {
             "type": "string",
-            "enum": [
-              "computer_hardware",
-              "peripherals",
-              "software_saas",
-              "subscription",
-              "hardware",
-              "acquired_business_software",
-              "academic_literature",
-              "smartphone",
-              "office_furniture"
+            "const": "DE"
+          },
+          "statutory_warranty_months": {
+            "type": [
+              "integer",
+              "null"
             ]
           },
-          "gross_price_eur": {
-            "type": "number",
-            "exclusiveMinimum": 0
-          },
-          "professional_use_percent": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
-          },
-          "academic_usage_percent": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100
-          },
-          "taxpayer_status": {
-            "type": "string",
-            "enum": [
-              "master_zweitstudium",
-              "werkstudent_employee",
-              "bachelor_erststudium"
+          "commercial_guarantee_months": {
+            "type": [
+              "integer",
+              "null"
             ]
           },
-          "purchase_date": {
-            "type": "string",
-            "format": "date"
+          "reversed_burden_months": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "cancellation_notice_months": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "cancellation_button_compliant": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "legal_scope": {
+            "type": "string"
+          },
+          "legal_notes": {
+            "type": "string"
+          },
+          "catalog_record_date": {
+            "type": "string"
+          },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "title",
+                "url"
+              ]
+            }
+          },
+          "cancellation_url": {
+            "type": "string"
+          },
+          "support_email": {
+            "type": "string"
           }
         },
         "required": [
-          "gross_price_eur"
+          "brand_slug",
+          "brand_name",
+          "category",
+          "jurisdiction",
+          "statutory_warranty_months",
+          "commercial_guarantee_months",
+          "reversed_burden_months",
+          "cancellation_notice_months",
+          "cancellation_button_compliant",
+          "legal_scope",
+          "legal_notes",
+          "catalog_record_date",
+          "sources"
+        ]
+      }
+    },
+    {
+      "name": "statutory_law_lookup",
+      "description": "Read a dated German Civil Code reference with an official source and scope notes.",
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "statute_section": {
+            "type": "string",
+            "enum": [
+              "434",
+              "437",
+              "438",
+              "439",
+              "475e",
+              "477",
+              "309_nr_9",
+              "312g",
+              "312k",
+              "355"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "de",
+              "en"
+            ],
+            "default": "de"
+          }
+        },
+        "required": [
+          "statute_section"
         ],
-        "allOf": [
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "section": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "statutory_text": {
+            "type": "string"
+          },
+          "legal_summary": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "format": "uri"
+          },
+          "scope_note": {
+            "type": "string"
+          },
+          "text_status": {
+            "type": "string"
+          },
+          "statute_section": {
+            "type": "string"
+          },
+          "effective_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_checked_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "duration_months": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "statutory_basis": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "section",
+          "title",
+          "language",
+          "statutory_text",
+          "legal_summary",
+          "source",
+          "scope_note",
+          "text_status"
+        ]
+      }
+    },
+    {
+      "name": "subscription_category_rules",
+      "description": "Explain when German standard-term and online cancellation rules may apply to consumer subscriptions.",
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subscription_type": {
+            "type": "string",
+            "enum": [
+              "streaming",
+              "gym",
+              "telecom",
+              "software",
+              "cloud",
+              "press",
+              "energy",
+              "generic",
+              "gym_fitness",
+              "streaming_media",
+              "saas_software",
+              "telecom_mobile_internet",
+              "press_news_subscription",
+              "energy_utility"
+            ]
+          },
+          "contract_category": {
+            "type": "string",
+            "enum": [
+              "generic",
+              "gym_fitness",
+              "streaming_media",
+              "saas_software",
+              "telecom_mobile_internet",
+              "press_news_subscription",
+              "energy_utility"
+            ]
+          },
+          "contract_start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the contract was concluded, if known"
+          }
+        },
+        "anyOf": [
           {
-            "anyOf": [
-              {
-                "required": [
-                  "asset_name"
-                ]
-              },
-              {
-                "required": [
-                  "item_name"
-                ]
-              }
+            "required": [
+              "subscription_type"
             ]
           },
           {
-            "anyOf": [
-              {
-                "required": [
-                  "asset_category"
-                ]
-              },
-              {
-                "required": [
-                  "item_category"
-                ]
-              }
+            "required": [
+              "contract_category"
             ]
           }
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "max_initial_term_months": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "automatic_renewal_rule": {
+            "type": "string"
+          },
+          "max_cancellation_notice_period_days": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "cancellation_button_mandatory": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "governing_statutes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rule_scope": {
+            "type": "string"
+          },
+          "scope_note": {
+            "type": "string"
+          },
+          "ordinary_termination": {
+            "type": "string"
+          },
+          "extraordinary_termination": {
+            "type": "string"
+          },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "title",
+                "url"
+              ]
+            }
+          },
+          "contract_start_date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dark_pattern_alert": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "max_initial_term_months",
+          "automatic_renewal_rule",
+          "max_cancellation_notice_period_days",
+          "cancellation_button_mandatory",
+          "governing_statutes",
+          "rule_scope",
+          "scope_note",
+          "ordinary_termination",
+          "extraordinary_termination",
+          "sources"
         ]
       }
     }

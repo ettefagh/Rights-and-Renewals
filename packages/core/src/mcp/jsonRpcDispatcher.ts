@@ -97,6 +97,7 @@ export type StatutoryLawLookupInput = z.infer<
 export const SubscriptionCategoryRulesInputSchema = z
   .object({
     contract_category: z.enum([
+      'generic',
       'gym_fitness',
       'streaming_media',
       'saas_software',
@@ -107,6 +108,10 @@ export const SubscriptionCategoryRulesInputSchema = z
     contract_start_date: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .refine((value) => {
+        const parsed = Date.parse(`${value}T00:00:00Z`);
+        return Number.isFinite(parsed) && new Date(parsed).toISOString().slice(0, 10) === value;
+      }, 'Must be a real calendar date')
       .optional(),
   })
   .strict();
@@ -146,7 +151,7 @@ export type TaxDeductibilityCheckInput = z.infer<
 >;
 
 // ============================================================================
-// 3. Verbatim BGB Statutory Ground Truth Table
+// 3. BGB references: scoped excerpts, summaries, and official source links
 // ============================================================================
 
 interface StatuteData {
@@ -235,19 +240,19 @@ const STATUTES_REGISTRY: Record<string, StatuteData> = {
     statutoryBasis: ['BGB § 475e Abs. 1', 'BGB § 475e Abs. 3'],
   },
   '477': {
-    section: 'BGB § 477 Abs. 1 Satz 1',
+    section: 'BGB § 477 Abs. 1 und 2',
     title: 'Beweislastumkehr',
     effectiveDate: '2022-01-01 (EU 2019/771)',
     durationMonths: 12,
     statutoryTextDe:
-      'Zeigt sich innerhalb von zwölf Monaten seit Gefahrübergang ein Sachmangel, so wird vermutet, dass die Sache bereits bei Gefahrübergang mangelhaft war, es sei denn, diese Vermutung ist mit der Art der Sache oder des Mangels unvereinbar.',
+      'Auszug aus § 477 Abs. 1 BGB: Zeigt sich innerhalb eines Jahres seit Gefahrübergang ein von den Anforderungen nach § 434 oder § 475b abweichender Zustand der Ware, so wird vermutet, dass die Ware bereits bei Gefahrübergang mangelhaft war, es sei denn, diese Vermutung ist mit der Art der Ware oder des mangelhaften Zustands unvereinbar. Bei Waren mit digitalen Elementen gilt für dauerhaft bereitzustellende digitale Elemente zusätzlich die gesonderte Vermutung nach Absatz 2 (während der Bereitstellungsdauer oder innerhalb von zwei Jahren seit Gefahrübergang).',
     statutoryTextEn:
-      'If a material defect becomes apparent within twelve months after the passing of risk, it is presumed that the goods were defective at the time of delivery, unless this presumption is incompatible with the nature of the goods or the defect.',
+      'Unofficial translation of the relevant rule: If, within one year after risk passes, a condition of the goods deviating from the requirements in §§ 434 or 475b becomes apparent, it is presumed that the goods were already defective when risk passed, unless this presumption is incompatible with the nature of the goods or the defective condition. For goods with digital elements subject to continuous supply, subsection (2) provides a separate presumption during the supply period or within two years after risk passes.',
     legalSummaryDe:
-      'Gesetzliche Beweislastumkehr beträgt für alle ab dem 01.01.2022 gekauften Verbrauchsgüter volle 12 Monate (vormals 6 Monate). Zeigt sich in dieser Zeit ein Defekt, muss der Verkäufer beweisen, dass die Ware bei Übergabe fehlerfrei war.',
+      'Bei einem Verbrauchsgüterkauf wird für einen Zustand, der innerhalb eines Jahres ab Gefahrübergang sichtbar wird, grundsätzlich vermutet, dass er schon bei Gefahrübergang vorlag. Das gilt nicht, wenn die Vermutung mit der Art der Ware oder des Mangels unvereinbar ist. Absatz 2 enthält eine eigene, bis zu zwei Jahre beziehungsweise an die Bereitstellungsdauer anknüpfende Regel für bestimmte digitale Elemente. Keine pauschale Aussage für jeden Kauf oder jede Art von Mangel.',
     legalSummaryEn:
-      'Statutory reversed burden of proof in German consumer sales is 12 months (reformed from 6 months on 01.01.2022). The seller bears the burden of proving that the item was defect-free at delivery.',
-    statutoryBasis: ['BGB § 477 Abs. 1 Satz 1', 'EU-Richtlinie 2019/771 Art. 11'],
+      'For a consumer goods sale, a qualifying non-conformity that becomes apparent within one year after risk passes is generally presumed to have existed at that time. The presumption does not apply where incompatible with the nature of the goods or defect. Subsection (2) has a distinct rule for certain continuously supplied digital elements. This is not a blanket rule for every purchase or defect.',
+    statutoryBasis: ['BGB § 477 Abs. 1 und 2', 'BGB §§ 434, 475b'],
   },
   '309_nr_9': {
     section: 'BGB § 309 Nr. 9 lit. b',
@@ -293,14 +298,14 @@ const STATUTES_REGISTRY: Record<string, StatuteData> = {
       'Kündigung von Verbraucherverträgen im elektronischen Geschäftsverkehr (Kündigungsbutton)',
     effectiveDate: '2022-07-01',
     statutoryTextDe:
-      'Der Unternehmer hat sicherzustellen, dass der Verbraucher auf der Website eine Kündigungsschaltfläche vorfindet, die gut lesbar mit nichts anderem als den Wörtern „Verträge hier kündigen“ [...] beschriftet ist. [...] Hat der Unternehmer die Schaltflächen nicht zur Verfügung gestellt, kann der Verbraucher einen Vertrag jederzeit und ohne Einhaltung einer Kündigungsfrist kündigen.',
+      'Zusammenfassung, kein Vollzitat: § 312k gilt, wenn eine Website Verbrauchern den Abschluss eines entgeltlichen Dauerschuldverhältnisses im elektronischen Geschäftsverkehr ermöglicht. Absatz 1 enthält Ausnahmen für Verträge mit gesetzlich ausschließlich strengerer Kündigungsform sowie Finanzdienstleistungen. Werden die erforderlichen Schaltflächen und die Bestätigungsseite nicht entsprechend Absatz 1 und 2 bereitgestellt, kann der Verbraucher den erfassten Vertrag nach Absatz 6 jederzeit ohne Einhaltung einer Kündigungsfrist kündigen; die Möglichkeit der außerordentlichen Kündigung bleibt davon unberührt.',
     statutoryTextEn:
-      'The business must ensure that the consumer finds a cancellation button on the website labeled legibly with nothing other than "Terminate contracts here" [...]. If the business has not provided the buttons, the consumer may terminate the contract at any time and without observing a notice period.',
+      'Summary, not a verbatim quotation: Section 312k applies where a website enables consumers to conclude a paid continuing contract in electronic commerce. Subsection (1) excludes contracts for which the law requires a form stricter than text form for termination, and financial services. Under subsection (6), if the required cancellation buttons and confirmation page are not provided in accordance with subsections (1) and (2), the consumer may terminate the covered contract at any time without a notice period; the separate right to extraordinary termination remains unaffected.',
     legalSummaryDe:
-      'Pflicht zur Bereitstellung eines 2-stufigen Kündigungsbuttons im Web. Fehlt der Button oder ist er fehlerhaft umgesetzt, hat der Verbraucher das gesetzliche Recht, den Vertrag fristlos und jederzeit außerordentlich zu kündigen (§ 312k Abs. 6 BGB).',
+      'Das Kündigungsbutton-Regime gilt nur bei erfülltem Anwendungsbereich des Absatzes 1. Es gibt gesetzliche Ausnahmen. Werden die erforderlichen Schaltflächen und die Bestätigungsseite nicht entsprechend Absatz 1 und 2 bereitgestellt, gewährt Absatz 6 für den erfassten Vertrag eine Kündigung jederzeit ohne Kündigungsfrist. Dieses gesetzliche Kündigungsrecht ist von einer außerordentlichen Kündigung aus anderem Rechtsgrund zu unterscheiden; beides hängt von Anwendungsbereich und Tatsachen ab.',
     legalSummaryEn:
-      'Mandatory accessible 2-step online cancellation button. If missing or non-compliant, the consumer has the statutory right to terminate immediately without notice (§ 312k(6) BGB).',
-    statutoryBasis: ['BGB § 312k Abs. 1, 2, 4, 6'],
+      'The online cancellation-button regime applies only when subsection (1) is satisfied and is subject to statutory exclusions. If the required buttons and confirmation page are not provided in accordance with subsections (1) and (2), subsection (6) permits termination of the covered contract at any time without a notice period. This statutory right is distinct from extraordinary termination on another legal ground; scope and facts must be assessed.',
+    statutoryBasis: ['BGB § 312k Abs. 1, 2, 6', 'EGBGB Art. 229 § 60'],
   },
   '355': {
     section: 'BGB § 355 Abs. 1 & 2',
@@ -365,117 +370,51 @@ export function handleStatutoryLawLookup(input: StatutoryLawLookupInput) {
     statutory_text: isEn ? item.statutoryTextEn : item.statutoryTextDe,
     legal_summary: isEn ? item.legalSummaryEn : item.legalSummaryDe,
     statutory_basis: item.statutoryBasis,
+    language: input.language,
+    source: `https://www.gesetze-im-internet.de/bgb/__${input.statute_section === '309_nr_9' ? '309' : input.statute_section}.html`,
+    text_status: input.statute_section === '477' && input.language === 'de'
+      ? 'official-source excerpt with scope summary'
+      : 'summary or unofficial translation; consult official German text',
+    scope_note: input.statute_section === '477'
+      ? 'Consumer-goods sale only; subsection (1) is subject to the statutory incompatibility exception. Subsection (2) separately addresses continuously supplied digital elements in goods with digital elements.'
+      : input.statute_section === '309_nr_9'
+        ? 'Controls standard terms within its statutory scope; it is not a universal rule for every subscription clause or individually negotiated term.'
+      : input.statute_section === '312k'
+          ? 'Applies when a website enables consumers to conclude a covered paid continuing contract in electronic commerce. Subsection (1) excludes financial services and contracts for which the law requires a form stricter than text form for termination.'
+          : 'This result is limited to the cited provision; applicability depends on the contract, facts, and any statutory exceptions.',
+    ...(input.statute_section === '477' ? { source_checked_on: '2026-11-10' } : {}),
   };
 }
 
 export function handleSubscriptionCategoryRules(
   input: SubscriptionCategoryRulesInput
 ) {
-  const isPreReform =
-    Boolean(input.contract_start_date && input.contract_start_date < '2022-03-01');
-
-  const categoryMap: Record<
-    string,
-    {
-      category: string;
-      maxInitialTermMonths: number;
-      automaticRenewalRule: string;
-      maxCancellationNoticeDays: number;
-      cancellationButtonMandatory: boolean;
-      governingStatutes: string[];
-      darkPatternAlert: string;
-    }
-  > = {
-    gym_fitness: {
-      category: 'gym_fitness',
-      maxInitialTermMonths: 24,
-      automaticRenewalRule: isPreReform
-        ? 'Legacy contract concluded before 01.03.2022: Tacit 1-year renewal clauses may remain effective unless modified.'
-        : 'Indefinite duration with max 1-month rolling cancellation notice period (§ 309 Nr. 9 lit. b BGB).',
-      maxCancellationNoticeDays: 30,
-      cancellationButtonMandatory: true,
-      governingStatutes: ['BGB § 309 Nr. 9', 'BGB § 312k'],
-      darkPatternAlert:
-        'Clauses attempting tacit 12-month auto-renewals for contracts concluded after 01.03.2022 are void under German law.',
-    },
-    streaming_media: {
-      category: 'streaming_media',
-      maxInitialTermMonths: 1,
-      automaticRenewalRule:
-        'Rolling monthly billing; cancellable anytime up to end of current billing cycle (max 30 days notice).',
-      maxCancellationNoticeDays: 30,
-      cancellationButtonMandatory: true,
-      governingStatutes: ['BGB § 309 Nr. 9', 'BGB § 312k', 'BGB § 355'],
-      darkPatternAlert:
-        'Hiding cancellation links or requiring chat/phone interaction violates BGB § 312k, permitting fristlose Kündigung (§ 312k Abs. 6).',
-    },
-    saas_software: {
-      category: 'saas_software',
-      maxInitialTermMonths: 12,
-      automaticRenewalRule: isPreReform
-        ? 'Legacy contract: prior terms apply.'
-        : 'After initial term, tacit renewal extends only indefinitely with maximum 1-month notice period.',
-      maxCancellationNoticeDays: 30,
-      cancellationButtonMandatory: true,
-      governingStatutes: ['BGB § 309 Nr. 9', 'BGB § 312k'],
-      darkPatternAlert:
-        'Annual student subscriptions paid monthly cannot enforce full remaining year penalty fees upon rollover.',
-    },
-    telecom_mobile_internet: {
-      category: 'telecom_mobile_internet',
-      maxInitialTermMonths: 24,
-      automaticRenewalRule:
-        'Following 24-month minimum term, contracts roll indefinitely with a maximum 1-month notice period (TKG § 56 & BGB § 309 Nr. 9).',
-      maxCancellationNoticeDays: 30,
-      cancellationButtonMandatory: true,
-      governingStatutes: ['TKG § 56', 'BGB § 309 Nr. 9', 'BGB § 312k'],
-      darkPatternAlert:
-        'Automatic 12-month contract extensions for mobile or broadband contracts are strictly prohibited.',
-    },
-    press_news_subscription: {
-      category: 'press_news_subscription',
-      maxInitialTermMonths: 24,
-      automaticRenewalRule: isPreReform
-        ? 'Legacy contract: terms apply.'
-        : 'Indefinite duration with max 1-month cancellation notice (§ 309 Nr. 9 lit. b BGB).',
-      maxCancellationNoticeDays: 30,
-      cancellationButtonMandatory: true,
-      governingStatutes: ['BGB § 309 Nr. 9', 'BGB § 312k'],
-      darkPatternAlert:
-        'Demanding printed written letters for contracts concluded online violates BGB § 312k.',
-    },
-    energy_utility: {
-      category: 'energy_utility',
-      maxInitialTermMonths: 24,
-      automaticRenewalRule:
-        'Maximum 1-month notice period after initial term (EnWG § 41b & BGB § 309 Nr. 9).',
-      maxCancellationNoticeDays: 30,
-      cancellationButtonMandatory: true,
-      governingStatutes: ['EnWG § 41b', 'BGB § 309 Nr. 9', 'BGB § 312k'],
-      darkPatternAlert:
-        'Tariff price increases trigger a statutory extraordinary termination right (Sonderkündigungsrecht gem. § 41 Abs. 5 EnWG).',
-    },
-  };
-
-  const selected = categoryMap[input.contract_category] ?? {
-    category: input.contract_category,
-    maxInitialTermMonths: 24,
-    automaticRenewalRule:
-      'Indefinite duration with max 1-month rolling cancellation notice period (§ 309 Nr. 9 lit. b BGB).',
-    maxCancellationNoticeDays: 30,
-    cancellationButtonMandatory: true,
-    governingStatutes: ['BGB § 309 Nr. 9', 'BGB § 312k'],
-    darkPatternAlert: 'Tacit renewal exceeds 1 month.',
-  };
+  const hasDate = Boolean(input.contract_start_date);
+  const isPreReform = hasDate && (input.contract_start_date as string) < '2022-03-01';
+  const renewalRule = isPreReform
+    ? 'The contract predates 01.03.2022. Under EGBGB Art. 229 § 60, the earlier version of § 309 applies; assess the clause, any later amendment, and the facts individually.'
+    : hasDate
+      ? 'For a contract concluded on or after 01.03.2022, standard terms within § 309 No. 9 scope may not bind the consumer for more than two years initially. Tacit renewal may only be indefinite and terminable at any time on no more than one month’s notice; a longer notice period before expiry is prohibited. This category does not establish that a particular term is within scope or effective.'
+      : 'If the contract was concluded on or after 01.03.2022, standard terms within § 309 No. 9 scope may not bind the consumer for more than two years initially. Tacit renewal may only be indefinite and terminable at any time on no more than one month’s notice; a longer notice period before expiry is prohibited. Supply the conclusion date and assess the clause and scope before applying this rule.';
 
   return {
-    category: selected.category,
-    max_initial_term_months: selected.maxInitialTermMonths,
-    automatic_renewal_rule: selected.automaticRenewalRule,
-    max_cancellation_notice_period_days: selected.maxCancellationNoticeDays,
-    cancellation_button_mandatory: selected.cancellationButtonMandatory,
-    governing_statutes: selected.governingStatutes,
-    dark_pattern_alert: selected.darkPatternAlert,
+    category: input.contract_category,
+    max_initial_term_months: input.contract_category === 'generic' ? null : 24,
+    automatic_renewal_rule: renewalRule,
+    max_cancellation_notice_period_days: null,
+    cancellation_button_mandatory: null,
+    governing_statutes: ['BGB § 309 Nr. 9', 'BGB § 312k'],
+    dark_pattern_alert: 'This category lookup cannot determine whether a design or contract term violates the law. Assess the applicable statute, contract, interface and facts.',
+    contract_start_date: input.contract_start_date ?? null,
+    rule_scope: '§ 309 No. 9 governs specified standard terms for regularly recurring supplies or services; individual negotiation, statutory exclusions and the contract facts can change the result. § 312k concerns paid continuing contracts where a website enables consumers to conclude the contract in electronic commerce, subject to statutory exclusions. Under EGBGB Art. 229 § 60, § 312k duties also apply to obligations arising before 01.07.2022.',
+    scope_note: 'The 24-month term cap and renewal restrictions are conditional on § 309 No. 9 applying to the standard term for regularly recurring goods or services. Individual negotiation, statutory exclusions and contract facts can change the result. § 312k concerns paid continuing contracts where a website enables consumers to conclude the contract in electronic commerce; subsection (1) excludes financial services and contracts for which law requires a stricter-than-text form for termination. EGBGB Art. 229 § 60 also applies § 312k duties to obligations arising before 01.07.2022.',
+    ordinary_termination: 'Apply the contract and mandatory law to the facts. No individual termination date or entitlement is determined by this category lookup.',
+    extraordinary_termination: 'No extraordinary termination entitlement is presumed. The § 312k(6) right to terminate at any time without notice is a distinct statutory remedy triggered when the required buttons and confirmation page are not provided in accordance with subsections (1) and (2); other extraordinary termination grounds require their own legal basis and facts.',
+    sources: [
+      { title: 'BGB § 309 No. 9 — standard terms', url: 'https://www.gesetze-im-internet.de/bgb/__309.html' },
+      { title: 'BGB § 312k — online cancellation', url: 'https://www.gesetze-im-internet.de/bgb/__312k.html' },
+      { title: 'EGBGB Art. 229 § 60 — transitional provision', url: 'https://www.gesetze-im-internet.de/bgbeg/art_229__60.html' },
+    ],
   };
 }
 
@@ -652,7 +591,7 @@ export function listMcpTools(): McpToolDefinition[] {
     {
       name: 'statutory_law_lookup',
       description:
-        'Query verbatim German Civil Code (BGB) consumer protection articles and legal interpretation rules without hallucination.',
+      'Look up scoped German Civil Code (BGB) consumer-law excerpts and summaries with links to official statutory sources.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -693,6 +632,7 @@ export function listMcpTools(): McpToolDefinition[] {
           contract_category: {
             type: 'string',
             enum: [
+              'generic',
               'gym_fitness',
               'streaming_media',
               'saas_software',
@@ -706,66 +646,10 @@ export function listMcpTools(): McpToolDefinition[] {
             type: 'string',
             format: 'date',
             description:
-              'ISO 8601 date (YYYY-MM-DD) when contract was concluded (evaluates pre- vs post-01.03.2022 rules).',
+              'ISO 8601 contract conclusion date (YYYY-MM-DD); required to assess the § 309 No. 9 transition on 01.03.2022.',
           },
         },
         required: ['contract_category'],
-        additionalProperties: false,
-      },
-    },
-    {
-      name: 'tax_deductibility_check',
-      description:
-        'Provide a preliminary German work/study expense categorization under § 9 EStG. Generic software subscriptions require manual review. The BMF 22.02.2022 guidance describes a one-year useful life for specified computer hardware, peripherals, and qualifying acquired business/application software; it does not by itself establish immediate deductibility.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          asset_name: {
-            type: 'string',
-            description:
-              "Commercial product or software name (e.g., 'MacBook Pro', 'Dell Monitor', 'JetBrains All Products Pack', 'iPhone 16 Pro').",
-          },
-          asset_category: {
-            type: 'string',
-            enum: [
-              'computer_hardware',
-              'peripherals',
-              'software_saas',
-              'subscription',
-              'hardware',
-              'acquired_business_software',
-              'academic_literature',
-              'smartphone',
-              'office_furniture',
-            ],
-            description:
-              'Tax asset category. software_saas means a recurring or otherwise unverified subscription and returns manual review. acquired_business_software is for acquired operating/application software within the BMF guidance scope.',
-          },
-          gross_price_eur: {
-            type: 'number',
-            minimum: 0,
-            description:
-              'Gross purchase price in EUR including German VAT (19% or 7%).',
-          },
-          taxpayer_status: {
-            type: 'string',
-            enum: [
-              'master_zweitstudium',
-              'werkstudent_employee',
-              'bachelor_erststudium',
-            ],
-            default: 'werkstudent_employee',
-            description: 'Tax status of student / filer.',
-          },
-          academic_usage_percent: {
-            type: 'integer',
-            minimum: 0,
-            maximum: 100,
-            description:
-              'Documented work/study usage percentage (standard simplification: 50%).',
-          },
-        },
-        required: ['asset_name', 'asset_category', 'gross_price_eur'],
         additionalProperties: false,
       },
     },
@@ -932,33 +816,13 @@ export async function dispatchJsonRpc(
             break;
           }
 
-          case 'tax_deductibility_check': {
-            const parsed =
-              TaxDeductibilityCheckInputSchema.safeParse(toolArgs);
-            if (!parsed.success) {
-              return {
-                jsonrpc: '2.0',
-                id: requestId,
-                error: {
-                  code: -32602,
-                  message: `Invalid params for tax_deductibility_check: ${parsed.error.issues
-                    .map((i) => `${i.path.join('.')}: ${i.message}`)
-                    .join(', ')}`,
-                  data: parsed.error.issues,
-                },
-              };
-            }
-            toolResultData = handleTaxDeductibilityCheck(parsed.data);
-            break;
-          }
-
           default: {
             return {
               jsonrpc: '2.0',
               id: requestId,
               error: {
                 code: -32602,
-                message: `Invalid params: Unknown tool "${toolName}". Supported tools: policy_lookup, statutory_law_lookup, subscription_category_rules, tax_deductibility_check.`,
+                message: `Invalid params: Unknown tool "${toolName}". Supported tools: policy_lookup, statutory_law_lookup, subscription_category_rules.`,
               },
             };
           }

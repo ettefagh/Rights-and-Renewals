@@ -3,138 +3,69 @@ import assert from 'node:assert/strict';
 const base = process.argv[2];
 assert.ok(base, 'Usage: node tests/mcp-reliability.mjs <showcase URL>');
 const endpoint = new URL('/api/mcp', base);
+const expectedTools = ['policy_lookup', 'statutory_law_lookup', 'subscription_category_rules'];
+const removedTools = ['claim_dossier_generate', 'tax_deductibility_check'];
 let id = 0;
-let protocolVersion;
 
-async function rpc(method, params, notification = false) {
-  const response = await fetch(endpoint, {
+async function post(method, params, requestId, protocolVersion) {
+  return fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json, text/event-stream',
       ...(protocolVersion && { 'MCP-Protocol-Version': protocolVersion }),
     },
-    body: JSON.stringify({ jsonrpc: '2.0', method, params, id: notification ? undefined : ++id }),
+    body: JSON.stringify({ jsonrpc: '2.0', method, params, id: requestId }),
   });
-  if (notification) {
-    assert.equal(response.status, 202);
-    return;
-  }
+}
+
+async function rpc(method, params, version = '2025-11-25') {
+  const requestId = ++id;
+  const response = await post(method, params, requestId, version);
   assert.equal(response.status, 200);
   const message = await response.json();
-  assert.equal(message.id, id);
+  assert.equal(message.id, requestId);
   return message;
 }
 
-function call(name, args) {
-  return rpc('tools/call', { name, arguments: args });
+function call(name, args, version) {
+  return rpc('tools/call', { name, arguments: args }, version);
 }
 
 async function toolResult(name, args) {
   const message = await call(name, args);
   assert.ok(!message.error, JSON.stringify(message.error));
   assert.notEqual(message.result.isError, true);
-  return JSON.parse(message.result.content[0].text);
+  const result = message.result.structuredContent;
+  assert.ok(result);
+  assert.deepEqual(result, JSON.parse(message.result.content[0].text));
+  return result;
 }
 
-const hello = await rpc('initialize', {
-  protocolVersion: '2025-11-25',
-  capabilities: {},
-  clientInfo: { name: 'cmlab-mcp-reliability', version: '1.0.0' },
-});
-protocolVersion = hello.result.protocolVersion;
-await rpc('notifications/initialized', undefined, true);
-const discovery = await rpc('tools/list', {});
-assert.ok(['claim_dossier_generate', 'tax_deductibility_check', 'policy_lookup'].every(
-  name => discovery.result.tools.some(tool => tool.name === name)
-));
-
-const cancellation = await toolResult('claim_dossier_generate', {
-  brand_slug: 'netflix',
-  item_name: 'Netflix Premium (synthetic test)',
-  purchase_date: '2026-11-01',
-  defect_description: 'Synthetic test only: cancellation request',
-  issue_type: 'contract_cancellation',
-});
-assert.equal(cancellation.status, 'draft');
-assert.equal(cancellation.issue_type, 'contract_cancellation');
-assert.deepEqual(cancellation.statutory_basis, []);
-assert.match(cancellation.dossier_text_de, /kündig/i);
-assert.ok(cancellation.sources.some(source => source.url === 'https://www.gesetze-im-internet.de/bgb/__312k.html'));
-assert.doesNotMatch(cancellation.dossier_text_de, /Mängelrüge|Nacherfüllung|Nachbesserung|Neulieferung/i);
-assert.notEqual(cancellation.lexfox_safe_harbor_certified, true);
-
-const minimalCancellation = await toolResult('claim_dossier_generate', {
-  service_slug: 'netflix',
-  contract_name: 'Synthetic subscription',
-  issue_type: 'contract_cancellation',
-});
-assert.match(minimalCancellation.dossier_text_de, /Synthetic subscription/);
-
-const defectArgs = {
-  brand_slug: 'apple',
-  item_name: 'Synthetic laptop',
-  purchase_date: '2026-10-01',
-  defect_description: 'Synthetic test: the screen does not turn on',
-};
-const defect = await toolResult('claim_dossier_generate', defectArgs);
-assert.match(defect.dossier_text_de, /Nacherfüllung/i);
-for (const invalid of [
-  { ...defectArgs, issue_type: 'unknown' },
-  { ...defectArgs, purchase_date: '2026-02-30' },
-  { ...defectArgs, brand_slug: 42 },
-  { brand_slug: 'netflix', issue_type: 'contract_cancellation' },
+const clientInfo = { name: 'cmlab-mcp-reliability', version: '2.0.0' };
+for (const [requested, expected] of [
+  ['2025-11-25', '2025-11-25'],
+  ['2025-06-18', '2025-06-18'],
+  ['2025-03-26', '2025-03-26'],
+  ['2024-11-05', '2025-11-25'],
 ]) {
-  assert.equal((await call('claim_dossier_generate', invalid)).error?.code, -32602);
+  const response = await post('initialize', { protocolVersion: requested, capabilities: {}, clientInfo }, ++id);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).result.protocolVersion, expected);
+  const notification = await post('notifications/initialized', undefined, undefined, expected);
+  assert.equal(notification.status, 202);
+  assert.equal(await notification.text(), '');
 }
+assert.equal((await post('tools/list', {}, ++id, 'invalid')).status, 400);
+assert.equal((await fetch(endpoint, { headers: { Accept: 'text/event-stream' } })).status, 405);
+assert.equal((await fetch(endpoint, { headers: { Origin: 'https://untrusted.example' } })).status, 403);
 
-const subscription = await toolResult('tax_deductibility_check', {
-  item_name: 'Netflix subscription',
-  item_category: 'subscription',
-  gross_price_eur: 13.99,
-  professional_use_percent: 50,
-  taxpayer_status: 'master_zweitstudium',
-  purchase_date: '2026-11-01',
-});
-assert.equal(subscription.status, 'manual_review');
-assert.equal(subscription.is_deductible, false);
-assert.equal(subscription.bmf_2022_eligible, false);
-assert.equal(subscription.deductible_amount_eur, null);
-assert.ok(subscription.sources.some(source => source.url === 'https://www.gesetze-im-internet.de/estg/__9.html'));
-
-const hardware = await toolResult('tax_deductibility_check', {
-  asset_name: 'Synthetic laptop',
-  asset_category: 'computer_hardware',
-  gross_price_eur: 1000,
-  academic_usage_percent: 50,
-});
-assert.equal(hardware.bmf_2022_eligible, true);
-assert.doesNotMatch(hardware.write_off_method, /sofortabschreibung/i);
-
-for (const args of [
-  { item_name: 'Generic hardware', item_category: 'hardware', professional_use_percent: 80 },
-  { asset_name: 'Unverified use', asset_category: 'computer_hardware' },
-  { asset_name: 'Recurring software', asset_category: 'software_saas', academic_usage_percent: 100 },
-]) {
-  const result = await toolResult('tax_deductibility_check', { ...args, gross_price_eur: 1000 });
-  assert.equal(result.status, 'manual_review');
-  assert.equal(result.bmf_2022_eligible, false);
-  assert.equal(result.deductible_amount_eur, null);
-}
-assert.equal((await call('tax_deductibility_check', {
-  item_name: 'Subscription with inconsistent classification',
-  item_category: 'subscription',
-  asset_category: 'acquired_business_software',
-  gross_price_eur: 15,
-})).error?.code, -32602);
-
+const { result: { tools } } = await rpc('tools/list', {});
+assert.deepEqual(tools.map(tool => tool.name), expectedTools);
+assert.ok(tools.every(tool => tool.outputSchema?.type === 'object' && tool.outputSchema.required.length > 0));
+for (const name of removedTools) assert.equal((await call(name, {})).error?.code, -32602);
 const serverCard = await fetch(new URL('/.well-known/mcp/server-card.json', base)).then(res => res.json());
-for (const name of ['claim_dossier_generate', 'tax_deductibility_check', 'policy_lookup']) {
-  assert.deepEqual(
-    serverCard.tools.find(tool => tool.name === name),
-    discovery.result.tools.find(tool => tool.name === name),
-  );
-}
+assert.deepEqual(serverCard.tools, tools);
 
 const netflix = await toolResult('policy_lookup', { service_slug: 'netflix', category: 'subscription' });
 assert.equal(netflix.statutory_warranty_months, null);
@@ -146,4 +77,34 @@ const apple = await toolResult('policy_lookup', { brand_slug: 'apple' });
 assert.equal(apple.statutory_warranty_months, 24);
 assert.ok(apple.sources.some(source => source.url === 'https://www.gesetze-im-internet.de/bgb/__438.html'));
 
-console.log('MCP reliability checks passed for', endpoint.href);
+const law = await toolResult('statutory_law_lookup', { statute_section: '477', language: 'en' });
+assert.equal(law.source, 'https://www.gesetze-im-internet.de/bgb/__477.html');
+assert.equal(law.language, 'en');
+assert.match(law.legal_summary, /goods|transfer of risk/i);
+assert.match(law.legal_summary + law.scope_note, /digital elements/i);
+
+const modern = await toolResult('subscription_category_rules', {
+  subscription_type: 'streaming',
+  contract_start_date: '2022-03-01',
+});
+assert.equal(modern.category, 'streaming_media');
+assert.equal(modern.cancellation_button_mandatory, null);
+assert.equal(modern.max_cancellation_notice_period_days, null);
+assert.match(JSON.stringify(modern), /without (observing )?(a )?notice(?: period)?/i);
+assert.match(modern.extraordinary_termination, /separate|independent|distinct|unaffected|own legal basis/i);
+assert.ok(modern.sources.some(source => source.url === 'https://www.gesetze-im-internet.de/bgb/__312k.html'));
+const legacy = await toolResult('subscription_category_rules', {
+  subscription_type: 'streaming',
+  contract_start_date: '2022-02-28',
+});
+assert.notEqual(legacy.automatic_renewal_rule, modern.automatic_renewal_rule);
+const generic = await toolResult('subscription_category_rules', { subscription_type: 'generic' });
+assert.equal(generic.category, 'generic');
+assert.equal((await call('subscription_category_rules', {
+  subscription_type: 'streaming', contract_start_date: '2026-02-30',
+})).error?.code, -32602);
+
+const legacyClient = await call('policy_lookup', { service_slug: 'netflix' }, '2025-03-26');
+assert.ok(legacyClient.result.content[0].text);
+assert.equal(legacyClient.result.structuredContent, undefined);
+console.log('Three-tool MCP, schema discovery, legal scope and protocol checks passed for', endpoint.href);

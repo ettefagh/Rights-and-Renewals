@@ -12,7 +12,7 @@ Save receipts on your device and track the dates that matter for purchases and s
 ## Discovery Resources
 - API Catalog: \`/.well-known/api-catalog\`
 - MCP Server Card: \`/.well-known/mcp/server-card.json\`
-- OAuth Metadata: \`/.well-known/oauth-protected-resource\`
+- Public MCP endpoint: \`/api/mcp\` (no OAuth sign-in required)
 - Agent Skills: \`/.well-known/agent-skills/index.json\`
-- Agent Registration: \`/auth.md\`
+- Service access documentation: \`/auth.md\`
 `;

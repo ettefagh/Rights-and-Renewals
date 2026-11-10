@@ -26,16 +26,19 @@ const providerGuides = new Map([
 
 export function getPolicyScope(category: PolicyWikiEntry['category'], entry?: PolicyWikiEntry) {
   if (category === 'hardware') {
+    const appleSource = entry?.brandSlug === 'apple'
+      ? { title: 'Apple — hardware warranty by product', url: 'https://www.apple.com/de/legal/warranty/' }
+      : undefined;
     return {
       statutory_warranty_months: entry?.statutoryWarrantyMonths ?? 24,
       reversed_burden_months: 12,
       statutory_basis: ['BGB § 437', 'BGB § 438 Abs. 1 Nr. 3', 'BGB § 477 Abs. 1'],
-      commercial_guarantee_months: entry?.commercialGuaranteeMonths ?? null,
+      commercial_guarantee_months: null,
       cancellation_notice_months: null,
       cancellation_button_compliant: null,
-      sources: goodsLaw,
-      legal_scope: 'General German consumer-goods purchase rules. Commercial guarantees depend on the product and provider terms.',
-      notes: entry?.legalNotes,
+      sources: appleSource ? [...goodsLaw, appleSource] : goodsLaw,
+      legal_scope: 'General German consumer-goods purchase rules. The usual limitation period is two years from delivery. The one-year presumption concerns when non-conformity appears after transfer of risk, with statutory exceptions. Commercial guarantees depend on the specific product and provider terms.',
+      notes: appleSource ? 'Check Apple’s warranty terms for the specific product and purchase country.' : undefined,
     };
   }
 

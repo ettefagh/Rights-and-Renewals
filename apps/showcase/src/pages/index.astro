@@ -181,7 +181,7 @@ export const prerender = false;
           <!-- Left Sub-Panel: MCP Protocol Console -->
           <div class="mcp-console-panel card">
             <div class="panel-header-row">
-              <div class="font-bold">Request console</div>
+              <div class="font-bold">Request console · local mock</div>
               <div id="mcp-latency-badge" class="latency-badge status-protected">
                 Ready to run
               </div>
@@ -191,8 +191,9 @@ export const prerender = false;
               <div class="form-group">
                 <label for="mcp-tool-select">Tool</label>
                 <select id="mcp-tool-select" class="form-select">
-                  <option value="policy_lookup">policy_lookup (BGB Policy &amp; § 312k Button)</option>
-                  <option value="claim_dossier_generate">claim_dossier_generate (§ 437 defect notice)</option>
+                  <option value="policy_lookup">policy_lookup (sample catalog)</option>
+                  <option value="statutory_law_lookup">statutory_law_lookup (sample statute reference)</option>
+                  <option value="subscription_category_rules">subscription_category_rules (sample rules)</option>
                   <option value="tools/list">tools/list (MCP Introspection)</option>
                 </select>
               </div>
@@ -200,9 +201,9 @@ export const prerender = false;
               <div class="form-group">
                 <label for="mcp-preset-select">Example</label>
                 <select id="mcp-preset-select" class="form-select">
-                  <option value="spotify">Spotify Student cancellation (§ 312k)</option>
-                  <option value="apple_macbook">Apple MacBook Pro 16 M3 defect notice (§ 437)</option>
-                  <option value="sony_headphones">Sony WH-1000XM5 month 11 (§ 477)</option>
+                  <option value="spotify">Spotify policy sample (local data)</option>
+                  <option value="law_477">BGB § 477 reference (sample)</option>
+                  <option value="subscription_rules">Subscription rules (sample)</option>
                   <option value="tools_list">tools/list inspection</option>
                 </select>
               </div>
@@ -234,7 +235,7 @@ export const prerender = false;
 
             <!-- Wire Protocol Streamer -->
             <div class="stream-output-wrapper" id="mcp-stream-output" aria-live="polite">
-              <div class="stream-empty">Ready for JSON-RPC 2.0 calls. Select a tool and run it to see the sample exchange.</div>
+              <div class="stream-empty">Local mock only · sample data, not a live response. Select a tool to inspect the exchange.</div>
             </div>
           </div>
 
@@ -251,7 +252,7 @@ export const prerender = false;
           <span class="section-tag">Sample wallet tools</span>
           <h2 class="section-title">Search the sample wallet</h2>
           <p class="section-subtitle text-muted">
-            Search brand policies and example entries, or try a command such as <code>&gt;claim</code>, <code>&gt;cancel</code>, or <code>&gt;tax</code>.
+            Search brand policies and example entries, or try a command such as <code>&gt;cancel</code>.
           </p>
         </div>
 

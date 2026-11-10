@@ -4,6 +4,8 @@ Use this guide to connect an AI coding environment to the Rights & Renewals MCP 
 
 `https://rightsandrenewals.pages.dev/api/mcp`
 
+The public MCP endpoint does not require OAuth sign-in. Any OAuth sign-in offered for the separate EmDash CMS applies only to EmDash and does not authenticate this endpoint.
+
 ## Safe setup and verification
 
 1. Identify the current client and consult its official documentation if a command, configuration format, or UI label below does not match the installed version.
@@ -86,7 +88,7 @@ Open Cursor Settings > Tools & MCP. Confirm the server and tools are available, 
 
 ### Claude Desktop
 
-In **Customize → Connectors**, add a custom connector named **Rights & Renewals** using the server URL above. Choose **No sign in** if asked. Enable it in a conversation and run the Spotify lookup. See the [Claude connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+In **Customize → Connectors**, add a custom connector named **Rights & Renewals** using the server URL above. The public endpoint does not require OAuth sign-in; if the client offers an authentication choice, configure it without OAuth. Enable it in a conversation and run the Spotify lookup. See the [Claude connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
 
 ### Windsurf
 
