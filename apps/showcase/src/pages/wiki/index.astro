@@ -2,6 +2,7 @@
 import { policySeedData } from '@cmlab/core';
 import type { PolicyWikiEntry } from '@cmlab/core';
 import BrandIcon from '../../components/BrandIcon.svelte';
+import AudienceSwitch from '../../components/AudienceSwitch.astro';
 import { Menu } from 'lucide-svelte';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
@@ -175,6 +176,7 @@ const hardware = policySeedData.filter((b: PolicyWikiEntry) => b.category === 'h
   </header>
 
   <main class="wiki-container">
+    <AudienceSwitch id="wiki-view">
     <div class="wiki-hero">
       <div class="hero-pill-badge" style="margin-bottom: var(--space-4, 16px);">
         <span>🏛️ BGB §§ 309, 312k, 438, 477</span> · <span>20 curated brands</span> · <span>Public information</span>
@@ -234,6 +236,26 @@ const hardware = policySeedData.filter((b: PolicyWikiEntry) => b.category === 'h
         </a>
       ))}
     </div>
+    <section slot="machine" aria-labelledby="wiki-machine-title">
+      <h1 id="wiki-machine-title">Machine-readable policy directory</h1>
+      <p>Public policy records and lookup interfaces for software agents.</p>
+      <ul>
+        <li><a href="/data/policy_wiki_seed_v1.json">Policy dataset (JSON)</a></li>
+        <li>MCP requests use <code>POST /api/mcp</code>.</li>
+        <li><a href="/.well-known/mcp/server-card.json">MCP server card</a></li>
+      </ul>
+      <h2>Directory summary</h2>
+      <pre>{JSON.stringify({
+        dataset: '/data/policy_wiki_seed_v1.json',
+        policy_lookup: { endpoint: '/api/mcp', tool: 'policy_lookup', argument: 'service_slug' },
+        total: policySeedData.length,
+        categories: {
+          subscription: subscriptions.map((brand: PolicyWikiEntry) => ({ brand_slug: brand.brandSlug, brand_name: brand.brandName })),
+          hardware: hardware.map((brand: PolicyWikiEntry) => ({ brand_slug: brand.brandSlug, brand_name: brand.brandName })),
+        },
+      }, null, 2)}</pre>
+    </section>
+    </AudienceSwitch>
   </main>
 
 </body>
