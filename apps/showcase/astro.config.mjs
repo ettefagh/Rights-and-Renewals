@@ -70,6 +70,35 @@ export default defineConfig({
     build: {
       minify: false,
       reportCompressedSize: false,
+      rollupOptions: {
+        output: {
+          banner: `if (typeof globalThis !== 'undefined' && typeof globalThis.MessageChannel === 'undefined') {
+  class MockMessagePort extends EventTarget {
+    constructor() { super(); this.onmessage = null; this._other = null; }
+    postMessage(msg) {
+      if (this._other) {
+        queueMicrotask(() => {
+          const ev = { data: msg };
+          if (typeof this._other.onmessage === 'function') this._other.onmessage(ev);
+        });
+      }
+    }
+    start() {}
+    close() {}
+  }
+  class MockMessageChannel {
+    constructor() {
+      this.port1 = new MockMessagePort();
+      this.port2 = new MockMessagePort();
+      this.port1._other = this.port2;
+      this.port2._other = this.port1;
+    }
+  }
+  globalThis.MessageChannel = MockMessageChannel;
+  globalThis.MessagePort = MockMessagePort;
+};`
+        }
+      }
     },
     resolve: {
       alias: [
