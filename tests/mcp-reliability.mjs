@@ -82,6 +82,10 @@ assert.equal(law.source, 'https://www.gesetze-im-internet.de/bgb/__477.html');
 assert.equal(law.language, 'en');
 assert.match(law.legal_summary, /goods|transfer of risk/i);
 assert.match(law.legal_summary + law.scope_note, /digital elements/i);
+const limitation = await toolResult('statutory_law_lookup', { statute_section: '475e', language: 'en' });
+assert.equal(limitation.source, 'https://www.gesetze-im-internet.de/bgb/__475e.html');
+assert.match(limitation.legal_summary, /first appeared/i);
+assert.match(limitation.legal_summary, /one-time twelve-month extension/i);
 
 const modern = await toolResult('subscription_category_rules', {
   subscription_type: 'streaming',

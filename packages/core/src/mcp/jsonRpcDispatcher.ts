@@ -225,7 +225,7 @@ const STATUTES_REGISTRY: Record<string, StatuteData> = {
     statutoryBasis: ['BGB § 439 Abs. 1 & 2', 'BGB § 475 Abs. 3 Satz 1'],
   },
   '475e': {
-    section: 'BGB § 475e Abs. 1 & 3',
+    section: 'BGB § 475e Abs. 3 bis 5',
     title: 'Sonderbestimmungen für die Verjährung',
     effectiveDate: '2022-01-01',
     durationMonths: 4,
@@ -234,10 +234,10 @@ const STATUTES_REGISTRY: Record<string, StatuteData> = {
     statutoryTextEn:
       'If a defect becomes apparent within the limitation period, the limitation shall not expire before the end of four months after the defect first became apparent. If the consumer handed over the goods for subsequent performance, the limitation period shall not expire before two months after the repaired or replaced goods were delivered.',
     legalSummaryDe:
-      '4-monatige Ablaufhemmung: Zeigt sich ein Mangel kurz vor Ende der 24 Monate, verjährt der Anspruch frühestens 4 Monate nach Mangelanzeige. Nach Rückgabe reparierter/ersetzter Ware gilt eine 2-monatige Mindestablaufhemmung.',
+      'Maßgeblich für Absatz 3 ist das erstmalige Auftreten des Mangels innerhalb der Verjährungsfrist. Absatz 4 regelt die Rückgabe der nachgebesserten oder ersetzten Ware. Absatz 5 sieht bei Nachbesserung eine einmalige Verlängerung der ursprünglichen Verjährungsfrist um zwölf Monate vor.',
     legalSummaryEn:
-      '4-month suspension of limitation if defect appears near month 24; 2-month suspension after repaired/replaced goods are handed back to the consumer.',
-    statutoryBasis: ['BGB § 475e Abs. 1', 'BGB § 475e Abs. 3'],
+      'Subsection (3) measures from when the defect first appeared within the limitation period. Subsection (4) addresses the handover of repaired or replacement goods. Subsection (5) provides a one-time twelve-month extension of the original limitation period when repair is performed.',
+    statutoryBasis: ['BGB § 475e Abs. 3 bis 5'],
   },
   '477': {
     section: 'BGB § 477 Abs. 1 und 2',
@@ -265,9 +265,9 @@ const STATUTES_REGISTRY: Record<string, StatuteData> = {
     statutoryTextEn:
       'In standard business terms, a provision is ineffective regarding a tacit renewal of the contract, unless the contract is only renewed for an indefinite period and the other party is granted the right to terminate the renewed contract with a notice period not exceeding one month.',
     legalSummaryDe:
-      'Stillschweigende automatische Vertragsverlängerungen (z. B. Fitnessstudio, Streaming, Zeitschriften) um feste Zeiträume (12 Monate) sind für Verträge ab dem 01.03.2022 unwirksam. Verträge verlängern sich nur unbefristet und sind jederzeit mit max. 1 Monat Kündigungsfrist kündbar.',
+      'Für erfasste AGB in ab dem 01.03.2022 entstandenen Vertragsverhältnissen ist eine bindende stillschweigende Verlängerung nur auf unbestimmte Zeit zulässig, wenn eine Kündigung jederzeit mit höchstens einem Monat Frist möglich ist. Für frühere Verträge ist die Übergangsvorschrift zu beachten.',
     legalSummaryEn:
-      'Tacit 12-month auto-renewals in consumer contracts concluded after 01.03.2022 are void under German law. Rollover contracts extend indefinitely with a maximum 1-month rolling cancellation notice period.',
+      'For covered standard terms in contracts arising from 1 March 2022, a binding tacit renewal is allowed only for an indefinite term with cancellation at any time on at most one month of notice. The transitional rule applies to earlier contracts.',
     statutoryBasis: [
       'BGB § 309 Nr. 9 lit. b & c',
       'Gesetz für faire Verbraucherverträge (BGBl. I 2021 S. 3433)',
@@ -283,9 +283,9 @@ const STATUTES_REGISTRY: Record<string, StatuteData> = {
     statutoryTextEn:
       'The consumer has a right of withdrawal under § 355 for off-premises contracts and distance contracts.',
     legalSummaryDe:
-      'Verbrauchern steht bei Online-Käufen und Fernabsatzverträgen ein 14-tägiges gesetzliches Widerrufsrecht ohne Angabe von Gründen zu.',
+      'Bei erfassten Fernabsatz- und außerhalb von Geschäftsräumen geschlossenen Verträgen besteht grundsätzlich ein Widerrufsrecht. Gesetzliche Ausnahmen und die für den Vertrag geltende Frist sind gesondert zu prüfen.',
     legalSummaryEn:
-      'Grants consumers a 14-day statutory right of withdrawal without stating reasons for distance and online contracts.',
+      'Covered distance and off-premises contracts generally carry a withdrawal right. Check the statutory exceptions and the deadline applicable to the contract.',
     statutoryBasis: [
       'BGB § 312g Abs. 1',
       'BGB § 355',
@@ -317,9 +317,9 @@ const STATUTES_REGISTRY: Record<string, StatuteData> = {
     statutoryTextEn:
       'If a statutory right of withdrawal is granted to a consumer, the consumer and the business are no longer bound by their declarations of intent to conclude the contract if the consumer has withdrawn in time. The withdrawal period is 14 days.',
     legalSummaryDe:
-      'Allgemeine Ausübung des Widerrufsrechts: Löst den Vertrag rückwirkend auf. Frist beträgt 14 Tage ab Belehrung bzw. Warenerhalt. Rückzahlung hat innerhalb von 14 Tagen zu erfolgen (§ 357 BGB).',
+      'Wo ein gesetzliches Widerrufsrecht besteht, beträgt die Frist grundsätzlich 14 Tage. Für Fristbeginn und Rückabwicklung gelten die Vorschriften zum jeweiligen Vertrag. § 357 kann bei Waren ein Zurückbehaltungsrecht bis zur Rückgabe oder zum Versandnachweis vorsehen.',
     legalSummaryEn:
-      'General withdrawal provisions: releases parties from contractual obligations. The withdrawal period is 14 days, and full refund must be provided within 14 days (§ 357 BGB).',
+      'Where a statutory right of withdrawal exists, the default period is 14 days. The start and return obligations depend on the applicable rules. Under § 357, a seller may be able to withhold reimbursement pending return of goods or proof of dispatch.',
     statutoryBasis: ['BGB § 355 Abs. 1 & 2', 'BGB § 357'],
   },
 };
