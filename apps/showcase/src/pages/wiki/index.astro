@@ -1,14 +1,24 @@
 ---
-import { policySeedData } from '@cmlab/core';
 import type { PolicyWikiEntry } from '@cmlab/core';
+import { getPublishedPolicies } from '../../lib/policy-cms';
 import BrandIcon from '../../components/BrandIcon.svelte';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
 
-export const prerender = true;
+export const prerender = false;
 
-const subscriptions = policySeedData.filter((b: PolicyWikiEntry) => b.category === 'subscription');
-const hardware = policySeedData.filter((b: PolicyWikiEntry) => b.category === 'hardware');
+let policies: PolicyWikiEntry[] = [];
+let cmsUnavailable = false;
+try {
+  policies = await getPublishedPolicies();
+} catch (error) {
+  console.error('[policy-wiki] EmDash published content is unavailable.', error);
+  Astro.response.status = 503;
+  cmsUnavailable = true;
+}
+
+const subscriptions = policies.filter((b) => b.category === 'subscription');
+const hardware = policies.filter((b) => b.category === 'hardware');
 ---
 
 <!DOCTYPE html>
@@ -16,8 +26,8 @@ const hardware = policySeedData.filter((b: PolicyWikiEntry) => b.category === 'h
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Rights &amp; Renewals · Brand Policy Wiki · Top 20 Markenverzeichnis</title>
-  <meta name="description" content="Rights & Renewals — Verifizierte BGB-Kündigungsfristen (§ 309 Nr. 9, § 312k BGB) und Gewährleistungsrichtlinien (§ 438, § 477 BGB) für die 20 relevantesten Marken." />
+  <title>Rights &amp; Renewals · Brand Policy Wiki</title>
+  <meta name="description" content="Veröffentlichte BGB-Kündigungsfristen und Gewährleistungsrichtlinien aus dem Rights &amp; Renewals EmDash CMS." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -166,13 +176,20 @@ const hardware = policySeedData.filter((b: PolicyWikiEntry) => b.category === 'h
   <main class="wiki-container">
     <div class="wiki-hero">
       <div class="hero-pill-badge" style="margin-bottom: var(--space-4, 16px);">
-        <span>🏛️ BGB §§ 309, 312k, 438, 477</span> · <span>20 Kuratierte Marken</span> · <span>Zero-Auth Static</span>
+        <span>🏛️ BGB §§ 309, 312k, 438, 477</span> · <span>{policies.length} veröffentlichte Marken</span> · <span>EmDash CMS</span>
       </div>
       <h1>Brand Policy Wiki</h1>
       <p>
         Deterministische Rechtsfakten, Kündigungsfristen und gesetzliche Gewährleistungsregeln für Studierende und Verbraucher in Deutschland — ohne Tracking, ohne Cookies und ohne Login.
       </p>
     </div>
+
+    {cmsUnavailable && (
+      <div role="alert" class="brand-card" style="margin-bottom: var(--space-6, 24px);">
+        <strong>Das Markenverzeichnis ist vorübergehend nicht verfügbar.</strong>
+        <p>Es werden nur aktuell veröffentlichte CMS-Einträge angezeigt. Bitte später erneut versuchen.</p>
+      </div>
+    )}
 
     <!-- Subscriptions Section -->
     <h2 class="category-section-title">🔄 Abonnements &amp; Digitale Dienste ({subscriptions.length})</h2>

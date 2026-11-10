@@ -18,15 +18,6 @@ const SHOWCASE_MARKDOWN = `# Rights & Renewals (Showcase)
 `;
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  // Capture Cloudflare Workers / Pages runtime bindings into globalThis.__CF_ENV__
-  const cfEnv = (context.locals as any)?.runtime?.env;
-  if (cfEnv) {
-    if (!(globalThis as any).__CF_ENV__) {
-      (globalThis as any).__CF_ENV__ = {};
-    }
-    Object.assign((globalThis as any).__CF_ENV__, cfEnv);
-  }
-
   const request = context.request;
   const url = new URL(request.url);
   const accept = request.headers.get('Accept') || '';
@@ -41,10 +32,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
         const p = part.trim();
         if (p.startsWith('text/markdown')) {
           const m = p.match(/q=([0-9.]+)/);
-          if (m) qMd = parseFloat(m[1]);
+          if (m?.[1]) qMd = parseFloat(m[1]);
         } else if (p.startsWith('text/html')) {
           const m = p.match(/q=([0-9.]+)/);
-          if (m) qHtml = parseFloat(m[1]);
+          if (m?.[1]) qHtml = parseFloat(m[1]);
         }
       }
       if (qHtml > qMd) prefersMarkdown = false;

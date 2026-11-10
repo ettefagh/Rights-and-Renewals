@@ -6,7 +6,9 @@
  */
 
 import type { APIRoute } from 'astro';
-import { dispatchJsonRpc, policySeedData } from '@cmlab/core';
+import { dispatchJsonRpc } from '@cmlab/core';
+import type { PolicyWikiEntry } from '@cmlab/core';
+import { getPublishedPolicies, getPublishedPolicy } from '../../lib/policy-cms';
 
 export const prerender = false;
 
@@ -21,17 +23,15 @@ interface JsonRpcRequest {
   };
 }
 
-// Canonical brand map for dual-slug and alias resolution
-const brandMap = new Map<string, any>();
-for (const b of policySeedData) {
-  const slug = (b.brandSlug || '').toLowerCase();
-  if (slug) brandMap.set(slug, b);
-  if (b.brandName) brandMap.set(b.brandName.toLowerCase(), b);
-  if (Array.isArray(b.searchAliases)) {
-    for (const alias of b.searchAliases) {
-      brandMap.set(alias.toLowerCase(), b);
+function findBrandCandidates(policies: PolicyWikiEntry[], query: string): PolicyWikiEntry[] {
+  const matches = new Map<string, PolicyWikiEntry>();
+  for (const brand of policies) {
+    const searchableNames = [brand.brandSlug, brand.brandName, ...brand.searchAliases];
+    if (searchableNames.some((name) => name.trim().toLowerCase() === query)) {
+      matches.set(brand.brandSlug, brand);
     }
   }
+  return [...matches.values()];
 }
 
 const CORS_HEADERS = {
@@ -224,12 +224,12 @@ export const POST: APIRoute = async ({ request }) => {
   if (body.method === 'tools/call') {
     const toolName = body.params?.name;
     const args = body.params?.arguments || {};
-
     if (toolName === 'claim_dossier_generate') {
-      const slug = (args.brand_slug || args.service_slug || '').toLowerCase().trim();
-      const itemName = args.item_name;
-      const purchaseDateStr = args.purchase_date;
-      const defectDesc = args.defect_description;
+      const rawSlug = args.brand_slug || args.service_slug;
+      const slug = typeof rawSlug === 'string' ? rawSlug.toLowerCase().trim() : '';
+      const itemName = typeof args.item_name === 'string' ? args.item_name.trim() : '';
+      const purchaseDateStr = typeof args.purchase_date === 'string' ? args.purchase_date.trim() : '';
+      const defectDesc = typeof args.defect_description === 'string' ? args.defect_description.trim() : '';
 
       if (!slug || !itemName || !purchaseDateStr || !defectDesc) {
         return new Response(
@@ -245,9 +245,34 @@ export const POST: APIRoute = async ({ request }) => {
           { headers: CORS_HEADERS }
         );
       }
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 160) {
+        return new Response(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: reqId,
+            error: { code: -32602, message: 'brand_slug must be a valid policy slug.' },
+          }),
+          { headers: CORS_HEADERS },
+        );
+      }
+      if (itemName.length > 300 || defectDesc.length > 10000) {
+        return new Response(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: reqId,
+            error: { code: -32602, message: 'item_name or defect_description is too long.' },
+          }),
+          { headers: CORS_HEADERS },
+        );
+      }
 
       const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!isoDateRegex.test(purchaseDateStr) || isNaN(Date.parse(purchaseDateStr))) {
+      const parsedPurchaseDate = new Date(`${purchaseDateStr}T00:00:00Z`);
+      if (
+        !isoDateRegex.test(purchaseDateStr) ||
+        Number.isNaN(parsedPurchaseDate.getTime()) ||
+        parsedPurchaseDate.toISOString().slice(0, 10) !== purchaseDateStr
+      ) {
         return new Response(
           JSON.stringify({
             jsonrpc: '2.0',
@@ -261,9 +286,14 @@ export const POST: APIRoute = async ({ request }) => {
         );
       }
 
-      const brand = brandMap.get(slug);
-      const brandName =
-        brand?.brandName || brand?.brand_name || slug.charAt(0).toUpperCase() + slug.slice(1);
+      let brandName = slug.replace(/-/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+      try {
+        const brand = await getPublishedPolicy(slug);
+        if (brand) brandName = brand.brandName;
+      } catch (error) {
+        // Dossier generation is still available when the optional CMS display-name lookup is down.
+        console.error('[mcp] Published EmDash policy lookup for claim brand is unavailable.', error);
+      }
 
       // Calculate BGB § 477 12-month reversed burden of proof cliff
       const pDate = new Date(purchaseDateStr + 'T00:00:00Z');
@@ -350,7 +380,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (toolName === 'policy_lookup') {
       const rawSlug = args.service_slug || args.brand_slug;
-      if (!rawSlug || typeof rawSlug !== 'string' || !rawSlug.trim()) {
+      if (!rawSlug || typeof rawSlug !== 'string' || !rawSlug.trim() || rawSlug.length > 160) {
         return new Response(
           JSON.stringify({
             jsonrpc: '2.0',
@@ -365,7 +395,38 @@ export const POST: APIRoute = async ({ request }) => {
       }
 
       const normalized = rawSlug.trim().toLowerCase();
-      const match = brandMap.get(normalized);
+      let candidates: PolicyWikiEntry[] = [];
+      try {
+        const exactSlugMatch = await getPublishedPolicy(normalized);
+        candidates = exactSlugMatch
+          ? [exactSlugMatch]
+          : findBrandCandidates(await getPublishedPolicies(), normalized);
+      } catch (error) {
+        console.error('[mcp] Published EmDash policy content is unavailable.', error);
+        return new Response(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: reqId,
+            error: { code: -32000, message: 'Published policy content is temporarily unavailable.' },
+          }),
+          { status: 503, headers: CORS_HEADERS },
+        );
+      }
+
+      if (candidates.length > 1) {
+        return new Response(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            id: reqId,
+            error: {
+              code: -32602,
+              message: 'Brand alias is ambiguous; use a canonical brand_slug.',
+            },
+          }),
+          { headers: CORS_HEADERS },
+        );
+      }
+      const match = candidates[0];
 
       if (!match) {
         return new Response(
@@ -376,7 +437,7 @@ export const POST: APIRoute = async ({ request }) => {
               content: [
                 {
                   type: 'text',
-                  text: `Brand slug '${normalized}' not found in canonical dataset.`,
+                  text: `No published policy matches '${normalized}'.`,
                 },
               ],
               isError: true,
