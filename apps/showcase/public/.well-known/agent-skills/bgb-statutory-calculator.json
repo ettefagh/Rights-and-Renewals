@@ -1,12 +1,12 @@
 {
   "$schema": "https://schemas.agentskills.io/skill/0.2.0/schema.json",
-  "name": "bgb-statutory-calculator",
+  "name": "statutory-law-lookup",
   "version": "1.0.0",
   "type": "skill-json",
-  "description": "Calculate statutory warranty deadlines under BGB § 438 (24-month limitation), § 477 (12-month burden of proof transition), and tacit contract renewal windows under § 309 Nr. 9 & § 312k.",
+  "description": "Look up German Civil Code (BGB) provisions with official source text and scope notes. This read-only tool returns statutory references; it does not calculate case-specific deadlines.",
   "invocation": {
     "type": "mcp",
-    "endpoint": "https://rightsandrenewals.pages.dev/api/mcp",
+    "endpoint": "{{ORIGIN}}/api/mcp",
     "tool": "statutory_law_lookup",
     "method": "POST"
   },
@@ -28,15 +28,17 @@
         ],
         "description": "German Civil Code (BGB) statute section identifier"
       },
-      "purchase_date": {
+      "language": {
         "type": "string",
-        "format": "date",
-        "description": "Reference purchase date in ISO 8601 format (YYYY-MM-DD)"
+        "enum": ["de", "en"],
+        "default": "de",
+        "description": "Language for the returned statutory reference"
       }
     },
     "required": [
       "statute_section"
-    ]
+    ],
+    "additionalProperties": false
   },
   "examples": [
     {

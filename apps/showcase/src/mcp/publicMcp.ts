@@ -19,7 +19,6 @@ const cors = {
   Vary: 'Origin',
 };
 const trustedOrigins = new Set([
-  'https://rightsandrenewals.pages.dev',
   'https://rightsandrenewals-app.pages.dev',
 ]);
 

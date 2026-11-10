@@ -9,16 +9,16 @@
   },
   "title": "Rights & Renewals MCP Server",
   "description": "Public MCP for German brand policy, statutory sources, and scoped subscription rules.",
-  "url": "https://rightsandrenewals.pages.dev/api/mcp",
-  "websiteUrl": "https://rightsandrenewals.pages.dev/agent-setup",
+  "url": "{{ORIGIN}}/api/mcp",
+  "websiteUrl": "{{ORIGIN}}/agent-setup",
   "transport": {
     "type": "streamable-http",
-    "endpoint": "https://rightsandrenewals.pages.dev/api/mcp"
+    "endpoint": "{{ORIGIN}}/api/mcp"
   },
   "transports": [
     {
       "type": "streamable-http",
-      "url": "https://rightsandrenewals.pages.dev/api/mcp",
+      "url": "{{ORIGIN}}/api/mcp",
       "formats": [
         "application/json"
       ]
@@ -27,7 +27,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://rightsandrenewals.pages.dev/api/mcp",
+      "url": "{{ORIGIN}}/api/mcp",
       "protocolVersions": [
         "2025-11-25",
         "2025-06-18",

@@ -4,7 +4,10 @@ import '../../styles/main.css';
 
 export const prerender = false;
 
-const promptText = "Fetch and execute the appropriate instructions to set me up for Rights & Renewals from https://rightsandrenewals.pages.dev/agent-setup/prompt.md";
+const publicOrigin = Astro.url.origin;
+const mcpUrl = new URL('/api/mcp', publicOrigin).toString();
+const promptUrl = new URL('/agent-setup/prompt.md', publicOrigin).toString();
+const promptText = `Fetch and execute the appropriate instructions to set me up for Rights & Renewals from ${promptUrl}`;
 ---
 
 <!DOCTYPE html>
@@ -470,7 +473,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
                 <div class="agent-title">Cursor IDE</div>
               </div>
             </div>
-            <p class="agent-summary">AI-first code editor with native remote HTTP/SSE MCP server connections via .cursor/mcp.json.</p>
+            <p class="agent-summary">AI-first code editor with native remote MCP server connections via .cursor/mcp.json.</p>
             <div class="capability-pills">
               <span class="cap-pill">IDE</span>
               <span class="cap-pill">Terminal</span>
@@ -508,7 +511,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
                 <div class="agent-title">VS Code / Continue</div>
               </div>
             </div>
-            <p class="agent-summary">Open-source AI code assistant extension supporting SSE transport configurations.</p>
+            <p class="agent-summary">Open-source AI code assistant extension supporting remote MCP server connections.</p>
             <div class="capability-pills">
               <span class="cap-pill">Extension</span>
               <span class="cap-pill">IDE</span>
@@ -556,8 +559,8 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
           <div class="step-item">
             <div class="step-label"><span class="step-num">1</span> 1-Click Terminal Command</div>
             <div class="code-box">
-              <button type="button" class="btn-copy-code" data-clipboard="claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Claude Code CLI command">Copy</button>
-              <pre><code>claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp</code></pre>
+              <button type="button" class="btn-copy-code" data-clipboard={`claude mcp add --transport http rights-and-renewals ${mcpUrl}`} aria-label="Copy Claude Code CLI command">Copy</button>
+              <pre><code>claude mcp add --transport http rights-and-renewals {mcpUrl}</code></pre>
             </div>
           </div>
 
@@ -590,7 +593,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
       "args": [
         "-y",
         "mcp-remote",
-        "https://rightsandrenewals.pages.dev/api/mcp"
+        "${mcpUrl}"
       ]
     }
   }
@@ -602,7 +605,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
       "args": [
         "-y",
         "mcp-remote",
-        "https://rightsandrenewals.pages.dev/api/mcp"
+        "${mcpUrl}"
       ]
     }
   }
@@ -627,14 +630,14 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
               <button type="button" class="btn-copy-code" data-clipboard={`{
   "mcpServers": {
     "rights-and-renewals": {
-      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+      "url": "${mcpUrl}"
     }
   }
 }`} aria-label="Copy Cursor MCP JSON config">Copy</button>
               <pre><code>{`{
   "mcpServers": {
     "rights-and-renewals": {
-      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+      "url": "${mcpUrl}"
     }
   }
 }`}</code></pre>
@@ -643,7 +646,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
 
           <div class="step-item">
             <div class="step-label"><span class="step-num">2</span> Or Cursor Settings UI</div>
-            <p class="text-secondary text-sm">Open <strong>Cursor Settings &gt; Features &gt; MCP &gt; Add New MCP Server</strong> with Name: <code>rights-and-renewals</code>, Type: <code>sse</code> or <code>http</code>, and URL: <code>https://rightsandrenewals.pages.dev/api/mcp</code>.</p>
+            <p class="text-secondary text-sm">Open <strong>Cursor Settings &gt; Features &gt; MCP &gt; Add New MCP Server</strong>, choose <strong>Streamable HTTP</strong>, and set the URL to <code>{mcpUrl}</code>.</p>
           </div>
         </div>
 
@@ -666,14 +669,14 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
               <button type="button" class="btn-copy-code" data-clipboard={`{
   "mcpServers": {
     "rights-and-renewals": {
-      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+      "serverUrl": "${mcpUrl}"
     }
   }
 }`} aria-label="Copy Windsurf MCP JSON config">Copy</button>
               <pre><code>{`{
   "mcpServers": {
     "rights-and-renewals": {
-      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+      "serverUrl": "${mcpUrl}"
     }
   }
 }`}</code></pre>
@@ -689,33 +692,19 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
         <!-- 5. VS Code / Continue Panel -->
         <div role="tabpanel" class="tabpanel" id="panel-continue" aria-labelledby="tab-continue" hidden>
           <h2>VS Code / Continue Configuration</h2>
-          <p class="text-secondary">Configure the Continue extension with SSE transport pointing to Rights &amp; Renewals.</p>
+          <p class="text-secondary">Configure the Continue extension to connect to Rights &amp; Renewals over Streamable HTTP.</p>
 
           <div class="step-item">
-            <div class="step-label"><span class="step-num">1</span> Configuration File: ~/.continue/config.json</div>
+            <div class="step-label"><span class="step-num">1</span> Configuration File: ~/.continue/config.yaml</div>
             <div class="code-box">
-              <button type="button" class="btn-copy-code" data-clipboard={`{
-  "mcpServers": [
-    {
-      "name": "rights-and-renewals",
-      "transport": {
-        "type": "sse",
-        "url": "https://rightsandrenewals.pages.dev/api/mcp"
-      }
-    }
-  ]
-}`} aria-label="Copy Continue JSON config">Copy</button>
-              <pre><code>{`{
-  "mcpServers": [
-    {
-      "name": "rights-and-renewals",
-      "transport": {
-        "type": "sse",
-        "url": "https://rightsandrenewals.pages.dev/api/mcp"
-      }
-    }
-  ]
-}`}</code></pre>
+              <button type="button" class="btn-copy-code" data-clipboard={`mcpServers:
+  - name: rights-and-renewals
+    type: streamable-http
+    url: ${mcpUrl}`} aria-label="Copy Continue YAML config">Copy</button>
+              <pre><code>{`mcpServers:
+  - name: rights-and-renewals
+    type: streamable-http
+    url: ${mcpUrl}`}</code></pre>
             </div>
           </div>
 
@@ -733,8 +722,8 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
           <div class="step-item">
             <div class="step-label"><span class="step-num">1</span> 1-Click Terminal Command</div>
             <div class="code-box">
-              <button type="button" class="btn-copy-code" data-clipboard="gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Gemini CLI command">Copy</button>
-              <pre><code>gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp</code></pre>
+              <button type="button" class="btn-copy-code" data-clipboard={`gemini mcp add --transport http rights-and-renewals ${mcpUrl}`} aria-label="Copy Gemini CLI command">Copy</button>
+              <pre><code>gemini mcp add --transport http rights-and-renewals {mcpUrl}</code></pre>
             </div>
           </div>
 
@@ -744,14 +733,14 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
               <button type="button" class="btn-copy-code" data-clipboard={`{
   "mcpServers": {
     "rights-and-renewals": {
-      "httpUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+      "httpUrl": "${mcpUrl}"
     }
   }
 }`} aria-label="Copy Gemini settings.json snippet">Copy</button>
               <pre><code>{`{
   "mcpServers": {
     "rights-and-renewals": {
-      "httpUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+      "httpUrl": "${mcpUrl}"
     }
   }
 }`}</code></pre>

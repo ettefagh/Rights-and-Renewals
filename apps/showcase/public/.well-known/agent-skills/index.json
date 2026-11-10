@@ -6,27 +6,21 @@
       "name": "rights-and-renewals",
       "type": "skill-md",
       "description": "Reference workflow for German consumer policy, statutory warranty rules, and subscription terms.",
-      "url": "https://rightsandrenewals.pages.dev/.well-known/agent-skills/rights-and-renewals/SKILL.md",
+      "url": "{{ORIGIN}}/.well-known/agent-skills/rights-and-renewals/SKILL.md",
       "author": "Rights & Renewals Team",
-      "license": "Apache-2.0",
-      "sha256": "0a7ab89152b903c21c9136ae4f63c320c32a98d8c572788c3bdc71d6330cdf58",
-      "digest": "sha256:0a7ab89152b903c21c9136ae4f63c320c32a98d8c572788c3bdc71d6330cdf58"
+      "license": "Apache-2.0"
     },
     {
       "name": "policy-lookup",
       "type": "skill-json",
       "description": "Look up cataloged German goods or subscription policies with statutory and available provider sources.",
-      "url": "/.well-known/agent-skills/policy-lookup.json",
-      "sha256": "5ce716904498ecc4a7e32b804ae32add5a0a71a9aaa4469524629a0d0f0be273",
-      "digest": "sha256:5ce716904498ecc4a7e32b804ae32add5a0a71a9aaa4469524629a0d0f0be273"
+      "url": "/.well-known/agent-skills/policy-lookup.json"
     },
     {
-      "name": "bgb-statutory-calculator",
+      "name": "statutory-law-lookup",
       "type": "skill-json",
       "description": "Read a dated German Civil Code reference with an official source and scope notes.",
-      "url": "/.well-known/agent-skills/bgb-statutory-calculator.json",
-      "sha256": "e3b09a54a4ce524360593982da59d9cf7d11cd586ac1d661e44f44c8f094cbec",
-      "digest": "sha256:e3b09a54a4ce524360593982da59d9cf7d11cd586ac1d661e44f44c8f094cbec"
+      "url": "/.well-known/agent-skills/bgb-statutory-calculator.json"
     }
   ]
 }

@@ -19,6 +19,16 @@ export default defineConfig({
     emdash({
       database: d1({ binding: 'DB' }),
       storage: r2({ binding: 'MEDIA' }),
+      plugins: [
+        {
+          id: 'cmlab-policy-publication-guard',
+          version: '1.0.0',
+          entrypoint: fileURLToPath(new URL('./src/lib/policy-publication-guard.ts', import.meta.url)).replaceAll('\\', '/'),
+          format: 'standard',
+          capabilities: ['hooks.content-policy:register'],
+          hooks: ['content:beforePublish'],
+        },
+      ],
     }),
   ],
   server: {

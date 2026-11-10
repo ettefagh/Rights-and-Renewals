@@ -1,20 +1,21 @@
 import { getEmDashCollection, getEmDashEntry, getRequestContext, isSafeHref, runWithContext } from 'emdash';
 import type { PolicyWikiEntry } from '@cmlab/core';
+import { validatePolicyVerifiedDate } from './policy-date.js';
 
 export const POLICY_COLLECTION = 'brand_policies';
 
-interface CmsPolicyFields {
-  title: unknown;
-  category: unknown;
-  statutory_warranty_months: unknown;
-  commercial_guarantee_months: unknown;
-  cancellation_notice_months: unknown;
-  cancellation_button_compliant: unknown;
-  cancellation_url?: unknown;
-  support_email?: unknown;
-  legal_notes: unknown;
-  verified_date: unknown;
-  search_aliases: unknown;
+export interface CmsPolicyFields {
+  title: string;
+  category: 'subscription' | 'hardware';
+  statutory_warranty_months: number;
+  commercial_guarantee_months: number;
+  cancellation_notice_months: number;
+  cancellation_button_compliant: boolean;
+  cancellation_url?: string | null;
+  support_email?: string | null;
+  legal_notes: string;
+  verified_date: string;
+  search_aliases: Array<{ alias: string }>;
 }
 
 interface CmsPolicyEntry {
@@ -79,20 +80,11 @@ function mapPolicyEntry(entry: CmsPolicyEntry): PolicyWikiEntry {
     throw new Error(`EmDash policy '${slug}' has an invalid search_aliases field.`);
   }
 
-  const verifiedDateTime = requiredString(data.verified_date, 'verified_date', slug);
-  const verifiedDate = verifiedDateTime.slice(0, 10);
-  const verifiedDateTimestamp = Date.parse(verifiedDateTime);
-  if (
-    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(verifiedDateTime) ||
-    Number.isNaN(verifiedDateTimestamp) ||
-    Number.isNaN(Date.parse(`${verifiedDate}T00:00:00Z`)) ||
-    new Date(Date.parse(`${verifiedDate}T00:00:00Z`)).toISOString().slice(0, 10) !== verifiedDate
-  ) {
-    throw new Error(`EmDash policy '${slug}' has an invalid verified_date datetime.`);
+  const dateValidation = validatePolicyVerifiedDate(data.verified_date);
+  if (!dateValidation.valid) {
+    throw new Error(`EmDash policy '${slug}' has an invalid verified_date field: ${dateValidation.reason}.`);
   }
-  if (verifiedDate > new Date().toISOString().slice(0, 10)) {
-    throw new Error(`EmDash policy '${slug}' has a future verified_date field.`);
-  }
+  const verifiedDate = dateValidation.date;
 
   const cancellationUrl = optionalSafeUrl(data.cancellation_url);
   const supportEmail = optionalEmail(data.support_email);

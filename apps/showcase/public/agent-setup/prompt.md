@@ -2,7 +2,7 @@
 
 Use this guide to connect an AI coding environment to the Rights & Renewals MCP server:
 
-`https://rightsandrenewals.pages.dev/api/mcp`
+`{{ORIGIN}}/api/mcp`
 
 The public MCP endpoint does not require OAuth sign-in. Any OAuth sign-in offered for the separate EmDash CMS applies only to EmDash and does not authenticate this endpoint.
 
@@ -25,7 +25,7 @@ Add a remote Streamable HTTP server in Antigravity's MCP Servers UI or configure
 {
   "mcpServers": {
     "rights-and-renewals": {
-      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+      "serverUrl": "{{ORIGIN}}/api/mcp"
     }
   }
 }
@@ -38,7 +38,7 @@ In the agent panel, open **⋯ > MCP Servers**. Confirm the server is connected 
 Add the HTTP server with:
 
 ```sh
-claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp
+claude mcp add --transport http rights-and-renewals {{ORIGIN}}/api/mcp
 ```
 
 Run `/mcp` in Claude Code to check the server status and available tools. Then call a read-only tool and inspect the response.
@@ -48,7 +48,7 @@ Run `/mcp` in Claude Code to check the server status and available tools. Then c
 Add the server with the Codex CLI:
 
 ```sh
-codex mcp add rights-and-renewals --url https://rightsandrenewals.pages.dev/api/mcp
+codex mcp add rights-and-renewals --url {{ORIGIN}}/api/mcp
 ```
 
 Check the saved server entry with `codex mcp list`. In a Codex session, verify the server tools are available and call one read-only tool. Confirm its result before reporting success.
@@ -62,7 +62,7 @@ For Copilot Agent mode, create `.vscode/mcp.json` in the workspace using VS Code
   "servers": {
     "rights-and-renewals": {
       "type": "http",
-      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+      "url": "{{ORIGIN}}/api/mcp"
     }
   }
 }
@@ -78,7 +78,7 @@ Create `.cursor/mcp.json` in the project (or `~/.cursor/mcp.json` for global set
 {
   "mcpServers": {
     "rights-and-renewals": {
-      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+      "url": "{{ORIGIN}}/api/mcp"
     }
   }
 }
@@ -98,7 +98,7 @@ In the Cascade MCP settings, open the raw configuration and merge this entry und
 {
   "mcpServers": {
     "rights-and-renewals": {
-      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+      "serverUrl": "{{ORIGIN}}/api/mcp"
     }
   }
 }
@@ -109,7 +109,7 @@ In the Cascade MCP settings, open the raw configuration and merge this entry und
 Add the Streamable HTTP server with:
 
 ```sh
-gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp
+gemini mcp add --transport http rights-and-renewals {{ORIGIN}}/api/mcp
 ```
 
 Restart Gemini CLI and run `/mcp list`. Confirm the server is Connected and its tools are listed, then call a read-only tool.

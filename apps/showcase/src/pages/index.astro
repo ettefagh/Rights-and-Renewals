@@ -5,6 +5,8 @@ import '../../styles/main.css';
 
 export const prerender = false;
 
+const mcpUrl = new URL('/api/mcp', Astro.url.origin).toString();
+
 const accept = Astro.request.headers.get('accept') || '';
 let prefersMarkdown = false;
 if (accept.includes('text/markdown')) {
@@ -33,15 +35,15 @@ if (prefersMarkdown) {
 
 ## Features & Capabilities
 - **Brand Policy Wiki**: Verified BGB §§ 437, 438, 477 warranty terms & § 312k cancellation rules for top 20 brands.
-- **Model Context Protocol (MCP)**: Native JSON-RPC 2.0 endpoints for AI agents.
-- **Agent Discovery**: API Catalog (RFC 9727), OAuth Protected Resource Metadata (RFC 9728), ARD AI Catalog, and WebMCP tools.
+- **Model Context Protocol (MCP)**: Public, read-only JSON-RPC tools over Streamable HTTP at ${mcpUrl}.
+- **Agent Discovery**: API Catalog (RFC 9727), ARD AI Catalog, MCP Server Card, and Agent Skills.
 
 ## Discovery Resources
 - API Catalog: \`/.well-known/api-catalog\`
 - MCP Server Card: \`/.well-known/mcp/server-card.json\`
-- OAuth Metadata: \`/.well-known/oauth-protected-resource\`
 - Agent Skills: \`/.well-known/agent-skills/index.json\`
-- Agent Registration: \`/auth.md\`
+- Service details: \`/auth.md\`
+- Setup guide: \`/agent-setup\`
 `, {
     status: 200,
     headers: {
@@ -61,7 +63,7 @@ if (prefersMarkdown) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Rights &amp; Renewals · CM-LAB · MCP Server &amp; Consumer Wallet Showcase</title>
-  <meta name="description" content="Rights & Renewals: Showcase webpage demonstrating the Model Context Protocol (MCP 2024-11-05) interface and the offline-first German consumer warranty & subscription wallet." />
+  <meta name="description" content="Rights & Renewals: Showcase webpage demonstrating the Model Context Protocol (MCP 2025-11-25) Streamable HTTP interface and the offline-first German consumer warranty & subscription wallet." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -140,7 +142,7 @@ if (prefersMarkdown) {
     <section id="hero" class="hero-section">
       <div class="layout-container hero-inner">
         <div class="hero-pill-badge">
-          <span>🏛️ BGB §§ 437, 477, 312k</span> · <span>MCP 2024-11-05</span> · <span>GoBD Rn. 108–110</span>
+          <span>🏛️ BGB §§ 437, 477, 312k</span> · <span>MCP 2025-11-25 · Streamable HTTP</span> · <span>GoBD Rn. 108–110</span>
         </div>
 
         <h1 class="hero-title">
@@ -173,7 +175,7 @@ if (prefersMarkdown) {
         <div class="hero-pillars-grid">
           <div class="pillar-card pillar-card-primary">
             <div>
-              <span class="pillar-kicker">01 · SYMMETRIC PROTOCOL ENGINE · MCP 2024-11-05</span>
+              <span class="pillar-kicker">01 · SYMMETRIC PROTOCOL ENGINE · MCP 2025-11-25</span>
               <h3 class="pillar-title" style="font-size: 18px; margin-top: 6px;">Dual-Surface Consumer Ground Truth</h3>
               <p class="pillar-desc" style="margin-top: 6px;">
                 Die lokale <strong>100dvh Offline-First Wallet PWA</strong> (Dexie.js v4 + WebCrypto AES-GCM-256) unterstützt die persönliche Fallverwaltung. Die öffentliche MCP-API bietet separat schreibgeschützte Policy- und Rechtsquellenabfragen.
@@ -355,7 +357,7 @@ if (prefersMarkdown) {
   "mcpServers": {
     "rights-and-renewals": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://rightsandrenewals.pages.dev/api/mcp"]
+      "args": ["-y", "mcp-remote", "${mcpUrl}"]
     }
   }
 }`}</code></pre>
@@ -366,7 +368,7 @@ if (prefersMarkdown) {
             <pre class="code-block"><code>{`{
   "mcpServers": {
     "rights-and-renewals": {
-      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+      "url": "${mcpUrl}"
     }
   }
 }`}</code></pre>

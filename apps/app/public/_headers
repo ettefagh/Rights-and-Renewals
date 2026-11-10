@@ -21,62 +21,6 @@
   Access-Control-Allow-Headers: Content-Type, Accept
   Cache-Control: public, max-age=3600
 
-/.well-known/oauth-protected-resource
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/oauth-authorization-server
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/ai-catalog.json
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/mcp/server-card.json
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/agent-skills/index.json
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/agent-skills/*
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/agent-card.json
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/poppy.json
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
-  Cache-Control: public, max-age=3600
-
 /auth.md
   Content-Type: text/markdown; charset=utf-8
   Access-Control-Allow-Origin: *

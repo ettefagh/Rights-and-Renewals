@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>CM-LAB · Two Faces of Ground Truth · MCP Server &amp; Consumer Wallet Showcase</title>
-  <meta name="description" content="Showcase webpage demonstrating the Model Context Protocol (MCP 2024-11-05) interface and the offline-first German consumer warranty & subscription wallet.">
+  <meta name="description" content="Showcase webpage demonstrating the Model Context Protocol (MCP 2025-11-25) Streamable HTTP interface and the offline-first German consumer warranty & subscription wallet.">
 
   <!-- Zero-FOUC Theme Initialization -->
   <script>
@@ -64,7 +64,7 @@
     <section id="hero" class="hero-section">
       <div class="layout-container hero-inner">
         <div class="hero-pill-badge">
-          <span>🏛️ BGB §§ 437, 477, 312k</span> · <span>MCP 2024-11-05</span> · <span>GoBD Rn. 108–110</span>
+          <span>🏛️ BGB §§ 437, 477, 312k</span> · <span>MCP 2025-11-25 · Streamable HTTP</span> · <span>GoBD Rn. 108–110</span>
         </div>
 
         <h1 class="hero-title">
@@ -252,7 +252,7 @@
        ======================================================================== -->
   <dialog id="quick-connect-modal" class="drawer-modal" aria-labelledby="drawer-modal-title">
     <div class="drawer-header">
-      <h3 id="drawer-modal-title">🤖 AI Agent Quick-Connect (MCP 2024-11-05)</h3>
+      <h3 id="drawer-modal-title">🤖 AI Agent Quick-Connect (MCP Streamable HTTP)</h3>
       <button id="drawer-close-btn" class="btn-compact btn-outline" aria-label="Schließen">✕</button>
     </div>
 
@@ -285,12 +285,12 @@
       <!-- Tab 2: Cursor IDE -->
       <div id="drawer-panel-cursor" class="drawer-tab-panel">
         <p class="text-muted" style="font-size: 13px;">
-          Fügen Sie diesen Server in <code>Settings &gt; Features &gt; MCP</code> in Cursor hinzu:
+          Fügen Sie den Streamable-HTTP-Server in <code>Settings &gt; Features &gt; MCP</code> in Cursor hinzu:
         </p>
         <pre class="drawer-pre" id="code-cursor-config">{
   "mcpServers": {
     "cmlab-warranty": {
-      "url": "https://[project].page.dev/api/mcp/sse"
+      "url": "https://YOUR-SHOWCASE-HOST/api/mcp"
     }
   }
 }</pre>
@@ -302,9 +302,9 @@
       <!-- Tab 3: Edge Worker -->
       <div id="drawer-panel-edge" class="drawer-tab-panel">
         <p class="text-muted" style="font-size: 13px;">
-          Cloudflare Pages Function JSON-RPC 2.0 Edge Endpoint:
+          Cloudflare Worker Streamable HTTP JSON-RPC 2.0 Endpoint:
         </p>
-        <pre class="drawer-pre" id="code-edge-config">POST https://[project].page.dev/api/mcp
+        <pre class="drawer-pre" id="code-edge-config">POST https://YOUR-SHOWCASE-HOST/api/mcp
 Content-Type: application/json
 
 {

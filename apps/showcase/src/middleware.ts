@@ -1,21 +1,23 @@
 import { defineMiddleware } from 'astro:middleware';
 
-const SHOWCASE_MARKDOWN = `# Rights & Renewals (Showcase)
+function getShowcaseMarkdown(origin: string): string {
+  return `# Rights & Renewals (Showcase)
 
 > Sovereign Consumer Rights, Subscription & Warranty Wallet with Brand Policy Wiki and Open MCP Server.
 
 ## Features & Capabilities
 - **Brand Policy Wiki**: Verified BGB §§ 437, 438, 477 warranty terms & § 312k cancellation rules for top 20 brands.
-- **Model Context Protocol (MCP)**: Native JSON-RPC 2.0 endpoints for AI agents.
-- **Agent Discovery**: API Catalog (RFC 9727), OAuth Protected Resource Metadata (RFC 9728), ARD AI Catalog, and WebMCP tools.
+- **Model Context Protocol (MCP)**: Public, read-only JSON-RPC tools over Streamable HTTP at ${origin}/api/mcp.
+- **Agent Discovery**: API Catalog (RFC 9727), ARD AI Catalog, MCP Server Card, and Agent Skills.
 
 ## Discovery Resources
 - API Catalog: \`/.well-known/api-catalog\`
 - MCP Server Card: \`/.well-known/mcp/server-card.json\`
-- OAuth Metadata: \`/.well-known/oauth-protected-resource\`
 - Agent Skills: \`/.well-known/agent-skills/index.json\`
-- Agent Registration: \`/auth.md\`
+- Service details: \`/auth.md\`
+- Setup guide: \`/agent-setup\`
 `;
+}
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const request = context.request;
@@ -42,7 +44,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     if (prefersMarkdown) {
-      return new Response(SHOWCASE_MARKDOWN, {
+      return new Response(getShowcaseMarkdown(url.origin), {
         status: 200,
         headers: {
           'Content-Type': 'text/markdown; charset=utf-8',

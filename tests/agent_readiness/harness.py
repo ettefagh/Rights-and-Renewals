@@ -945,22 +945,7 @@ def run_isitagentready_audit(accessor: EndpointAccessor) -> Dict[str, Any]:
             f"Failed to parse MCP server card: {e}"
         ))
 
-    # 14. a2aAgentCard
-    resp = accessor.fetch("/.well-known/agent-card.json")
-    if resp.status_code == 200:
-        checks.append(AuditCheckResult(
-            "a2aAgentCard", "protocolDiscovery", "A2A Protocol Agent Card",
-            "pass",
-            "A2A agent card metadata present"
-        ))
-    else:
-        checks.append(AuditCheckResult(
-            "a2aAgentCard", "protocolDiscovery", "A2A Protocol Agent Card",
-            "neutral",
-            "A2A Agent Card optional"
-        ))
-
-    # 15. agentSkills
+    # 14. agentSkills
     resp = accessor.fetch("/.well-known/agent-skills/index.json")
     try:
         data = json.loads(resp.body)
@@ -985,7 +970,7 @@ def run_isitagentready_audit(accessor: EndpointAccessor) -> Dict[str, Any]:
             f"Failed to parse Agent Skills index: {e}"
         ))
 
-    # 16. webMcp
+    # 15. webMcp
     wmcp = validate_webmcp_code(accessor.base_dir)
     if wmcp["valid"]:
         checks.append(AuditCheckResult(
@@ -1001,7 +986,7 @@ def run_isitagentready_audit(accessor: EndpointAccessor) -> Dict[str, Any]:
             "No WebMCP programmatic or declarative tools detected"
         ))
 
-    # 17. ard
+    # 16. ard
     resp = accessor.fetch("/.well-known/ai-catalog.json")
     cors = resp.get_header("Access-Control-Allow-Origin")
     try:
@@ -1025,21 +1010,6 @@ def run_isitagentready_audit(accessor: EndpointAccessor) -> Dict[str, Any]:
             "ard", "protocolDiscovery", "Agentic Resource Discovery (ARD)",
             "fail",
             f"Failed to parse ARD manifest: {e}"
-        ))
-
-    # 18. personalAgentProtocol
-    resp = accessor.fetch("/.well-known/poppy.json")
-    if resp.status_code == 200:
-        checks.append(AuditCheckResult(
-            "personalAgentProtocol", "protocolDiscovery", "Personal Agent Protocol (Poppy)",
-            "pass",
-            "Poppy manifest present"
-        ))
-    else:
-        checks.append(AuditCheckResult(
-            "personalAgentProtocol", "protocolDiscovery", "Personal Agent Protocol (Poppy)",
-            "neutral",
-            "Poppy protocol manifest optional"
         ))
 
     # Category 5: Commerce (Neutral for non-commerce apps)

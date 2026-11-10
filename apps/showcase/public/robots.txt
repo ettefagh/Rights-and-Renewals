@@ -1,6 +1,6 @@
 # ==============================================================================
 # CM-LAB Sovereign Rights & Renewals Showcase (RFC 9309 Compliant)
-# Domain: https://rightsandrenewals.pages.dev
+# Domain: {{ORIGIN}}
 # Governance: RFC 9309, contentsignals.org, EU Directive 2019/790 Art. 4
 # ==============================================================================
 
@@ -14,6 +14,7 @@
 User-agent: *
 Allow: /
 Disallow: /emdash/
+Disallow: /_emdash/
 Disallow: /api/
 Allow: /api/mcp
 Allow: /wiki/
@@ -27,16 +28,19 @@ Content-Signal: search=yes, ai-train=no, ai-input=yes
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /emdash/
+Disallow: /_emdash/
 Content-Signal: search=yes, ai-train=no, ai-input=yes
 
 User-agent: Claude-SearchBot
 Allow: /
 Disallow: /emdash/
+Disallow: /_emdash/
 Content-Signal: search=yes, ai-train=no, ai-input=yes
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /emdash/
+Disallow: /_emdash/
 Content-Signal: search=yes, ai-train=no, ai-input=yes
 
 # ------------------------------------------------------------------------------
@@ -45,16 +49,19 @@ Content-Signal: search=yes, ai-train=no, ai-input=yes
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /emdash/
+Disallow: /_emdash/
 Content-Signal: search=yes, ai-train=no, ai-input=yes
 
 User-agent: Claude-User
 Allow: /
 Disallow: /emdash/
+Disallow: /_emdash/
 Content-Signal: search=yes, ai-train=no, ai-input=yes
 
 User-agent: Perplexity-User
 Allow: /
 Disallow: /emdash/
+Disallow: /_emdash/
 Content-Signal: search=yes, ai-train=no, ai-input=yes
 
 # ------------------------------------------------------------------------------
@@ -88,5 +95,5 @@ Disallow: /
 # ------------------------------------------------------------------------------
 # 5. Sitemaps & Agent Discovery Pointers
 # ------------------------------------------------------------------------------
-Sitemap: https://rightsandrenewals.pages.dev/sitemap.xml
-Agentmap: https://rightsandrenewals.pages.dev/.well-known/ai-catalog.json
+Sitemap: {{ORIGIN}}/sitemap.xml
+Agentmap: {{ORIGIN}}/.well-known/ai-catalog.json

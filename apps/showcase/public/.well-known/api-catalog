@@ -1,77 +1,47 @@
 {
   "linkset": [
     {
-      "anchor": "https://rightsandrenewals.pages.dev/api/mcp",
+      "anchor": "{{ORIGIN}}/api/mcp",
       "service-desc": [
         {
-          "href": "https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json",
+          "href": "{{ORIGIN}}/.well-known/mcp/server-card.json",
           "type": "application/json"
         }
       ],
       "service-doc": [
         {
-          "href": "https://rightsandrenewals.pages.dev/auth.md",
+          "href": "{{ORIGIN}}/auth.md",
           "type": "text/markdown"
-        }
-      ],
-      "status": [
-        {
-          "href": "https://rightsandrenewals.pages.dev/api/health"
         }
       ]
     },
     {
-      "anchor": "https://rightsandrenewals.pages.dev/api/v1",
+      "anchor": "{{ORIGIN}}/.well-known/agent-skills/index.json",
       "service-desc": [
         {
-          "href": "https://rightsandrenewals.pages.dev/openapi.json",
-          "type": "application/vnd.oai.openapi+json"
-        }
-      ],
-      "service-doc": [
-        {
-          "href": "https://rightsandrenewals.pages.dev/docs",
-          "type": "text/markdown"
-        }
-      ],
-      "status": [
-        {
-          "href": "https://rightsandrenewals.pages.dev/api/health"
-        }
-      ]
-    },
-    {
-      "anchor": "https://rightsandrenewals.pages.dev/.well-known/agent-skills",
-      "service-desc": [
-        {
-          "href": "https://rightsandrenewals.pages.dev/.well-known/agent-skills/index.json",
+          "href": "{{ORIGIN}}/.well-known/agent-skills/index.json",
           "type": "application/json"
         }
       ],
       "service-doc": [
         {
-          "href": "https://rightsandrenewals.pages.dev/auth.md",
+          "href": "{{ORIGIN}}/auth.md",
           "type": "text/markdown"
         }
       ]
     },
     {
-      "anchor": "https://rightsandrenewals.pages.dev/",
+      "anchor": "{{ORIGIN}}/",
       "service-desc": [
         {
-          "href": "https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json",
+          "href": "{{ORIGIN}}/.well-known/mcp/server-card.json",
           "type": "application/json"
         }
       ],
       "service-doc": [
         {
-          "href": "https://rightsandrenewals.pages.dev/auth.md",
+          "href": "{{ORIGIN}}/auth.md",
           "type": "text/markdown"
-        }
-      ],
-      "status": [
-        {
-          "href": "https://rightsandrenewals.pages.dev/api/health"
         }
       ]
     }

@@ -5,7 +5,7 @@ This page describes the public consumer rights resources and MCP endpoint. It is
 ## Public resources
 
 - Policy Wiki: `/wiki`
-- Public MCP endpoint: `https://rightsandrenewals.pages.dev/api/mcp`
+- Public MCP endpoint: `{{ORIGIN}}/api/mcp`
 - MCP Server Card: `/.well-known/mcp/server-card.json`
 - Agent Skills index: `/.well-known/agent-skills/index.json`
 - API Catalog: `/.well-known/api-catalog`

@@ -1,13 +1,32 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "rightsandrenewals",
-  "compatibility_date": "2025-01-01",
+  "name": "rightsandrenewals-showcase",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-11-10",
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "pages_build_output_dir": "./dist",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "run_worker_first": [
+      "/auth.md",
+      "/robots.txt",
+      "/sitemap.xml",
+      "/agent-setup/prompt.md",
+      "/.well-known/*"
+    ]
+  },
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01
+    }
   },
   "d1_databases": [
     {

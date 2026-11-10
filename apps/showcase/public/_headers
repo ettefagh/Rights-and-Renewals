@@ -22,20 +22,6 @@
   Access-Control-Allow-Headers: Content-Type, Accept
   Cache-Control: public, max-age=3600
 
-/.well-known/oauth-protected-resource
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/oauth-authorization-server
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization, Accept
-  Cache-Control: public, max-age=3600
-
 /.well-known/ai-catalog.json
   Content-Type: application/json; charset=utf-8
   Access-Control-Allow-Origin: *
@@ -64,20 +50,6 @@
   Access-Control-Allow-Headers: Content-Type, Accept
   Cache-Control: public, max-age=3600
 
-/.well-known/agent-card.json
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
-  Cache-Control: public, max-age=3600
-
-/.well-known/poppy.json
-  Content-Type: application/json; charset=utf-8
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Accept
-  Cache-Control: public, max-age=3600
-
 /auth.md
   Content-Type: text/markdown; charset=utf-8
   Access-Control-Allow-Origin: *
@@ -97,11 +69,5 @@
 /api/mcp
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: POST, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Allow-Headers: Content-Type, Accept, MCP-Protocol-Version
   Cache-Control: no-store, no-cache, must-revalidate
-
-/sse
-  Access-Control-Allow-Origin: *
-  Content-Type: text/event-stream
-  Cache-Control: no-cache
-  Connection: keep-alive

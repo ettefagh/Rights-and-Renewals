@@ -1,5 +1,6 @@
 <script lang="ts">
   import { walletStore } from '../state/wallet.svelte';
+  import { getShowcaseUrl } from '../lib/showcase-url';
   import {
     formatFriendlyDate,
     formatRelativeRemaining,
@@ -40,6 +41,8 @@
   let isNotifCenterOpen = $state(false);
 
   const DONUT_COLORS = ['#2F524C', '#D96B4B', '#0D9488', '#D97706', '#4F46E5'];
+  const showcaseAdminUrl = getShowcaseUrl('/_emdash/admin');
+  const showcaseWikiUrl = getShowcaseUrl('/wiki');
 
   // Compute SVG donut chart segments for active subscriptions
   let donutSegments = $derived.by(() => {
@@ -207,19 +210,21 @@
             >
               <span>Sync / PIN</span>
             </button>
-            <button
-              type="button"
-              class="notif-util-btn"
-              onclick={() => {
-                isNotifCenterOpen = false;
-                if (typeof window !== 'undefined') {
-                  window.open('https://rightsandrenewals.pages.dev/emdash', '_blank', 'noopener,noreferrer');
-                }
-              }}
-              title="Open EmDash Editorial & Policy Telemetry Desk"
-            >
-              <span>⚡ EmDash</span>
-            </button>
+            {#if showcaseAdminUrl}
+              <button
+                type="button"
+                class="notif-util-btn"
+                onclick={() => {
+                  isNotifCenterOpen = false;
+                  if (typeof window !== 'undefined') {
+                    window.open(showcaseAdminUrl, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+                title="Open the EmDash editorial dashboard"
+              >
+                <span>⚡ EmDash</span>
+              </button>
+            {/if}
           </div>
         </div>
       {/if}
@@ -571,35 +576,45 @@
             <span>Quick Guide to Your Consumer Rights</span>
           </div>
           <div style="display: flex; gap: 14px; margin-left: auto;">
-            <a href="https://rightsandrenewals.pages.dev/wiki" target="_blank" rel="noopener noreferrer" style="color: var(--color-pine-teal, #2F524C); font-size: 12px; font-weight: 700; text-decoration: underline;">
-              Public Wiki ↗
-            </a>
-            <a href="https://rightsandrenewals.pages.dev/emdash" target="_blank" rel="noopener noreferrer" style="color: var(--color-pine-teal, #2F524C); font-size: 12px; font-weight: 700; text-decoration: underline;">
-              ⚡ EmDash CMS Desk ↗
-            </a>
+            {#if showcaseWikiUrl}
+              <a href={showcaseWikiUrl} target="_blank" rel="noopener noreferrer" style="color: var(--color-pine-teal, #2F524C); font-size: 12px; font-weight: 700; text-decoration: underline;">
+                Public Wiki ↗
+              </a>
+            {/if}
+            {#if showcaseAdminUrl}
+              <a href={showcaseAdminUrl} target="_blank" rel="noopener noreferrer" style="color: var(--color-pine-teal, #2F524C); font-size: 12px; font-weight: 700; text-decoration: underline;">
+                ⚡ EmDash CMS Desk ↗
+              </a>
+            {/if}
           </div>
         </div>
         <div class="glossary-items-grid">
           <div class="glossary-footnote">
             <strong>* Easy-Claim Period &amp; 2-Year Protection:</strong>
             In the first 12 months after buying a product, any defect is automatically presumed to have existed at delivery — you don't need an expert report. Total statutory protection lasts 24 months.
-            <a href="https://rightsandrenewals.pages.dev/wiki" target="_blank" rel="noopener noreferrer">
-              Learn more (§§ 438, 477 BGB Wiki) &rarr;
-            </a>
+            {#if showcaseWikiUrl}
+              <a href={showcaseWikiUrl} target="_blank" rel="noopener noreferrer">
+                Learn more (§§ 438, 477 BGB Wiki) &rarr;
+              </a>
+            {/if}
           </div>
           <div class="glossary-footnote">
             <strong>** 1-Click Cancel &amp; Monthly Cancel Right:</strong>
             Online providers must offer a direct 2-step cancellation button without login walls, and tacitly renewed contracts can be canceled monthly.
-            <a href="https://rightsandrenewals.pages.dev/wiki" target="_blank" rel="noopener noreferrer">
-              Learn more (§ 312k &amp; § 309 BGB Wiki) &rarr;
-            </a>
+            {#if showcaseWikiUrl}
+              <a href={showcaseWikiUrl} target="_blank" rel="noopener noreferrer">
+                Learn more (§ 312k &amp; § 309 BGB Wiki) &rarr;
+              </a>
+            {/if}
           </div>
           <div class="glossary-footnote">
             <strong>*** Verified Original Receipt:</strong>
             When you snap a receipt photo, your device computes a tamper-proof cryptographic fingerprint (SHA-256) so stores and tax offices can verify the image was never altered.
-            <a href="https://rightsandrenewals.pages.dev/wiki" target="_blank" rel="noopener noreferrer">
-              Learn more (Receipt Verification Wiki) &rarr;
-            </a>
+            {#if showcaseWikiUrl}
+              <a href={showcaseWikiUrl} target="_blank" rel="noopener noreferrer">
+                Learn more (Receipt Verification Wiki) &rarr;
+              </a>
+            {/if}
           </div>
         </div>
       </footer>
