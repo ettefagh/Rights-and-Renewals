@@ -5,7 +5,7 @@ import AudienceSwitch from '../components/AudienceSwitch.astro';
 
 export const prerender = true;
 
-const promptText = "Fetch and execute the appropriate instructions to set me up for Rights & Renewals from https://rightsandrenewals.pages.dev/agent-setup/prompt.md";
+const promptText = "Read https://rightsandrenewals.pages.dev/agent-setup/prompt.md. Review its setup steps and ask me before changing configuration or running commands. After setup, verify the live MCP connection and call a read-only tool before reporting success.";
 ---
 
 <!DOCTYPE html>
@@ -14,7 +14,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Rights &amp; Renewals · Agent Setup</title>
-  <meta name="description" content="Connect your AI coding agent to Rights & Renewals. 1-click installer commands and copyable configuration snippets for Claude Code, Claude Desktop, Cursor, Windsurf, VS Code / Continue, and Gemini CLI." />
+  <meta name="description" content="Connect Antigravity, Claude Code, Codex, VS Code Copilot, Cursor, and Gemini CLI to the Rights & Renewals MCP server with setup instructions and connection checks." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -382,7 +382,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
   </header>
 
   <main id="agent-setup-main">
-    <AudienceSwitch humanHref="/agent-setup" machineHref="/machine/agent-setup.md" />
+    <AudienceSwitch humanHref="/agent-setup" machineHref="/machine/view/agent-setup" />
     <!-- HERO SECTION -->
     <section class="agent-setup-hero">
       <div class="layout-container">
@@ -422,8 +422,14 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
         <button type="button" class="filter-chip" data-filter="extension" aria-pressed="false">Extension</button>
       </div>
 
-      <!-- 6-AGENT CATALOG CARD GRID -->
+      <!-- PRIORITIZED AGENT CATALOG -->
       <div class="catalog-grid" id="agent-grid">
+        <!-- 1. Antigravity -->
+        <article class="agent-card" id="agent-card-antigravity" data-workflows="ide cloud" data-target-tab="tab-antigravity">
+          <div><div class="agent-card-header"><div class="agent-icon">✨</div><div><div class="agent-meta-vendor">Google</div><div class="agent-title">Antigravity</div></div></div>
+            <p class="agent-summary">Remote Streamable HTTP MCP support through Antigravity MCP Servers or mcp_config.json.</p><div class="capability-pills"><span class="cap-pill">IDE</span><span class="cap-pill">Cloud</span></div>
+          </div><span class="card-action-link">View guide →</span>
+        </article>
         <!-- 1. Claude Code -->
         <article class="agent-card" id="agent-card-claude-code" data-workflows="terminal cloud" data-target-tab="tab-claude-code">
           <div>
@@ -443,26 +449,21 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
           <span class="card-action-link">View guide →</span>
         </article>
 
-        <!-- 2. Claude Desktop -->
-        <article class="agent-card" id="agent-card-claude-desktop" data-workflows="cloud standalone" data-target-tab="tab-claude-desktop">
-          <div>
-            <div class="agent-card-header">
-              <div class="agent-icon">🟪</div>
-              <div>
-                <div class="agent-meta-vendor">Anthropic</div>
-                <div class="agent-title">Claude Desktop</div>
-              </div>
-            </div>
-            <p class="agent-summary">Standalone desktop app integrating MCP servers through local stdio mcp-remote bridge.</p>
-            <div class="capability-pills">
-              <span class="cap-pill">Standalone</span>
-              <span class="cap-pill">Cloud</span>
-            </div>
-          </div>
-          <span class="card-action-link">View guide →</span>
+        <!-- 3. Codex -->
+        <article class="agent-card" id="agent-card-codex" data-workflows="terminal ide" data-target-tab="tab-codex">
+          <div><div class="agent-card-header"><div class="agent-icon">⬛</div><div><div class="agent-meta-vendor">OpenAI</div><div class="agent-title">Codex</div></div></div>
+            <p class="agent-summary">Configure remote MCP servers from the Codex CLI or shared Codex config.</p><div class="capability-pills"><span class="cap-pill">Terminal</span><span class="cap-pill">IDE</span></div>
+          </div><span class="card-action-link">View guide →</span>
         </article>
 
-        <!-- 3. Cursor -->
+        <!-- 4. VS Code / GitHub Copilot -->
+        <article class="agent-card" id="agent-card-vscode" data-workflows="ide extension" data-target-tab="tab-vscode">
+          <div><div class="agent-card-header"><div class="agent-icon">🟦</div><div><div class="agent-meta-vendor">Microsoft</div><div class="agent-title">VS Code · GitHub Copilot</div></div></div>
+            <p class="agent-summary">Connect HTTP MCP servers in Agent mode with VS Code's .vscode/mcp.json format.</p><div class="capability-pills"><span class="cap-pill">IDE</span><span class="cap-pill">Extension</span></div>
+          </div><span class="card-action-link">View guide →</span>
+        </article>
+
+        <!-- 5. Cursor -->
         <article class="agent-card" id="agent-card-cursor" data-workflows="ide terminal" data-target-tab="tab-cursor">
           <div>
             <div class="agent-card-header">
@@ -476,6 +477,25 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
             <div class="capability-pills">
               <span class="cap-pill">IDE</span>
               <span class="cap-pill">Terminal</span>
+            </div>
+          </div>
+          <span class="card-action-link">View guide →</span>
+        </article>
+
+        <!-- 2. Claude Desktop -->
+        <article class="agent-card" id="agent-card-claude-desktop" data-workflows="cloud standalone" data-target-tab="tab-claude-desktop">
+          <div>
+            <div class="agent-card-header">
+              <div class="agent-icon">🟪</div>
+              <div>
+                <div class="agent-meta-vendor">Anthropic</div>
+                <div class="agent-title">Claude Desktop</div>
+              </div>
+            </div>
+            <p class="agent-summary">Add the public MCP endpoint as a remote connector in Claude Desktop.</p>
+            <div class="capability-pills">
+              <span class="cap-pill">Standalone</span>
+              <span class="cap-pill">Cloud</span>
             </div>
           </div>
           <span class="card-action-link">View guide →</span>
@@ -495,25 +515,6 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
             <div class="capability-pills">
               <span class="cap-pill">IDE</span>
               <span class="cap-pill">Cloud</span>
-            </div>
-          </div>
-          <span class="card-action-link">View guide →</span>
-        </article>
-
-        <!-- 5. VS Code / Continue -->
-        <article class="agent-card" id="agent-card-continue" data-workflows="extension ide" data-target-tab="tab-continue">
-          <div>
-            <div class="agent-card-header">
-              <div class="agent-icon">🟢</div>
-              <div>
-                <div class="agent-meta-vendor">Continue.dev</div>
-                <div class="agent-title">VS Code / Continue</div>
-              </div>
-            </div>
-            <p class="agent-summary">Open-source AI code assistant extension supporting SSE transport configurations.</p>
-            <div class="capability-pills">
-              <span class="cap-pill">Extension</span>
-              <span class="cap-pill">IDE</span>
             </div>
           </div>
           <span class="card-action-link">View guide →</span>
@@ -542,12 +543,20 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
       <!-- DETAILED TABBED GUIDES -->
       <section class="tabs-container" id="agent-tabs-section">
         <div class="tablist" role="tablist" aria-label="AI Agents Setup Guides">
-          <button type="button" role="tab" class="tab-btn" id="tab-claude-code" aria-selected="true" aria-controls="panel-claude-code">Claude Code</button>
-          <button type="button" role="tab" class="tab-btn" id="tab-claude-desktop" aria-selected="false" aria-controls="panel-claude-desktop">Claude Desktop</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-antigravity" aria-selected="true" aria-controls="panel-antigravity">Antigravity</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-claude-code" aria-selected="false" aria-controls="panel-claude-code">Claude Code</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-codex" aria-selected="false" aria-controls="panel-codex">Codex</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-vscode" aria-selected="false" aria-controls="panel-vscode">VS Code · Copilot</button>
           <button type="button" role="tab" class="tab-btn" id="tab-cursor" aria-selected="false" aria-controls="panel-cursor">Cursor</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-claude-desktop" aria-selected="false" aria-controls="panel-claude-desktop">Claude Desktop</button>
           <button type="button" role="tab" class="tab-btn" id="tab-windsurf" aria-selected="false" aria-controls="panel-windsurf">Windsurf</button>
-          <button type="button" role="tab" class="tab-btn" id="tab-continue" aria-selected="false" aria-controls="panel-continue">VS Code / Continue</button>
           <button type="button" role="tab" class="tab-btn" id="tab-gemini" aria-selected="false" aria-controls="panel-gemini">Gemini CLI</button>
+        </div>
+
+        <div role="tabpanel" class="tabpanel" id="panel-antigravity" aria-labelledby="tab-antigravity">
+          <h2>Antigravity Configuration</h2><p class="text-secondary">Add a remote Streamable HTTP server from MCP Servers or edit <code>.agents/mcp_config.json</code> (global: <code>~/.gemini/config/mcp_config.json</code>).</p>
+          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add server configuration</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard={`{\n  "mcpServers": {\n    "rights-and-renewals": {\n      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"\n    }\n  }\n}`} aria-label="Copy Antigravity MCP config">Copy</button><pre><code>{`{\n  "mcpServers": {\n    "rights-and-renewals": {\n      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"\n    }\n  }\n}`}</code></pre></div></div>
+          <div class="step-item"><div class="step-label"><span class="step-num">2</span> Verify live connection</div><p class="text-secondary text-sm">Open the agent panel's <strong>⋯ &gt; MCP Servers</strong>, confirm the server is connected and tools are listed, then request a read-only policy lookup and inspect the result.</p></div>
         </div>
 
         <!-- 1. Claude Code Panel -->
@@ -565,59 +574,31 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
 
           <div class="step-item">
             <div class="step-label"><span class="step-num">2</span> Verify Connection</div>
-            <p class="text-secondary text-sm">Launch Claude Code and run <code>/mcp</code> to verify all 5 tools are connected.</p>
+            <p class="text-secondary text-sm">Launch Claude Code and run <code>/mcp</code>. Confirm the server is connected, then request a read-only policy lookup and inspect its result.</p>
           </div>
         </div>
 
-        <!-- 2. Claude Desktop Panel -->
+        <div role="tabpanel" class="tabpanel" id="panel-codex" aria-labelledby="tab-codex" hidden>
+          <h2>Codex Configuration</h2><p class="text-secondary">Codex CLI and IDE share MCP configuration.</p>
+          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add the server</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard="codex mcp add rights-and-renewals --url https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Codex command">Copy</button><pre><code>codex mcp add rights-and-renewals --url https://rightsandrenewals.pages.dev/api/mcp</code></pre></div></div>
+          <div class="step-item"><div class="step-label"><span class="step-num">2</span> Verify configuration</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard="codex mcp list" aria-label="Copy Codex verification command">Copy</button><pre><code>codex mcp list</code></pre></div><p class="text-secondary text-sm">In a Codex session, confirm tools are available and invoke a read-only policy lookup. Inspect the tool result before reporting that setup works.</p></div>
+        </div>
+
+        <div role="tabpanel" class="tabpanel" id="panel-vscode" aria-labelledby="tab-vscode" hidden>
+          <h2>VS Code with GitHub Copilot</h2><p class="text-secondary">Create <code>.vscode/mcp.json</code>. This uses VS Code's <code>servers</code> configuration format.</p>
+          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add the HTTP server</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard={`{\n  "servers": {\n    "rights-and-renewals": {\n      "type": "http",\n      "url": "https://rightsandrenewals.pages.dev/api/mcp"\n    }\n  }\n}`} aria-label="Copy VS Code MCP config">Copy</button><pre><code>{`{\n  "servers": {\n    "rights-and-renewals": {\n      "type": "http",\n      "url": "https://rightsandrenewals.pages.dev/api/mcp"\n    }\n  }\n}`}</code></pre></div></div>
+          <div class="step-item"><div class="step-label"><span class="step-num">2</span> Verify connection and tool call</div><p class="text-secondary text-sm">Open Copilot Chat in <strong>Agent</strong> mode, run <strong>MCP: List Servers</strong> from the Command Palette and confirm it is enabled. Invoke a read-only policy lookup and inspect its result.</p></div>
+        </div>
+
         <div role="tabpanel" class="tabpanel" id="panel-claude-desktop" aria-labelledby="tab-claude-desktop" hidden>
           <h2>Claude Desktop Configuration</h2>
-          <p class="text-secondary">Claude Desktop connects to remote HTTP MCP endpoints via a local stdio bridge using <code>mcp-remote</code>.</p>
-
-          <div class="step-item">
-            <div class="step-label"><span class="step-num">1</span> Configuration File Location</div>
-            <p class="text-secondary text-sm">
-              macOS: <code>~/Library/Application Support/Claude/claude_desktop_config.json</code><br />
-              Windows: <code>%APPDATA%\Claude\claude_desktop_config.json</code>
-            </p>
+          <p class="text-secondary">Open Customize → Connectors and add a custom connector named Rights &amp; Renewals. Use the URL below and choose No sign in if prompted.</p>
+          <div class="code-box">
+            <button type="button" class="btn-copy-code" data-clipboard="https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Claude Desktop endpoint">Copy</button>
+            <pre><code>https://rightsandrenewals.pages.dev/api/mcp</code></pre>
           </div>
-
-          <div class="step-item">
-            <div class="step-label"><span class="step-num">2</span> Add to claude_desktop_config.json</div>
-            <div class="code-box">
-              <button type="button" class="btn-copy-code" data-clipboard={`{
-  "mcpServers": {
-    "rights-and-renewals": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://rightsandrenewals.pages.dev/api/mcp"
-      ]
-    }
-  }
-}`} aria-label="Copy Claude Desktop config JSON">Copy</button>
-              <pre><code>{`{
-  "mcpServers": {
-    "rights-and-renewals": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://rightsandrenewals.pages.dev/api/mcp"
-      ]
-    }
-  }
-}`}</code></pre>
-            </div>
-          </div>
-
-          <div class="step-item">
-            <div class="step-label"><span class="step-num">3</span> Restart Claude Desktop</div>
-            <p class="text-secondary text-sm">Restart Claude Desktop completely to reload configuration.</p>
-          </div>
+          <p class="text-secondary text-sm">Enable the connector in a conversation and ask for a Spotify policy lookup. <a href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp">Claude connector documentation</a></p>
         </div>
-
         <!-- 3. Cursor Panel -->
         <div role="tabpanel" class="tabpanel" id="panel-cursor" aria-labelledby="tab-cursor" hidden>
           <h2>Cursor IDE Configuration</h2>
@@ -645,7 +626,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
 
           <div class="step-item">
             <div class="step-label"><span class="step-num">2</span> Or Cursor Settings UI</div>
-            <p class="text-secondary text-sm">Open <strong>Cursor Settings &gt; Features &gt; MCP &gt; Add New MCP Server</strong> with Name: <code>rights-and-renewals</code>, Type: <code>sse</code> or <code>http</code>, and URL: <code>https://rightsandrenewals.pages.dev/api/mcp</code>.</p>
+            <p class="text-secondary text-sm">Open <strong>Cursor Settings &gt; Features &gt; MCP &gt; Add New MCP Server</strong> and add the HTTP server named <code>rights-and-renewals</code> with URL: <code>https://rightsandrenewals.pages.dev/api/mcp</code>.</p>
           </div>
         </div>
 
@@ -684,46 +665,7 @@ const promptText = "Fetch and execute the appropriate instructions to set me up 
 
           <div class="step-item">
             <div class="step-label"><span class="step-num">3</span> Refresh Cascade MCP Panel</div>
-            <p class="text-secondary text-sm">Click the Refresh button in the Cascade MCP panel to discover all tools.</p>
-          </div>
-        </div>
-
-        <!-- 5. VS Code / Continue Panel -->
-        <div role="tabpanel" class="tabpanel" id="panel-continue" aria-labelledby="tab-continue" hidden>
-          <h2>VS Code / Continue Configuration</h2>
-          <p class="text-secondary">Configure the Continue extension with SSE transport pointing to Rights &amp; Renewals.</p>
-
-          <div class="step-item">
-            <div class="step-label"><span class="step-num">1</span> Configuration File: ~/.continue/config.json</div>
-            <div class="code-box">
-              <button type="button" class="btn-copy-code" data-clipboard={`{
-  "mcpServers": [
-    {
-      "name": "rights-and-renewals",
-      "transport": {
-        "type": "sse",
-        "url": "https://rightsandrenewals.pages.dev/api/mcp"
-      }
-    }
-  ]
-}`} aria-label="Copy Continue JSON config">Copy</button>
-              <pre><code>{`{
-  "mcpServers": [
-    {
-      "name": "rights-and-renewals",
-      "transport": {
-        "type": "sse",
-        "url": "https://rightsandrenewals.pages.dev/api/mcp"
-      }
-    }
-  ]
-}`}</code></pre>
-            </div>
-          </div>
-
-          <div class="step-item">
-            <div class="step-label"><span class="step-num">2</span> Activate Agent Mode</div>
-            <p class="text-secondary text-sm">Ensure <strong>Agent Mode</strong> is selected in the Continue chat input dropdown for tools to be callable.</p>
+            <p class="text-secondary text-sm">Refresh the Cascade MCP panel to discover tools, then request a read-only Spotify policy lookup.</p>
           </div>
         </div>
 

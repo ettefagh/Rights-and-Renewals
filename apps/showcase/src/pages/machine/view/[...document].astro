@@ -1,0 +1,57 @@
+---
+import AudienceSwitch from '../../../components/AudienceSwitch.astro';
+import { getMachineDocument } from '../../../data/machine-documents';
+
+export const prerender = false;
+
+const path = Astro.params.document;
+const document = getMachineDocument(path === 'home' ? path : path && path + '.md');
+if (!document) Astro.response.status = 404;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <title>{document ? document.title + ' | Markdown' : 'Document not found'}</title>
+    {document && <link rel="alternate" type="text/markdown" href={document.rawHref} />}
+  </head>
+  <body>
+    <main>
+      {document && <a class="raw-link" href={document.rawHref} type="text/markdown">Raw Markdown</a>}
+      <pre>{document?.markdown ?? '# Document not found'}</pre>
+    </main>
+    <AudienceSwitch humanHref={document?.humanHref ?? '/'} machineHref={Astro.url.pathname} active="machine" />
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    background: #f7faf8;
+    color: #182f2b;
+  }
+
+  main {
+    max-width: 75ch;
+    margin-inline: auto;
+    padding: clamp(16px, 4vw, 48px);
+  }
+
+  .raw-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: #2f524c;
+    font: 600 14px/1 system-ui, sans-serif;
+  }
+
+  pre {
+    margin-block: 12px 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    font: 14px/1.65 ui-monospace, monospace;
+  }
+</style>

@@ -341,7 +341,11 @@ class TestTier1CategoryB_ShowcaseWebpage(unittest.TestCase):
         self.assertIn("agent-card-claude-desktop", content)
         self.assertIn("agent-card-cursor", content)
         self.assertIn("agent-card-windsurf", content)
-        self.assertIn("agent-card-continue", content)
+        preferred_clients = ("antigravity", "claude-code", "codex", "vscode", "cursor")
+        card_positions = [content.index(f'id="agent-card-{client}"') for client in preferred_clients]
+        tab_positions = [content.index(f'id="tab-{client}"') for client in preferred_clients]
+        self.assertEqual(card_positions, sorted(card_positions))
+        self.assertEqual(tab_positions, sorted(tab_positions))
         self.assertIn("agent-card-gemini", content)
         self.assertIn('role="tablist"', content)
         self.assertIn('role="tab"', content)

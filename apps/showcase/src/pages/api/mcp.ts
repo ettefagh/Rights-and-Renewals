@@ -34,11 +34,13 @@ for (const b of policySeedData) {
   }
 }
 
+const streamableVersions = ['2025-11-25', '2025-06-18', '2025-03-26'];
+
 const CORS_HEADERS = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, MCP-Protocol-Version',
   'Cache-Control': 'no-store, no-cache, must-revalidate',
 };
 
@@ -48,7 +50,7 @@ export const OPTIONS: APIRoute = async () => {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, MCP-Protocol-Version',
     },
   });
 };
@@ -68,7 +70,7 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  if (!body || body.jsonrpc !== '2.0' || !body.method) {
+  if (!body || body.jsonrpc !== '2.0' || typeof body.method !== 'string' || !body.method) {
     return new Response(
       JSON.stringify({
         jsonrpc: '2.0',
@@ -83,12 +85,16 @@ export const POST: APIRoute = async ({ request }) => {
 
   // 1. Initialize
   if (body.method === 'initialize') {
+    const requested = body.params?.protocolVersion;
+    const protocolVersion = streamableVersions.includes(requested) || requested === '2024-11-05'
+      ? requested
+      : requested ? streamableVersions[0] : '2024-11-05';
     return new Response(
       JSON.stringify({
         jsonrpc: '2.0',
         id: reqId,
         result: {
-          protocolVersion: '2024-11-05',
+          protocolVersion,
           capabilities: { tools: {} },
           serverInfo: { name: 'rights-and-renewals', version: '1.0.0' },
         },
@@ -98,8 +104,8 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   // 2. Initialized Notification
-  if (body.method === 'notifications/initialized') {
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  if (body.method.startsWith('notifications/') && body.id === undefined) {
+    return new Response(null, { status: 202, headers: CORS_HEADERS });
   }
 
   // 3. Tools List
