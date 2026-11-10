@@ -25,7 +25,6 @@
     Search,
     Bell,
     Settings,
-    Plus,
     Receipt,
     Shield,
     ExternalLink,
@@ -262,22 +261,12 @@
           type="button"
           class="omnibar-trigger-btn"
           onclick={() => (walletStore.isOmnibarOpen = true)}
-          aria-label="Open Universal Search (⌘K)"
+          aria-keyshortcuts="Control+K Meta+K"
         >
-          <Search size={16} class="search-icon" />
-          <span class="placeholder-text">Search Subs, Warranties, Serial Numbers, or type &gt;tax...</span>
-          <kbd class="shortcut-badge">⌘K</kbd>
+          <Search size={18} aria-hidden="true" />
+          <span>Search wallet</span>
         </button>
       </div>
-
-      <button
-        type="button"
-        class="add-entry-btn"
-        onclick={() => walletStore.setView('capture')}
-      >
-        <Plus size={16} />
-        <span>Add Entry</span>
-      </button>
     </section>
 
     {#if walletStore.currentView === 'dashboard'}
@@ -804,6 +793,10 @@
 
 <style>
   .wallet-shell {
+    --workspace-gutter: clamp(18px, 3vw, 42px);
+    --wallet-dock-left: max(12px, calc((100% - 370px) / 2));
+    --wallet-dock-right: var(--wallet-dock-left);
+    --wallet-dock-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -811,8 +804,11 @@
     padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
   }
 
+  .col-12 {
+    grid-column: 1 / -1;
+  }
+
   .deadlines-workspace {
-    --workspace-gutter: clamp(18px, 3vw, 42px);
     padding: var(--workspace-gutter) var(--workspace-gutter) 28px;
   }
 
@@ -853,8 +849,8 @@
   .deadline-empty h2, .deadline-empty p { margin: 0; }
   .deadline-empty p { color: var(--color-ink-secondary, #526561); }
 
-  .wallet-bottom-nav { position: fixed; z-index: var(--z-index-navbar, 200); left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: flex; align-items: center; gap: 4px; padding: 7px; border: 1px solid var(--color-border-subtle, rgba(180, 196, 190, 0.82)); border-radius: 999px; background: var(--color-card-white, #fff); backdrop-filter: blur(16px); box-shadow: 0 8px 28px rgba(22, 51, 44, 0.14); }
-  .wallet-nav-link { min-width: 92px; min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 13px; border: 0; border-radius: 999px; color: var(--color-ink-primary, #10201d); background: transparent; text-decoration: none; font: inherit; font-size: 12px; cursor: pointer; }
+  .wallet-bottom-nav { position: fixed; z-index: var(--z-index-navbar, 200); left: var(--wallet-dock-left); right: calc(var(--wallet-dock-right) + 68px); bottom: var(--wallet-dock-bottom); display: flex; align-items: center; gap: 4px; padding: 7px; border: 1px solid var(--color-border-subtle, rgba(180, 196, 190, 0.82)); border-radius: 999px; background: var(--color-card-white, #fff); backdrop-filter: blur(16px); box-shadow: 0 8px 28px rgba(22, 51, 44, 0.14); }
+  .wallet-nav-link { flex: 1; min-width: 0; min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 13px; border: 0; border-radius: 999px; color: var(--color-ink-primary, #10201d); background: transparent; text-decoration: none; font: inherit; font-size: 12px; cursor: pointer; }
   .wallet-nav-link.active { background: rgba(29, 153, 116, 0.12); color: #086849; font-weight: 700; }
   .wallet-nav-link:focus-visible { outline: 3px solid #16765e; outline-offset: 2px; }
 
@@ -863,10 +859,6 @@
   }
 
   :global([data-theme="dark"]) .wallet-nav-link.active { background: #1f4038; color: #c5f5e8; }
-
-  @media (min-width: 768px) {
-    .wallet-bottom-nav { left: calc(50% - 185px); right: auto; transform: none; }
-  }
 
   .capture-workspace { display: flex; flex-direction: column; gap: 16px; max-width: 1160px; margin: 0 auto; }
   .capture-deadline-support { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--color-border-subtle, #cbd5d1); border-radius: 14px; background: var(--color-card-white, #fff); }
@@ -879,7 +871,8 @@
   .capture-deadline-support button:focus-visible { outline: 3px solid #16765e; }
 
   @media (max-width: 767px) {
-    .deadlines-workspace { padding: 20px 16px 26px; }
+    .wallet-shell { --workspace-gutter: 16px; }
+    .deadlines-workspace { padding-block: 20px 26px; }
     .deadlines-heading { align-items: flex-start; }
     .today-date { padding-top: 7px; font-size: 13px; }
     .deadlines-master-detail { grid-template-columns: minmax(0, 1fr); }
@@ -888,25 +881,29 @@
     .deadline-row-copy strong { font-size: 15px; }
     .deadline-row-copy span { font-size: 12px; }
     .deadline-countdown { font-size: 11px; padding: 6px 8px; }
-    .wallet-bottom-nav { left: 12px; right: 82px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); transform: none; justify-content: space-around; padding: 5px; }
-    .wallet-nav-link { flex: 1; min-width: 0; min-height: 52px; }
+    .wallet-bottom-nav { padding: 5px; }
+    .wallet-nav-link { min-height: 52px; }
     .wallet-shell { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
     .capture-workspace { gap: 12px; }
   }
 
   @media (horizontal-viewport-segments: 2) {
+    .wallet-shell {
+      --wallet-segment-inset: max(12px, calc((env(viewport-segment-width 0 0, 50vw) - 370px) / 2));
+      --wallet-dock-left: calc(env(viewport-segment-left 0 0, 0px) + var(--wallet-segment-inset));
+      --wallet-dock-right: calc(100vw - env(viewport-segment-right 0 0, 50vw) + var(--wallet-segment-inset));
+    }
+    .search-command-row { max-width: calc(env(viewport-segment-width 0 0, 50vw) - 24px); }
     .deadlines-master-detail { grid-template-columns: minmax(0, calc(env(viewport-segment-width 0 0, 50vw) - var(--workspace-gutter) - 24px)) minmax(0, calc(env(viewport-segment-width 1 0, 50vw) - var(--workspace-gutter) - 24px)); gap: calc(env(viewport-segment-left 1 0, 50vw) - env(viewport-segment-right 0 0, 50vw) + 48px); }
     .deadline-list { padding-right: 18px; }
     .deadline-detail { padding-left: 24px; }
-    .wallet-bottom-nav { left: calc(env(viewport-segment-left 0 0, 0px) + max(12px, (env(viewport-segment-width 0 0, 50vw) - 286px) / 2)); right: auto; transform: none; width: max-content; justify-content: space-around; }
-    .wallet-nav-link { min-width: 64px; padding-inline: 4px; font-size: 10px; }
+    .wallet-nav-link { padding-inline: 4px; }
     .capture-workspace { max-width: none; display: grid; grid-template-columns: minmax(0, calc(env(viewport-segment-width 0 0, 50vw) - 24px)) minmax(0, calc(env(viewport-segment-width 1 0, 50vw) - 24px)); gap: calc(env(viewport-segment-left 1 0, 50vw) - env(viewport-segment-right 0 0, 50vw) + 48px); align-items: start; }
     .capture-workspace :global(.capture-panel) { grid-column: 1; }
     .capture-deadline-support { grid-column: 2; margin-top: 64px; }
   }
 
   @media (max-width: 360px) {
-    .wallet-bottom-nav { right: 78px; }
     .wallet-nav-link { padding-inline: 4px; font-size: 10px; white-space: nowrap; }
   }
 
@@ -1129,20 +1126,20 @@
 
   /* Separated Search Command Row */
   .search-command-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    min-width: 0;
+    padding-inline: var(--workspace-gutter);
   }
 
   .omnibar-trigger-wrapper {
-    flex: 1;
+    max-width: 560px;
   }
 
   .omnibar-trigger-btn {
     width: 100%;
-    height: 44px;
+    min-height: 48px;
     display: flex;
     align-items: center;
+    gap: 10px;
     padding: 0 14px;
     background-color: var(--color-card-white, #FFFFFF);
     border: 1px solid var(--color-border-subtle, #CBD5E1);
@@ -1158,43 +1155,9 @@
     border-color: var(--color-pine-teal, #2F524C);
   }
 
-  .placeholder-text {
-    flex: 1;
-    text-align: left;
-    margin-left: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .shortcut-badge {
-    padding: 2px 7px;
-    border-radius: 6px;
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    color: #64748B;
-    font-size: 11px;
-    font-family: monospace;
-  }
-
-  .add-entry-btn {
-    height: 44px;
-    padding: 0 18px;
-    border-radius: 14px;
-    background: var(--color-pine-teal, #2F524C);
-    color: #FFFFFF;
-    border: none;
-    font-weight: 700;
-    font-size: 13px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  .add-entry-btn:hover {
-    background: #233F3A;
+  .omnibar-trigger-btn:focus-visible {
+    outline: 3px solid var(--color-pine-teal, #2F524C);
+    outline-offset: 2px;
   }
 
   @media (min-width: 1024px) {

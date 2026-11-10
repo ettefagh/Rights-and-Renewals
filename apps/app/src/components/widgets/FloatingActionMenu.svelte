@@ -98,26 +98,13 @@
 
   .fab-container {
     position: fixed;
-    right: calc(50% - 185px);
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    right: var(--wallet-dock-right, 14px);
+    bottom: var(--wallet-dock-bottom, 12px);
     z-index: var(--z-index-popover);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 12px;
-  }
-
-  @media (max-width: 767px) {
-    .fab-container {
-      right: 14px;
-      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    }
-  }
-
-  @media (horizontal-viewport-segments: 2) {
-    .fab-container {
-      right: calc(100vw - env(viewport-segment-right 0 0, 50vw) + max(12px, (env(viewport-segment-width 0 0, 50vw) - 286px) / 2));
-    }
   }
 
   .fab-speed-dial {
