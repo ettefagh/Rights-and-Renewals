@@ -67,16 +67,20 @@ export const policyFields = [
   },
   {
     slug: 'verified_date',
-    label: 'Last verified (date)',
-    type: 'string',
+    label: 'Last verified (UTC date and time)',
+    type: 'datetime',
     required: true,
-    validation: { pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
   },
   {
     slug: 'search_aliases',
-    label: 'Search aliases (JSON array of strings)',
-    type: 'json',
+    label: 'Search aliases',
+    type: 'repeater',
     required: true,
+    validation: {
+      minItems: 0,
+      maxItems: 80,
+      subFields: [{ slug: 'alias', label: 'Alias', type: 'string', required: true }],
+    },
     defaultValue: [],
   },
 ];
@@ -127,8 +131,8 @@ export async function loadCanonicalPolicies() {
         ...(policy.cancellationUrl ? { cancellation_url: policy.cancellationUrl } : {}),
         ...(policy.supportEmail ? { support_email: policy.supportEmail } : {}),
         legal_notes: policy.legalNotes,
-        verified_date: policy.verifiedDate,
-        search_aliases: policy.searchAliases,
+        verified_date: `${policy.verifiedDate}T00:00:00Z`,
+        search_aliases: policy.searchAliases.map((alias) => ({ alias })),
       },
     };
   });

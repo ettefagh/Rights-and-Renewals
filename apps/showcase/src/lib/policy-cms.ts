@@ -70,18 +70,25 @@ function mapPolicyEntry(entry: CmsPolicyEntry): PolicyWikiEntry {
   if (typeof data.cancellation_button_compliant !== 'boolean') {
     throw new Error(`EmDash policy '${slug}' has an invalid cancellation_button_compliant field.`);
   }
-  if (!Array.isArray(data.search_aliases) || !data.search_aliases.every((alias) => typeof alias === 'string')) {
+  if (
+    !Array.isArray(data.search_aliases) ||
+    !data.search_aliases.every(
+      (item) => typeof item === 'object' && item !== null && !Array.isArray(item) && typeof (item as { alias?: unknown }).alias === 'string',
+    )
+  ) {
     throw new Error(`EmDash policy '${slug}' has an invalid search_aliases field.`);
   }
 
-  const verifiedDate = requiredString(data.verified_date, 'verified_date', slug);
-  const verifiedDateTimestamp = Date.parse(`${verifiedDate}T00:00:00Z`);
+  const verifiedDateTime = requiredString(data.verified_date, 'verified_date', slug);
+  const verifiedDate = verifiedDateTime.slice(0, 10);
+  const verifiedDateTimestamp = Date.parse(verifiedDateTime);
   if (
-    !/^\d{4}-\d{2}-\d{2}$/.test(verifiedDate) ||
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(verifiedDateTime) ||
     Number.isNaN(verifiedDateTimestamp) ||
-    new Date(verifiedDateTimestamp).toISOString().slice(0, 10) !== verifiedDate
+    Number.isNaN(Date.parse(`${verifiedDate}T00:00:00Z`)) ||
+    new Date(Date.parse(`${verifiedDate}T00:00:00Z`)).toISOString().slice(0, 10) !== verifiedDate
   ) {
-    throw new Error(`EmDash policy '${slug}' has an invalid verified_date field.`);
+    throw new Error(`EmDash policy '${slug}' has an invalid verified_date datetime.`);
   }
   if (verifiedDate > new Date().toISOString().slice(0, 10)) {
     throw new Error(`EmDash policy '${slug}' has a future verified_date field.`);
@@ -104,7 +111,9 @@ function mapPolicyEntry(entry: CmsPolicyEntry): PolicyWikiEntry {
     ...(supportEmail ? { supportEmail } : {}),
     legalNotes: requiredString(data.legal_notes, 'legal_notes', slug),
     verifiedDate,
-    searchAliases: data.search_aliases.map((alias) => (alias as string).trim()).filter(Boolean),
+    searchAliases: data.search_aliases
+      .map((item) => (item as { alias: string }).alias.trim())
+      .filter(Boolean),
   };
 }
 

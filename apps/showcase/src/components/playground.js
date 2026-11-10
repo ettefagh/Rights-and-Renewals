@@ -178,7 +178,7 @@ export class PlaygroundController {
 
     // 1. Log Outbound Frame
     this.appendStreamFrame('outbound', {
-      title: `--> POST /api/mcp [JSON-RPC 2.0 Request #${reqId}]`,
+      title: `--> Client-side Mock [JSON-RPC 2.0 Request #${reqId}]`,
       payload: requestPayload
     });
 
@@ -192,7 +192,7 @@ export class PlaygroundController {
     // 4. Log Inbound Frame
     const statusLine = response.error ? 'HTTP/1.1 400 Bad Request' : 'HTTP/1.1 200 OK';
     this.appendStreamFrame('inbound', {
-      title: `<-- ${statusLine} (${elapsed}ms latency)`,
+      title: `<-- Mock response (${elapsed}ms simulated)`,
       payload: response
     });
   }
@@ -242,6 +242,19 @@ export class PlaygroundController {
   }
 
   copyCurlCommand() {
+    const publicReadOnlyTools = new Set([
+      'policy_lookup',
+      'statutory_law_lookup',
+      'subscription_category_rules',
+    ]);
+    if (this.activeTool !== 'tools/list' && !publicReadOnlyTools.has(this.activeTool)) {
+      this.appendStreamFrame('error', {
+        title: 'Local demo only',
+        content: `${this.activeTool} is simulated in this browser and is not available on the public MCP endpoint.`,
+      });
+      return;
+    }
+
     let args = {};
     try {
       args = JSON.parse(this.argsEditor?.value || '{}');

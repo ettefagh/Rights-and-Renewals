@@ -175,18 +175,27 @@
 				},
 				{
 					"slug": "verified_date",
-					"label": "Last verified (date)",
-					"type": "string",
-					"required": true,
-					"validation": {
-						"pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-					}
+					"label": "Last verified (UTC date and time)",
+					"type": "datetime",
+					"required": true
 				},
 				{
 					"slug": "search_aliases",
-					"label": "Search aliases (JSON array of strings)",
-					"type": "json",
+					"label": "Search aliases",
+					"type": "repeater",
 					"required": true,
+					"validation": {
+						"minItems": 0,
+						"maxItems": 80,
+						"subFields": [
+							{
+								"slug": "alias",
+								"label": "Alias",
+								"type": "string",
+								"required": true
+							}
+						]
+					},
 					"defaultValue": []
 				}
 			]
@@ -356,11 +365,17 @@
 					"cancellation_url": "https://www.spotify.com/account/cancel/",
 					"support_email": "support@spotify.com",
 					"legal_notes": "BGB § 309 Nr. 9 lit. b applies: contracts tacitly renewed roll monthly with maximum 1-month notice. BGB § 312k cancellation button compliant.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"spotify student",
-						"spotify premium",
-						"music streaming"
+						{
+							"alias": "spotify student"
+						},
+						{
+							"alias": "spotify premium"
+						},
+						{
+							"alias": "music streaming"
+						}
 					]
 				}
 			},
@@ -378,13 +393,23 @@
 					"cancellation_url": "https://reportaproblem.apple.com/",
 					"support_email": "contactus.de@euro.apple.com",
 					"legal_notes": "Statutory 24m defect liability (BGB § 438 Abs. 1 Nr. 3). 12m reversed burden of proof (BGB § 477 Abs. 1). Apple 1-Year Limited Manufacturer Guarantee (BGB § 443) does not limit statutory seller claims.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"macbook",
-						"iphone",
-						"ipad",
-						"airpods",
-						"apple store"
+						{
+							"alias": "macbook"
+						},
+						{
+							"alias": "iphone"
+						},
+						{
+							"alias": "ipad"
+						},
+						{
+							"alias": "airpods"
+						},
+						{
+							"alias": "apple store"
+						}
 					]
 				}
 			},
@@ -402,11 +427,17 @@
 					"cancellation_url": "https://www.mediamarkt.de/de/myaccount/orders",
 					"support_email": "kontakt@mediamarkt.de",
 					"legal_notes": "Seller is liable for 24 months (BGB § 437). § 286 ZPO allows alternative proof of purchase (bank statement) if receipt is lost. Retailer cannot demand manufacturer RMA referral.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"media markt",
-						"mediamarkt saturn",
-						"electronics"
+						{
+							"alias": "media markt"
+						},
+						{
+							"alias": "mediamarkt saturn"
+						},
+						{
+							"alias": "electronics"
+						}
 					]
 				}
 			},
@@ -424,11 +455,17 @@
 					"cancellation_url": "https://www.amazon.de/mc/pipelines/cancellation",
 					"support_email": "impressum@amazon.de",
 					"legal_notes": "BGB § 309 Nr. 9 rolling 1-month cancellation. Prime student subscriptions refund pro-rata if unused benefits remain.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"amazon prime",
-						"prime student",
-						"aws"
+						{
+							"alias": "amazon prime"
+						},
+						{
+							"alias": "prime student"
+						},
+						{
+							"alias": "aws"
+						}
 					]
 				}
 			},
@@ -446,11 +483,17 @@
 					"cancellation_url": "https://www.netflix.com/cancelplan",
 					"support_email": "support@netflix.com",
 					"legal_notes": "Monthly rolling billing. Compliant with BGB § 312k 2-step cancellation button. Termination takes effect at end of current billing period.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"netflix de",
-						"streaming",
-						"movies"
+						{
+							"alias": "netflix de"
+						},
+						{
+							"alias": "streaming"
+						},
+						{
+							"alias": "movies"
+						}
 					]
 				}
 			},
@@ -468,12 +511,20 @@
 					"cancellation_url": "https://account.adobe.com/plans",
 					"support_email": "support@adobe.com",
 					"legal_notes": "Student discount annual plans paid monthly. Under German law (BGB § 309 Nr. 9), post-first-year renewal must allow monthly cancellation without early termination penalty fees.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"adobe cc",
-						"photoshop",
-						"illustrator",
-						"premiere"
+						{
+							"alias": "adobe cc"
+						},
+						{
+							"alias": "photoshop"
+						},
+						{
+							"alias": "illustrator"
+						},
+						{
+							"alias": "premiere"
+						}
 					]
 				}
 			},
@@ -491,12 +542,20 @@
 					"cancellation_url": "https://account.microsoft.com/services",
 					"support_email": "kunden@microsoft.com",
 					"legal_notes": "Office 365 single/family. Complies with BGB § 312k. Surface hardware purchases carry statutory 24-month seller defect liability under BGB § 438.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"ms office",
-						"office 365",
-						"surface",
-						"xbox game pass"
+						{
+							"alias": "ms office"
+						},
+						{
+							"alias": "office 365"
+						},
+						{
+							"alias": "surface"
+						},
+						{
+							"alias": "xbox game pass"
+						}
 					]
 				}
 			},
@@ -514,13 +573,23 @@
 					"cancellation_url": "https://abo.bahn.de/",
 					"support_email": "kundendialog@bahn.de",
 					"legal_notes": "Deutschlandticket subscription must be cancelled by the 10th of each month for the subsequent month per tariff terms, compliant with BGB § 309 Nr. 9.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"bahn",
-						"db navigator",
-						"d-ticket",
-						"deutschlandticket",
-						"bahncard"
+						{
+							"alias": "bahn"
+						},
+						{
+							"alias": "db navigator"
+						},
+						{
+							"alias": "d-ticket"
+						},
+						{
+							"alias": "deutschlandticket"
+						},
+						{
+							"alias": "bahncard"
+						}
 					]
 				}
 			},
@@ -538,11 +607,17 @@
 					"cancellation_url": "https://github.com/settings/billing",
 					"support_email": "support@github.com",
 					"legal_notes": "Developer tools qualify as 100% digital tax write-offs under BMF 22.02.2022 decree without GWG ceiling.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"github copilot",
-						"git",
-						"gh pro"
+						{
+							"alias": "github copilot"
+						},
+						{
+							"alias": "git"
+						},
+						{
+							"alias": "gh pro"
+						}
 					]
 				}
 			},
@@ -560,12 +635,20 @@
 					"cancellation_url": "https://account.jetbrains.com/licenses",
 					"support_email": "sales@jetbrains.com",
 					"legal_notes": "Free student licenses renew annually with university email. Commercial renewals subject to monthly/annual terms under BGB § 309.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"intellij",
-						"pycharm",
-						"webstorm",
-						"clion"
+						{
+							"alias": "intellij"
+						},
+						{
+							"alias": "pycharm"
+						},
+						{
+							"alias": "webstorm"
+						},
+						{
+							"alias": "clion"
+						}
 					]
 				}
 			},
@@ -583,11 +666,17 @@
 					"cancellation_url": "https://www.youtube.com/paid_memberships",
 					"support_email": "support@google.com",
 					"legal_notes": "Monthly subscription cancellable at any time before next billing date. BGB § 312k 2-step button compliant.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"yt premium",
-						"google play",
-						"youtube music"
+						{
+							"alias": "yt premium"
+						},
+						{
+							"alias": "google play"
+						},
+						{
+							"alias": "youtube music"
+						}
 					]
 				}
 			},
@@ -605,11 +694,17 @@
 					"cancellation_url": "https://www.saturn.de/de/myaccount/orders",
 					"support_email": "kontakt@saturn.de",
 					"legal_notes": "Identical statutory terms to MediaMarkt. BGB § 439 gives buyer remedy choice between repair or replacement.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"saturn tech",
-						"saturn de",
-						"electronics"
+						{
+							"alias": "saturn tech"
+						},
+						{
+							"alias": "saturn de"
+						},
+						{
+							"alias": "electronics"
+						}
 					]
 				}
 			},
@@ -627,10 +722,14 @@
 					"cancellation_url": "https://www.otto.de/user/orders",
 					"support_email": "service@otto.de",
 					"legal_notes": "Statutory 24m Gewährleistung under BGB § 438. Otto also offers 30-day extended voluntary return policy for distance sales.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"otto versand",
-						"otto de"
+						{
+							"alias": "otto versand"
+						},
+						{
+							"alias": "otto de"
+						}
 					]
 				}
 			},
@@ -648,12 +747,20 @@
 					"cancellation_url": "https://www.mindfactory.de/rma",
 					"support_email": "info@mindfactory.de",
 					"legal_notes": "PC hardware components. BGB § 477 12-month reversed burden of proof protects against retailer claims that pins or sockets were user-damaged.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"pc parts",
-						"hardware",
-						"gpu",
-						"cpu"
+						{
+							"alias": "pc parts"
+						},
+						{
+							"alias": "hardware"
+						},
+						{
+							"alias": "gpu"
+						},
+						{
+							"alias": "cpu"
+						}
 					]
 				}
 			},
@@ -671,11 +778,17 @@
 					"cancellation_url": "https://www.notion.so/settings",
 					"support_email": "team@makenotion.com",
 					"legal_notes": "Productivity SaaS tool qualifying as 100% tax-deductible digital workspace asset under BMF 22.02.2022.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"notion ai",
-						"productivity",
-						"workspace"
+						{
+							"alias": "notion ai"
+						},
+						{
+							"alias": "productivity"
+						},
+						{
+							"alias": "workspace"
+						}
 					]
 				}
 			},
@@ -693,11 +806,17 @@
 					"cancellation_url": "https://support.gymshark.com/",
 					"support_email": "support@gymshark.com",
 					"legal_notes": "Textile and fitness gear. Statutory 24-month defect liability under BGB §§ 434, 438 applies to zipper and seam defects.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"fitness",
-						"apparel",
-						"sportswear"
+						{
+							"alias": "fitness"
+						},
+						{
+							"alias": "apparel"
+						},
+						{
+							"alias": "sportswear"
+						}
 					]
 				}
 			},
@@ -715,11 +834,17 @@
 					"cancellation_url": "https://www.mcfit.com/de/kuendigung/",
 					"support_email": "kontakt@mcfit.com",
 					"legal_notes": "Fitness studio contracts. Following BGB § 309 Nr. 9 lit. b reform, post-initial-term renewals are strictly limited to monthly rolling termination.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"fitness studio",
-						"rsg group",
-						"gym"
+						{
+							"alias": "fitness studio"
+						},
+						{
+							"alias": "rsg group"
+						},
+						{
+							"alias": "gym"
+						}
 					]
 				}
 			},
@@ -737,11 +862,17 @@
 					"cancellation_url": "https://urbansportsclub.com/de/account",
 					"support_email": "help@urbansportsclub.com",
 					"legal_notes": "Flexible sports membership. BGB § 312k 2-step button compliant with 1-month cancellation notice.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"usc",
-						"sports membership",
-						"fitness"
+						{
+							"alias": "usc"
+						},
+						{
+							"alias": "sports membership"
+						},
+						{
+							"alias": "fitness"
+						}
 					]
 				}
 			},
@@ -759,11 +890,17 @@
 					"cancellation_url": "https://www.disneyplus.com/account",
 					"support_email": "help@disneyplus.com",
 					"legal_notes": "Streaming subscription. BGB § 312k compliant. Rolling monthly renewal after initial billing.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"disney",
-						"disneyplus",
-						"streaming"
+						{
+							"alias": "disney"
+						},
+						{
+							"alias": "disneyplus"
+						},
+						{
+							"alias": "streaming"
+						}
 					]
 				}
 			},
@@ -781,12 +918,20 @@
 					"cancellation_url": "https://www.vodafone.de/meinvodafone/services/kuendigung",
 					"support_email": "kontakt@vodafone.com",
 					"legal_notes": "Telecommunication contracts (TKG § 56 & BGB § 309 Nr. 9). After 24-month minimum term, contracts roll indefinitely with a maximum 1-month notice period.",
-					"verified_date": "2026-10-25",
+					"verified_date": "2026-10-25T00:00:00Z",
 					"search_aliases": [
-						"vodafone dsl",
-						"gigacube",
-						"mobile",
-						"telekom"
+						{
+							"alias": "vodafone dsl"
+						},
+						{
+							"alias": "gigacube"
+						},
+						{
+							"alias": "mobile"
+						},
+						{
+							"alias": "telekom"
+						}
 					]
 				}
 			}
