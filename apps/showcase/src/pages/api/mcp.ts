@@ -280,6 +280,14 @@ export const POST: APIRoute = async ({ request }) => {
         );
       }
 
+      if (args.category !== undefined && args.category !== match.category) {
+        return Response.json({
+          jsonrpc: '2.0',
+          id: reqId,
+          error: { code: -32602, message: `Catalog category for '${match.brandSlug}' is ${match.category}` },
+        }, { headers: CORS_HEADERS });
+      }
+
       const { notes, ...scope } = getPolicyScope(match.category, match);
       const policy = {
         ...scope,

@@ -58,6 +58,7 @@ const cancellation = await toolResult('claim_dossier_generate', {
 });
 assert.equal(cancellation.status, 'draft');
 assert.equal(cancellation.issue_type, 'contract_cancellation');
+assert.deepEqual(cancellation.statutory_basis, []);
 assert.match(cancellation.dossier_text_de, /kündig/i);
 assert.ok(cancellation.sources.some(source => source.url === 'https://www.gesetze-im-internet.de/bgb/__312k.html'));
 assert.doesNotMatch(cancellation.dossier_text_de, /Mängelrüge|Nacherfüllung|Nachbesserung|Neulieferung/i);
@@ -140,6 +141,7 @@ assert.equal(netflix.statutory_warranty_months, null);
 assert.equal(netflix.commercial_guarantee_months, null);
 assert.equal(netflix.cancellation_button_compliant, null);
 assert.ok(netflix.sources.some(source => source.url === 'https://help.netflix.com/de/node/407'));
+assert.equal((await call('policy_lookup', { service_slug: 'netflix', category: 'hardware' })).error?.code, -32602);
 const apple = await toolResult('policy_lookup', { brand_slug: 'apple' });
 assert.equal(apple.statutory_warranty_months, 24);
 assert.ok(apple.sources.some(source => source.url === 'https://www.gesetze-im-internet.de/bgb/__438.html'));
