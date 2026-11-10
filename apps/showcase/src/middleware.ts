@@ -1,13 +1,13 @@
 import { defineMiddleware } from 'astro:middleware';
 
-const SHOWCASE_MARKDOWN = `# Rights & Renewals (Showcase)
+const SHOWCASE_MARKDOWN = `# Rights & Renewals
 
-> Sovereign Consumer Rights, Subscription & Warranty Wallet with Brand Policy Wiki and Open MCP Server.
+Save receipts on your device and track the dates that matter for purchases and subscriptions in Germany.
 
-## Features & Capabilities
-- **Brand Policy Wiki**: Verified BGB §§ 437, 438, 477 warranty terms & § 312k cancellation rules for top 20 brands.
-- **Model Context Protocol (MCP)**: Native JSON-RPC 2.0 endpoints for AI agents.
-- **Agent Discovery**: API Catalog (RFC 9727), OAuth Protected Resource Metadata (RFC 9728), ARD AI Catalog, and WebMCP tools.
+- [Open the wallet](https://rightsandrenewals-app.pages.dev/) to save a purchase, see upcoming dates, or prepare a notice draft.
+- [Browse the Policy Wiki](/wiki) for brand cancellation and warranty information.
+- [Try the MCP Playground](/#mcp-playground) with sample policy lookups and notice drafts.
+- [Set up your agent](/agent-setup) to connect to the public JSON-RPC endpoint at \`/api/mcp\`.
 
 ## Discovery Resources
 - API Catalog: \`/.well-known/api-catalog\`
