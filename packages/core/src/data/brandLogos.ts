@@ -1,7 +1,7 @@
 export interface BrandLogoRecord {
   name: string;
   file?: string;
-  source?: 'developer-icons' | 'simple-icons';
+  source?: 'developer-icons' | 'simple-icons' | 'dashboard-icons' | 'official-site';
 }
 
 const records: Record<string, BrandLogoRecord> = {
@@ -18,12 +18,12 @@ const records: Record<string, BrandLogoRecord> = {
   youtube: { name: 'YouTube Premium', file: 'youtube.svg', source: 'developer-icons' },
   saturn: { name: 'Saturn', file: 'saturn.svg', source: 'simple-icons' },
   otto: { name: 'Otto', file: 'otto.svg', source: 'simple-icons' },
-  mindfactory: { name: 'Mindfactory' },
+  mindfactory: { name: 'Mindfactory', file: 'mindfactory.png', source: 'official-site' },
   notion: { name: 'Notion Plus', file: 'notion.svg', source: 'developer-icons' },
-  gymshark: { name: 'Gymshark' },
-  mcfit: { name: 'McFIT / RSG Group' },
-  'urban-sports-club': { name: 'Urban Sports Club' },
-  'disney-plus': { name: 'Disney+' },
+  gymshark: { name: 'Gymshark', file: 'gymshark.png', source: 'official-site' },
+  mcfit: { name: 'McFIT / RSG Group', file: 'mcfit.png', source: 'official-site' },
+  'urban-sports-club': { name: 'Urban Sports Club', file: 'urban-sports-club.ico', source: 'official-site' },
+  'disney-plus': { name: 'Disney+', file: 'disney-plus.svg', source: 'dashboard-icons' },
   vodafone: { name: 'Vodafone', file: 'vodafone.svg', source: 'simple-icons' }
 };
 
