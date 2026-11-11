@@ -111,11 +111,18 @@ export async function buildPublishedEventRegistry(): Promise<PublishedEventRegis
 
   for (const id of ['home', 'agent-setup'] as const) {
     const fallback = await fallbackPageTelemetryMetadata(id);
-    if (pageIds.has(fallback.pageId)) continue;
-    pageIds.add(fallback.pageId);
-    revisions.add(fallback.revision);
-    pageRevisions[fallback.pageId] = fallback.revision;
-    pageChildren[fallback.pageId] = { blocks: [], ctas: [], entities: [] };
+    if (!pageIds.has(fallback.pageId)) {
+      pageIds.add(fallback.pageId);
+      revisions.add(fallback.revision);
+      pageRevisions[fallback.pageId] = fallback.revision;
+      pageChildren[fallback.pageId] = { blocks: [], ctas: [], entities: [] };
+    }
+    const actions = id === 'home' ? ['open-wallet', 'copy-curl'] : ['open-wallet', 'copy-prompt'];
+    for (const action of actions) {
+      const ctaId = `cta:${id}:${action}`;
+      ctaIds.add(ctaId);
+      if (!pageChildren[fallback.pageId]!.ctas.includes(ctaId)) pageChildren[fallback.pageId]!.ctas.push(ctaId);
+    }
   }
 
   const addEntity = async (pageId: string, entityId: string, content: unknown, revision?: string) => {

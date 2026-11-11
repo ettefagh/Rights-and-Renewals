@@ -383,7 +383,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
         <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Theme umschalten" title="Theme umschalten">
           <span class="theme-icon" aria-hidden="true">🌙</span>
         </button>
-        <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
+        <a data-cta-id="open-wallet" href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
           Open wallet ↗
         </a>
       </div>
@@ -395,7 +395,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
           <a href="/#mcp-playground">MCP Playground</a>
           <a href="/agent-setup" aria-current="page">Agent setup</a>
           <a href="/emdash">EmDash CMS</a>
-          <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" target="_blank" rel="noopener noreferrer">Open wallet</a>
+          <a data-cta-id="open-wallet" href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" target="_blank" rel="noopener noreferrer">Open wallet</a>
         </nav>
       </details>
     </div>
@@ -423,7 +423,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
           <button
             type="button"
             class="copy-prompt-btn"
-            id="hero-copy-prompt-btn"
+            id="hero-copy-prompt-btn" data-cta-id="copy-prompt"
             data-prompt={promptText}
             aria-label="Copy unified setup prompt for AI coding agents"
           >
@@ -894,4 +894,3 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
   <TelemetryConsent />
 </body>
 </html>
-

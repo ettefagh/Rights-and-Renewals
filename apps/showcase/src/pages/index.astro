@@ -83,7 +83,7 @@ const contentSections = cmsPage?.sections.filter((section) => section.placement 
         <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Toggle theme" title="Toggle theme">
           <span class="theme-icon" aria-hidden="true">🌙</span>
         </button>
-        <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
+        <a data-cta-id="open-wallet" href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
           Open wallet ↗
         </a>
       </div>
@@ -117,7 +117,7 @@ const contentSections = cmsPage?.sections.filter((section) => section.placement 
             </>
           )}
           <div class="home-actions">
-            {!homeIntroHasCta && <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Open the wallet <ArrowUpRight size={18} aria-hidden="true" /></a>}
+            {!homeIntroHasCta && <a data-cta-id="open-wallet" href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Open the wallet <ArrowUpRight size={18} aria-hidden="true" /></a>}
             <a href="#wallet-demo" class="btn btn-outline">Explore the demo</a>
           </div>
           <p class="home-note"><ShieldCheck size={19} aria-hidden="true" /> Your receipts stay on your device.</p>
@@ -235,7 +235,7 @@ const contentSections = cmsPage?.sections.filter((section) => section.placement 
                 <button id="mcp-run-btn" class="btn-compact btn-primary">
                   Run request
                 </button>
-                <button id="mcp-copy-curl-btn" class="btn-compact btn-outline">
+                <button id="mcp-copy-curl-btn" data-cta-id="copy-curl" class="btn-compact btn-outline">
                   Copy cURL
                 </button>
               </div>
@@ -382,4 +382,3 @@ const contentSections = cmsPage?.sections.filter((section) => section.placement 
   </script>
 </body>
 </html>
-
