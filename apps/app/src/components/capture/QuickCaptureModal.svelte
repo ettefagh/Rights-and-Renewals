@@ -20,6 +20,7 @@
     Receipt,
     Shield
   } from 'lucide-svelte';
+  import SubscriptionPlanPanel from '../views/SubscriptionPlanPanel.svelte';
 
   let title = $state('');
   let merchant = $state('');
@@ -33,6 +34,7 @@
   let taxCategory = $state<TaxCategory>('arbeitsmittel');
   let beruflicheNutzungProzent = $state(100);
   let cancellationUrl = $state('');
+  let policyPlanId = $state<string | undefined>(undefined);
 
   // Receipt processing state
   let receiptFile = $state<File | null>(null);
@@ -168,6 +170,7 @@
         id,
         title: title.trim(),
         category,
+        policyPlanId: category === 'subscription' ? policyPlanId : undefined,
         billingCycle: category === 'subscription' ? billingCycle : undefined,
         paymentType: category === 'subscription' ? paymentType : undefined,
         brandSlug: merchant.toLowerCase().replace(/[^a-z0-9]/g, '-'),
@@ -353,6 +356,7 @@
           class="text-input"
         />
       </div>
+      <SubscriptionPlanPanel bind:planId={policyPlanId} />
     {:else}
       <div class="form-grid-2">
         <div class="field-wrap">

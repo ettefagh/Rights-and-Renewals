@@ -1,18 +1,20 @@
 ---
 import '../../../styles/editorial-sections.css';
-import type { WebsiteBlock } from '../../lib/website-cms.js';
+import type { WebsiteBlock, WebsiteBlockPlacement } from '../../lib/website-cms.js';
 
-interface Props { sections: WebsiteBlock[]; title?: string; preview?: boolean }
-const { sections, title, preview = false } = Astro.props;
+interface Props { sections: WebsiteBlock[]; title?: string; preview?: boolean; placement?: WebsiteBlockPlacement; headingLevel?: 'h1' | 'h2'; headingId?: string }
+const { sections, title, preview = false, placement = 'content', headingLevel = 'h2', headingId } = Astro.props;
+const placedSections = sections.filter((section) => section.placement === placement);
+const primaryHeadingIndex = placedSections.findIndex((section) => typeof section.heading === 'string');
 const safeId = (value: unknown, fallback: string) => typeof value === 'string' && /^[A-Za-z][A-Za-z0-9_-]{0,119}$/.test(value) ? value : fallback;
 ---
 
 {preview && <p class="editorial-preview-banner" role="status">Draft preview · this page is not public content.</p>}
 {title && <h1 class="editorial-page-title">{title}</h1>}
-<div class="editorial-sections">
-  {sections.map((section, index) => (
+<div class:list={['editorial-sections', placement === 'content' ? '' : 'editorial-sections--slot']}>
+  {placedSections.map((section, index) => (
     <section class={`editorial-section editorial-section--${section._type}`} id={safeId(section._key, `section-${index + 1}`)}>
-      {section.heading && <h2>{section.heading as string}</h2>}
+      {section.heading && (headingLevel === 'h1' && index === primaryHeadingIndex ? <h1 id={headingId}>{section.heading as string}</h1> : <h2>{section.heading as string}</h2>)}
       {section.body && <p>{section.body as string}</p>}
       {section._type === 'feature_list' && Array.isArray(section.items) && (
         <ul>{section.items.map((item) => <li><strong>{item.title}</strong><span>{item.body}</span></li>)}</ul>
@@ -26,3 +28,10 @@ const safeId = (value: unknown, fallback: string) => typeof value === 'string' &
     </section>
   ))}
 </div>
+
+<style>
+  .editorial-sections--slot { width: auto; margin: 0; gap: 0; padding: 0; }
+  .editorial-sections--slot .editorial-section { padding: 0; border: 0; border-radius: 0; background: transparent; }
+  .editorial-sections--slot .editorial-section h1 { margin: 0 0 .75rem; font-size: clamp(2.2rem, 5vw, 4rem); line-height: 1.04; }
+  .editorial-sections--slot .editorial-section h2 { margin: 0 0 .75rem; }
+</style>

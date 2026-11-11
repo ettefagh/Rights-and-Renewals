@@ -24,8 +24,19 @@ describe('website CMS content', () => {
       { _type: 'hero', _key: 'third', heading: 'Last' },
       { _type: 'raw_html', html: '<script>bad()</script>' },
     ])).toEqual([
-      { _type: 'copy_section', _key: 'first', heading: 'First', body: 'Text' },
-      { _type: 'hero', _key: 'third', heading: 'Last' },
+      { _type: 'copy_section', placement: 'content', _key: 'first', heading: 'First', body: 'Text' },
+      { _type: 'hero', placement: 'content', _key: 'third', heading: 'Last' },
+    ]);
+  });
+
+  it('accepts only declared page template placements', () => {
+    expect(validateWebsiteBlocks([
+      { _type: 'hero', placement: 'home-intro', heading: 'Home' },
+      { _type: 'copy_section', placement: 'agent-intro', heading: 'Agents', body: 'Agents' },
+      { _type: 'hero', placement: 'footer', heading: 'Unsupported' },
+    ])).toEqual([
+      { _type: 'hero', placement: 'home-intro', heading: 'Home' },
+      { _type: 'copy_section', placement: 'agent-intro', heading: 'Agents', body: 'Agents' },
     ]);
   });
 
@@ -37,7 +48,7 @@ describe('website CMS content', () => {
 
   it('uses native EmDash entry preview only for the authorized render context', async () => {
     emdash.getEmDashEntry.mockResolvedValue({ entry: page('agent-setup', 'draft', [{ _type: 'hero', _key: 'h1', heading: 'Draft heading' }]), isPreview: true, error: null });
-    await expect(getWebsitePageForRender('agent-setup')).resolves.toMatchObject({ isPreview: true, sections: [{ heading: 'Draft heading' }] });
+    await expect(getWebsitePageForRender('agent-setup')).resolves.toMatchObject({ isPreview: true, sections: [{ placement: 'content', heading: 'Draft heading' }] });
     expect(emdash.getEmDashEntry).toHaveBeenCalledWith('pages', 'agent-setup');
   });
 });

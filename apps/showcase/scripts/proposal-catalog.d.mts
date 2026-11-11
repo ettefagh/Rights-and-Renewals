@@ -8,5 +8,7 @@ export const proposalLimits: {
   readonly body: number;
   readonly pageSize: number;
   readonly maxPageSize: number;
+  readonly cursorMaxLength: number;
+  readonly resolutionNote: number;
   readonly contractVersion: string;
 };

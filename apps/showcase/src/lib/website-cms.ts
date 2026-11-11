@@ -2,10 +2,14 @@ import { getEmDashCollection, getEmDashEntry, getRequestContext, isSafeHref, run
 
 export const WEBSITE_COLLECTION = 'pages';
 export const WEBSITE_BLOCK_TYPES = ['hero', 'copy_section', 'feature_list', 'faq', 'cta'] as const;
+export const WEBSITE_BLOCK_PLACEMENTS = ['content', 'home-intro', 'agent-intro'] as const;
+
+export type WebsiteBlockPlacement = typeof WEBSITE_BLOCK_PLACEMENTS[number];
 
 export interface WebsiteBlock {
   _type: string;
   _key?: string;
+  placement: WebsiteBlockPlacement;
   [field: string]: unknown;
 }
 
@@ -36,6 +40,12 @@ function validateItem(value: unknown): Record<string, unknown> | undefined {
   const item = value as Record<string, unknown>;
   const type = item._type;
   if (typeof type !== 'string' || !WEBSITE_BLOCK_TYPES.includes(type as typeof WEBSITE_BLOCK_TYPES[number])) return undefined;
+  const placement = item.placement === undefined
+    ? 'content'
+    : typeof item.placement === 'string' && WEBSITE_BLOCK_PLACEMENTS.includes(item.placement as WebsiteBlockPlacement)
+      ? item.placement as WebsiteBlockPlacement
+      : undefined;
+  if (!placement) return undefined;
   const key = cleanText(item._key, 120);
   const heading = cleanText(item.heading, 180);
   const body = cleanText(item.body, 4000);
@@ -62,12 +72,14 @@ function validateItem(value: unknown): Record<string, unknown> | undefined {
     : [];
 
   if (type === 'hero' && !heading) return undefined;
+  if (placement !== 'content' && !heading) return undefined;
   if (type === 'copy_section' && !heading && !body) return undefined;
   if (type === 'feature_list' && items.length === 0) return undefined;
   if (type === 'faq' && questions.length === 0) return undefined;
   if (type === 'cta' && !(label && href && id)) return undefined;
   return {
     _type: type,
+    placement,
     ...(key ? { _key: key } : {}),
     ...(heading ? { heading } : {}),
     ...(body ? { body } : {}),

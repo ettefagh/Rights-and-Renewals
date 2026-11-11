@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { readFile } from 'node:fs/promises';
 import { PluginStorageRepository } from 'emdash';
 import { proposalQueueStorage } from '../../scripts/proposal-catalog.mjs';
 import {
@@ -31,7 +32,15 @@ describe('editorial proposal service', () => {
       .toMatchObject({ cancel: true });
     expect(await plugin.hooks['content:beforeSchedule']!.handler({ collection: 'editorial_proposals' } as never, {} as never))
       .toMatchObject({ cancel: true });
-    expect(Object.keys(plugin.routes)).toEqual(['proposeDraft', 'listOwnDrafts', 'listReviewerDrafts']);
+    expect(Object.keys(plugin.routes)).toEqual(['proposeDraft', 'listOwnDrafts', 'listReviewerDrafts', 'resolveProposal']);
+  });
+
+  it('keeps the Astro native plugin descriptor routes aligned with the plugin implementation', async () => {
+    const config = await readFile(new URL('../../astro.config.mjs', import.meta.url), 'utf8');
+    const descriptor = config.match(/id: 'cmlab-editorial-proposals'[\s\S]*?routes:\s*\[([^\]]*)\]/)?.[1];
+    expect(descriptor).toBeDefined();
+    const descriptorRoutes = [...descriptor!.matchAll(/'([^']+)'/g)].map((match) => match[1]);
+    expect(descriptorRoutes).toEqual(Object.keys(createPlugin().routes));
   });
 
   it('requires a host-authenticated contributor and fails closed without the ownership adapter', async () => {
@@ -86,26 +95,54 @@ describe('editorial proposal service', () => {
 
   it('does not let revision suggestions omit the expected revision or target id', async () => {
     const service = createEditorialProposalService({
-      createOwnedDraft: vi.fn(), listOwnDrafts: vi.fn(), listReviewerDrafts: vi.fn(),
+      createOwnedDraft: vi.fn(), listOwnDrafts: vi.fn(), listReviewerDrafts: vi.fn(), resolveReviewerDraft: vi.fn(),
     });
     expect(await service.propose(actor, { ...valid, kind: 'revision_suggestion' })).toEqual({ ok: false, code: 'invalid_input' });
   });
 
   it('restricts the shared reviewer queue to authenticated editors and admins', async () => {
-    const listReviewerDrafts = vi.fn(async () => []);
+    const listReviewerDrafts = vi.fn(async () => ({ items: [], hasMore: false }));
     const service = createEditorialProposalService({
-      createOwnedDraft: vi.fn(), listOwnDrafts: vi.fn(), listReviewerDrafts,
+      createOwnedDraft: vi.fn(), listOwnDrafts: vi.fn(), listReviewerDrafts, resolveReviewerDraft: vi.fn(),
     });
-    expect(await service.listForReviewer(actor)).toEqual([]);
-    expect(await service.listForReviewer(undefined)).toEqual([]);
+    expect(await service.listForReviewer(actor)).toEqual({ items: [], hasMore: false });
+    expect(await service.listForReviewer(undefined)).toEqual({ items: [], hasMore: false });
     expect(listReviewerDrafts).not.toHaveBeenCalled();
     await service.listForReviewer({ id: 'editor-1', role: 40 });
     await service.listForReviewer({ id: 'admin-1', role: 'admin' });
     expect(listReviewerDrafts).toHaveBeenCalledTimes(2);
   });
 
+  it('requires reviewer authorization and explicit applied target metadata before resolution', async () => {
+    const resolveReviewerDraft = vi.fn(async (actorId, proposalId, input) => ({
+      id: proposalId,
+      ownerId: actor.id,
+      status: 'draft' as const,
+      revision: 'payload-revision',
+      proposal: valid,
+      proposalState: input.action,
+      storageRevision: 'next-storage-revision',
+      audit: [],
+    }));
+    const service = createEditorialProposalService({
+      createOwnedDraft: vi.fn(), listOwnDrafts: vi.fn(),
+      listReviewerDrafts: vi.fn(async () => ({ items: [], hasMore: false })),
+      resolveReviewerDraft,
+    });
+    const request = { action: 'applied' as const, expectedStorageRevision: 'current-storage-revision' };
+    expect(await service.resolveForReviewer({ id: 'editor-1', role: 40 }, 'proposal-1', request)).toEqual({ ok: false, code: 'invalid_input' });
+    expect(resolveReviewerDraft).not.toHaveBeenCalled();
+    expect(await service.resolveForReviewer({ id: 'editor-1', role: 40 }, 'proposal-1', {
+      ...request, appliedTargetId: 'page-1', appliedTargetRevision: 'revision-8',
+    })).toMatchObject({ ok: true, item: { proposalState: 'applied' } });
+    expect(resolveReviewerDraft).toHaveBeenCalledWith('editor-1', 'proposal-1', expect.objectContaining({
+      appliedTargetId: 'page-1', appliedTargetRevision: 'revision-8',
+    }));
+    expect(await service.resolveForReviewer(actor, 'proposal-1', { ...request, action: 'rejected' })).toEqual({ ok: false, code: 'role_denied' });
+  });
+
   it('uses EmDash route context storage for draft-only proposal persistence', async () => {
-    const compareAndSet = vi.fn(async () => ({ applied: true }));
+    const compareAndSet = vi.fn(async () => ({ applied: true, revision: 'storage-revision-1' }));
     const plugin = createPlugin();
     const response = await plugin.routes.proposeDraft!.handler({
       input: valid,

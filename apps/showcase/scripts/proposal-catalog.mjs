@@ -14,5 +14,7 @@ export const proposalLimits = Object.freeze({
   body: 12000,
   pageSize: 50,
   maxPageSize: 100,
+  cursorMaxLength: 4096,
+  resolutionNote: 1000,
   contractVersion: '1.0.0',
 });

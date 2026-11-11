@@ -10,6 +10,7 @@
   } from '../../utils/dateFormatters';
   import StatutoryTimelineBar from '../widgets/StatutoryTimelineBar.svelte';
   import CounterDeskCard from '../widgets/CounterDeskCard.svelte';
+  import SubscriptionPlanPanel from './SubscriptionPlanPanel.svelte';
   import {
     X,
     FileText,
@@ -29,9 +30,11 @@
     categoryOverride ?? (item?.category === 'subscription' ? 'subscription' : 'hardware')
   );
   let isSaving = $state(false);
+  let editingPlanId = $state<string | undefined>(undefined);
 
   function startEditMode(targetItem: WalletItem) {
     categoryOverride = targetItem.category === 'subscription' ? 'subscription' : 'hardware';
+    editingPlanId = targetItem.policyPlanId;
     walletStore.isEditingDrawer = true;
   }
 
@@ -71,6 +74,7 @@
         merchantOrProvider: rawMerchant,
         billingCycle: activeEditCategory === 'subscription' ? rawBillingCycle : undefined,
         paymentType: activeEditCategory === 'subscription' ? rawPaymentType : undefined,
+        policyPlanId: activeEditCategory === 'subscription' ? editingPlanId : undefined,
         priceGrossEur: activeEditCategory === 'subscription' ? safePrice : item.priceGrossEur,
         purchaseDate: rawPurchaseDate || item.purchaseDate,
         expiryDate: rawExpiryDate || item.expiryDate,
@@ -257,6 +261,7 @@
                     placeholder="https://..."
                   />
                 </label>
+                <SubscriptionPlanPanel bind:planId={editingPlanId} lookupEnabled={false} />
               {:else}
                 <div class="two-col-fields">
                   <label class="field-group">
@@ -349,6 +354,9 @@
           {/if}
 
           {#if item.category === 'subscription'}
+            {#if item.policyPlanId}
+              <SubscriptionPlanPanel planId={item.policyPlanId} editable={false} />
+            {/if}
             <div class="cancellation-prompt-card">
               <div class="cancel-prompt-header">
                 <ShieldAlert size={16} class="text-pine" />

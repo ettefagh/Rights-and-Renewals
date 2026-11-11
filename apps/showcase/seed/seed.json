@@ -3066,6 +3066,18 @@
 					"version": 1,
 					"fields": [
 						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
+						{
 							"slug": "heading",
 							"label": "Heading",
 							"type": "string",
@@ -3119,6 +3131,18 @@
 				{
 					"version": 1,
 					"fields": [
+						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
 						{
 							"slug": "heading",
 							"label": "Heading",
@@ -3174,6 +3198,18 @@
 					"version": 1,
 					"fields": [
 						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
+						{
 							"slug": "heading",
 							"label": "Heading",
 							"type": "string",
@@ -3225,6 +3261,18 @@
 					"version": 1,
 					"fields": [
 						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
+						{
 							"slug": "heading",
 							"label": "Heading",
 							"type": "string",
@@ -3275,6 +3323,18 @@
 				{
 					"version": 1,
 					"fields": [
+						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
 						{
 							"slug": "heading",
 							"label": "Heading",

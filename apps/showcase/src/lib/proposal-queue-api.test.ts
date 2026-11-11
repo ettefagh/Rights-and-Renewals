@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { listPendingProposals, proposalTargetHref } from './proposal-queue-api.js';
+import { listPendingProposals, proposalTargetHref, resolveProposal } from './proposal-queue-api.js';
 import { EDITORIAL_PROPOSAL_CONTRACT_VERSION, type EditorialProposalInput } from './editorial-proposals.js';
 
 const proposal: EditorialProposalInput = {
@@ -22,20 +22,40 @@ describe('proposal queue API', () => {
       expect(new Headers(init?.headers).get('X-EmDash-Request')).toBe('1');
       expect(JSON.parse(String(init?.body))).toEqual({ limit: 50 });
       return new Response(JSON.stringify({ success: true, data: { items: [
-        { id: 'draft-1', ownerId: 'editorial-author-2', status: 'draft', revision: 'digest-1', proposal },
-      ] } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        { id: 'draft-1', ownerId: 'editorial-author-2', status: 'draft', revision: 'digest-1', proposal,
+          proposalState: 'pending', storageRevision: 'storage-revision-1', audit: [] },
+      ], hasMore: true, cursor: 'opaque-next-page' } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     });
     vi.stubGlobal('fetch', fetch);
 
-    await expect(listPendingProposals()).resolves.toMatchObject([
-      { id: 'draft-1', ownerId: 'editorial-author-2', status: 'draft', proposal },
-    ]);
+    await expect(listPendingProposals()).resolves.toMatchObject({
+      items: [{ id: 'draft-1', ownerId: 'editorial-author-2', status: 'draft', proposal,
+        proposalState: 'pending', storageRevision: 'storage-revision-1' }],
+      hasMore: true, cursor: 'opaque-next-page',
+    });
     expect(String(fetch.mock.calls[0]?.[0])).toBe('/_emdash/api/plugins/cmlab-editorial-proposals/listReviewerDrafts');
   });
 
   it('rejects malformed queue records rather than rendering them as proposals', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ data: { items: [{ id: 'bad' }] } }), { status: 200 })));
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ data: { items: [{ id: 'bad' }], hasMore: false } }), { status: 200 })));
     await expect(listPendingProposals()).rejects.toThrow('invalid record');
+  });
+
+  it('sends cursor pagination and reports lifecycle CAS conflicts', async () => {
+    const fetch = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => new Response(JSON.stringify({ success: true, data: {
+      ok: false, code: 'conflict',
+    } }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    vi.stubGlobal('fetch', fetch);
+    await expect(listPendingProposals({ cursor: 'opaque-cursor' })).rejects.toThrow('invalid response');
+    expect(JSON.parse(String(fetch.mock.calls[0]?.[1]?.body))).toEqual({ limit: 50, cursor: 'opaque-cursor' });
+
+    await expect(resolveProposal('proposal-1', {
+      action: 'rejected', expectedStorageRevision: 'stale-revision',
+    })).rejects.toThrow('changed while you were reviewing');
+    expect(String(fetch.mock.calls[1]?.[0])).toBe('/_emdash/api/plugins/cmlab-editorial-proposals/resolveProposal');
+    expect(JSON.parse(String(fetch.mock.calls[1]?.[1]?.body))).toEqual({
+      proposalId: 'proposal-1', action: 'rejected', expectedStorageRevision: 'stale-revision',
+    });
   });
 
   it('links only allowlisted collection targets with safe encoded IDs', () => {

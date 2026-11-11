@@ -60,6 +60,31 @@ export type ProposalDraft = {
   proposal: EditorialProposalInput;
 };
 
+export type ProposalState = 'pending' | 'rejected' | 'archived' | 'applied';
+export type ProposalResolutionAction = Exclude<ProposalState, 'pending'>;
+export type ProposalAuditEvent = {
+  action: ProposalResolutionAction;
+  actorId: string;
+  occurredAt: string;
+  targetId: string | null;
+  targetRevision: string | null;
+  note: string | null;
+};
+export type ProposalQueueItem = ProposalDraft & {
+  proposalState: ProposalState;
+  /** Opaque EmDash storage revision used for lifecycle compare-and-set. */
+  storageRevision: string;
+  audit: ProposalAuditEvent[];
+};
+export type ProposalQueuePage = { items: ProposalQueueItem[]; cursor?: string; hasMore: boolean };
+export type ProposalResolutionInput = {
+  action: ProposalResolutionAction;
+  expectedStorageRevision: string;
+  appliedTargetId?: string;
+  appliedTargetRevision?: string;
+  note?: string;
+};
+
 /** The host adapter must atomically deduplicate, set authorId from actorId, and create draft-only content. */
 export interface EditorialProposalHost {
   createOwnedDraft(input: {
@@ -69,7 +94,8 @@ export interface EditorialProposalHost {
     idempotencyKey: string;
   }): Promise<{ kind: 'created' | 'replayed'; draft: ProposalDraft }>;
   listOwnDrafts(actorId: string, limit: number): Promise<ProposalDraft[]>;
-  listReviewerDrafts(limit: number): Promise<ProposalDraft[]>;
+  listReviewerDrafts(limit: number, cursor?: string): Promise<ProposalQueuePage>;
+  resolveReviewerDraft(actorId: string, proposalId: string, input: ProposalResolutionInput): Promise<ProposalQueueItem | null>;
 }
 
 export type ProposalResult =
@@ -132,9 +158,30 @@ export function createEditorialProposalService(host?: EditorialProposalHost) {
       if (!isContributor(actor.role)) return [];
       return host.listOwnDrafts(actor.id, 50);
     },
-    async listForReviewer(actor: ProposalActor | undefined, limit = 50): Promise<ProposalDraft[]> {
-      if (!actor?.id || !isReviewer(actor.role) || !host) return [];
-      return host.listReviewerDrafts(Math.min(100, Math.max(1, Math.floor(limit))));
+    async listForReviewer(actor: ProposalActor | undefined, limit = 50, cursor?: string): Promise<ProposalQueuePage> {
+      if (!actor?.id || !isReviewer(actor.role) || !host) return { items: [], hasMore: false };
+      return host.listReviewerDrafts(Math.min(100, Math.max(1, Math.floor(limit))), cursor);
+    },
+    async resolveForReviewer(actor: ProposalActor | undefined, proposalId: string, input: ProposalResolutionInput) {
+      if (!actor?.id) return { ok: false as const, code: 'unauthenticated' as const };
+      if (!isReviewer(actor.role)) return { ok: false as const, code: 'role_denied' as const };
+      if (!host) return { ok: false as const, code: 'host_adapter_unavailable' as const };
+      if (!/^[A-Za-z0-9_-]{1,128}$/.test(proposalId) || !input.expectedStorageRevision) {
+        return { ok: false as const, code: 'invalid_input' as const };
+      }
+      if (input.action === 'applied' && (!input.appliedTargetId || !input.appliedTargetRevision)) {
+        return { ok: false as const, code: 'invalid_input' as const };
+      }
+      if (input.action !== 'applied' && (input.appliedTargetId || input.appliedTargetRevision)) {
+        return { ok: false as const, code: 'invalid_input' as const };
+      }
+      try {
+        const item = await host.resolveReviewerDraft(actor.id, proposalId, input);
+        return item ? { ok: true as const, item } : { ok: false as const, code: 'conflict' as const };
+      } catch (error) {
+        if (error instanceof ProposalConflictError) return { ok: false as const, code: 'conflict' as const };
+        throw error;
+      }
     },
   };
 }

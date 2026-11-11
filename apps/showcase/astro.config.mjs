@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 export default defineConfig({
   output: 'server',
   adapter: cloudflare({
+    ...(process.env.CMLAB_ISSUE37_PREVIEW === 'true' ? { configPath: './wrangler.issue37-preview.jsonc' } : {}),
     imageService: 'passthrough',
     prerenderEnvironment: 'node',
   }),
@@ -27,7 +28,7 @@ export default defineConfig({
           format: 'native',
           capabilities: ['hooks.content-policy:register', 'content:read'],
           hooks: ['content:beforePublish', 'content:beforeSchedule'],
-          routes: ['proposeDraft', 'listOwnDrafts', 'listReviewerDrafts'],
+          routes: ['proposeDraft', 'listOwnDrafts', 'listReviewerDrafts', 'resolveProposal'],
         },
         {
           id: 'cmlab-policy-graph-review',

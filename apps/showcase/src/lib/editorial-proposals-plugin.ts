@@ -8,23 +8,29 @@ import {
   ProposalConflictError,
   type EditorialProposalHost,
   type ProposalDraft,
+  type ProposalQueueItem,
+  type ProposalState,
+  type ProposalAuditEvent,
+  type ProposalResolutionInput,
 } from './editorial-proposals';
-import { proposalQueueStorage } from '../../scripts/proposal-catalog.mjs';
+import { proposalLimits, proposalQueueStorage } from '../../scripts/proposal-catalog.mjs';
 
 type StorageRecord = {
   ownerId: string;
   createdAt: string;
-  proposalState: 'pending';
+  proposalState: ProposalState;
   targetRevision: string | null;
   bodyDigest: string;
   payloadDigest: string;
   draft: ProposalDraft;
+  audit: ProposalAuditEvent[];
 };
 
 type StorageCollection = {
   get(id: string): Promise<StorageRecord | null>;
-  compareAndSet(id: string, expectedRevision: string | null, data: StorageRecord): Promise<{ applied: boolean }>;
-  query(options?: { where?: Record<string, unknown>; orderBy?: Record<string, 'asc' | 'desc'>; limit?: number }): Promise<{ items: Array<{ id: string; data: StorageRecord }> }>;
+  getVersioned(id: string): Promise<{ value: StorageRecord; revision: string } | null>;
+  compareAndSet(id: string, expectedRevision: string | null, data: StorageRecord): Promise<{ applied: boolean; revision?: string }>;
+  query(options?: { where?: Record<string, unknown>; orderBy?: Record<string, 'asc' | 'desc'>; limit?: number; cursor?: string }): Promise<{ items: Array<{ id: string; data: StorageRecord }>; cursor?: string; hasMore: boolean }>;
 };
 
 type ProposalRuntime = {
@@ -80,7 +86,7 @@ export function createEmDashEditorialProposalHost(runtime: ProposalRuntime): Edi
       };
       const record: StorageRecord = {
         ownerId: actorId, createdAt: new Date().toISOString(), proposalState: 'pending',
-        targetRevision, bodyDigest, payloadDigest, draft,
+        targetRevision, bodyDigest, payloadDigest, draft, audit: [],
       };
       const write = await storage.compareAndSet(id, null, record);
       if (write.applied) return { kind: 'created', draft };
@@ -94,14 +100,64 @@ export function createEmDashEditorialProposalHost(runtime: ProposalRuntime): Edi
       const result = await storage.query({ where: { ownerId: actorId, proposalState: 'pending' }, orderBy: { createdAt: 'desc' }, limit: Math.min(50, limit) });
       return result.items.filter(({ data }) => data.ownerId === actorId).map(({ data }) => data.draft);
     },
-    async listReviewerDrafts(limit) {
-      const result = await storage.query({ where: { proposalState: 'pending' }, orderBy: { createdAt: 'desc' }, limit: Math.min(100, limit) });
-      return result.items.filter(({ data }) => data.proposalState === 'pending').map(({ data }) => data.draft);
+    async listReviewerDrafts(limit, cursor) {
+      const result = await storage.query({
+        where: { proposalState: 'pending' }, orderBy: { createdAt: 'desc' },
+        limit: Math.min(100, limit), ...(cursor ? { cursor } : {}),
+      });
+      const items: ProposalQueueItem[] = [];
+      for (const { id, data } of result.items) {
+        if (data.proposalState !== 'pending' || data.draft.id !== id) continue;
+        const versioned = await storage.getVersioned(id);
+        if (!versioned || versioned.value.proposalState !== 'pending') continue;
+        items.push({ ...data.draft, proposalState: data.proposalState, storageRevision: versioned.revision, audit: data.audit ?? [] });
+      }
+      return { items, ...(result.cursor ? { cursor: result.cursor } : {}), hasMore: result.hasMore };
+    },
+    async resolveReviewerDraft(actorId, proposalId, input: ProposalResolutionInput) {
+      const versioned = await storage.getVersioned(proposalId);
+      if (!versioned || versioned.revision !== input.expectedStorageRevision || versioned.value.proposalState !== 'pending') return null;
+      const current = versioned.value;
+      const event: ProposalAuditEvent = {
+        action: input.action,
+        actorId,
+        occurredAt: new Date().toISOString(),
+        targetId: input.action === 'applied' ? input.appliedTargetId! : null,
+        targetRevision: input.action === 'applied' ? input.appliedTargetRevision! : null,
+        note: input.note?.trim() || null,
+      };
+      const next: StorageRecord = { ...current, proposalState: input.action, audit: [...(current.audit ?? []), event] };
+      const write = await storage.compareAndSet(proposalId, versioned.revision, next);
+      if (!write.applied || !write.revision) return null;
+      return {
+        ...current.draft,
+        proposalState: input.action,
+        storageRevision: write.revision,
+        audit: next.audit,
+      };
     },
   };
 }
 
-const listInput = z.object({ limit: z.number().int().min(1).max(100).optional() }).strict();
+const listInput = z.object({
+  limit: z.number().int().min(1).max(100).optional(),
+  cursor: z.string().min(1).max(proposalLimits.cursorMaxLength).optional(),
+}).strict();
+const resolveInput = z.object({
+  proposalId: z.string().regex(/^[A-Za-z0-9_-]{1,128}$/),
+  action: z.enum(['rejected', 'archived', 'applied']),
+  expectedStorageRevision: z.string().min(1).max(128),
+  appliedTargetId: z.string().regex(/^[A-Za-z0-9_-]{1,80}$/).optional(),
+  appliedTargetRevision: z.string().trim().min(1).max(128).optional(),
+  note: z.string().trim().max(proposalLimits.resolutionNote).optional(),
+}).strict().superRefine((value, ctx) => {
+  if (value.action === 'applied' && (!value.appliedTargetId || !value.appliedTargetRevision)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Applied attestations require a target ID and revision' });
+  }
+  if (value.action !== 'applied' && (value.appliedTargetId || value.appliedTargetRevision)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Target metadata is only valid for applied attestations' });
+  }
+});
 
 /** The factory intentionally accepts no injected host functions; Astro JSON options cannot carry trusted adapters. */
 export function createPlugin(_options: Record<string, never> = {}) {
@@ -144,13 +200,41 @@ export function createPlugin(_options: Record<string, never> = {}) {
       },
       listReviewerDrafts: {
         input: listInput,
-        request: { body: 'json', maxBytes: 256 },
+        request: { body: 'json', maxBytes: proposalLimits.cursorMaxLength + 512 },
         permission: 'content:publish_any',
         handler: async ({ input, user, ...runtime }) => {
           const parsedInput = listInput.safeParse(input);
-          if (!parsedInput.success) return { items: [] };
+          if (!parsedInput.success) return { items: [], hasMore: false };
           const service = createEditorialProposalService(createEmDashEditorialProposalHost(runtime));
-          return { items: await service.listForReviewer(user ? { id: user.id, role: user.role } : undefined, parsedInput.data.limit ?? 50) };
+          return service.listForReviewer(
+            user ? { id: user.id, role: user.role } : undefined,
+            parsedInput.data.limit ?? 50,
+            parsedInput.data.cursor,
+          );
+        },
+      },
+      resolveProposal: {
+        input: resolveInput,
+        request: { body: 'json', maxBytes: proposalLimits.resolutionNote * 4 + 1024 },
+        permission: 'content:publish_any',
+        handler: async ({ input, user, ...runtime }) => {
+          const parsedInput = resolveInput.safeParse(input);
+          if (!parsedInput.success) return { ok: false, code: 'invalid_input' };
+          const { proposalId, ...resolution } = parsedInput.data;
+          const service = createEditorialProposalService(createEmDashEditorialProposalHost(runtime));
+          const result = await service.resolveForReviewer(
+            user ? { id: user.id, role: user.role } : undefined,
+            proposalId,
+            {
+              action: resolution.action,
+              expectedStorageRevision: resolution.expectedStorageRevision,
+              ...(resolution.appliedTargetId ? { appliedTargetId: resolution.appliedTargetId } : {}),
+              ...(resolution.appliedTargetRevision ? { appliedTargetRevision: resolution.appliedTargetRevision } : {}),
+              ...(resolution.note ? { note: resolution.note } : {}),
+            },
+          );
+          if (!result.ok) return result;
+          return { ok: true, item: result.item };
         },
       },
     },

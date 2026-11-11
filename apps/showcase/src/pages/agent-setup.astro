@@ -13,6 +13,8 @@ export const prerender = false;
 
 const cmsPage = await getWebsitePageForRender('agent-setup');
 const pageTelemetryRevision = cmsPage ? await hashTelemetryRevision({ title: cmsPage.title, description: cmsPage.description ?? '', sections: cmsPage.sections }) : undefined;
+const agentIntroBlocks = cmsPage?.sections.filter((section) => section.placement === 'agent-intro') ?? [];
+const contentSections = cmsPage?.sections.filter((section) => section.placement === 'content') ?? [];
 const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
 const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its setup steps and ask me before changing configuration or running commands. After setup, verify the public MCP connection with a read-only tool before reporting success.`;
 ---
@@ -401,17 +403,21 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
 
   <main id="agent-setup-main" data-telemetry-page={cmsPage ? 'page:agent-setup' : undefined} data-telemetry-revision={pageTelemetryRevision}>
     <AudienceSwitch humanHref="/agent-setup" machineHref="/machine/view/agent-setup" />
-    {cmsPage?.sections.length ? <EditorialSections sections={cmsPage.sections} preview={cmsPage.isPreview} /> : null}
     <!-- HERO SECTION -->
     <section class="agent-setup-hero">
       <div class="layout-container">
-        <div class="agent-setup-badge">
-          <span>⚡ Model Context Protocol</span> · <span>JSON-RPC 2.0</span>
-        </div>
-        <h1 class="agent-setup-title">Agent Setup</h1>
-        <p class="agent-setup-description">
-          Connect your agent to the public <strong>Rights &amp; Renewals</strong> MCP endpoint for read-only brand policy, statute, and subscription-rule lookups. Use the wallet for private receipts and purchase records.
-        </p>
+        {cmsPage ? <EditorialSections sections={cmsPage.sections} placement="agent-intro" headingLevel="h1" preview={cmsPage.isPreview} /> : null}
+        {agentIntroBlocks.length === 0 && (
+          <>
+            <div class="agent-setup-badge">
+              <span>⚡ Model Context Protocol</span> · <span>JSON-RPC 2.0</span>
+            </div>
+            <h1 class="agent-setup-title">Agent Setup</h1>
+            <p class="agent-setup-description">
+              Connect your agent to the public <strong>Rights &amp; Renewals</strong> MCP endpoint for read-only brand policy, statute, and subscription-rule lookups. Use the wallet for private receipts and purchase records.
+            </p>
+          </>
+        )}
 
         <div class="hero-actions">
           <button
@@ -429,6 +435,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
         </div>
       </div>
     </section>
+    {contentSections.length > 0 && cmsPage ? <EditorialSections sections={contentSections} /> : null}
 
     <div class="layout-container" style="padding-top: var(--space-6, 24px); padding-bottom: var(--space-16, 64px);">
 

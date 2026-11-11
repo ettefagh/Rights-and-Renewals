@@ -40,7 +40,7 @@ function getValidatedShowcaseOrigin(): string | null {
 
 const showcaseOrigin = getValidatedShowcaseOrigin();
 
-export function getShowcaseUrl(path: '/wiki' | '/_emdash/admin' | '/api/emdash/wiki'): string | null {
+export function getShowcaseUrl(path: '/wiki' | '/_emdash/admin' | '/api/emdash/wiki' | '/api/emdash/plans'): string | null {
   if (!showcaseOrigin) return null;
   return new URL(path, showcaseOrigin).toString();
 }

@@ -43,6 +43,8 @@ export interface WalletItem {
   title: string;
   category: ItemCategory;
   brandSlug: string;
+  /** Explicit user-selected published catalog plan. Never inferred from the provider name. */
+  policyPlanId?: string | undefined;
   merchantOrProvider: string;
   serialNumber?: string | undefined; // Hardware Serial/E-Nr./IMEI for retail counter actions
   barcodeValue?: string | undefined; // Scannable POS barcode (Code 128 / EAN / Invoice)
