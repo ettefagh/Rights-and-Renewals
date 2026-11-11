@@ -1,33 +1,46 @@
 ---
-import { policySeedData } from '@cmlab/core';
+import { getPolicyForPage } from '../../lib/policy-cms';
 import type { PolicyWikiEntry } from '@cmlab/core';
 import BrandIcon from '../../components/BrandIcon.svelte';
+import AudienceSwitch from '../../components/AudienceSwitch.astro';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
 
-export function getStaticPaths() {
-  return policySeedData.map((brand: PolicyWikiEntry) => ({
-    params: { slug: brand.brandSlug },
-    props: { brand },
-  }));
+export const prerender = false;
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+let brand: PolicyWikiEntry | null = null;
+let cmsUnavailable = false;
+let isPreview = false;
+try {
+  const result = await getPolicyForPage(Astro.params.slug ?? '');
+  brand = result.policy;
+  isPreview = result.isPreview;
+} catch (error) {
+  console.error('[policy-wiki] EmDash published content is unavailable.', error);
+  Astro.response.status = 503;
+  cmsUnavailable = true;
 }
+if (!brand && !cmsUnavailable) Astro.response.status = 404;
 
-export const prerender = true;
+const isSubscription = brand?.category === 'subscription';
+const pageTitle = brand
+  ? `${brand.brandName} · Verbraucherrechte & Kündigung · Rights & Renewals Brand Policy Wiki`
+  : 'Marke nicht gefunden · Rights & Renewals Brand Policy Wiki';
+const pageDescription = brand
+  ? isSubscription
+    ? `Rights & Renewals — Gesetzliche Kündigungsfristen nach BGB § 309 Nr. 9 und Kündigungsbutton-Direktlink (§ 312k BGB) für ${brand.brandName}.`
+    : `Rights & Renewals — Gesetzliche Gewährleistung nach BGB § 438, 12-Monate Beweislastumkehr (§ 477 BGB) und Garantiebestimmungen für ${brand.brandName}.`
+  : 'Es wurde kein veröffentlichter CMS-Eintrag für diese Marke gefunden.';
 
-const { brand } = Astro.props as { brand: PolicyWikiEntry };
-
-const isSubscription = brand.category === 'subscription';
-const pageTitle = `${brand.brandName} · Verbraucherrechte & Kündigung · Rights & Renewals Brand Policy Wiki`;
-const pageDescription = isSubscription
-  ? `Rights & Renewals — Gesetzliche Kündigungsfristen nach BGB § 309 Nr. 9 und Kündigungsbutton-Direktlink (§ 312k BGB) für ${brand.brandName}.`
-  : `Rights & Renewals — Gesetzliche Gewährleistung nach BGB § 438, 12-Monate Beweislastumkehr (§ 477 BGB) und Garantiebestimmungen für ${brand.brandName}.`;
-
-const deepLinkWallet = `https://rightsandrenewals-app.pages.dev/#action=view&slug=${brand.brandSlug}`;
-const deepLinkCapture = `https://rightsandrenewals-app.pages.dev/#action=quick-add&brand=${encodeURIComponent(brand.brandName)}&category=${brand.category}`;
-const legacyDeepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${brand.brandSlug}`;
+const deepLinkWallet = brand ? `https://rightsandrenewals-app.pages.dev/#action=view&slug=${brand.brandSlug}` : '#';
+const deepLinkCapture = brand ? `https://rightsandrenewals-app.pages.dev/#action=quick-add&brand=${encodeURIComponent(brand.brandName)}&category=${brand.category}` : '#';
+const legacyDeepLinkWallet = brand ? `https://app.cm-lab.pages.dev/#action=view&slug=${brand.brandSlug}` : '#';
 ---
 
 <!DOCTYPE html>
+{brand ? (
 <html lang="de" data-theme="light">
 <head>
   <meta charset="utf-8" />
@@ -239,6 +252,12 @@ const legacyDeepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${b
   </header>
 
   <main class="wiki-container">
+    {isPreview && (
+      <p class="preview-notice" role="status" style="padding: 12px 16px; border: 1px solid #b45309; border-radius: 8px; background: #fffbeb; color: #78350f;">
+        EmDash editor preview: this private view is not public until the policy is published.
+      </p>
+    )}
+    {!isPreview && <AudienceSwitch humanHref={`/wiki/${brand.brandSlug}`} machineHref={`/machine/view/wiki/${brand.brandSlug}`} />}
     <!-- Breadcrumb -->
     <nav class="wiki-breadcrumb" aria-label="Breadcrumb">
       <a href="/">Home</a>
@@ -352,14 +371,16 @@ const legacyDeepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${b
             </>
           )}
 
-          <div class="stat-item">
-            <span class="stat-label">Kundenservice &amp; Support-Kontakt</span>
-            <span class="stat-value">
-              <a href={`mailto:${brand.supportEmail}`} style="color: var(--color-primary-teal, #2F524C);">
-                {brand.supportEmail}
-              </a>
-            </span>
-          </div>
+          {brand.supportEmail && (
+            <div class="stat-item">
+              <span class="stat-label">Kundenservice &amp; Support-Kontakt</span>
+              <span class="stat-value">
+                <a href={`mailto:${brand.supportEmail}`} style="color: var(--color-primary-teal, #2F524C);">
+                  {brand.supportEmail}
+                </a>
+              </span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -390,3 +411,20 @@ const legacyDeepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${b
 
 </body>
 </html>
+ ) : (
+  <html lang="de" data-theme="light">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>{cmsUnavailable ? 'Markenverzeichnis vorübergehend nicht verfügbar' : pageTitle}</title>
+      <meta name="description" content={pageDescription} />
+    </head>
+    <body class="showcase-shell">
+      <main class="wiki-container">
+        <h1>{cmsUnavailable ? 'Markenverzeichnis vorübergehend nicht verfügbar' : 'Marke nicht gefunden'}</h1>
+        <p>{cmsUnavailable ? 'Das veröffentlichte EmDash-Verzeichnis kann gerade nicht geladen werden.' : 'Für diese Marke gibt es keinen veröffentlichten CMS-Eintrag.'}</p>
+        <a href="/wiki">Zurück zum Markenverzeichnis</a>
+      </main>
+    </body>
+  </html>
+)}

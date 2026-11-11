@@ -130,26 +130,10 @@ flowchart LR
 * All user records, receipt images, and alarm schedules are encrypted on-device via **AES-GCM-256** with keys derived using **PBKDF2** (100,000 iterations, SHA-256).
 * Zero unencrypted user data ever touches a remote server or database.
 
-### 🤖 Rights & Renewals MCP Server & AI Agent Readiness
-* **Server Identity:** Rebranded from legacy naming to `rights-and-renewals` (`v1.0.0`) operating with 100% parity across edge functions and SSR endpoints (`POST /api/mcp`).
-* **Cloudflare-Style Agent Setup Desk ([`/agent-setup`](https://rightsandrenewals.pages.dev/agent-setup)):**
-  * Modeled after [Cloudflare's Agent Setup](https://developers.cloudflare.com/agent-setup/) with a single, copyable setup prompt:
-    ```bash
-    Fetch and execute the appropriate instructions to set me up for Rights & Renewals from https://rightsandrenewals.pages.dev/agent-setup/prompt.md
-    ```
-  * Tabbed installation instructions and 1-click configuration snippets for **6 major AI agents**:
-    * **Claude Code:** `claude mcp add rights-and-renewals -- transport=http url=https://rightsandrenewals.pages.dev/api/mcp`
-    * **Claude Desktop:** Configuration snippet using `mcp-remote` with streamable HTTP transport.
-    * **Cursor:** Direct `.cursor/mcp.json` definition for the IDE composer.
-    * **Windsurf:** `mcp_config.json` integration targeting the edge endpoint.
-    * **VS Code / Continue:** `config.json` entry with SSE fallback.
-    * **Gemini CLI:** `gemini mcp add rights-and-renewals --url https://rightsandrenewals.pages.dev/api/mcp`
-* **Full 5-Tool Legal & Policy Toolset:**
-  1. `policy_lookup`: Returns verified BGB warranty terms, return windows, and § 312k cancellation URLs for 20 major consumer brands.
-  2. `claim_dossier_generate`: Programmatically generates DIN 5008 formal legal notice letters with statutory citations.
-  3. `statutory_law_lookup`: Direct statutory text retrieval for BGB §§ 437, 438, 477, 309 Nr. 9, and 312k.
-  4. `subscription_category_rules`: Returns category-specific legal cancellation rules and statutory notice ceilings.
-  5. `tax_deductibility_check`: Evaluates Sofortabschreibung eligibility under BMF 22.02.2022 and § 9 EStG.
+### 🤖 Rights & Renewals MCP Server
+* Public MCP endpoint: `https://rightsandrenewals.pages.dev/api/mcp` (Streamable HTTP; no OAuth sign-in required).
+* Connect with the setup instructions at [`/agent-setup`](https://rightsandrenewals.pages.dev/agent-setup). Verify the live connection and inspect the tools exposed by the server before relying on it.
+* OAuth sign-in for the separate EmDash CMS, if enabled, applies only to EmDash resources and does not authenticate the public MCP endpoint.
 * **AI-Agent Discovery Standards:**
   * **MCP Server Card:** SEP-2127 manifest at [`/.well-known/mcp/server-card.json`](https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json)
   * **Agent Skills Discovery:** agentskills.io format at [`/.well-known/agent-skills/index.json`](https://rightsandrenewals.pages.dev/.well-known/agent-skills/index.json) and [`SKILL.md`](https://rightsandrenewals.pages.dev/.well-known/agent-skills/rights-and-renewals/SKILL.md)

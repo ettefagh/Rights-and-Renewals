@@ -3,7 +3,7 @@
   "compilerOptions": {
     "jsx": "preserve",
     "jsxImportSource": "astro",
-    "types": ["astro/client", "unplugin-icons/types/svelte"]
+    "types": ["astro/client", "unplugin-icons/types/svelte", "@cloudflare/workers-types"]
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist", "node_modules"]

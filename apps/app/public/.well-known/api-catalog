@@ -1,53 +1,7 @@
 {
   "linkset": [
     {
-      "anchor": "https://rightsandrenewals-app.pages.dev/api/mcp",
-      "service-desc": [
-        {
-          "href": "https://rightsandrenewals-app.pages.dev/.well-known/mcp/server-card.json",
-          "type": "application/json"
-        }
-      ],
-      "service-doc": [
-        {
-          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
-          "type": "text/markdown"
-        }
-      ],
-      "status": [
-        {
-          "href": "https://rightsandrenewals-app.pages.dev/api/health"
-        }
-      ]
-    },
-    {
-      "anchor": "https://rightsandrenewals-app.pages.dev/api/ical",
-      "service-desc": [
-        {
-          "href": "https://rightsandrenewals-app.pages.dev/openapi.json",
-          "type": "application/vnd.oai.openapi+json"
-        }
-      ],
-      "service-doc": [
-        {
-          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
-          "type": "text/markdown"
-        }
-      ],
-      "status": [
-        {
-          "href": "https://rightsandrenewals-app.pages.dev/api/health"
-        }
-      ]
-    },
-    {
-      "anchor": "https://rightsandrenewals-app.pages.dev/.well-known/agent-skills",
-      "service-desc": [
-        {
-          "href": "https://rightsandrenewals-app.pages.dev/.well-known/agent-skills/index.json",
-          "type": "application/json"
-        }
-      ],
+      "anchor": "https://rightsandrenewals-app.pages.dev/api/auth/request-pin",
       "service-doc": [
         {
           "href": "https://rightsandrenewals-app.pages.dev/auth.md",
@@ -56,22 +10,47 @@
       ]
     },
     {
-      "anchor": "https://rightsandrenewals-app.pages.dev/",
-      "service-desc": [
-        {
-          "href": "https://rightsandrenewals-app.pages.dev/.well-known/mcp/server-card.json",
-          "type": "application/json"
-        }
-      ],
+      "anchor": "https://rightsandrenewals-app.pages.dev/api/auth/verify-pin",
       "service-doc": [
         {
           "href": "https://rightsandrenewals-app.pages.dev/auth.md",
           "type": "text/markdown"
         }
-      ],
-      "status": [
+      ]
+    },
+    {
+      "anchor": "https://rightsandrenewals-app.pages.dev/api/calendar/subscriptions.ics",
+      "service-doc": [
         {
-          "href": "https://rightsandrenewals-app.pages.dev/api/health"
+          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
+          "type": "text/markdown"
+        }
+      ]
+    },
+    {
+      "anchor": "https://rightsandrenewals-app.pages.dev/api/calendar/warranties.ics",
+      "service-doc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
+          "type": "text/markdown"
+        }
+      ]
+    },
+    {
+      "anchor": "https://rightsandrenewals-app.pages.dev/api/ical/subscriptions/demo",
+      "service-doc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
+          "type": "text/markdown"
+        }
+      ]
+    },
+    {
+      "anchor": "https://rightsandrenewals-app.pages.dev/api/ical/warranties/demo",
+      "service-doc": [
+        {
+          "href": "https://rightsandrenewals-app.pages.dev/auth.md",
+          "type": "text/markdown"
         }
       ]
     }

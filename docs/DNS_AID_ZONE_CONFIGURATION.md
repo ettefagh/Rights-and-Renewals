@@ -11,7 +11,7 @@
 
 ## 1. Overview
 
-DNS for AI Discovery (**DNS-AID**) allows autonomous AI agents and client frameworks to discover Model Context Protocol (MCP) servers, Agent Skills manifests, and Agent-to-Agent (A2A) endpoints directly through the Domain Name System without intermediary registries.
+This zone configuration lets autonomous AI agents and client frameworks discover the project's Model Context Protocol (MCP) server, Agent Skills manifest, and ARD catalog through the Domain Name System.
 
 This guide provides the authoritative zone file configurations for BIND 9, NSD, and Cloudflare DNS, along with DNSSEC signing specifications.
 
@@ -26,7 +26,6 @@ All discovery endpoints are rooted under the `_agents` namespace label:
 └── _agents
     ├── _index   --> Organization Agent Skills Index & ARD Manifest
     ├── _mcp     --> SEP-1649 Model Context Protocol Server (/api/mcp)
-    ├── _a2a     --> Agent-to-Agent Interface (/agent-card.json)
     └── _catalog --> Direct ARD ai-catalog.json URL pointer
 ```
 
@@ -59,20 +58,10 @@ _mcp._agents.<domain>.     3600 IN HTTPS 1 . (
                                key65301="/api/mcp"
                            )
 
-; A2A Agent Card Discovery
-_a2a._agents.<domain>.     3600 IN HTTPS 1 . (
-                               alpn="h3,h2"
-                               port=443
-                               mandatory=alpn,port
-                               well-known="agent-card.json"
-                               key65301="/.well-known/agent-card.json"
-                           )
-
 ; Auxiliary Text Fallbacks
 _catalog._agents.<domain>. 3600 IN TXT   "url=https://<domain>/.well-known/ai-catalog.json"
-_index._agents.<domain>.   3600 IN TXT   "v=dnsaid1 services=_mcp,_a2a index=/.well-known/agent-skills/index.json catalog=/.well-known/ai-catalog.json"
+_index._agents.<domain>.   3600 IN TXT   "v=dnsaid1 services=_mcp index=/.well-known/agent-skills/index.json catalog=/.well-known/ai-catalog.json"
 _mcp._agents.<domain>.     3600 IN TXT   "v=dnsaid1 proto=mcp endpoint=/api/mcp card=/.well-known/mcp/server-card.json transport=streamable-http"
-_a2a._agents.<domain>.     3600 IN TXT   "v=dnsaid1 proto=a2a card=/.well-known/agent-card.json binding=JSON-RPC-2.0"
 ```
 
 ---
@@ -82,11 +71,9 @@ _a2a._agents.<domain>.     3600 IN TXT   "v=dnsaid1 proto=a2a card=/.well-known/
 ```dns
 _index._agents.<domain>.   3600 IN HTTPS 1 . alpn="h3,h2" port=443 mandatory=alpn,port well-known="agent-skills/index.json,ai-catalog.json" key65301="/.well-known/agent-skills/index.json"
 _mcp._agents.<domain>.     3600 IN HTTPS 1 . alpn="h3,h2" port=443 mandatory=alpn,port well-known="mcp/server-card.json" key65301="/api/mcp"
-_a2a._agents.<domain>.     3600 IN HTTPS 1 . alpn="h3,h2" port=443 mandatory=alpn,port well-known="agent-card.json" key65301="/.well-known/agent-card.json"
 _catalog._agents.<domain>. 3600 IN TXT   "url=https://<domain>/.well-known/ai-catalog.json"
-_index._agents.<domain>.   3600 IN TXT   "v=dnsaid1 services=_mcp,_a2a index=/.well-known/agent-skills/index.json catalog=/.well-known/ai-catalog.json"
+_index._agents.<domain>.   3600 IN TXT   "v=dnsaid1 services=_mcp index=/.well-known/agent-skills/index.json catalog=/.well-known/ai-catalog.json"
 _mcp._agents.<domain>.     3600 IN TXT   "v=dnsaid1 proto=mcp endpoint=/api/mcp card=/.well-known/mcp/server-card.json transport=streamable-http"
-_a2a._agents.<domain>.     3600 IN TXT   "v=dnsaid1 proto=a2a card=/.well-known/agent-card.json binding=JSON-RPC-2.0"
 ```
 
 ---
@@ -97,8 +84,7 @@ _a2a._agents.<domain>.     3600 IN TXT   "v=dnsaid1 proto=a2a card=/.well-known/
 Under **DNS** > **Records**, create the following records:
 1. **Type**: `HTTPS` | **Name**: `_index._agents` | **TTL**: `Auto` | **Priority**: `1` | **Target**: `.` | **Value**: `alpn="h3,h2" port=443`
 2. **Type**: `HTTPS` | **Name**: `_mcp._agents` | **TTL**: `Auto` | **Priority**: `1` | **Target**: `.` | **Value**: `alpn="h3,h2" port=443`
-3. **Type**: `HTTPS` | **Name**: `_a2a._agents` | **TTL**: `Auto` | **Priority**: `1` | **Target**: `.` | **Value**: `alpn="h3,h2" port=443`
-4. **Type**: `TXT` | **Name**: `_catalog._agents` | **Content**: `url=https://<domain>/.well-known/ai-catalog.json`
+3. **Type**: `TXT` | **Name**: `_catalog._agents` | **Content**: `url=https://<domain>/.well-known/ai-catalog.json`
 
 ### 5.2 Cloudflare API Integration
 ```bash

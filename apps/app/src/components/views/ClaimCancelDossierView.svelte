@@ -23,10 +23,10 @@
   let item = $derived(walletStore.selectedItem);
 
   let selectedTemplate = $state<LegalTemplateId>('T1');
-  let consumerName = $state('Max Mustermann');
-  let consumerAddress = $state('Musterstraße 1, 60311 Frankfurt am Main');
-  let consumerEmail = $state('max@study.srh.de');
-  let defectDescription = $state('Hardware device fails to power on; intermittent USB-C charging failure.');
+  let consumerName = $state('');
+  let consumerAddress = $state('');
+  let consumerEmail = $state('');
+  let defectDescription = $state('');
   let copied = $state(false);
   let isGeneratingPdf = $state(false);
 
@@ -108,8 +108,8 @@
       <span>Back</span>
     </button>
     <div class="header-titles">
-      <h2 class="page-title">Deterministic BGB Legal Notice Compiler</h2>
-      <p class="page-subtitle">Verbatim DIN 5008 legal notices backed by BGH VIII ZR 285/18 (LexFox) safe harbor.</p>
+      <p class="page-eyebrow">Draft · review before sending</p>
+      <h2 class="page-title">Claim or cancellation draft</h2>
     </div>
   </div>
 
@@ -123,9 +123,9 @@
       <!-- Left Column: Controls & Form -->
       <div class="controls-column">
         <div class="card-section">
-          <label for="template-select" class="section-label">Select Statutory Template (T1–T5):</label>
+          <label for="template-select" class="section-label">Choose a letter template (T1–T5)</label>
           <div id="template-select" class="template-selector">
-            {#each templates as tmpl}
+            {#each templates as tmpl (tmpl.id)}
               <button
                 type="button"
                 class="template-option"
@@ -140,7 +140,7 @@
         </div>
 
         <div class="card-section">
-          <span class="section-label">Claimant Information:</span>
+          <span class="section-label">Your details</span>
           <div class="field-row">
             <label for="claimant-name" class="mini-label">Name:</label>
             <input id="claimant-name" type="text" bind:value={consumerName} class="mini-input" />
@@ -157,7 +157,7 @@
 
         {#if selectedTemplate === 'T1' || selectedTemplate === 'T2'}
           <div class="card-section">
-            <label for="defect-desc" class="section-label">Defect Description (Mängelbeschreibung):</label>
+            <label for="defect-desc" class="section-label">Describe the issue</label>
             <textarea
               id="defect-desc"
               rows={3}
@@ -175,7 +175,7 @@
             disabled={isGeneratingPdf}
           >
             <Download size={16} />
-            <span>{isGeneratingPdf ? 'Compiling PDF...' : 'Download DIN 5008 PDF Dossier'}</span>
+            <span>{isGeneratingPdf ? 'Preparing PDF...' : 'Export PDF'}</span>
           </button>
           <button type="button" class="btn-secondary" onclick={copyText}>
             {#if copied}
@@ -183,7 +183,7 @@
               <span>Copied!</span>
             {:else}
               <Copy size={16} />
-              <span>Copy Plaintext Notice</span>
+              <span>Copy text</span>
             {/if}
           </button>
         </div>
@@ -192,6 +192,8 @@
       <!-- Right Column: Compiled Document Preview -->
       <div class="preview-column">
         <div class="document-preview-card">
+          <h3 class="preview-title">Letter preview</h3>
+          <p class="preview-note">Check the details and wording before sending.</p>
           <div class="doc-header-bar">
             <span class="doc-badge">DIN 5008 / BGB Formal Notice</span>
             <span class="doc-citation">{noticeResult?.statutoryBasis.join(', ')}</span>
@@ -245,17 +247,29 @@
     flex-direction: column;
   }
 
+  .page-eyebrow {
+    margin: 0 0 2px;
+    color: var(--color-ink-secondary, #475569);
+    font-size: 12px;
+  }
+
+  .preview-title {
+    margin: 0;
+    color: var(--color-ink-primary, #0F172A);
+    font-size: 18px;
+  }
+
+  .preview-note {
+    margin: 4px 0 12px;
+    color: var(--color-ink-secondary, #475569);
+    font-size: 13px;
+  }
+
   .page-title {
     margin: 0;
     font-size: var(--font-size-xl, 20px);
     font-weight: var(--font-weight-bold, 700);
     color: var(--color-ink-primary, #0F172A);
-  }
-
-  .page-subtitle {
-    margin: 2px 0 0;
-    font-size: var(--font-size-xs, 12px);
-    color: var(--color-ink-secondary, #475569);
   }
 
   .dossier-grid {
@@ -340,7 +354,8 @@
     flex: 1;
     border: 1px solid var(--color-border-subtle, #E2E8F0);
     border-radius: 6px;
-    padding: 6px 10px;
+    min-height: 44px;
+    padding: 8px 10px;
     font-size: 12px;
   }
 
@@ -357,7 +372,7 @@
   }
 
   .btn-primary {
-    height: 42px;
+    min-height: 48px;
     border-radius: var(--radius-md, 12px);
     background: var(--color-pine-teal, #2F524C);
     color: #FFFFFF;
@@ -372,7 +387,7 @@
   }
 
   .btn-secondary {
-    height: 38px;
+    min-height: 48px;
     border-radius: var(--radius-md, 12px);
     background: #FFFFFF;
     border: 1px solid var(--color-border-subtle, #E2E8F0);
@@ -394,6 +409,37 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  @media (max-width: 600px) {
+    .view-header {
+      align-items: flex-start;
+    }
+
+    .back-btn {
+      min-height: 48px;
+      flex: 0 0 auto;
+    }
+
+    .page-title {
+      font-size: 24px;
+    }
+
+    .field-row {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mini-label {
+      width: auto;
+    }
+
+    .doc-header-bar {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+    }
   }
 
   .doc-header-bar {

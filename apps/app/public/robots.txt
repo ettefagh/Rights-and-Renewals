@@ -86,4 +86,3 @@ Disallow: /
 # 5. Sitemaps & Agent Discovery Pointers
 # ------------------------------------------------------------------------------
 Sitemap: https://rightsandrenewals-app.pages.dev/sitemap.xml
-Agentmap: https://rightsandrenewals-app.pages.dev/.well-known/ai-catalog.json

@@ -155,7 +155,7 @@ class TestTier1CategoryB_ShowcaseWebpage(unittest.TestCase):
             "method": "initialize",
             "params": {}
         })
-        self.assertEqual(init_resp["result"]["protocolVersion"], "2024-11-05")
+        self.assertEqual(init_resp["result"]["protocolVersion"], "2025-11-25")
         self.assertIn(init_resp["result"]["serverInfo"]["name"], ["rights-and-renewals", "cmlab-warranty-mcp"])
 
         tools_resp = self.mcp_server.handle_request({
@@ -165,8 +165,7 @@ class TestTier1CategoryB_ShowcaseWebpage(unittest.TestCase):
             "params": {}
         })
         tool_names = [t["name"] for t in tools_resp["result"]["tools"]]
-        self.assertIn("policy_lookup", tool_names)
-        self.assertIn("claim_dossier_generate", tool_names)
+        self.assertEqual(tool_names, ["policy_lookup", "statutory_law_lookup", "subscription_category_rules"])
 
     def test_02_split_screen_mcp_playground_policy_lookup(self):
         """TC-SHOWCASE-02: Verify interactive playground policy_lookup execution over JSON-RPC 2.0."""
@@ -188,31 +187,20 @@ class TestTier1CategoryB_ShowcaseWebpage(unittest.TestCase):
         self.assertEqual(content.get("brand_name"), "Spotify")
         self.assertEqual(content.get("category"), "subscription")
         self.assertIn("BGB § 309 Nr. 9", content.get("statutory_basis", []))
-        self.assertTrue(content.get("cancellation_button_compliant"))
+        self.assertIsNone(content["cancellation_button_compliant"])
+        self.assertIsNone(content["statutory_warranty_months"])
+        self.assertEqual(content, resp["result"]["structuredContent"])
 
-    def test_03_split_screen_mcp_playground_claim_dossier_generate(self):
-        """TC-SHOWCASE-03: Verify playground claim_dossier_generate produces BGB citations."""
-        req = {
-            "jsonrpc": "2.0",
-            "id": "play-2",
-            "method": "tools/call",
-            "params": {
-                "name": "claim_dossier_generate",
-                "arguments": {
-                    "brand_slug": "apple",
-                    "item_name": "MacBook Pro 16",
-                    "purchase_date": "2026-01-15",
-                    "defect_description": "Flickering mini-LED backlight"
-                }
-            }
-        }
-        resp = self.mcp_server.handle_request(req)
-        self.assertEqual(resp["jsonrpc"], "2.0")
-        content = json.loads(resp["result"]["content"][0]["text"])
-        self.assertTrue(content["valid"])
-        self.assertIn("BGB § 437", content["statutory_basis"])
-        self.assertIn("MÄNGELRÜGE GEMÄSS § 437 BGB", content["dossier_text_de"])
-        self.assertIn("MacBook Pro 16", content["dossier_text_de"])
+    def test_03_retired_tools_are_unavailable(self):
+        """TC-SHOWCASE-03: Public MCP clients cannot invoke retired tools."""
+        for tool in ("claim_dossier_generate", "tax_deductibility_check"):
+            resp = self.mcp_server.handle_request({
+                "jsonrpc": "2.0",
+                "id": "retired",
+                "method": "tools/call",
+                "params": {"name": tool, "arguments": {}},
+            })
+            self.assertEqual(resp["error"]["code"], -32602)
 
     def test_04_calendar_type1_monthly_grid_data_model(self):
         """TC-SHOWCASE-04: Verify Calendar Type 1 (Monthly ISO 8601 DIN Grid) event and urgency badges."""
@@ -341,7 +329,11 @@ class TestTier1CategoryB_ShowcaseWebpage(unittest.TestCase):
         self.assertIn("agent-card-claude-desktop", content)
         self.assertIn("agent-card-cursor", content)
         self.assertIn("agent-card-windsurf", content)
-        self.assertIn("agent-card-continue", content)
+        preferred_clients = ("antigravity", "claude-code", "codex", "vscode", "cursor")
+        card_positions = [content.index(f'id="agent-card-{client}"') for client in preferred_clients]
+        tab_positions = [content.index(f'id="tab-{client}"') for client in preferred_clients]
+        self.assertEqual(card_positions, sorted(card_positions))
+        self.assertEqual(tab_positions, sorted(tab_positions))
         self.assertIn("agent-card-gemini", content)
         self.assertIn('role="tablist"', content)
         self.assertIn('role="tab"', content)

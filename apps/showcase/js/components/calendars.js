@@ -287,8 +287,8 @@ export class CalendarSuiteController {
               🛑 Kündigung vorbereiten (§ 312k)
             </button>
           ` : `
-            <button class="btn-compact btn-primary timeline-btn" data-tool="claim_dossier_generate" data-slug="${item.brandSlug}" data-name="${item.name}" data-date="${item.purchaseDate}">
-              ⚖️ Mängelrüge vorbereiten (§ 439)
+            <button class="btn-compact btn-primary timeline-btn" data-tool="local-notice" data-name="${item.name}" data-date="${item.purchaseDate}">
+              📝 Lokalen Entwurf ansehen
             </button>
           `}
         </div>
@@ -424,18 +424,10 @@ export class CalendarSuiteController {
           window.dispatchEvent(new CustomEvent('mcp:trigger-tool', {
             detail: { tool, args: { service_slug: slug } }
           }));
-        } else if (tool === 'claim_dossier_generate') {
-          window.dispatchEvent(new CustomEvent('mcp:trigger-tool', {
-            detail: {
-              tool,
-              args: {
-                brand_slug: slug,
-                item_name: tlBtn.getAttribute('data-name'),
-                purchase_date: tlBtn.getAttribute('data-date'),
-                defect_description: 'Gesetzliche Mängelanzeige vor Ablauf der Frist'
-              }
-            }
-          }));
+        } else if (tool === 'local-notice') {
+          const name = tlBtn.getAttribute('data-name');
+          const date = tlBtn.getAttribute('data-date');
+          alert(`Lokaler Entwurf für ${name}\nKaufdatum: ${date}\nRechtsgrundlage: BGB §§ 437, 439\n\nBitte ergänzen Sie die konkrete Mangelbeschreibung und prüfen Sie den Text vor dem Versand. Dieser Entwurf wird nicht versendet.`);
         }
         return;
       }

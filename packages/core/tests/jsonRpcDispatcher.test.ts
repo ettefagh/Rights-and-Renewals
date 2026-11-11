@@ -60,7 +60,7 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     }
   });
 
-  it('MCP-05: returns all 4 read-only tools on tools/list', async () => {
+  it('MCP-05: returns only the three public consumer-rights tools', async () => {
     const response = await dispatchJsonRpc({
       jsonrpc: '2.0',
       id: 'req-01',
@@ -70,16 +70,16 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     expect('result' in response).toBe(true);
     if ('result' in response) {
       const result = response.result as any;
-      expect(result.tools).toHaveLength(4);
+      expect(result.tools).toHaveLength(3);
       const names = result.tools.map((t: any) => t.name);
       expect(names).toEqual(
         expect.arrayContaining([
           'policy_lookup',
           'statutory_law_lookup',
           'subscription_category_rules',
-          'tax_deductibility_check',
         ])
       );
+      expect(names).not.toContain('tax_deductibility_check');
     }
   });
 
@@ -101,8 +101,12 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     if ('result' in spotifyRes) {
       const parsed = JSON.parse((spotifyRes.result as any).content[0].text);
       expect(parsed.brand_name).toBe('Spotify');
-      expect(parsed.cancellation_button_compliant).toBe(true);
-      expect(parsed.cancellation_notice_months).toBe(1);
+      expect(parsed.cancellation_button_compliant).toBeNull();
+      expect(parsed.cancellation_notice_months).toBeNull();
+      expect(parsed.statutory_warranty_months).toBeNull();
+      expect(parsed.sources).toContainEqual(expect.objectContaining({
+        url: 'https://support.spotify.com/de/article/cancel-premium/',
+      }));
     }
 
     // Uncataloged brand
@@ -146,7 +150,12 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
       const content = JSON.parse((response.result as any).content[0].text);
       expect(content.section).toContain('BGB § 477 Abs. 1');
       expect(content.duration_months).toBe(12);
-      expect(content.statutory_text).toContain('zwölf Monaten');
+      expect(content.statutory_text).toContain('eines Jahres');
+      expect(content.statutory_text).toContain('Absatz 2');
+      expect(content.source).toBe('https://www.gesetze-im-internet.de/bgb/__477.html');
+      expect(content.text_status).toContain('official-source');
+      expect(content.scope_note).toContain('Consumer-goods sale');
+      expect(content.source_checked_on).toBe('2026-11-10');
     }
   });
 
@@ -166,8 +175,14 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     expect('result' in postReform).toBe(true);
     if ('result' in postReform) {
       const content = JSON.parse((postReform.result as any).content[0].text);
-      expect(content.max_cancellation_notice_period_days).toBe(30);
-      expect(content.automatic_renewal_rule).toContain('max 1-month');
+      expect(content.max_cancellation_notice_period_days).toBeNull();
+      expect(content.automatic_renewal_rule).toContain('§ 309 No. 9');
+      expect(content.ordinary_termination).toContain('No individual');
+      expect(content.extraordinary_termination).toContain('No extraordinary');
+      expect(content.sources).toEqual(expect.arrayContaining([
+        expect.objectContaining({ url: 'https://www.gesetze-im-internet.de/bgb/__309.html' }),
+        expect.objectContaining({ url: 'https://www.gesetze-im-internet.de/bgb/__312k.html' }),
+      ]));
     }
 
     const preReform = await dispatchJsonRpc({
@@ -185,53 +200,7 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     expect('result' in preReform).toBe(true);
     if ('result' in preReform) {
       const content = JSON.parse((preReform.result as any).content[0].text);
-      expect(content.automatic_renewal_rule).toContain('Legacy contract');
-    }
-  });
-
-  it('MCP-09: executes tax_deductibility_check for computer hardware and smartphones', async () => {
-    const macbookRes = await dispatchJsonRpc({
-      jsonrpc: '2.0',
-      id: 'tax-1',
-      method: 'tools/call',
-      params: {
-        name: 'tax_deductibility_check',
-        arguments: {
-          asset_name: 'MacBook Pro',
-          asset_category: 'computer_hardware',
-          gross_price_eur: 2000,
-          academic_usage_percent: 50,
-          taxpayer_status: 'master_zweitstudium',
-        },
-      },
-    });
-    expect('result' in macbookRes).toBe(true);
-    if ('result' in macbookRes) {
-      const content = JSON.parse((macbookRes.result as any).content[0].text);
-      expect(content.is_deductible).toBe(true);
-      expect(content.bmf_2022_eligible).toBe(true);
-      expect(content.deductible_amount_eur).toBe(1000);
-      expect(content.loss_carryforward_eligible).toBe(true);
-    }
-
-    const phoneRes = await dispatchJsonRpc({
-      jsonrpc: '2.0',
-      id: 'tax-2',
-      method: 'tools/call',
-      params: {
-        name: 'tax_deductibility_check',
-        arguments: {
-          asset_name: 'iPhone 16 Pro',
-          asset_category: 'smartphone',
-          gross_price_eur: 1300,
-        },
-      },
-    });
-    expect('result' in phoneRes).toBe(true);
-    if ('result' in phoneRes) {
-      const content = JSON.parse((phoneRes.result as any).content[0].text);
-      expect(content.bmf_2022_eligible).toBe(false);
-      expect(content.depreciation_type).toBe('LINEAR_5_YEARS');
+      expect(content.automatic_renewal_rule).toContain('predates 01.03.2022');
     }
   });
 
@@ -306,6 +275,7 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     if ('error' in unknownTool) {
       expect(unknownTool.error.code).toBe(-32602);
       expect(unknownTool.error.message).toContain('Unknown tool');
+      expect(unknownTool.error.message).toContain('Unknown tool');
     }
 
     const noName = await dispatchJsonRpc({
@@ -317,6 +287,18 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     expect('error' in noName).toBe(true);
     if ('error' in noName) {
       expect(noName.error.code).toBe(-32602);
+    }
+  });
+
+  it('does not expose the tax helper through MCP calls', async () => {
+    const response = await dispatchJsonRpc({
+      jsonrpc: '2.0', id: 'tax-removed', method: 'tools/call',
+      params: { name: 'tax_deductibility_check', arguments: {} },
+    });
+    expect('error' in response).toBe(true);
+    if ('error' in response) {
+      expect(response.error.code).toBe(-32602);
+      expect(response.error.message).toContain('Unknown tool');
     }
   });
 
@@ -353,6 +335,8 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
 
   it('covers all subscription categories', async () => {
     const categories = [
+      'generic',
+      'gym_fitness',
       'streaming_media',
       'saas_software',
       'telecom_mobile_internet',
@@ -376,107 +360,24 @@ describe('jsonRpcDispatcher - Open MCP Protocol & Strict Schemas', () => {
     }
   });
 
-  it('covers all asset categories and usage tiers in tax deductibility check', async () => {
-    // 1. Peripherals
-    const periph = await dispatchJsonRpc({
-      jsonrpc: '2.0',
-      id: 'tax-periph',
-      method: 'tools/call',
-      params: {
-        name: 'tax_deductibility_check',
-        arguments: {
-          asset_name: 'LG Monitor',
-          asset_category: 'peripherals',
-          gross_price_eur: 300,
-          academic_usage_percent: 95, // Tier 1: >=90%
-        },
-      },
+  it('rejects impossible contract dates and leaves generic category unclassified', async () => {
+    const impossible = await dispatchJsonRpc({
+      jsonrpc: '2.0', id: 'bad-date', method: 'tools/call',
+      params: { name: 'subscription_category_rules', arguments: { contract_category: 'generic', contract_start_date: '2022-02-30' } },
     });
-    expect('result' in periph).toBe(true);
-    if ('result' in periph) {
-      const content = JSON.parse((periph.result as any).content[0].text);
-      expect(content.deductible_amount_eur).toBe(300); // 100%
-      expect(content.bmf_2022_eligible).toBe(true);
-    }
+    expect('error' in impossible).toBe(true);
 
-    // 2. Software SaaS
-    const saas = await dispatchJsonRpc({
-      jsonrpc: '2.0',
-      id: 'tax-saas',
-      method: 'tools/call',
-      params: {
-        name: 'tax_deductibility_check',
-        arguments: {
-          asset_name: 'GitHub Copilot',
-          asset_category: 'software_saas',
-          gross_price_eur: 100,
-        },
-      },
+    const generic = await dispatchJsonRpc({
+      jsonrpc: '2.0', id: 'generic', method: 'tools/call',
+      params: { name: 'subscription_category_rules', arguments: { contract_category: 'generic' } },
     });
-    expect('result' in saas).toBe(true);
-
-    // 3. Academic literature
-    const lit = await dispatchJsonRpc({
-      jsonrpc: '2.0',
-      id: 'tax-lit',
-      method: 'tools/call',
-      params: {
-        name: 'tax_deductibility_check',
-        arguments: {
-          asset_name: 'BGB Kommentar',
-          asset_category: 'academic_literature',
-          gross_price_eur: 80,
-          taxpayer_status: 'bachelor_erststudium',
-          academic_usage_percent: 5, // Tier 3: <10%
-        },
-      },
-    });
-    expect('result' in lit).toBe(true);
-    if ('result' in lit) {
-      const content = JSON.parse((lit.result as any).content[0].text);
-      expect(content.deductible_amount_eur).toBe(0);
-      expect(content.depreciation_type).toBe('SOFORTABSCHREIBUNG_SOFORTAUFWAND');
-      expect(content.form_target).toContain('Anlage Sonderausgaben');
-    }
-
-    // 4. Office furniture <= 952
-    const deskCheap = await dispatchJsonRpc({
-      jsonrpc: '2.0',
-      id: 'tax-desk-1',
-      method: 'tools/call',
-      params: {
-        name: 'tax_deductibility_check',
-        arguments: {
-          asset_name: 'Desk',
-          asset_category: 'office_furniture',
-          gross_price_eur: 400,
-        },
-      },
-    });
-    expect('result' in deskCheap).toBe(true);
-    if ('result' in deskCheap) {
-      const content = JSON.parse((deskCheap.result as any).content[0].text);
-      expect(content.depreciation_type).toBe('GWG_SOFORTABSCHREIBUNG');
-    }
-
-    // 5. Office furniture > 952
-    const deskExp = await dispatchJsonRpc({
-      jsonrpc: '2.0',
-      id: 'tax-desk-2',
-      method: 'tools/call',
-      params: {
-        name: 'tax_deductibility_check',
-        arguments: {
-          asset_name: 'Executive Chair',
-          asset_category: 'office_furniture',
-          gross_price_eur: 1500,
-        },
-      },
-    });
-    expect('result' in deskExp).toBe(true);
-    if ('result' in deskExp) {
-      const content = JSON.parse((deskExp.result as any).content[0].text);
-      expect(content.depreciation_type).toBe('LINEAR_13_YEARS');
+    expect('result' in generic).toBe(true);
+    if ('result' in generic) {
+      const content = JSON.parse((generic.result as any).content[0].text);
+      expect(content.category).toBe('generic');
+      expect(content.max_initial_term_months).toBeNull();
+      expect(content.scope_note).toContain('standard term');
     }
   });
+
 });

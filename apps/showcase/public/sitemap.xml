@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://rightsandrenewals.pages.dev/</loc>
+    <loc>{{ORIGIN}}/</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://rightsandrenewals.pages.dev/auth.md</loc>
+    <loc>{{ORIGIN}}/wiki</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>{{ORIGIN}}/auth.md</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://rightsandrenewals.pages.dev/.well-known/api-catalog</loc>
+    <loc>{{ORIGIN}}/.well-known/api-catalog</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rightsandrenewals.pages.dev/.well-known/oauth-protected-resource</loc>
-    <lastmod>2026-11-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json</loc>
+    <loc>{{ORIGIN}}/.well-known/mcp/server-card.json</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://rightsandrenewals.pages.dev/.well-known/agent-skills/index.json</loc>
+    <loc>{{ORIGIN}}/.well-known/agent-skills/index.json</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rightsandrenewals.pages.dev/.well-known/ai-catalog.json</loc>
+    <loc>{{ORIGIN}}/.well-known/ai-catalog.json</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

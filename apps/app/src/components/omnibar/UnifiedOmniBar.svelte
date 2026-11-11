@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { walletStore } from '../../state/wallet.svelte';
+  import { getShowcaseUrl } from '../../lib/showcase-url';
   import { PrefixTrie, type PolicyWikiEntry, type WalletItem } from '@cmlab/core';
   import {
     Search,
@@ -21,6 +22,8 @@
   // PrefixTrie instance populated from seed/wiki
   let trie = new PrefixTrie();
   let wikiEntries = $state<PolicyWikiEntry[]>([]);
+  const showcaseAdminUrl = getShowcaseUrl('/_emdash/admin');
+  const showcaseWikiUrl = getShowcaseUrl('/wiki');
 
   onMount(async () => {
     try {
@@ -146,12 +149,12 @@
       case 'emdash':
       case 'cms':
         if (typeof window !== 'undefined') {
-          window.open('https://rightsandrenewals.pages.dev/emdash', '_blank', 'noopener,noreferrer');
+          if (showcaseAdminUrl) window.open(showcaseAdminUrl, '_blank', 'noopener,noreferrer');
         }
         break;
       case 'wiki':
         if (typeof window !== 'undefined') {
-          window.open('https://rightsandrenewals.pages.dev/wiki', '_blank', 'noopener,noreferrer');
+          if (showcaseWikiUrl) window.open(showcaseWikiUrl, '_blank', 'noopener,noreferrer');
         }
         break;
       case 'import':
@@ -203,7 +206,8 @@
           bind:this={inputElement}
           type="text"
           class="omnibar-input"
-          placeholder="Search items, brands, policies or type >command (e.g. >tax, >claim)..."
+          aria-label="Search items and policies"
+          placeholder="Search items and policies"
           bind:value={query}
           onfocus={() => (isFocused = true)}
           onblur={() => (isFocused = false)}
@@ -243,8 +247,8 @@
           </div>
           <div class="command-hints">
             <span>Available verbs:</span>
-            <code>>emdash</code>
-            <code>>wiki</code>
+            {#if showcaseAdminUrl}<code>>emdash</code>{/if}
+            {#if showcaseWikiUrl}<code>>wiki</code>{/if}
             <code>>tax</code>
             <code>>claim</code>
             <code>>cancel</code>
@@ -265,16 +269,18 @@
                 <Camera size={14} />
                 <span>Snap New Receipt (&lt;15s)</span>
               </button>
-              <button
-                type="button"
-                class="chip-btn"
-                onclick={() => {
-                  executeCommand('emdash');
-                }}
-              >
-                <Zap size={14} />
-                <span>⚡ EmDash Desk</span>
-              </button>
+              {#if showcaseAdminUrl}
+                <button
+                  type="button"
+                  class="chip-btn"
+                  onclick={() => {
+                    executeCommand('emdash');
+                  }}
+                >
+                  <Zap size={14} />
+                  <span>⚡ EmDash Desk</span>
+                </button>
+              {/if}
               <button
                 type="button"
                 class="chip-btn"
@@ -433,6 +439,7 @@
 
   .omnibar-input {
     flex: 1;
+    min-width: 0;
     border: none;
     outline: none;
     font-size: var(--font-size-base, 16px);

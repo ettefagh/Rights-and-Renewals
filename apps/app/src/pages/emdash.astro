@@ -1,5 +1,9 @@
 ---
+import { getShowcaseUrl } from '../lib/showcase-url';
+
 export const prerender = true;
+
+const adminUrl = getShowcaseUrl('/_emdash/admin');
 ---
 <!DOCTYPE html>
 <html lang="de">
@@ -7,11 +11,8 @@ export const prerender = true;
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EmDash Policy Desk · Rights &amp; Renewals</title>
-  <meta http-equiv="refresh" content="0; url=https://rightsandrenewals.pages.dev/emdash" />
+  {adminUrl && <meta http-equiv="refresh" content={`0; url=${adminUrl}`} />}
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script is:inline>
-    window.location.replace("https://rightsandrenewals.pages.dev/emdash");
-  </script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -77,13 +78,11 @@ export const prerender = true;
 <body>
   <div class="redirect-card">
     <img src="/favicon.svg" alt="Rights & Renewals" class="logo" />
-    <h1 class="title">Opening EmDash Policy Desk...</h1>
-    <p class="desc">
-      Connecting to the live Cloudflare Edge EmDash editorial and telemetry desk.
-    </p>
-    <a href="https://rightsandrenewals.pages.dev/emdash" class="btn">
-      <span>Open EmDash Desk Directly ↗</span>
-    </a>
+    {adminUrl && <h1 class="title">Opening EmDash Policy Desk...</h1>}
+    {adminUrl && <p class="desc">Connecting to the EmDash editorial dashboard.</p>}
+    {adminUrl && <a href={adminUrl} class="btn"><span>Open EmDash Desk Directly ↗</span></a>}
+    {!adminUrl && <h1 class="title">EmDash Desk Unavailable</h1>}
+    {!adminUrl && <p class="desc">The editorial dashboard link is not configured for this wallet.</p>}
   </div>
 </body>
 </html>
