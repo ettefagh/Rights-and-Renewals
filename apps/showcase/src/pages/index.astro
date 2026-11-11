@@ -3,11 +3,17 @@ import '../../styles/tokens.css';
 import '../../styles/main.css';
 import '../../styles/homepage.css';
 import AudienceSwitch from '../components/AudienceSwitch.astro';
+import EditorialSections from '../components/editorial/EditorialSections.astro';
 import { ArrowUpRight, CalendarDays, ChevronRight, Menu, ReceiptText, RefreshCw, ShieldCheck } from 'lucide-svelte';
+import { getWebsitePageForRender } from '../lib/website-cms.js';
+import TelemetryConsent from '../components/TelemetryConsent.astro';
+import { telemetryRevision as hashTelemetryRevision } from '../lib/telemetry-registry';
 
 export const prerender = false;
 
 const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
+const cmsPage = await getWebsitePageForRender('home');
+const pageTelemetryRevision = cmsPage ? await hashTelemetryRevision({ title: cmsPage.title, description: cmsPage.description ?? '', sections: cmsPage.sections }) : undefined;
 
 ---
 
@@ -16,8 +22,8 @@ const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Rights &amp; Renewals · Receipts, subscriptions and consumer policies</title>
-  <meta name="description" content="Save receipts on your device, track warranty and renewal dates, and look up consumer policies for purchases and subscriptions in Germany." />
+  <title>{cmsPage?.title ?? 'Rights & Renewals · Receipts, subscriptions and consumer policies'}</title>
+  <meta name="description" content={cmsPage?.description ?? 'Save receipts on your device, track warranty and renewal dates, and look up consumer policies for purchases and subscriptions in Germany.'} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -93,7 +99,7 @@ const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
   <!-- ========================================================================
        MAIN SHOWCASE CONTENT
        ======================================================================== -->
-  <main id="showcase-main">
+  <main id="showcase-main" data-telemetry-page={cmsPage ? 'page:home' : undefined} data-telemetry-revision={pageTelemetryRevision}>
     <AudienceSwitch humanHref="/" machineHref="/machine/view/home" />
 
     <section id="hero" class="home-hero" aria-labelledby="home-title">
@@ -294,6 +300,7 @@ const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
       </div>
     </section>
 
+    {cmsPage?.sections.length ? <EditorialSections sections={cmsPage.sections} preview={cmsPage.isPreview} /> : null}
   </main>
 
   <footer class="home-footer">
@@ -350,6 +357,8 @@ const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
       </div>
     </div>
   </dialog>
+
+  <TelemetryConsent />
 
   <!-- Initialize Client Controllers -->
   <script>

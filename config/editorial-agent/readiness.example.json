@@ -1,0 +1,13 @@
+{
+  "contractVersion": "1.0.0",
+  "pluginId": "cmlab-editorial-proposals",
+  "requiredRole": "Contributor",
+  "requiredTokenScope": "mcp:tools:cmlab-editorial-proposals",
+  "tools": ["propose_draft"],
+  "capabilities": ["hooks.content-policy:register"],
+  "forbiddenTokenScopes": ["content:write", "content:publish", "schema:write", "plugins:manage"],
+  "draftCollection": "editorial_proposals",
+  "connectionVerified": false,
+  "credentialIssued": false,
+  "accessRouting": "DEFERRED: current email Access policy covers /_emdash/*; native MCP OAuth interoperability is unverified"
+}

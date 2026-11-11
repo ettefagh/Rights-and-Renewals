@@ -1,0 +1,37 @@
+---
+import '../../styles/tokens.css';
+import '../../styles/main.css';
+import EditorialSections from '../components/editorial/EditorialSections.astro';
+import { PortableText } from 'emdash/ui';
+import { getSeoMeta } from 'emdash/seo';
+import { getWebsitePageForRender } from '../lib/website-cms.js';
+
+export const prerender = false;
+const slug = Astro.params.slug ?? '';
+const page = await getWebsitePageForRender(slug);
+if (!page) return Astro.rewrite('/404');
+const seo = getSeoMeta({ data: { title: page.title, excerpt: page.description, seo: page.seo } }, {
+  siteTitle: 'Rights & Renewals', siteUrl: Astro.url.origin, path: `/${slug}`,
+  defaultDescription: page.description,
+});
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{seo.title}</title>
+    {seo.description && <meta name="description" content={seo.description} />}
+    {seo.canonical && <link rel="canonical" href={seo.canonical} />}
+    {seo.robots && <meta name="robots" content={seo.robots} />}
+    <meta property="og:title" content={seo.ogTitle} />
+    {seo.ogDescription && <meta property="og:description" content={seo.ogDescription} />}
+    {seo.ogImage && <meta property="og:image" content={seo.ogImage} />}
+  </head>
+  <body class="showcase-shell">
+    <main id="main-content">
+      <EditorialSections title={page.title} sections={page.sections} preview={page.isPreview} />
+      {Array.isArray(page.legacyContent) && page.legacyContent.length > 0 && <div class="legacy-portable-content"><PortableText value={page.legacyContent} /></div>}
+    </main>
+  </body>
+</html>

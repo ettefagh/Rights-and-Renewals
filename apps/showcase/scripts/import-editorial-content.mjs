@@ -1,0 +1,25 @@
+import { readFile } from 'node:fs/promises';
+import { EmDashClient } from 'emdash/client';
+import { customHeadersInterceptor, parseHeadersFromEnv } from 'emdash/client/cf-access';
+import { editorialCollections, editorialRelations } from './editorial-catalog.mjs';
+import { learningCollections, learningRelations } from './learning-catalog.mjs';
+import { websiteCollections, websiteRelations, websiteBlockTypes } from './website-catalog.mjs';
+import { createSchemaHttpAdapter, runEditorialImport } from './editorial-importer.mjs';
+
+const targetValue = process.env.EMDASH_URL;
+if (!targetValue) throw new Error('Set EMDASH_URL to an EmDash site origin.');
+const target = new URL(targetValue);
+const local = ['localhost', '127.0.0.1', '[::1]'].includes(target.hostname);
+if (target.protocol !== 'https:' && !(local && target.protocol === 'http:')) throw new Error('Remote EmDash URLs require HTTPS.');
+if (target.username || target.password || target.pathname !== '/' || target.search || target.hash) throw new Error('EMDASH_URL must contain only the site origin.');
+const token = process.env.EMDASH_TOKEN;
+if (!local && !token) throw new Error('Set EMDASH_TOKEN before connecting to a remote site.');
+const apply = process.argv.includes('--apply');
+if (apply && !token) throw new Error('Set EMDASH_TOKEN before applying schema changes; the importer requires an authenticated operator token.');
+const operatorHeaders = parseHeadersFromEnv();
+const client = new EmDashClient({ baseUrl: target.origin, ...(token ? { token } : {}), devBypass: local && !token, interceptors: [customHeadersInterceptor(operatorHeaders)] });
+if (token) Object.assign(client, createSchemaHttpAdapter({ origin: target.origin, token, headers: operatorHeaders }));
+const seed = JSON.parse(await readFile(new URL('../seed/seed.json', import.meta.url), 'utf8'));
+const excluded = new Set(['pages', 'posts', 'brand_policies']);
+const entries = Object.entries(seed.content).flatMap(([collection, items]) => excluded.has(collection) ? [] : items.map((item) => ({ collection, ...item })));
+await runEditorialImport({ client, collections: [...editorialCollections, ...learningCollections, ...websiteCollections], relations: [...editorialRelations, ...learningRelations, ...websiteRelations], blockTypes: websiteBlockTypes, entries, apply, log: (message) => process.stdout.write(message) });

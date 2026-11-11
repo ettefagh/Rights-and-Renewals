@@ -1,6 +1,19 @@
 import { getPublishedPolicies, getPublishedPolicy } from '../lib/policy-cms';
 
 import { SHOWCASE_MARKDOWN } from './showcase-markdown';
+import { getPublishedWebsitePages } from '../lib/website-cms';
+
+const pageMarkdown = (page: { title: string; description?: string; sections: { _type: string; heading?: unknown; body?: unknown; cta_label?: unknown; cta_url?: unknown; items?: unknown; questions?: unknown }[] }) => {
+  const lines = [`# ${page.title}`, '', ...(page.description ? [page.description, ''] : [])];
+  for (const section of page.sections) {
+    if (typeof section.heading === 'string') lines.push(`## ${section.heading}`, '');
+    if (typeof section.body === 'string') lines.push(section.body, '');
+    if (Array.isArray(section.items)) for (const item of section.items) if (item && typeof item === 'object' && 'title' in item && 'body' in item) lines.push(`- **${String(item.title)}**: ${String(item.body)}`);
+    if (Array.isArray(section.questions)) for (const item of section.questions) if (item && typeof item === 'object' && 'question' in item && 'answer' in item) lines.push(`### ${String(item.question)}`, '', String(item.answer), '');
+    if (typeof section.cta_label === 'string' && typeof section.cta_url === 'string') lines.push(`[${section.cta_label}](${section.cta_url})`, '');
+  }
+  return lines.join('\n').trim() + '\n';
+};
 
 const agentSetup = `# Rights & Renewals MCP
 
@@ -24,11 +37,19 @@ Initialize the connection before listing tools. Then call policy_lookup with ser
 
 export async function getMachineDocument(document: string | undefined) {
   if (document === 'home') {
-    return { title: 'Rights & Renewals', humanHref: '/', rawHref: '/?format=markdown', markdown: SHOWCASE_MARKDOWN };
+    const home = (await getPublishedWebsitePages()).find((page) => page.id === 'home');
+    return { title: 'Rights & Renewals', humanHref: '/', rawHref: '/?format=markdown', markdown: SHOWCASE_MARKDOWN + (home ? `\n\n${pageMarkdown(home)}` : '') };
+  }
+
+  const pageSlug = document?.match(/^pages\/([a-z0-9-]+)\.md$/)?.[1];
+  if (pageSlug) {
+    const page = (await getPublishedWebsitePages()).find((item) => item.id === pageSlug);
+    if (page) return { title: page.title, humanHref: `/${pageSlug}`, rawHref: `/machine/pages/${pageSlug}.md`, markdown: pageMarkdown(page) };
   }
 
   if (document === 'agent-setup.md') {
-    return { title: 'Agent setup', humanHref: '/agent-setup', rawHref: '/machine/agent-setup.md', markdown: agentSetup };
+    const page = (await getPublishedWebsitePages()).find((item) => item.id === 'agent-setup');
+    return { title: 'Agent setup', humanHref: '/agent-setup', rawHref: '/machine/agent-setup.md', markdown: agentSetup + (page ? `\n\n${pageMarkdown(page)}` : '') };
   }
 
   if (document === 'wiki.md') {

@@ -1,0 +1,11 @@
+{
+  "queryScript": "apps/showcase/scripts/query-editorial-analytics.mjs",
+  "allowedReports": ["events-by-name", "events-by-day", "cta-clicks", "registrations"],
+  "registrationReport": "not_configured until an authoritative account-creation ledger adapter is connected",
+  "notes": [
+    "Counts use SUM(_sample_interval) and remain approximate.",
+    "No report treats events as unique visitors.",
+    "Never pass SQL or arbitrary table names to the query script.",
+    "Analytics Engine data retention is three months."
+  ]
+}

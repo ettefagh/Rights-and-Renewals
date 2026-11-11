@@ -1,13 +1,20 @@
 ---
 import '../../styles/tokens.css';
 import '../../styles/main.css';
+import '../../styles/public-pages.css';
 import AudienceSwitch from '../components/AudienceSwitch.astro';
+import EditorialSections from '../components/editorial/EditorialSections.astro';
+import { Menu } from 'lucide-svelte';
+import { getWebsitePageForRender } from '../lib/website-cms.js';
+import TelemetryConsent from '../components/TelemetryConsent.astro';
+import { telemetryRevision as hashTelemetryRevision } from '../lib/telemetry-registry';
 
 export const prerender = false;
 
+const cmsPage = await getWebsitePageForRender('agent-setup');
+const pageTelemetryRevision = cmsPage ? await hashTelemetryRevision({ title: cmsPage.title, description: cmsPage.description ?? '', sections: cmsPage.sections }) : undefined;
 const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
-
-const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its setup steps and ask me before changing configuration or running commands. After setup, verify the live MCP connection and call a read-only tool before reporting success.`;
+const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its setup steps and ask me before changing configuration or running commands. After setup, verify the public MCP connection with a read-only tool before reporting success.`;
 ---
 
 <!DOCTYPE html>
@@ -15,8 +22,8 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Rights &amp; Renewals · Agent Setup</title>
-  <meta name="description" content="Connect Antigravity, Claude Code, Codex, VS Code Copilot, Cursor, and Gemini CLI to the Rights & Renewals MCP server with setup instructions and connection checks." />
+  <title>{cmsPage?.title ?? 'Agent Setup'} · Rights &amp; Renewals</title>
+  <meta name="description" content={cmsPage?.description ?? 'Connect an agent to the public read-only Rights & Renewals MCP endpoint.'} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -351,7 +358,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
     }
   </style>
 </head>
-<body class="showcase-shell">
+<body class="showcase-shell agent-setup-page">
 
   <!-- ========================================================================
        STICKY UTILITY HEADER
@@ -364,27 +371,37 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
       </a>
 
       <nav class="nav-links" aria-label="Main Navigation">
-        <a href="/" class="nav-item">Überblick</a>
+        <a href="/#wallet-demo" class="nav-item">Wallet demo</a>
+        <a href="/wiki" class="nav-item">Policy Wiki</a>
         <a href="/#mcp-playground" class="nav-item">MCP Playground</a>
-        <a href="/#omnibar-section" class="nav-item">Omnibar</a>
-        <a href="/wiki" class="nav-item">Brand Policy Wiki</a>
-        <a href="/emdash" class="nav-item">EmDash CMS</a>
-        <a href="/agent-setup" class="nav-item active" aria-current="page">Agent Setup</a>
+        <a href="/agent-setup" class="nav-item active" aria-current="page">Agent setup</a>
       </nav>
 
       <div class="nav-actions">
         <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Theme umschalten" title="Theme umschalten">
           <span class="theme-icon" aria-hidden="true">🌙</span>
         </button>
-        <a href="https://rightsandrenewals-app.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
-          📱 Zur App ↗
+        <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
+          Open wallet ↗
         </a>
       </div>
+      <details class="mobile-nav">
+        <summary aria-label="Open navigation menu"><Menu size={24} aria-hidden="true" /><span class="sr-only">Menu</span></summary>
+        <nav class="mobile-nav-panel" aria-label="Mobile navigation">
+          <a href="/#wallet-demo">Wallet demo</a>
+          <a href="/wiki">Policy Wiki</a>
+          <a href="/#mcp-playground">MCP Playground</a>
+          <a href="/agent-setup" aria-current="page">Agent setup</a>
+          <a href="/emdash">EmDash CMS</a>
+          <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" target="_blank" rel="noopener noreferrer">Open wallet</a>
+        </nav>
+      </details>
     </div>
   </header>
 
-  <main id="agent-setup-main">
+  <main id="agent-setup-main" data-telemetry-page={cmsPage ? 'page:agent-setup' : undefined} data-telemetry-revision={pageTelemetryRevision}>
     <AudienceSwitch humanHref="/agent-setup" machineHref="/machine/view/agent-setup" />
+    {cmsPage?.sections.length ? <EditorialSections sections={cmsPage.sections} preview={cmsPage.isPreview} /> : null}
     <!-- HERO SECTION -->
     <section class="agent-setup-hero">
       <div class="layout-container">
@@ -393,7 +410,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
         </div>
         <h1 class="agent-setup-title">Agent Setup</h1>
         <p class="agent-setup-description">
-          Connect your AI coding agent to <strong>Rights &amp; Renewals</strong>. Query German consumer statutory law (BGB §§ 437, 477, 312k), warranty burden-of-proof cliffs, and tax deductibility proofs in real-time.
+          Connect your agent to the public <strong>Rights &amp; Renewals</strong> MCP endpoint for read-only brand policy, statute, and subscription-rule lookups. Use the wallet for private receipts and purchase records.
         </p>
 
         <div class="hero-actions">
@@ -475,7 +492,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
                 <div class="agent-title">Cursor IDE</div>
               </div>
             </div>
-            <p class="agent-summary">AI-first code editor with native remote Streamable HTTP MCP server connections via .cursor/mcp.json.</p>
+            <p class="agent-summary">AI-first code editor with native remote HTTP/SSE MCP server connections via .cursor/mcp.json.</p>
             <div class="capability-pills">
               <span class="cap-pill">IDE</span>
               <span class="cap-pill">Terminal</span>
@@ -557,7 +574,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
 
         <div role="tabpanel" class="tabpanel" id="panel-antigravity" aria-labelledby="tab-antigravity">
           <h2>Antigravity Configuration</h2><p class="text-secondary">Add a remote Streamable HTTP server from MCP Servers or edit <code>.agents/mcp_config.json</code> (global: <code>~/.gemini/config/mcp_config.json</code>).</p>
-          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add server configuration</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard={`{\n  "mcpServers": {\n    "rights-and-renewals": {\n      "serverUrl": "${mcpEndpoint}"\n    }\n  }\n}`} aria-label="Copy Antigravity MCP config">Copy</button><pre><code>{`{\n  "mcpServers": {\n    "rights-and-renewals": {\n      "serverUrl": "${mcpEndpoint}"\n    }\n  }\n}`}</code></pre></div></div>
+          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add server configuration</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard={`{\n  "mcpServers": {\n    "rights-and-renewals": {\n      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"\n    }\n  }\n}`} aria-label="Copy Antigravity MCP config">Copy</button><pre><code>{`{\n  "mcpServers": {\n    "rights-and-renewals": {\n      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"\n    }\n  }\n}`}</code></pre></div></div>
           <div class="step-item"><div class="step-label"><span class="step-num">2</span> Verify live connection</div><p class="text-secondary text-sm">Open the agent panel's <strong>⋯ &gt; MCP Servers</strong>, confirm the server is connected and tools are listed, then request a read-only policy lookup and inspect the result.</p></div>
         </div>
 
@@ -569,8 +586,8 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
           <div class="step-item">
             <div class="step-label"><span class="step-num">1</span> 1-Click Terminal Command</div>
             <div class="code-box">
-              <button type="button" class="btn-copy-code" data-clipboard={`claude mcp add --transport http rights-and-renewals ${mcpEndpoint}`} aria-label="Copy Claude Code CLI command">Copy</button>
-              <pre><code>{`claude mcp add --transport http rights-and-renewals ${mcpEndpoint}`}</code></pre>
+              <button type="button" class="btn-copy-code" data-clipboard="claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Claude Code CLI command">Copy</button>
+              <pre><code>claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp</code></pre>
             </div>
           </div>
 
@@ -582,13 +599,13 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
 
         <div role="tabpanel" class="tabpanel" id="panel-codex" aria-labelledby="tab-codex" hidden>
           <h2>Codex Configuration</h2><p class="text-secondary">Codex CLI and IDE share MCP configuration. This public endpoint connects without OAuth sign-in.</p>
-          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add the server</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard={`codex mcp add rights-and-renewals --url ${mcpEndpoint}`} aria-label="Copy Codex command">Copy</button><pre><code>{`codex mcp add rights-and-renewals --url ${mcpEndpoint}`}</code></pre></div></div>
+          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add the server</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard="codex mcp add rights-and-renewals --url https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Codex command">Copy</button><pre><code>codex mcp add rights-and-renewals --url https://rightsandrenewals.pages.dev/api/mcp</code></pre></div></div>
           <div class="step-item"><div class="step-label"><span class="step-num">2</span> Verify configuration</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard="codex mcp list" aria-label="Copy Codex verification command">Copy</button><pre><code>codex mcp list</code></pre></div><p class="text-secondary text-sm">In a Codex session, confirm tools are available and invoke a read-only policy lookup. Inspect the tool result before reporting that setup works.</p></div>
         </div>
 
         <div role="tabpanel" class="tabpanel" id="panel-vscode" aria-labelledby="tab-vscode" hidden>
           <h2>VS Code with GitHub Copilot</h2><p class="text-secondary">Create <code>.vscode/mcp.json</code>. This uses VS Code's <code>servers</code> configuration format.</p>
-          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add the HTTP server</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard={`{\n  "servers": {\n    "rights-and-renewals": {\n      "type": "http",\n      "url": "${mcpEndpoint}"\n    }\n  }\n}`} aria-label="Copy VS Code MCP config">Copy</button><pre><code>{`{\n  "servers": {\n    "rights-and-renewals": {\n      "type": "http",\n      "url": "${mcpEndpoint}"\n    }\n  }\n}`}</code></pre></div></div>
+          <div class="step-item"><div class="step-label"><span class="step-num">1</span> Add the HTTP server</div><div class="code-box"><button type="button" class="btn-copy-code" data-clipboard={`{\n  "servers": {\n    "rights-and-renewals": {\n      "type": "http",\n      "url": "https://rightsandrenewals.pages.dev/api/mcp"\n    }\n  }\n}`} aria-label="Copy VS Code MCP config">Copy</button><pre><code>{`{\n  "servers": {\n    "rights-and-renewals": {\n      "type": "http",\n      "url": "https://rightsandrenewals.pages.dev/api/mcp"\n    }\n  }\n}`}</code></pre></div></div>
           <div class="step-item"><div class="step-label"><span class="step-num">2</span> Verify connection and tool call</div><p class="text-secondary text-sm">Open Copilot Chat in <strong>Agent</strong> mode, run <strong>MCP: List Servers</strong> from the Command Palette and confirm it is enabled. Invoke a read-only policy lookup and inspect its result.</p></div>
         </div>
 
@@ -596,8 +613,8 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
           <h2>Claude Desktop Configuration</h2>
           <p class="text-secondary">Open Customize → Connectors and add a custom connector named Rights &amp; Renewals. This public MCP endpoint does not require OAuth sign-in; if prompted, configure it without OAuth. EmDash sign-in applies only to the separate CMS.</p>
           <div class="code-box">
-            <button type="button" class="btn-copy-code" data-clipboard={`${mcpEndpoint}`} aria-label="Copy Claude Desktop endpoint">Copy</button>
-            <pre><code>{`${mcpEndpoint}`}</code></pre>
+            <button type="button" class="btn-copy-code" data-clipboard="https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Claude Desktop endpoint">Copy</button>
+            <pre><code>https://rightsandrenewals.pages.dev/api/mcp</code></pre>
           </div>
           <p class="text-secondary text-sm">Enable the connector in a conversation and ask for a Spotify policy lookup. <a href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp">Claude connector documentation</a></p>
         </div>
@@ -612,14 +629,14 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
               <button type="button" class="btn-copy-code" data-clipboard={`{
   "mcpServers": {
     "rights-and-renewals": {
-      "url": "${mcpEndpoint}"
+      "url": "https://rightsandrenewals.pages.dev/api/mcp"
     }
   }
 }`} aria-label="Copy Cursor MCP JSON config">Copy</button>
               <pre><code>{`{
   "mcpServers": {
     "rights-and-renewals": {
-      "url": "${mcpEndpoint}"
+      "url": "https://rightsandrenewals.pages.dev/api/mcp"
     }
   }
 }`}</code></pre>
@@ -628,7 +645,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
 
           <div class="step-item">
             <div class="step-label"><span class="step-num">2</span> Or Cursor Settings UI</div>
-            <p class="text-secondary text-sm">Open <strong>Cursor Settings &gt; Features &gt; MCP &gt; Add New MCP Server</strong> and add the HTTP server named <code>rights-and-renewals</code> with URL: <code>{`${mcpEndpoint}`}</code>.</p>
+            <p class="text-secondary text-sm">Open <strong>Cursor Settings &gt; Features &gt; MCP &gt; Add New MCP Server</strong> and add the HTTP server named <code>rights-and-renewals</code> with URL: <code>https://rightsandrenewals.pages.dev/api/mcp</code>.</p>
           </div>
         </div>
 
@@ -651,14 +668,14 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
               <button type="button" class="btn-copy-code" data-clipboard={`{
   "mcpServers": {
     "rights-and-renewals": {
-      "serverUrl": "${mcpEndpoint}"
+      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
     }
   }
 }`} aria-label="Copy Windsurf MCP JSON config">Copy</button>
               <pre><code>{`{
   "mcpServers": {
     "rights-and-renewals": {
-      "serverUrl": "${mcpEndpoint}"
+      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
     }
   }
 }`}</code></pre>
@@ -679,8 +696,8 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
           <div class="step-item">
             <div class="step-label"><span class="step-num">1</span> 1-Click Terminal Command</div>
             <div class="code-box">
-              <button type="button" class="btn-copy-code" data-clipboard={`gemini mcp add --transport http rights-and-renewals ${mcpEndpoint}`} aria-label="Copy Gemini CLI command">Copy</button>
-              <pre><code>{`gemini mcp add --transport http rights-and-renewals ${mcpEndpoint}`}</code></pre>
+              <button type="button" class="btn-copy-code" data-clipboard="gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Gemini CLI command">Copy</button>
+              <pre><code>gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp</code></pre>
             </div>
           </div>
 
@@ -690,14 +707,14 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
               <button type="button" class="btn-copy-code" data-clipboard={`{
   "mcpServers": {
     "rights-and-renewals": {
-      "httpUrl": "${mcpEndpoint}"
+      "httpUrl": "https://rightsandrenewals.pages.dev/api/mcp"
     }
   }
 }`} aria-label="Copy Gemini settings.json snippet">Copy</button>
               <pre><code>{`{
   "mcpServers": {
     "rights-and-renewals": {
-      "httpUrl": "${mcpEndpoint}"
+      "httpUrl": "https://rightsandrenewals.pages.dev/api/mcp"
     }
   }
 }`}</code></pre>
@@ -866,5 +883,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
   <script>
     import '../components/webmcp.ts';
   </script>
+
+  <TelemetryConsent />
 </body>
 </html>

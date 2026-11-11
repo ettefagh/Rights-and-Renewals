@@ -1,0 +1,23 @@
+---
+interface Props {
+  context?: 'public' | 'editor' | 'preview';
+}
+const { context = 'public' } = Astro.props;
+---
+
+{context === 'public' && (
+  <>
+  <section aria-labelledby="telemetry-consent-title" data-telemetry-preferences>
+    <h2 id="telemetry-consent-title">Optional site measurement</h2>
+    <p>Allow anonymous, approximate counts of published page, block, and button events. No visitor ID is created.</p>
+    <label>
+      <input type="checkbox" data-telemetry-consent />
+      Allow optional site measurement
+    </label>
+    <p role="status" aria-live="polite" data-telemetry-consent-status></p>
+  </section>
+  <script>
+    import '../scripts/telemetry';
+  </script>
+  </>
+)}
