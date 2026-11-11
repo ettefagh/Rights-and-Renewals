@@ -30,6 +30,9 @@
     const isPast12m = now >= cliff12m.getTime();
 
     return {
+      purchaseDateIso: formatIso(purchase),
+      cliff12mIso: formatIso(cliff12m),
+      expiry24mIso: formatIso(expiry24m),
       purchaseDate: formatFriendlyDate(formatIso(purchase), 'short'),
       cliff12m: formatFriendlyDate(formatIso(cliff12m), 'short'),
       expiry24m: formatFriendlyDate(formatIso(expiry24m), 'short'),
@@ -63,21 +66,30 @@
     </div>
   </div>
 
-  <!-- Milestone Nodes with Friendly Dates -->
-  <div class="milestone-nodes">
-    <div class="node-item">
-      <span class="node-label">Purchased</span>
-      <span class="node-date">{milestones.purchaseDate}</span>
-    </div>
-    <div class="node-item center">
-      <span class="node-label">Easy-Claim Ends*</span>
-      <span class="node-date">{milestones.cliff12m}</span>
-    </div>
-    <div class="node-item end">
-      <span class="node-label">Warranty Ends*</span>
-      <span class="node-date">{milestones.expiry24m}</span>
-    </div>
-  </div>
+  <!-- Dates are derived from the saved purchase and expiry dates. -->
+  <ol class="milestone-nodes" aria-label="Purchase protection timeline">
+    <li class="node-item">
+      <span class="timeline-node" aria-hidden="true"></span>
+      <span class="node-copy">
+        <span class="node-label">Purchased</span>
+        <time class="node-date" datetime={milestones.purchaseDateIso}>{milestones.purchaseDate}</time>
+      </span>
+    </li>
+    <li class="node-item">
+      <span class="timeline-node" aria-hidden="true"></span>
+      <span class="node-copy">
+        <span class="node-label">Proof rules change*</span>
+        <time class="node-date" datetime={milestones.cliff12mIso}>{milestones.cliff12m}</time>
+      </span>
+    </li>
+    <li class="node-item">
+      <span class="timeline-node" aria-hidden="true"></span>
+      <span class="node-copy">
+        <span class="node-label">Warranty period ends*</span>
+        <time class="node-date" datetime={milestones.expiry24mIso}>{milestones.expiry24m}</time>
+      </span>
+    </li>
+  </ol>
 </div>
 
 <style>
@@ -179,32 +191,63 @@
 
   .milestone-nodes {
     display: flex;
-    justify-content: space-between;
-    margin-top: 6px;
+    flex-direction: column;
+    gap: 0;
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 0;
   }
 
   .node-item {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .node-item.center {
+    position: relative;
+    display: grid;
+    grid-template-columns: 12px minmax(0, 1fr);
     align-items: center;
+    gap: 0 12px;
+    min-height: 40px;
   }
 
-  .node-item.end {
-    align-items: flex-end;
+  .node-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 24px;
+    bottom: -16px;
+    width: 2px;
+    background: #b9d4ca;
+  }
+
+  .timeline-node {
+    z-index: 1;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--color-pine-teal, #126b56);
+    border-radius: 50%;
+    background: var(--color-card-white, #fff);
+  }
+
+  .node-copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
   }
 
   .node-label {
-    font-size: 10px;
-    color: var(--color-ink-secondary, #475569);
-    font-weight: 600;
+    color: var(--color-ink-primary, #10201d);
+    font-size: 13px;
+    font-weight: 650;
   }
 
   .node-date {
-    font-size: 11px;
-    color: var(--color-ink-primary, #0F172A);
+    color: var(--color-ink-secondary, #475569);
+    font-size: 12px;
     font-weight: 600;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 420px) {
+    .node-copy { align-items: flex-start; flex-direction: column; gap: 1px; padding-block: 5px; }
   }
 </style>

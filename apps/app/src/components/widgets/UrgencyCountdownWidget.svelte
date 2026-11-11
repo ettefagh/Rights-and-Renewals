@@ -2,6 +2,7 @@
   import { walletStore } from '../../state/wallet.svelte';
   import { copyToClipboardSafe } from '@cmlab/core';
   import {
+    CONCURRENCY_SHORT_SUFFIX,
     formatFriendlyDate,
     computeCoverageProgress,
     getSubscriptionConcurrency
@@ -51,6 +52,7 @@
         {@const days = walletStore.computeDaysRemaining(item.expiryDate)}
         {@const isSub = item.category === 'subscription'}
         {@const subMeta = isSub ? getSubscriptionConcurrency(item) : null}
+        {@const paymentType = item.paymentType ?? 'auto_pay'}
         {@const cov = !isSub ? computeCoverageProgress(item.purchaseDate, item.expiryDate) : null}
         <div
           class="urgent-item-row"
@@ -71,16 +73,16 @@
               {#if isSub && subMeta}
                 <span
                   class="payment-chip"
-                  class:invoice={subMeta.paymentType === 'invoice'}
+                  class:invoice={paymentType === 'invoice'}
                 >
-                  ● {subMeta.paymentLabel}
+                  ● {paymentType === 'auto_pay' ? 'Auto-Pay' : 'Invoice'}
                 </span>
               {/if}
             </div>
 
             {#if isSub && subMeta}
               <span class="item-merchant">
-                {item.merchantOrProvider} • <strong>€{item.priceGrossEur.toFixed(2)}{subMeta.shortUnit}</strong> • Renews {formatFriendlyDate(item.expiryDate, 'short')}
+                {item.merchantOrProvider} • <strong>€{item.priceGrossEur.toFixed(2)}{CONCURRENCY_SHORT_SUFFIX[subMeta]}</strong> • Renews {formatFriendlyDate(item.expiryDate, 'short')}
               </span>
             {:else if cov}
               <div class="warranty-inline-meta">

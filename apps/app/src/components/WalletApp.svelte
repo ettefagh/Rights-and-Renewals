@@ -2,6 +2,8 @@
   import { walletStore } from '../state/wallet.svelte';
   import { getShowcaseUrl } from '../lib/showcase-url';
   import {
+    CONCURRENCY_BADGE_LABEL,
+    CONCURRENCY_SHORT_SUFFIX,
     formatFriendlyDate,
     formatRelativeRemaining,
     computeCoverageProgress,
@@ -21,6 +23,7 @@
   import TaxSummaryExportView from './views/TaxSummaryExportView.svelte';
   import ReceiptRegisterZoomModal from './views/ReceiptRegisterZoomModal.svelte';
   import AssistedCancellationModal from './views/AssistedCancellationModal.svelte';
+  import PolicyWikiView from './views/PolicyWikiView.svelte';
 
   import {
     Search,
@@ -41,7 +44,8 @@
 
   let isDarkTheme = $state(false);
   let isNotifCenterOpen = $state(false);
-  let activeWorkspace = $state<'deadlines' | 'vault'>('deadlines');
+  let activeWorkspace = $state<'deadlines' | 'vault' | 'wiki'>('deadlines');
+  let wikiTargetSlug = $state<string | null>(null);
   let selectedDeadlineId = $state<string | null>(null);
 
   let deadlineItems = $derived.by(() =>
@@ -58,6 +62,12 @@
   let selectedDeadline = $derived(
     deadlineItems.find((item) => item.id === selectedDeadlineId) ?? deadlineItems[0] ?? null
   );
+
+  function setWorkspace(workspace: 'deadlines' | 'vault' | 'wiki') {
+    if (workspace !== 'wiki') wikiTargetSlug = null;
+    activeWorkspace = workspace;
+    walletStore.setView('dashboard');
+  }
 
   const DONUT_COLORS = ['#2F524C', '#D96B4B', '#0D9488', '#D97706', '#4F46E5'];
   const showcaseAdminUrl = getShowcaseUrl('/_emdash/admin');
@@ -341,7 +351,7 @@
             {/if}
           </div>
         </section>
-      {:else}
+      {:else if activeWorkspace === 'vault'}
       <!-- Smart Visual Pulse Row: SVG Spend Donut + Action Radar (Less Text, Zero "Protected Capital" / "Tax Deductible") -->
       <section class="col-12 bento-col-5 visual-pulse-card">
         <div class="donut-widget-layout">
@@ -452,23 +462,23 @@
                       class:soon={days > 7 && days <= 30}
                       title={`${days} days until renewal`}
                     ></span>
-                    <span class="concurrency-pill">{meta.label}</span>
+                    <span class="concurrency-pill">{CONCURRENCY_BADGE_LABEL[meta]}</span>
                     <!-- Dedicated Payment Indicator (Debated & Standardized in Project Glossary) -->
                     <span
                       class="payment-badge"
-                      class:invoice={meta.paymentType === 'invoice'}
-                      title={meta.paymentType === 'auto_pay'
+                      class:invoice={sub.paymentType === 'invoice'}
+                      title={(sub.paymentType ?? 'auto_pay') === 'auto_pay'
                         ? 'Deducted automatically from your account or card'
                         : 'Requires manual invoice transfer'}
                     >
                       <span class="pay-pulse-dot"></span>
-                      {meta.paymentLabel}
+                      {sub.paymentType === 'invoice' ? 'Invoice' : 'Auto-Pay'}
                     </span>
                   </div>
 
                   <div class="sub-price-cluster">
                     <span class="sub-price">€{sub.priceGrossEur.toFixed(2)}</span>
-                    <span class="sub-cycle-unit">{meta.shortUnit}</span>
+                    <span class="sub-cycle-unit">{CONCURRENCY_SHORT_SUFFIX[meta]}</span>
                   </div>
                 </div>
 
@@ -559,11 +569,11 @@
                   <div class="war-status-left">
                     <span
                       class="notif-status-dot"
-                      class:urgent={cov.daysRemaining <= 14}
-                      class:soon={cov.daysRemaining > 14 && cov.daysRemaining <= 60}
+                      class:urgent={cov.tone === 'urgent'}
+                      class:soon={cov.tone === 'warning'}
                     ></span>
-                    <span class="easy-claim-pill" class:easy={cov.isEasyClaimPeriod}>
-                      {cov.isEasyClaimPeriod ? 'Easy-Claim Period*' : '2-Year Protection*'}
+                    <span class="easy-claim-pill" class:easy={cov.isWithinEasyClaim12m}>
+                      {cov.isWithinEasyClaim12m ? 'Easy-Claim Period*' : '2-Year Protection*'}
                     </span>
                     {#if war.hasProofOfPurchase || war.receiptSha256}
                       <span class="verified-mini-pill" title="Verified Original Receipt***">
@@ -694,6 +704,10 @@
           </div>
         </div>
       </footer>
+      {:else}
+        <section class="col-12">
+          <PolicyWikiView bind:selectedCompanySlug={wikiTargetSlug} />
+        </section>
       {/if}
 
     {:else if walletStore.currentView === 'capture'}
@@ -753,8 +767,7 @@
       class:active={walletStore.currentView === 'dashboard' && activeWorkspace === 'deadlines'}
       aria-current={walletStore.currentView === 'dashboard' && activeWorkspace === 'deadlines' ? 'page' : undefined}
       onclick={() => {
-        activeWorkspace = 'deadlines';
-        walletStore.setView('dashboard');
+        setWorkspace('deadlines');
       }}
     ><CalendarDays size={20} aria-hidden="true" /><span>Deadlines</span></button>
     <button
@@ -763,13 +776,17 @@
       class:active={walletStore.currentView === 'dashboard' && activeWorkspace === 'vault'}
       aria-current={walletStore.currentView === 'dashboard' && activeWorkspace === 'vault' ? 'page' : undefined}
       onclick={() => {
-        activeWorkspace = 'vault';
-        walletStore.setView('dashboard');
+        setWorkspace('vault');
       }}
     ><LockKeyhole size={20} aria-hidden="true" /><span>Vault</span></button>
-    {#if showcaseWikiUrl}
-      <a class="wallet-nav-link" href={showcaseWikiUrl} target="_blank" rel="noopener noreferrer"><BookOpen size={20} aria-hidden="true" /><span>Wiki</span></a>
-    {/if}
+    <button
+      type="button"
+      class="wallet-nav-link"
+      class:active={walletStore.currentView === 'dashboard' && activeWorkspace === 'wiki'}
+      aria-current={walletStore.currentView === 'dashboard' && activeWorkspace === 'wiki' ? 'page' : undefined}
+      data-testid="wiki-tab"
+      onclick={() => setWorkspace('wiki')}
+    ><BookOpen size={20} aria-hidden="true" /><span>Wiki</span></button>
   </nav>
 
   <!-- Portable FAB Speed Dial -->

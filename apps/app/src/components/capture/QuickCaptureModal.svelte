@@ -219,7 +219,7 @@
       onclick={() => walletStore.setView('dashboard')}
       aria-label="Close capture"
     >
-      <X size={20} />
+      <X size={20} aria-hidden="true" />
     </button>
   </div>
 
@@ -233,22 +233,22 @@
       <button
         type="button"
         class="cat-btn"
-        class:active={category === 'subscription'}
-        aria-pressed={category === 'subscription'}
-        onclick={() => (category = 'subscription')}
-      >
-        <Receipt size={16} aria-hidden="true" />
-        <span>Subscription</span>
-      </button>
-      <button
-        type="button"
-        class="cat-btn"
         class:active={category === 'hardware'}
         aria-pressed={category === 'hardware'}
         onclick={() => (category = 'hardware')}
       >
         <Shield size={16} aria-hidden="true" />
         <span>Purchase</span>
+      </button>
+      <button
+        type="button"
+        class="cat-btn"
+        class:active={category === 'subscription'}
+        aria-pressed={category === 'subscription'}
+        onclick={() => (category = 'subscription')}
+      >
+        <Receipt size={16} aria-hidden="true" />
+        <span>Subscription</span>
       </button>
     </div>
 
@@ -577,6 +577,9 @@
   }
 
   .text-input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     min-height: 48px;
     border: 1px solid var(--color-border-subtle, #E2E8F0);
     border-radius: var(--radius-sm, 8px);
@@ -588,7 +591,7 @@
 
   .form-grid-2 {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 12px;
   }
 
@@ -779,4 +782,42 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  .capture-panel {
+    border-radius: 22px;
+    padding: clamp(18px, 2.5vw, 28px);
+    gap: 18px;
+    box-shadow: 0 12px 34px rgba(22, 51, 44, 0.07);
+  }
+
+  .capture-panel, .capture-form, .form-grid-2 { min-width: 0; max-width: 100%; }
+  .capture-header { padding-bottom: 16px; }
+  .panel-title { font-size: clamp(28px, 4vw, 36px); letter-spacing: -0.04em; }
+  .panel-eyebrow { font-size: 14px; }
+  .close-btn { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; }
+  .close-btn:hover { color: var(--color-pine-teal, #126b56); background: var(--color-surface-subtle, #f0f5f3); }
+  .category-toggle-row { gap: 0; padding: 4px; border: 1px solid var(--color-border-subtle, #cbd5d1); border-radius: 999px; background: #f5f8f7; }
+  .cat-btn { min-height: 50px; border: 0; border-radius: 999px; background: transparent; font-size: 14px; }
+  .cat-btn.active { border-color: transparent; background: var(--color-pine-teal, #126b56); color: #fff; box-shadow: 0 3px 8px rgba(18, 107, 86, 0.16); }
+  .field-label { font-size: 13px; font-weight: 700; color: var(--color-ink-primary, #10201d); }
+  .text-input { min-height: 50px; border-radius: 12px; border-color: #c7d2ce; }
+  .text-input:focus-visible { outline: 3px solid rgba(18, 107, 86, 0.3); border-color: var(--color-pine-teal, #126b56); }
+  .receipt-slot-card { background: #fff; border: 1.5px solid var(--color-pine-teal, #126b56); border-radius: 16px; padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 14px; }
+  .receipt-header { font-size: 15px; color: var(--color-ink-primary, #10201d); }
+  .receipt-header :global(svg) { color: var(--color-pine-teal, #126b56); }
+  .receipt-desc { font-size: 12px; }
+  .upload-controls { grid-column: 2; grid-row: 1 / span 2; justify-content: flex-end; }
+  .file-upload-btn { min-height: 48px; border: 1px solid var(--color-pine-teal, #126b56); border-radius: 12px; background: #fff; color: var(--color-pine-teal, #126b56); font-size: 13px; }
+  .submit-action-btn { min-height: 54px; border-radius: 14px; margin-top: 2px; font-size: 16px; letter-spacing: -0.01em; box-shadow: 0 5px 14px rgba(18, 107, 86, 0.16); }
+  .tax-card { border-radius: 14px; }
+
+  @media (max-width: 520px) {
+    .capture-panel { padding: 16px; border-radius: 18px; }
+    .category-toggle-row { gap: 2px; }
+    .cat-btn { min-height: 48px; font-size: 13px; }
+    .receipt-slot-card { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .upload-controls { grid-column: 1; grid-row: auto; justify-content: flex-start; }
+    .file-upload-btn { width: 100%; justify-content: center; }
+  }
+
 </style>

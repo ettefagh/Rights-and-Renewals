@@ -2,6 +2,8 @@
   import { walletStore } from '../../state/wallet.svelte';
   import type { BillingCycle, PaymentMethodType, WalletItem } from '@cmlab/core';
   import {
+    CONCURRENCY_BADGE_LABEL,
+    CONCURRENCY_SHORT_SUFFIX,
     formatFriendlyDate,
     formatRelativeRemaining,
     getSubscriptionConcurrency
@@ -198,7 +200,7 @@
                     <select
                       name="billingCycle"
                       class="field-input"
-                      value={subMeta?.cycle || 'monthly'}
+                      value={subMeta ?? 'monthly'}
                     >
                       <option value="daily">Daily</option>
                       <option value="weekly">Weekly</option>
@@ -379,23 +381,23 @@
                 <span class="label">Payment Method</span>
                 <span
                   class="payment-indicator-pill"
-                  class:invoice={subMeta.paymentType === 'invoice'}
+                  class:invoice={item.paymentType === 'invoice'}
                 >
                   <span class="pulse-dot"></span>
-                  {subMeta.paymentLabel}
+                  {item.paymentType === 'invoice' ? 'Invoice' : 'Auto-Pay'}
                 </span>
               </div>
               <div class="row">
-                <span class="label">Billing Rate ({subMeta.label})</span>
+                <span class="label">Billing Rate ({CONCURRENCY_BADGE_LABEL[subMeta]})</span>
                 <span class="val price">
-                  €{item.priceGrossEur.toFixed(2)} <small>{subMeta.shortUnit}</small>
+                  €{item.priceGrossEur.toFixed(2)} <small>{CONCURRENCY_SHORT_SUFFIX[subMeta]}</small>
                 </span>
               </div>
               <div class="row">
-                <span class="label">Next Billing Date</span>
+                <span class="label">Next renewal</span>
                 <span class="val">
                   {formatFriendlyDate(item.expiryDate, 'long')}
-                  <span class="rel-tag">({formatRelativeRemaining(item.expiryDate)})</span>
+                  <span class="rel-tag">({formatRelativeRemaining(item.expiryDate, 'renewal').label})</span>
                 </span>
               </div>
             {:else}
@@ -407,7 +409,7 @@
                 <span class="label">Warranty Valid Until*</span>
                 <span class="val">
                   {formatFriendlyDate(item.expiryDate, 'long')}
-                  <span class="rel-tag">({formatRelativeRemaining(item.expiryDate)})</span>
+                  <span class="rel-tag">({formatRelativeRemaining(item.expiryDate, 'warranty').label})</span>
                 </span>
               </div>
             {/if}
@@ -436,7 +438,7 @@
 
           {#if item.category === 'hardware'}
             <div class="timeline-section">
-              <h3 class="section-title">2-Year Protection &amp; Easy-Claim Timeline*</h3>
+              <h3 class="section-title">Timeline</h3>
               <StatutoryTimelineBar {item} />
             </div>
           {/if}

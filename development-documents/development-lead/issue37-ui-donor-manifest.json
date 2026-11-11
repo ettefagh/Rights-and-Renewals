@@ -1,0 +1,127 @@
+{
+  "root": "C:\\Users\\admin\\.codex\\worktrees\\cm-lab-ui-reference",
+  "head": "f3530afe9e8f3b1676e61771a4cc934da2f0bbf5",
+  "files": [
+    {
+      "path": "apps/app/src/components/WalletApp.svelte",
+      "status": " M",
+      "sha256": "278d6f11d67360c0a62717dc3814458d87b11601b819b8213346d7f778913df2"
+    },
+    {
+      "path": "apps/app/src/components/capture/QuickCaptureModal.svelte",
+      "status": " M",
+      "sha256": "38a5b56479618d8335fd3d669cf13d03d7a19460c32b2f45cddaca065421a07a"
+    },
+    {
+      "path": "apps/app/src/components/views/ClaimCancelDossierView.svelte",
+      "status": " M",
+      "sha256": "b235c47103619bdd92cbde933de25d435603b0345ec9dbed21513ba8e70db9c1"
+    },
+    {
+      "path": "apps/app/src/components/views/ItemDetailDrawer.svelte",
+      "status": " M",
+      "sha256": "55171c46a4238542b096f832f1c4743d770cd82f9aba1a77c9db34cfe76c7e14"
+    },
+    {
+      "path": "apps/app/src/components/views/ReceiptRegisterZoomModal.svelte",
+      "status": " M",
+      "sha256": "db042a977dd9537d0572696bdd97e5a5e17e68c3b9e1fc2989b4b00615ea1315"
+    },
+    {
+      "path": "apps/app/src/components/views/TaxSummaryExportView.svelte",
+      "status": " M",
+      "sha256": "655ac9992dd39a4bbb9a8de677d2a8c4e2a6381c1d1321f9dac1a87c538cc382"
+    },
+    {
+      "path": "apps/app/src/components/widgets/MonthlyCalendarGrid.svelte",
+      "status": " M",
+      "sha256": "9059358898d15a34ce2729ccba8545b60a56fb3ad37e51598b996ade01b7c899"
+    },
+    {
+      "path": "apps/app/src/components/widgets/StatutoryTimelineBar.svelte",
+      "status": " M",
+      "sha256": "8bde9eb334ee5e693ab5ed45479a9ba437ff883eec2b36d3722ed5dc1829ed05"
+    },
+    {
+      "path": "apps/app/src/components/widgets/UrgencyCountdownWidget.svelte",
+      "status": " M",
+      "sha256": "548fc09a9550235041418f2fdf9701faa656623fbbacf06e7cf3855f4349ab3c"
+    },
+    {
+      "path": "apps/showcase/src/components/AudienceSwitch.astro",
+      "status": " M",
+      "sha256": "9671d9fc973cba5700280e8f2448ac0ada5570c1e0ae161f9161d24f60b6d5ed"
+    },
+    {
+      "path": "apps/showcase/src/components/simulator.js",
+      "status": " M",
+      "sha256": "ecf059d30e4a215a634c72da6d14c2f598aa900fa680aaa44941cbeb38e68b06"
+    },
+    {
+      "path": "apps/showcase/src/data/showcase-markdown.ts",
+      "status": " M",
+      "sha256": "19d8342c60d91e6f4d30d679ce4398d2f9f21352382672e32b07e6fe6b4702fb"
+    },
+    {
+      "path": "apps/showcase/src/pages/agent-setup.astro",
+      "status": " M",
+      "sha256": "bb8463a9b102a846bf5b235e2261f705e5d5779ce5107e7aaed464e2b912542e"
+    },
+    {
+      "path": "apps/showcase/src/pages/index.astro",
+      "status": " M",
+      "sha256": "6c23d300fe55d8355d43760cb3c3ba43f4bea3ef55fa9b85cb3d69154a405f8b"
+    },
+    {
+      "path": "apps/showcase/src/pages/machine/view/[...document].astro",
+      "status": " M",
+      "sha256": "fff5056592f122257e7d7fa9bb7060467def739c908d06bbe637c46544baf606"
+    },
+    {
+      "path": "apps/showcase/src/pages/wiki/[slug].astro",
+      "status": " M",
+      "sha256": "950aa926d09d954bb5b382c78adbd4189fe91cc852e24094c529a11939f90c41"
+    },
+    {
+      "path": "apps/showcase/src/pages/wiki/index.astro",
+      "status": " M",
+      "sha256": "f0189a2c32cfafa9e2a615b00a809f81d5f2efc3357f08e312d00b4be6cfb1af"
+    },
+    {
+      "path": "apps/showcase/styles/homepage.css",
+      "status": " M",
+      "sha256": "dd54ff230b323c21326da18b116f529af37b29dbf2c2521315c8023f8885162d"
+    },
+    {
+      "path": "apps/app/src/components/views/PolicyWikiView.svelte",
+      "status": "??",
+      "sha256": "10b1e85dd8d22f23112f95d709c8d562adabc5c7dcdd6cbfc95b7f8a16033cbe"
+    },
+    {
+      "path": "apps/app/src/components/views/wikiContent.ts",
+      "status": "??",
+      "sha256": "689fc4c373a6b6b42e727fe5f87234cc4f64c6c1c1b4cf1d7e103337848e0bfe"
+    },
+    {
+      "path": "apps/showcase/styles/machine-reader.css",
+      "status": "??",
+      "sha256": "a666918857411799cffc2a2aec4282904814759c919c0e7d283f9b1d5c8bc19a"
+    },
+    {
+      "path": "apps/showcase/styles/policy-wiki.css",
+      "status": "??",
+      "sha256": "b9e29588ffbf67ce853ba560d86696c00b5a30fcfe02e27c67a18534b4335706"
+    },
+    {
+      "path": "apps/showcase/styles/public-pages.css",
+      "status": "??",
+      "sha256": "45220b6f689f4dd997a1fa410a2b56db51e01eaf05c8d29bf1b88d1ac2de419e"
+    },
+    {
+      "path": "design-qa.md",
+      "status": "??",
+      "sha256": "1472776fb878c1320033f6d71162f3cb18560636c3129b2b0c2e935e09b9f063"
+    }
+  ],
+  "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

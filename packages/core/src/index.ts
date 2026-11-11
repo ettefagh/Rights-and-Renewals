@@ -168,3 +168,7 @@ export type {
 export { copyToClipboardSafe } from './utils/safeClipboard.js';
 export { generateBarcodeSvg } from './utils/barcodeSvg.js';
 
+// Shared, locally hosted brand identity for the wallet and public Wiki.
+export { getBrandLogo, getBrandMonogram } from './data/brandLogos.js';
+export type { BrandLogoRecord } from './data/brandLogos.js';
+
