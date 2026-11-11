@@ -9,6 +9,6 @@ describe('portable native review console', () => {
     expect(source).not.toMatch(/new URL\(/);
     expect(policyReviewConsoleAdminEntry).toBe('./src/admin/index.tsx');
     const plugin = createPlugin();
-    expect(plugin.admin?.pages.map((page) => page.path)).toEqual(['/review', '/proposals']);
+    expect(plugin.admin?.pages?.map((page) => page.path)).toEqual(['/review', '/proposals']);
   });
 });
