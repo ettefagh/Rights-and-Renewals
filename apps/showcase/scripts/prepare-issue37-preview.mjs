@@ -14,12 +14,15 @@ const config = {
   name: 'rightsandrenewals-showcase-issue37-preview',
   vars: {
     EMDASH_SITE_URL: 'https://rightsandrenewals-showcase-issue37-preview.padarhava.workers.dev',
-    PUBLIC_EVENTS_ENABLED: 'false',
+    PUBLIC_EVENTS_ENABLED: process.env.ISSUE37_EVENTS_ENABLED === 'true' ? 'true' : 'false',
+    PUBLIC_EVENTS_ORIGINS: 'https://rightsandrenewals-showcase-issue37-preview.padarhava.workers.dev',
     CMLAB_PREVIEW_EDITORIAL_LOCK: 'true',
   },
   d1_databases: [{ binding: 'DB', database_name: 'rightsandrenewals-issue37-preview', database_id: databaseId }],
   r2_buckets: [{ binding: 'MEDIA', bucket_name: 'rightsandrenewals-issue37-preview-media' }],
   kv_namespaces: [{ binding: 'SESSION', id: sessionId }],
+  analytics_engine_datasets: [{ binding: 'ANALYTICS', dataset: 'cmlab_editorial_events_issue37' }],
+  ratelimits: [{ name: 'PUBLIC_EVENTS_RATE_LIMITER', namespace_id: '3711112026', simple: { limit: 120, period: 60 } }],
 };
 delete config.previews;
 await writeFile(new URL('../wrangler.issue37-preview.jsonc', import.meta.url), `${JSON.stringify(config, null, 2)}\n`);

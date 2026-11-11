@@ -3,6 +3,8 @@ import type { PolicyWikiEntry } from '@cmlab/core';
 import { getPolicyForPage } from '../../lib/policy-cms.js';
 import BrandIcon from '../../components/BrandIcon.svelte';
 import AudienceSwitch from '../../components/AudienceSwitch.astro';
+import TelemetryConsent from '../../components/TelemetryConsent.astro';
+import { policyTelemetryMetadata } from '../../lib/telemetry-page-metadata.js';
 import { Menu } from 'lucide-svelte';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
@@ -22,6 +24,7 @@ try {
   return new Response('Published policy content is temporarily unavailable.', { status: 503 });
 }
 if (!brand) return Astro.rewrite('/404');
+const telemetry = isPreview ? null : await policyTelemetryMetadata(brand);
 
 const isSubscription = brand.category === 'subscription';
 const pageTitle = `${brand.brandName} · Verbraucherrechte & Kündigung · Rights & Renewals Brand Policy Wiki`;
@@ -258,7 +261,7 @@ const legacyCaptureHref = `${legacyWalletHref}#action=capture`;
     </div>
   </header>
 
-  <main class="wiki-container">
+  <main class="wiki-container" data-telemetry-page={telemetry?.pageId} data-telemetry-revision={telemetry?.revision}>
     <AudienceSwitch humanHref={`/wiki/${brand.brandSlug}`} machineHref={`/machine/view/wiki/${brand.brandSlug}`} />
     <!-- Breadcrumb -->
     <nav class="wiki-breadcrumb" aria-label="Breadcrumb">
@@ -399,5 +402,6 @@ const legacyCaptureHref = `${legacyWalletHref}#action=capture`;
     </footer>
   </main>
 
+  <TelemetryConsent context={isPreview ? 'preview' : 'public'} />
 </body>
 </html>

@@ -1,15 +1,75 @@
+import { getEmDashCollection } from 'emdash';
 import { getPublishedPolicies } from './policy-cms';
-import { readPublishedPlanSummaries } from './policy-graph-cms';
+import { entryId, withPublicContext } from './policy-graph-cms';
 import { loadLearningContent } from './learning-cms';
 import { getPublishedWebsitePages } from './website-cms';
 import type { PublishedEventRegistry } from './telemetry';
+import {
+  cmsPageTelemetryMetadata,
+  planTelemetryMetadata,
+  policyTelemetryMetadata,
+  telemetryRevision,
+  wikiTelemetryMetadata,
+} from './telemetry-page-metadata';
 
 const MAX_IDS = 500;
-export const telemetryRevision = async (value: unknown) => {
-  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(value)));
-  return `sha256-${[...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`;
-};
+const PLAN_PAGE_SIZE = 100;
 const safeId = (prefix: string, id: string) => `${prefix}:${id}`;
+
+interface CmsPlanEntry {
+  id: string;
+  status?: string;
+  data: Record<string, unknown>;
+}
+
+interface PublishedPlanSummary {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+}
+
+async function readPublishedPlanCatalog(): Promise<PublishedPlanSummary[]> {
+  return withPublicContext(async () => {
+    const plans: PublishedPlanSummary[] = [];
+    const ids = new Set<string>();
+    let cursor: string | undefined;
+
+    for (let page = 0; page < Math.ceil(MAX_IDS / PLAN_PAGE_SIZE); page += 1) {
+      const result = await getEmDashCollection('policy_plans', {
+        status: 'published',
+        limit: PLAN_PAGE_SIZE,
+        ...(cursor ? { cursor } : {}),
+      });
+      if (result.error) throw result.error;
+
+      for (const raw of result.entries as CmsPlanEntry[]) {
+        if (raw.status && raw.status !== 'published') continue;
+        const id = entryId(raw);
+        const slug = raw.id || String(raw.data.stable_key ?? id);
+        if (ids.has(id)) throw new Error('Published plan catalog returned a duplicate ID.');
+        ids.add(id);
+        plans.push({
+          id,
+          slug,
+          title: typeof raw.data.title === 'string' && raw.data.title ? raw.data.title
+            : typeof raw.data.name === 'string' && raw.data.name ? raw.data.name : 'Untitled plan',
+          summary: typeof raw.data.summary === 'string' ? raw.data.summary : '',
+        });
+        if (plans.length > MAX_IDS) throw new Error('Published plan telemetry registry exceeds its bounded capacity');
+      }
+
+      if (!result.hasMore) return plans;
+      if (!result.nextCursor || result.nextCursor === cursor) throw new Error('Published plan telemetry catalog returned an invalid cursor.');
+      if (page === Math.ceil(MAX_IDS / PLAN_PAGE_SIZE) - 1) throw new Error('Published plan telemetry registry exceeds its bounded capacity');
+      cursor = result.nextCursor;
+    }
+
+    throw new Error('Published plan telemetry catalog exceeded its read bound.');
+  });
+}
+
+export { telemetryRevision };
 
 export async function buildPublishedEventRegistry(): Promise<PublishedEventRegistry> {
   const [pages, policies, learning] = await Promise.all([
@@ -29,8 +89,7 @@ export async function buildPublishedEventRegistry(): Promise<PublishedEventRegis
   const entityRevisions: Record<string, string> = {};
 
   for (const page of pages) {
-    const pageId = `page:${page.id}`;
-    const revision = await telemetryRevision({ title: page.title, description: page.description ?? '', sections: page.sections });
+    const { pageId, revision } = await cmsPageTelemetryMetadata(page);
     pageIds.add(pageId);
     revisions.add(revision);
     pageRevisions[pageId] = revision;
@@ -49,46 +108,40 @@ export async function buildPublishedEventRegistry(): Promise<PublishedEventRegis
     pageChildren[pageId] = children;
   }
 
-  const addEntity = async (pageId: string, kind: string, id: string, content: unknown) => {
-    const entityId = safeId(kind, id);
+  const addEntity = async (pageId: string, entityId: string, content: unknown, revision?: string) => {
     entityIds.add(entityId);
-    const revision = await telemetryRevision(content);
-    revisions.add(revision);
-    entityRevisions[entityId] = revision;
+    const entityRevision = revision ?? await telemetryRevision(content);
+    revisions.add(entityRevision);
+    entityRevisions[entityId] = entityRevision;
     pageChildren[pageId]?.entities.push(entityId);
   };
-  const wikiPage = 'page:wiki';
+  const wikiIdentity = await wikiTelemetryMetadata();
+  const wikiPage = wikiIdentity.pageId;
   // Wiki routes are served by the site even when no editable CMS page exists.
   pageIds.add(wikiPage);
-  pageRevisions[wikiPage] = await telemetryRevision({ route: '/wiki', title: 'Policy Wiki' });
-  revisions.add(pageRevisions[wikiPage]);
+  pageRevisions[wikiPage] = wikiIdentity.revision;
+  revisions.add(wikiIdentity.revision);
   pageChildren[wikiPage] = { blocks: [], ctas: [], entities: [] };
   for (const policy of policies) {
-    await addEntity(wikiPage, 'policy', policy.brandSlug, policy);
-    const policyPage = `page:policy:${policy.brandSlug}`;
-    const revision = entityRevisions[`policy:${policy.brandSlug}`]!;
-    pageIds.add(policyPage);
-    pageRevisions[policyPage] = revision;
-    pageChildren[policyPage] = { blocks: [], ctas: [], entities: [`policy:${policy.brandSlug}`] };
+    const identity = await policyTelemetryMetadata(policy);
+    await addEntity(wikiPage, identity.entityId, policy, identity.revision);
+    pageIds.add(identity.pageId);
+    pageRevisions[identity.pageId] = identity.revision;
+    pageChildren[identity.pageId] = { blocks: [], ctas: [], entities: [identity.entityId] };
   }
-  for (const law of learning.laws) await addEntity(wikiPage, 'law', law.id, law);
-  for (const term of learning.glossary) await addEntity(wikiPage, 'glossary', term.id, term);
-  for (const quiz of learning.quizzes) await addEntity(wikiPage, 'quiz', quiz.id, quiz);
+  for (const law of learning.laws) await addEntity(wikiPage, safeId('law', law.id), law);
+  for (const term of learning.glossary) await addEntity(wikiPage, safeId('glossary', term.id), term);
+  for (const quiz of learning.quizzes) await addEntity(wikiPage, safeId('quiz', quiz.id), quiz);
 
-  const providers = [...new Set(policies.filter((policy) => policy.category === 'subscription').map((policy) => policy.brandSlug))].slice(0, MAX_IDS);
-  const planLists = await Promise.all(providers.map((provider) => readPublishedPlanSummaries(provider, 12)));
-  const plans = planLists.flat();
+  const plans = await readPublishedPlanCatalog();
   if (plans.length > MAX_IDS) throw new Error('Published plan telemetry registry exceeds its bounded capacity');
   for (const plan of plans) {
-    const routePageId = `page:plan:${plan.id}`;
-    pageIds.add(routePageId);
-    const revision = await telemetryRevision(plan);
-    pageRevisions[routePageId] = revision;
-    revisions.add(revision);
-    pageChildren[routePageId] = { blocks: [], ctas: [], entities: [safeId('plan', plan.id)] };
-    entityIds.add(safeId('plan', plan.id));
-    revisions.add(revision);
-    entityRevisions[safeId('plan', plan.id)] = revision;
+    const identity = await planTelemetryMetadata(plan);
+    pageIds.add(identity.pageId);
+    pageRevisions[identity.pageId] = identity.revision;
+    revisions.add(identity.revision);
+    pageChildren[identity.pageId] = { blocks: [], ctas: [], entities: [identity.entityId] };
+    await addEntity(identity.pageId, identity.entityId, plan, identity.revision);
   }
 
   if ([pageIds, entityIds, blockIds, ctaIds, revisions].some((set) => set.size > MAX_IDS)) {

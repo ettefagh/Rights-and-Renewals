@@ -10,7 +10,8 @@
   "preview_urls": true,
   "vars": {
     "EMDASH_SITE_URL": "https://rightsandrenewals-showcase-issue37-preview.padarhava.workers.dev",
-    "PUBLIC_EVENTS_ENABLED": "false",
+    "PUBLIC_EVENTS_ENABLED": "true",
+    "PUBLIC_EVENTS_ORIGINS": "https://rightsandrenewals-showcase-issue37-preview.padarhava.workers.dev",
     "CMLAB_PREVIEW_EDITORIAL_LOCK": "true"
   },
   "assets": {
@@ -50,6 +51,22 @@
     {
       "binding": "SESSION",
       "id": "4b2f2fa54a7a49328f1d8e95fae2cf92"
+    }
+  ],
+  "analytics_engine_datasets": [
+    {
+      "binding": "ANALYTICS",
+      "dataset": "cmlab_editorial_events_issue37"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "PUBLIC_EVENTS_RATE_LIMITER",
+      "namespace_id": "3711112026",
+      "simple": {
+        "limit": 120,
+        "period": 60
+      }
     }
   ]
 }

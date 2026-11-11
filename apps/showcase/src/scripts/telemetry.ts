@@ -1,4 +1,7 @@
+import { publicEventSchema } from '../lib/telemetry';
+
 const CONSENT_KEY = 'cmlab-public-events-consent-v1';
+let emitCurrentPageView: () => void = () => {};
 const isRestrictedContext = () => location.pathname.startsWith('/_emdash/')
   || document.documentElement.dataset.cmsContext === 'editor'
   || document.documentElement.dataset.cmsContext === 'preview'
@@ -11,12 +14,14 @@ function consented(): boolean {
 
 async function emit(event: Record<string, unknown>): Promise<void> {
   if (!consented()) return;
+  const parsed = publicEventSchema.safeParse({ ...event, consent: true });
+  if (!parsed.success) return;
   try {
     await fetch('/api/events', {
       method: 'POST',
       credentials: 'omit',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...event, consent: true }),
+      body: JSON.stringify(parsed.data),
       keepalive: true,
     });
   } catch {
@@ -34,7 +39,13 @@ if (page && !isRestrictedContext()) {
   const pageId = page.dataset.telemetryPage;
   const revision = page.dataset.telemetryRevision;
   if (pageId && revision) {
-    void emit({ name: 'page_view', pageId, revision });
+    let pageViewRequested = false;
+    emitCurrentPageView = () => {
+      if (!consented() || pageViewRequested) return;
+      pageViewRequested = true;
+      void emit({ name: 'page_view', pageId, revision });
+    };
+    emitCurrentPageView();
     const pageSlug = pageId.replace(/^page:/, '');
     document.querySelectorAll<HTMLElement>('.editorial-section[id]').forEach((block) => {
       const blockId = `block:${pageSlug}:${block.id}`;
@@ -75,6 +86,7 @@ document.querySelectorAll<HTMLInputElement>('[data-telemetry-consent]').forEach(
     try {
       if (checkbox.checked && !isRestrictedContext()) localStorage.setItem(CONSENT_KEY, 'yes');
       else localStorage.removeItem(CONSENT_KEY);
+      if (checkbox.checked) emitCurrentPageView();
       if (status) status.textContent = checkbox.checked ? 'Optional measurement enabled.' : 'Optional measurement disabled.';
     } catch {
       checkbox.checked = false;

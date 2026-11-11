@@ -3,6 +3,8 @@ import type { PolicyWikiEntry } from '@cmlab/core';
 import { getPublishedPolicies } from '../../lib/policy-cms.js';
 import BrandIcon from '../../components/BrandIcon.svelte';
 import AudienceSwitch from '../../components/AudienceSwitch.astro';
+import TelemetryConsent from '../../components/TelemetryConsent.astro';
+import { policyTelemetryMetadata, wikiTelemetryMetadata } from '../../lib/telemetry-page-metadata.js';
 import { ChevronRight, Menu, Search } from 'lucide-svelte';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
@@ -24,6 +26,11 @@ try {
 
 const subscriptions = policies.filter((b) => b.category === 'subscription');
 const hardware = policies.filter((b) => b.category === 'hardware');
+const wikiTelemetry = await wikiTelemetryMetadata();
+const policyTelemetry = new Map(await Promise.all(policies.map(async (policy) => [
+  policy.brandSlug,
+  await policyTelemetryMetadata(policy),
+] as const)));
 const policySearchText = (brand: PolicyWikiEntry) =>
   [brand.brandName, brand.brandSlug, brand.category, brand.legalNotes, ...(brand.searchAliases ?? [])]
     .filter(Boolean)
@@ -195,7 +202,7 @@ const policySearchText = (brand: PolicyWikiEntry) =>
     </div>
   </header>
 
-  <main class="wiki-container">
+  <main class="wiki-container" data-telemetry-page={wikiTelemetry.pageId} data-telemetry-revision={wikiTelemetry.revision}>
     <AudienceSwitch humanHref="/wiki/" machineHref="/machine/view/wiki" />
     <div class="wiki-hero">
       <p class="wiki-kicker">Public reference · {policies.length} brands</p>
@@ -219,7 +226,7 @@ const policySearchText = (brand: PolicyWikiEntry) =>
       <h2 class="category-section-title" id="subscription-list-title">Subscriptions &amp; digital services <span>({subscriptions.length})</span></h2>
       <div class="policy-brand-list">
       {subscriptions.map((brand: PolicyWikiEntry) => (
-        <a href={`/wiki/${brand.brandSlug}`} class="policy-brand-row" data-brand-row data-search={policySearchText(brand)}>
+        <a href={`/wiki/${brand.brandSlug}`} class="policy-brand-row" data-brand-row data-search={policySearchText(brand)} data-telemetry-policy-id={policyTelemetry.get(brand.brandSlug)?.entityId} data-telemetry-entity-revision={policyTelemetry.get(brand.brandSlug)?.revision}>
           <span class="policy-brand-mark" aria-hidden="true"><BrandIcon slug={brand.brandSlug} brandName={brand.brandName} size={27} decorative /></span>
           <span class="policy-brand-main"><strong>{brand.brandName}</strong><small>Subscription · cancellation policy</small></span>
           <span class="policy-brand-meta">{brand.cancellationButtonCompliant ? '§ 312k button listed' : 'Policy status under review'}</span>
@@ -234,7 +241,7 @@ const policySearchText = (brand: PolicyWikiEntry) =>
       <h2 class="category-section-title" id="hardware-list-title">Hardware &amp; electronics <span>({hardware.length})</span></h2>
       <div class="policy-brand-list">
       {hardware.map((brand: PolicyWikiEntry) => (
-        <a href={`/wiki/${brand.brandSlug}`} class="policy-brand-row" data-brand-row data-search={policySearchText(brand)}>
+        <a href={`/wiki/${brand.brandSlug}`} class="policy-brand-row" data-brand-row data-search={policySearchText(brand)} data-telemetry-policy-id={policyTelemetry.get(brand.brandSlug)?.entityId} data-telemetry-entity-revision={policyTelemetry.get(brand.brandSlug)?.revision}>
           <span class="policy-brand-mark" aria-hidden="true"><BrandIcon slug={brand.brandSlug} brandName={brand.brandName} size={27} decorative /></span>
           <span class="policy-brand-main"><strong>{brand.brandName}</strong><small>Purchase · statutory warranty</small></span>
           <span class="policy-brand-meta">{brand.statutoryWarrantyMonths} months · § 438 BGB</span>
@@ -274,6 +281,8 @@ const policySearchText = (brand: PolicyWikiEntry) =>
       form?.addEventListener('reset', () => setTimeout(filterPolicies, 0));
     })();
   </script>
+
+  <TelemetryConsent />
 
 </body>
 </html>

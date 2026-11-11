@@ -1,5 +1,7 @@
 ---
 import PlanFindings from '../../../components/editorial/PlanFindings.astro';
+import TelemetryConsent from '../../../components/TelemetryConsent.astro';
+import { planTelemetryMetadata } from '../../../lib/telemetry-page-metadata.js';
 import { parsePolicyContext, loadPublishedPlanSummary, resolvePublishedPlanProjection } from '../../../lib/policy-graph-cms.js';
 import '../../../../styles/tokens.css';
 import '../../../../styles/main.css';
@@ -19,6 +21,7 @@ try {
   return new Response('Published plan information is temporarily unavailable.', { status: 503 });
 }
 Astro.response.headers.set('Cache-Control', 'private, no-store');
+const telemetry = await planTelemetryMetadata(plan);
 ---
 
 <!doctype html>
@@ -30,11 +33,12 @@ Astro.response.headers.set('Cache-Control', 'private, no-store');
     <meta name="description" content={plan.summary || `Published policy review for ${plan.title}.`} />
   </head>
   <body>
-    <main class="plan-page">
+    <main class="plan-page" data-telemetry-page={telemetry.pageId} data-telemetry-revision={telemetry.revision}>
       <nav aria-label="Breadcrumb"><a href="/wiki">Policy Wiki</a> / <span>{plan.title}</span></nav>
       <header><h1>{plan.title}</h1>{plan.summary && <p>{plan.summary}</p>}</header>
       <PlanFindings result={projection} />
     </main>
+    <TelemetryConsent />
   </body>
 </html>
 
