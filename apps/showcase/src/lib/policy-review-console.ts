@@ -1,9 +1,10 @@
 import { definePlugin } from 'emdash';
-import { fileURLToPath } from 'node:url';
 
 export const policyReviewConsoleId = 'cmlab-policy-review-console';
 
-export const policyReviewConsoleAdminEntry = fileURLToPath(new URL('../admin/index.tsx', import.meta.url)).replaceAll('\\', '/');
+// Astro resolves the absolute build entry in astro.config.mjs. Keep the runtime
+// manifest portable: workerd cannot resolve source file URLs from import.meta.url.
+export const policyReviewConsoleAdminEntry = './src/admin/index.tsx';
 
 export function createPlugin() {
   return definePlugin({

@@ -1,0 +1,894 @@
+{
+  "artifactVersion": 1,
+  "status": "draft",
+  "observedOn": "2026-11-11",
+  "purpose": "Source-backed draft catalog research. Not approved for import or publication; no provider assessment is included.",
+  "sources": [
+    {
+      "id": "netflix-de-plans",
+      "title": "Netflix Germany plan comparison",
+      "url": "https://www.netflix.com/de-de/browse/genre/81683021",
+      "sourceKind": "product_observation",
+      "observedOn": "2026-11-11",
+      "summary": "The Germany page lists Standard with ads at EUR 6.99/month (1080p), Standard at EUR 15.99/month (1080p, no ads), and Premium at EUR 21.99/month (4K/HDR, 3D audio, no ads)."
+    },
+    {
+      "id": "netflix-billing",
+      "title": "Netflix registration help",
+      "url": "https://help.netflix.com/de/node/112419",
+      "sourceKind": "official_guidance",
+      "observedOn": "2026-11-11",
+      "summary": "Netflix states that membership fees are charged monthly on the registration day.",
+      "limitation": "General help-center guidance; signup and billing can depend on account/payment partner."
+    },
+    {
+      "id": "icloud-de-plans",
+      "title": "Apple Germany iCloud+ plans",
+      "url": "https://www.apple.com/de/icloud/",
+      "sourceKind": "product_observation",
+      "observedOn": "2026-11-11",
+      "summary": "The Germany page lists 50 GB EUR 0.99/month, 200 GB EUR 2.99/month, 2 TB EUR 9.99/month, 6 TB EUR 29.99/month, and 12 TB EUR 59.99/month."
+    },
+    {
+      "id": "bgb-312k",
+      "title": "German Civil Code section 312k",
+      "url": "https://www.gesetze-im-internet.de/bgb/__312k.html",
+      "sourceKind": "official_law",
+      "observedOn": "2026-11-11",
+      "summary": "Section 312k sets cancellation-button and confirmation-flow duties for qualifying paid continuing contracts that consumers can conclude through a website; paragraph 6 provides a no-notice cancellation consequence when required controls are unavailable.",
+      "limitation": "General statutory text only. Coverage, exemptions, facts, and any provider-specific compliance require separate review."
+    }
+  ],
+  "entries": [
+    {
+      "collection": "policy_services",
+      "id": "policy_services-netflix-streaming",
+      "slug": "netflix-streaming",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Netflix streaming",
+        "summary": "Subscription streaming service; Germany plan prices observed on 2026-11-11.",
+        "stable_key": "service:netflix-streaming"
+      }
+    },
+    {
+      "collection": "policy_services",
+      "id": "policy_services-icloud-plus",
+      "slug": "icloud-plus",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "Apple iCloud+",
+        "summary": "Cloud storage subscription; Germany plan prices observed on 2026-11-11.",
+        "stable_key": "service:icloud-plus"
+      }
+    },
+    {
+      "collection": "policy_plans",
+      "id": "policy_plans-netflix-standard-with-ads",
+      "slug": "netflix-standard-with-ads",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Standard with ads",
+        "summary": "EUR 6.99 per month; 1080p; advertising is included.",
+        "stable_key": "plan:netflix-standard-with-ads"
+      }
+    },
+    {
+      "collection": "policy_offers",
+      "id": "policy_offers-netflix-standard-with-ads-monthly-de",
+      "slug": "netflix-standard-with-ads-monthly-de",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Standard with ads — Germany monthly price",
+        "summary": "EUR 6.99 per month; 1080p; advertising is included.",
+        "stable_key": "offer:netflix-standard-with-ads-monthly-de",
+        "offer_key": "netflix:de:netflix-standard-with-ads:monthly"
+      }
+    },
+    {
+      "collection": "policy_offer_versions",
+      "id": "policy_offer_versions-netflix-standard-with-ads-monthly-de-observed-2026-11-11",
+      "slug": "netflix-standard-with-ads-monthly-de-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Observed 2026-11-11",
+        "version_key": "offer-version:netflix-standard-with-ads-monthly-de-observed-2026-11-11",
+        "offer": "netflix-standard-with-ads-monthly-de",
+        "terms_statement": "EUR 6.99 per month; 1080p; advertising is included. Observed on 2026-11-11. This is a source-backed price observation, not a complete contract-terms summary.",
+        "source_url": "https://www.netflix.com/de-de/browse/genre/81683021",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_plans",
+      "id": "policy_plans-netflix-standard",
+      "slug": "netflix-standard",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Standard",
+        "summary": "EUR 15.99 per month; 1080p; no ads.",
+        "stable_key": "plan:netflix-standard"
+      }
+    },
+    {
+      "collection": "policy_offers",
+      "id": "policy_offers-netflix-standard-monthly-de",
+      "slug": "netflix-standard-monthly-de",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Standard — Germany monthly price",
+        "summary": "EUR 15.99 per month; 1080p; no ads.",
+        "stable_key": "offer:netflix-standard-monthly-de",
+        "offer_key": "netflix:de:netflix-standard:monthly"
+      }
+    },
+    {
+      "collection": "policy_offer_versions",
+      "id": "policy_offer_versions-netflix-standard-monthly-de-observed-2026-11-11",
+      "slug": "netflix-standard-monthly-de-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Observed 2026-11-11",
+        "version_key": "offer-version:netflix-standard-monthly-de-observed-2026-11-11",
+        "offer": "netflix-standard-monthly-de",
+        "terms_statement": "EUR 15.99 per month; 1080p; no ads. Observed on 2026-11-11. This is a source-backed price observation, not a complete contract-terms summary.",
+        "source_url": "https://www.netflix.com/de-de/browse/genre/81683021",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_plans",
+      "id": "policy_plans-netflix-premium",
+      "slug": "netflix-premium",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Premium",
+        "summary": "EUR 21.99 per month; 4K and HDR; 3D audio; no ads.",
+        "stable_key": "plan:netflix-premium"
+      }
+    },
+    {
+      "collection": "policy_offers",
+      "id": "policy_offers-netflix-premium-monthly-de",
+      "slug": "netflix-premium-monthly-de",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Premium — Germany monthly price",
+        "summary": "EUR 21.99 per month; 4K and HDR; 3D audio; no ads.",
+        "stable_key": "offer:netflix-premium-monthly-de",
+        "offer_key": "netflix:de:netflix-premium:monthly"
+      }
+    },
+    {
+      "collection": "policy_offer_versions",
+      "id": "policy_offer_versions-netflix-premium-monthly-de-observed-2026-11-11",
+      "slug": "netflix-premium-monthly-de-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Observed 2026-11-11",
+        "version_key": "offer-version:netflix-premium-monthly-de-observed-2026-11-11",
+        "offer": "netflix-premium-monthly-de",
+        "terms_statement": "EUR 21.99 per month; 4K and HDR; 3D audio; no ads. Observed on 2026-11-11. This is a source-backed price observation, not a complete contract-terms summary.",
+        "source_url": "https://www.netflix.com/de-de/browse/genre/81683021",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_plans",
+      "id": "policy_plans-icloud-50gb",
+      "slug": "icloud-50gb",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 50 GB",
+        "summary": "EUR 0.99 per month; 50 GB storage.",
+        "stable_key": "plan:icloud-50gb"
+      }
+    },
+    {
+      "collection": "policy_offers",
+      "id": "policy_offers-icloud-50gb-monthly-de",
+      "slug": "icloud-50gb-monthly-de",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 50 GB — Germany monthly price",
+        "summary": "EUR 0.99 per month; 50 GB storage.",
+        "stable_key": "offer:icloud-50gb-monthly-de",
+        "offer_key": "apple:de:icloud-50gb:monthly"
+      }
+    },
+    {
+      "collection": "policy_offer_versions",
+      "id": "policy_offer_versions-icloud-50gb-monthly-de-observed-2026-11-11",
+      "slug": "icloud-50gb-monthly-de-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "Observed 2026-11-11",
+        "version_key": "offer-version:icloud-50gb-monthly-de-observed-2026-11-11",
+        "offer": "icloud-50gb-monthly-de",
+        "terms_statement": "EUR 0.99 per month; 50 GB storage. Observed on 2026-11-11. This is a source-backed price observation, not a complete contract-terms summary.",
+        "source_url": "https://www.apple.com/de/icloud/",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_plans",
+      "id": "policy_plans-icloud-200gb",
+      "slug": "icloud-200gb",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 200 GB",
+        "summary": "EUR 2.99 per month; 200 GB storage.",
+        "stable_key": "plan:icloud-200gb"
+      }
+    },
+    {
+      "collection": "policy_offers",
+      "id": "policy_offers-icloud-200gb-monthly-de",
+      "slug": "icloud-200gb-monthly-de",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 200 GB — Germany monthly price",
+        "summary": "EUR 2.99 per month; 200 GB storage.",
+        "stable_key": "offer:icloud-200gb-monthly-de",
+        "offer_key": "apple:de:icloud-200gb:monthly"
+      }
+    },
+    {
+      "collection": "policy_offer_versions",
+      "id": "policy_offer_versions-icloud-200gb-monthly-de-observed-2026-11-11",
+      "slug": "icloud-200gb-monthly-de-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "Observed 2026-11-11",
+        "version_key": "offer-version:icloud-200gb-monthly-de-observed-2026-11-11",
+        "offer": "icloud-200gb-monthly-de",
+        "terms_statement": "EUR 2.99 per month; 200 GB storage. Observed on 2026-11-11. This is a source-backed price observation, not a complete contract-terms summary.",
+        "source_url": "https://www.apple.com/de/icloud/",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_plans",
+      "id": "policy_plans-icloud-2tb",
+      "slug": "icloud-2tb",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 2 TB",
+        "summary": "EUR 9.99 per month; 2 TB storage.",
+        "stable_key": "plan:icloud-2tb"
+      }
+    },
+    {
+      "collection": "policy_offers",
+      "id": "policy_offers-icloud-2tb-monthly-de",
+      "slug": "icloud-2tb-monthly-de",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 2 TB — Germany monthly price",
+        "summary": "EUR 9.99 per month; 2 TB storage.",
+        "stable_key": "offer:icloud-2tb-monthly-de",
+        "offer_key": "apple:de:icloud-2tb:monthly"
+      }
+    },
+    {
+      "collection": "policy_offer_versions",
+      "id": "policy_offer_versions-icloud-2tb-monthly-de-observed-2026-11-11",
+      "slug": "icloud-2tb-monthly-de-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "Observed 2026-11-11",
+        "version_key": "offer-version:icloud-2tb-monthly-de-observed-2026-11-11",
+        "offer": "icloud-2tb-monthly-de",
+        "terms_statement": "EUR 9.99 per month; 2 TB storage. Observed on 2026-11-11. This is a source-backed price observation, not a complete contract-terms summary.",
+        "source_url": "https://www.apple.com/de/icloud/",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_plans",
+      "id": "policy_plans-icloud-6tb",
+      "slug": "icloud-6tb",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 6 TB",
+        "summary": "EUR 29.99 per month; 6 TB storage.",
+        "stable_key": "plan:icloud-6tb"
+      }
+    },
+    {
+      "collection": "policy_offers",
+      "id": "policy_offers-icloud-6tb-monthly-de",
+      "slug": "icloud-6tb-monthly-de",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 6 TB — Germany monthly price",
+        "summary": "EUR 29.99 per month; 6 TB storage.",
+        "stable_key": "offer:icloud-6tb-monthly-de",
+        "offer_key": "apple:de:icloud-6tb:monthly"
+      }
+    },
+    {
+      "collection": "policy_offer_versions",
+      "id": "policy_offer_versions-icloud-6tb-monthly-de-observed-2026-11-11",
+      "slug": "icloud-6tb-monthly-de-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "Observed 2026-11-11",
+        "version_key": "offer-version:icloud-6tb-monthly-de-observed-2026-11-11",
+        "offer": "icloud-6tb-monthly-de",
+        "terms_statement": "EUR 29.99 per month; 6 TB storage. Observed on 2026-11-11. This is a source-backed price observation, not a complete contract-terms summary.",
+        "source_url": "https://www.apple.com/de/icloud/",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_plans",
+      "id": "policy_plans-icloud-12tb",
+      "slug": "icloud-12tb",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 12 TB",
+        "summary": "EUR 59.99 per month; 12 TB storage.",
+        "stable_key": "plan:icloud-12tb"
+      }
+    },
+    {
+      "collection": "policy_offers",
+      "id": "policy_offers-icloud-12tb-monthly-de",
+      "slug": "icloud-12tb-monthly-de",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "iCloud+ 12 TB — Germany monthly price",
+        "summary": "EUR 59.99 per month; 12 TB storage.",
+        "stable_key": "offer:icloud-12tb-monthly-de",
+        "offer_key": "apple:de:icloud-12tb:monthly"
+      }
+    },
+    {
+      "collection": "policy_offer_versions",
+      "id": "policy_offer_versions-icloud-12tb-monthly-de-observed-2026-11-11",
+      "slug": "icloud-12tb-monthly-de-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "Observed 2026-11-11",
+        "version_key": "offer-version:icloud-12tb-monthly-de-observed-2026-11-11",
+        "offer": "icloud-12tb-monthly-de",
+        "terms_statement": "EUR 59.99 per month; 12 TB storage. Observed on 2026-11-11. This is a source-backed price observation, not a complete contract-terms summary.",
+        "source_url": "https://www.apple.com/de/icloud/",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_rules",
+      "id": "policy_rules-bgb-312k-online-cancellation",
+      "slug": "bgb-312k-online-cancellation",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "bgb-312k"
+      ],
+      "data": {
+        "title": "BGB section 312k online cancellation requirements",
+        "summary": "General statutory rule for qualifying paid continuing contracts consumers can conclude through a website; applicability is not assessed for any provider.",
+        "stable_key": "rule:bgb-312k-online-cancellation",
+        "rule_key": "DE:BGB:312k",
+        "official_source_url": "https://www.gesetze-im-internet.de/bgb/__312k.html"
+      }
+    },
+    {
+      "collection": "policy_rule_versions",
+      "id": "policy_rule_versions-bgb-312k-online-cancellation-observed-2026-11-11",
+      "slug": "bgb-312k-online-cancellation-observed-2026-11-11",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "bgb-312k"
+      ],
+      "data": {
+        "title": "BGB § 312k text observed 2026-11-11",
+        "version_key": "rule-version:DE:BGB:312k:2026-11-11",
+        "rule": "bgb-312k-online-cancellation",
+        "statement": "For qualifying paid continuing contracts that consumers can conclude through a website, § 312k requires a continuously available, easily accessible cancellation button and confirmation flow. If the required controls are not provided, paragraph 6 allows cancellation at any time without a notice period. This records the statutory text only and does not determine coverage or compliance for a particular contract.",
+        "source_url": "https://www.gesetze-im-internet.de/bgb/__312k.html",
+        "observed_at": "2026-11-11T00:00:00.000Z",
+        "applicability_country": "DE",
+        "applicability_customer": "consumer"
+      }
+    },
+    {
+      "collection": "policy_evidence",
+      "id": "policy_evidence-netflix-de-plans",
+      "slug": "netflix-de-plans",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-de-plans"
+      ],
+      "data": {
+        "title": "Netflix Germany plan comparison",
+        "stable_key": "evidence:netflix-de-plans",
+        "evidence_kind": "product_observation",
+        "public_excerpt": "The Germany page lists Standard with ads at EUR 6.99/month (1080p), Standard at EUR 15.99/month (1080p, no ads), and Premium at EUR 21.99/month (4K/HDR, 3D audio, no ads).",
+        "internal_notes": "Observed from the official source on 2026-11-11; this is source evidence, not an assessment.",
+        "source_url": "https://www.netflix.com/de-de/browse/genre/81683021",
+        "observed_at": "2026-11-11T00:00:00.000Z"
+      }
+    },
+    {
+      "collection": "policy_evidence",
+      "id": "policy_evidence-netflix-billing",
+      "slug": "netflix-billing",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "netflix-billing"
+      ],
+      "data": {
+        "title": "Netflix registration help",
+        "stable_key": "evidence:netflix-billing",
+        "evidence_kind": "official_guidance",
+        "public_excerpt": "Netflix states that membership fees are charged monthly on the registration day.",
+        "internal_notes": "General help-center guidance; signup and billing can depend on account/payment partner.",
+        "source_url": "https://help.netflix.com/de/node/112419",
+        "observed_at": "2026-11-11T00:00:00.000Z"
+      }
+    },
+    {
+      "collection": "policy_evidence",
+      "id": "policy_evidence-icloud-de-plans",
+      "slug": "icloud-de-plans",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "icloud-de-plans"
+      ],
+      "data": {
+        "title": "Apple Germany iCloud+ plans",
+        "stable_key": "evidence:icloud-de-plans",
+        "evidence_kind": "product_observation",
+        "public_excerpt": "The Germany page lists 50 GB EUR 0.99/month, 200 GB EUR 2.99/month, 2 TB EUR 9.99/month, 6 TB EUR 29.99/month, and 12 TB EUR 59.99/month.",
+        "internal_notes": "Observed from the official source on 2026-11-11; this is source evidence, not an assessment.",
+        "source_url": "https://www.apple.com/de/icloud/",
+        "observed_at": "2026-11-11T00:00:00.000Z"
+      }
+    },
+    {
+      "collection": "policy_evidence",
+      "id": "policy_evidence-bgb-312k",
+      "slug": "bgb-312k",
+      "status": "draft",
+      "observedOn": "2026-11-11",
+      "sourceIds": [
+        "bgb-312k"
+      ],
+      "data": {
+        "title": "German Civil Code section 312k",
+        "stable_key": "evidence:bgb-312k",
+        "evidence_kind": "official_law",
+        "public_excerpt": "Section 312k sets cancellation-button and confirmation-flow duties for qualifying paid continuing contracts that consumers can conclude through a website; paragraph 6 provides a no-notice cancellation consequence when required controls are unavailable.",
+        "internal_notes": "General statutory text only. Coverage, exemptions, facts, and any provider-specific compliance require separate review.",
+        "source_url": "https://www.gesetze-im-internet.de/bgb/__312k.html",
+        "observed_at": "2026-11-11T00:00:00.000Z"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "relation": "provider_services",
+      "parent": {
+        "collection": "policy_providers",
+        "slug": "netflix"
+      },
+      "child": {
+        "collection": "policy_services",
+        "slug": "netflix-streaming"
+      }
+    },
+    {
+      "relation": "provider_services",
+      "parent": {
+        "collection": "policy_providers",
+        "slug": "apple"
+      },
+      "child": {
+        "collection": "policy_services",
+        "slug": "icloud-plus"
+      }
+    },
+    {
+      "relation": "service_plans",
+      "parent": {
+        "collection": "policy_services",
+        "slug": "netflix-streaming"
+      },
+      "child": {
+        "collection": "policy_plans",
+        "slug": "netflix-standard-with-ads"
+      }
+    },
+    {
+      "relation": "plan_offers",
+      "parent": {
+        "collection": "policy_plans",
+        "slug": "netflix-standard-with-ads"
+      },
+      "child": {
+        "collection": "policy_offers",
+        "slug": "netflix-standard-with-ads-monthly-de"
+      }
+    },
+    {
+      "relation": "offer_versions",
+      "parent": {
+        "collection": "policy_offers",
+        "slug": "netflix-standard-with-ads-monthly-de"
+      },
+      "child": {
+        "collection": "policy_offer_versions",
+        "slug": "netflix-standard-with-ads-monthly-de-observed-2026-11-11"
+      }
+    },
+    {
+      "relation": "service_plans",
+      "parent": {
+        "collection": "policy_services",
+        "slug": "netflix-streaming"
+      },
+      "child": {
+        "collection": "policy_plans",
+        "slug": "netflix-standard"
+      }
+    },
+    {
+      "relation": "plan_offers",
+      "parent": {
+        "collection": "policy_plans",
+        "slug": "netflix-standard"
+      },
+      "child": {
+        "collection": "policy_offers",
+        "slug": "netflix-standard-monthly-de"
+      }
+    },
+    {
+      "relation": "offer_versions",
+      "parent": {
+        "collection": "policy_offers",
+        "slug": "netflix-standard-monthly-de"
+      },
+      "child": {
+        "collection": "policy_offer_versions",
+        "slug": "netflix-standard-monthly-de-observed-2026-11-11"
+      }
+    },
+    {
+      "relation": "service_plans",
+      "parent": {
+        "collection": "policy_services",
+        "slug": "netflix-streaming"
+      },
+      "child": {
+        "collection": "policy_plans",
+        "slug": "netflix-premium"
+      }
+    },
+    {
+      "relation": "plan_offers",
+      "parent": {
+        "collection": "policy_plans",
+        "slug": "netflix-premium"
+      },
+      "child": {
+        "collection": "policy_offers",
+        "slug": "netflix-premium-monthly-de"
+      }
+    },
+    {
+      "relation": "offer_versions",
+      "parent": {
+        "collection": "policy_offers",
+        "slug": "netflix-premium-monthly-de"
+      },
+      "child": {
+        "collection": "policy_offer_versions",
+        "slug": "netflix-premium-monthly-de-observed-2026-11-11"
+      }
+    },
+    {
+      "relation": "service_plans",
+      "parent": {
+        "collection": "policy_services",
+        "slug": "icloud-plus"
+      },
+      "child": {
+        "collection": "policy_plans",
+        "slug": "icloud-50gb"
+      }
+    },
+    {
+      "relation": "plan_offers",
+      "parent": {
+        "collection": "policy_plans",
+        "slug": "icloud-50gb"
+      },
+      "child": {
+        "collection": "policy_offers",
+        "slug": "icloud-50gb-monthly-de"
+      }
+    },
+    {
+      "relation": "offer_versions",
+      "parent": {
+        "collection": "policy_offers",
+        "slug": "icloud-50gb-monthly-de"
+      },
+      "child": {
+        "collection": "policy_offer_versions",
+        "slug": "icloud-50gb-monthly-de-observed-2026-11-11"
+      }
+    },
+    {
+      "relation": "service_plans",
+      "parent": {
+        "collection": "policy_services",
+        "slug": "icloud-plus"
+      },
+      "child": {
+        "collection": "policy_plans",
+        "slug": "icloud-200gb"
+      }
+    },
+    {
+      "relation": "plan_offers",
+      "parent": {
+        "collection": "policy_plans",
+        "slug": "icloud-200gb"
+      },
+      "child": {
+        "collection": "policy_offers",
+        "slug": "icloud-200gb-monthly-de"
+      }
+    },
+    {
+      "relation": "offer_versions",
+      "parent": {
+        "collection": "policy_offers",
+        "slug": "icloud-200gb-monthly-de"
+      },
+      "child": {
+        "collection": "policy_offer_versions",
+        "slug": "icloud-200gb-monthly-de-observed-2026-11-11"
+      }
+    },
+    {
+      "relation": "service_plans",
+      "parent": {
+        "collection": "policy_services",
+        "slug": "icloud-plus"
+      },
+      "child": {
+        "collection": "policy_plans",
+        "slug": "icloud-2tb"
+      }
+    },
+    {
+      "relation": "plan_offers",
+      "parent": {
+        "collection": "policy_plans",
+        "slug": "icloud-2tb"
+      },
+      "child": {
+        "collection": "policy_offers",
+        "slug": "icloud-2tb-monthly-de"
+      }
+    },
+    {
+      "relation": "offer_versions",
+      "parent": {
+        "collection": "policy_offers",
+        "slug": "icloud-2tb-monthly-de"
+      },
+      "child": {
+        "collection": "policy_offer_versions",
+        "slug": "icloud-2tb-monthly-de-observed-2026-11-11"
+      }
+    },
+    {
+      "relation": "service_plans",
+      "parent": {
+        "collection": "policy_services",
+        "slug": "icloud-plus"
+      },
+      "child": {
+        "collection": "policy_plans",
+        "slug": "icloud-6tb"
+      }
+    },
+    {
+      "relation": "plan_offers",
+      "parent": {
+        "collection": "policy_plans",
+        "slug": "icloud-6tb"
+      },
+      "child": {
+        "collection": "policy_offers",
+        "slug": "icloud-6tb-monthly-de"
+      }
+    },
+    {
+      "relation": "offer_versions",
+      "parent": {
+        "collection": "policy_offers",
+        "slug": "icloud-6tb-monthly-de"
+      },
+      "child": {
+        "collection": "policy_offer_versions",
+        "slug": "icloud-6tb-monthly-de-observed-2026-11-11"
+      }
+    },
+    {
+      "relation": "service_plans",
+      "parent": {
+        "collection": "policy_services",
+        "slug": "icloud-plus"
+      },
+      "child": {
+        "collection": "policy_plans",
+        "slug": "icloud-12tb"
+      }
+    },
+    {
+      "relation": "plan_offers",
+      "parent": {
+        "collection": "policy_plans",
+        "slug": "icloud-12tb"
+      },
+      "child": {
+        "collection": "policy_offers",
+        "slug": "icloud-12tb-monthly-de"
+      }
+    },
+    {
+      "relation": "offer_versions",
+      "parent": {
+        "collection": "policy_offers",
+        "slug": "icloud-12tb-monthly-de"
+      },
+      "child": {
+        "collection": "policy_offer_versions",
+        "slug": "icloud-12tb-monthly-de-observed-2026-11-11"
+      }
+    },
+    {
+      "relation": "rule_versions",
+      "parent": {
+        "collection": "policy_rules",
+        "slug": "bgb-312k-online-cancellation"
+      },
+      "child": {
+        "collection": "policy_rule_versions",
+        "slug": "bgb-312k-online-cancellation-observed-2026-11-11"
+      }
+    }
+  ]
+}
