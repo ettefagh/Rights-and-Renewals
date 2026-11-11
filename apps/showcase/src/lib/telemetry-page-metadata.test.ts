@@ -2,12 +2,20 @@ import { describe, expect, it } from 'vitest';
 import { telemetryRevision } from './telemetry-page-metadata';
 import {
   cmsPageTelemetryMetadata,
+  fallbackPageTelemetryMetadata,
   planTelemetryMetadata,
   policyTelemetryMetadata,
   wikiTelemetryMetadata,
 } from './telemetry-page-metadata';
 
 describe('telemetry page metadata', () => {
+  it('gives published fallback templates stable distinct page revisions', async () => {
+    const home = await fallbackPageTelemetryMetadata('home');
+    expect(home.pageId).toBe('page:home');
+    expect(home.revision).toBe(await telemetryRevision({ route: '/', templateVersion: 1 }));
+    expect(await fallbackPageTelemetryMetadata('home')).toEqual(home);
+    expect(await fallbackPageTelemetryMetadata('agent-setup')).not.toEqual(home);
+  });
   it('builds a stable CMS page id and hashes only its public page content', async () => {
     const page = { id: 'about-us', title: 'About', sections: [{ _key: 'intro', body: 'Hello' }] };
     const expectedRevision = await telemetryRevision({ title: 'About', description: '', sections: page.sections });

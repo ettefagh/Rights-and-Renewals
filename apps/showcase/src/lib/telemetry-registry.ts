@@ -6,6 +6,7 @@ import { getPublishedWebsitePages } from './website-cms';
 import type { PublishedEventRegistry } from './telemetry';
 import {
   cmsPageTelemetryMetadata,
+  fallbackPageTelemetryMetadata,
   planTelemetryMetadata,
   policyTelemetryMetadata,
   telemetryRevision,
@@ -106,6 +107,15 @@ export async function buildPublishedEventRegistry(): Promise<PublishedEventRegis
       }
     }
     pageChildren[pageId] = children;
+  }
+
+  for (const id of ['home', 'agent-setup'] as const) {
+    const fallback = await fallbackPageTelemetryMetadata(id);
+    if (pageIds.has(fallback.pageId)) continue;
+    pageIds.add(fallback.pageId);
+    revisions.add(fallback.revision);
+    pageRevisions[fallback.pageId] = fallback.revision;
+    pageChildren[fallback.pageId] = { blocks: [], ctas: [], entities: [] };
   }
 
   const addEntity = async (pageId: string, entityId: string, content: unknown, revision?: string) => {

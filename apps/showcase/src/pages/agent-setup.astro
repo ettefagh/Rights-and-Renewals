@@ -7,12 +7,12 @@ import EditorialSections from '../components/editorial/EditorialSections.astro';
 import { Menu } from 'lucide-svelte';
 import { getWebsitePageForRender } from '../lib/website-cms.js';
 import TelemetryConsent from '../components/TelemetryConsent.astro';
-import { telemetryRevision as hashTelemetryRevision } from '../lib/telemetry-registry';
+import { telemetryRevision as hashTelemetryRevision, fallbackPageTelemetryMetadata } from '../lib/telemetry-page-metadata';
 
 export const prerender = false;
 
 const cmsPage = await getWebsitePageForRender('agent-setup');
-const pageTelemetryRevision = cmsPage ? await hashTelemetryRevision({ title: cmsPage.title, description: cmsPage.description ?? '', sections: cmsPage.sections }) : undefined;
+const pageTelemetryRevision = cmsPage ? await hashTelemetryRevision({ title: cmsPage.title, description: cmsPage.description ?? '', sections: cmsPage.sections }) : (await fallbackPageTelemetryMetadata('agent-setup')).revision;
 const agentIntroBlocks = cmsPage?.sections.filter((section) => section.placement === 'agent-intro') ?? [];
 const contentSections = cmsPage?.sections.filter((section) => section.placement === 'content') ?? [];
 const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
@@ -401,7 +401,7 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
     </div>
   </header>
 
-  <main id="agent-setup-main" data-telemetry-page={cmsPage ? 'page:agent-setup' : undefined} data-telemetry-revision={pageTelemetryRevision}>
+  <main id="agent-setup-main" data-telemetry-page="page:agent-setup" data-telemetry-revision={pageTelemetryRevision}>
     <AudienceSwitch humanHref="/agent-setup" machineHref="/machine/view/agent-setup" />
     <!-- HERO SECTION -->
     <section class="agent-setup-hero">
@@ -894,3 +894,4 @@ const promptText = `Read ${Astro.url.origin}/agent-setup/prompt.md. Review its s
   <TelemetryConsent />
 </body>
 </html>
+

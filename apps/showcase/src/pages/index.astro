@@ -7,13 +7,13 @@ import EditorialSections from '../components/editorial/EditorialSections.astro';
 import { ArrowUpRight, CalendarDays, ChevronRight, Menu, ReceiptText, RefreshCw, ShieldCheck } from 'lucide-svelte';
 import { getWebsitePageForRender } from '../lib/website-cms.js';
 import TelemetryConsent from '../components/TelemetryConsent.astro';
-import { telemetryRevision as hashTelemetryRevision } from '../lib/telemetry-registry';
+import { telemetryRevision as hashTelemetryRevision, fallbackPageTelemetryMetadata } from '../lib/telemetry-page-metadata';
 
 export const prerender = false;
 
 const mcpEndpoint = new URL('/api/mcp', Astro.url).href;
 const cmsPage = await getWebsitePageForRender('home');
-const pageTelemetryRevision = cmsPage ? await hashTelemetryRevision({ title: cmsPage.title, description: cmsPage.description ?? '', sections: cmsPage.sections }) : undefined;
+const pageTelemetryRevision = cmsPage ? await hashTelemetryRevision({ title: cmsPage.title, description: cmsPage.description ?? '', sections: cmsPage.sections }) : (await fallbackPageTelemetryMetadata('home')).revision;
 const homeIntroBlocks = cmsPage?.sections.filter((section) => section.placement === 'home-intro') ?? [];
 const homeIntroHasCta = homeIntroBlocks.some((section) => typeof section.cta_label === 'string' && typeof section.cta_url === 'string' && typeof section.cta_id === 'string');
 const contentSections = cmsPage?.sections.filter((section) => section.placement === 'content') ?? [];
@@ -102,7 +102,7 @@ const contentSections = cmsPage?.sections.filter((section) => section.placement 
   <!-- ========================================================================
        MAIN SHOWCASE CONTENT
        ======================================================================== -->
-  <main id="showcase-main" data-telemetry-page={cmsPage ? 'page:home' : undefined} data-telemetry-revision={pageTelemetryRevision}>
+  <main id="showcase-main" data-telemetry-page="page:home" data-telemetry-revision={pageTelemetryRevision}>
     <AudienceSwitch humanHref="/" machineHref="/machine/view/home" />
 
     <section id="hero" class="home-hero" aria-labelledby="home-title">
@@ -382,3 +382,4 @@ const contentSections = cmsPage?.sections.filter((section) => section.placement 
   </script>
 </body>
 </html>
+

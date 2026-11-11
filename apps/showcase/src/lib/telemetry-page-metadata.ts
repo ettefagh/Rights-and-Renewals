@@ -3,6 +3,13 @@ export interface TelemetryPageMetadata {
   revision: string;
 }
 
+export async function fallbackPageTelemetryMetadata(id: 'home' | 'agent-setup'): Promise<TelemetryPageMetadata> {
+  return {
+    pageId: `page:${id}`,
+    revision: await telemetryRevision({ route: id === 'home' ? '/' : '/agent-setup', templateVersion: 1 }),
+  };
+}
+
 export interface TelemetryEntityPageMetadata extends TelemetryPageMetadata {
   entityId: string;
 }
