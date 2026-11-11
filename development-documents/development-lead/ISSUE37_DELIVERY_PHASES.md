@@ -6,10 +6,7 @@ recorded but are postponed; they are not completion gates for this phase.
 
 ## Phase 1 — current delivery
 
-- Media/logos: audit and verify existing local SVG assets, accessible labeled
-  fallbacks and provenance; pursue genuine replacements for the five remaining
-  brands. Do not substitute unrelated icons or fabricated logos. Verify both apps
-  serve the correct assets. Keep unresolved source/asset needs explicit.
+- Media/logos: all 20 current catalog brands now have local identity assets with recorded provenance. Both previews served byte-matching assets for all 20. Unknown future brands retain accessible labeled fallbacks.
 - Minimal analytics: consented page views, policy opens and CTA clicks; aggregate
   counts by page/policy/button and date. No visitor fingerprinting, unique-user
   claims, search text or registration inference. Validate before sending; late
