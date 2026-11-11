@@ -19,6 +19,10 @@ export interface ReviewState {
   assessmentFieldsHash: string;
   assessment: Record<string, unknown>;
   dependencies: Array<{ id: string; revision: string; contentHash: string }>;
+  sources: Array<{
+    collection: string; id: string; title: string; revision: string;
+    sourceUrl: string; statement: string; contentHash: string;
+  }>;
   expectedApprovalRevision: string | null;
   currentApproval: null | { reviewerId: string; approvedAt: string; expiresAt: string; auditId: string };
 }

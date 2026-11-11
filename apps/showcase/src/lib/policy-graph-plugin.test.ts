@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 
 const emdash = vi.hoisted(() => ({
   definePlugin: vi.fn((definition: unknown) => definition), getEmDashReferences: vi.fn(),
@@ -41,11 +42,19 @@ describe('native policy review plugin', () => {
   it('exports an Astro native createPlugin factory and registers publication/scheduling gates', () => {
     const plugin = createPlugin();
     expect(emdash.definePlugin).toHaveBeenCalled();
+    expect(plugin.capabilities).toContain('content:write');
     expect(plugin).toMatchObject({
       id: 'cmlab-policy-graph-review',
-      hooks: { 'content:beforeSave': expect.any(Function), 'content:beforePublish': expect.any(Function), 'content:beforeSchedule': expect.any(Function) },
+      hooks: {
+        'content:beforeSave': { handler: expect.any(Function), errorPolicy: 'abort' },
+        'content:beforePublish': expect.any(Function),
+        'content:beforeSchedule': expect.any(Function),
+      },
       routes: { reviewAssessment: { permission: 'content:publish_any' }, approveAssessment: { permission: 'content:publish_any' } },
     });
+    expect(plugin.capabilities).toContain('content:publish');
+    const astroConfig = readFileSync(new URL('../../astro.config.mjs', import.meta.url), 'utf8');
+    expect(astroConfig).toMatch(/id: 'cmlab-policy-graph-review'[\s\S]*?capabilities: \['content:read', 'content:write', 'content:publish', 'hooks\.content-policy:register'\][\s\S]*?hooks: \['content:beforeSave', 'content:beforePublish', 'content:beforeSchedule'\]/);
   });
 
   it('re-reads current draft relation edges and blocks publication without matching protected approval', async () => {
@@ -80,9 +89,35 @@ describe('native policy review plugin', () => {
   });
 
   it('blocks edits to already published rule versions so their identity stays immutable', async () => {
+    const plugin = createPlugin() as unknown as { hooks: Record<string, { handler: (event: unknown, context: unknown) => Promise<unknown> }> };
+    await expect(plugin.hooks['content:beforeSave']!.handler({ collection: 'policy_rule_versions', id: '01RULE', content: {} }, fakeContext())).rejects.toThrow('immutable');
+  });
+
+  it('blocks edits to formerly published versions even after they are unpublished', async () => {
+    const plugin = createPlugin() as unknown as { hooks: Record<string, { handler: (event: unknown, context: unknown) => Promise<unknown> }> };
+    const ctx = fakeContext();
+    const getVersioned = ctx.content.getVersioned as ReturnType<typeof vi.fn>;
+    getVersioned.mockResolvedValue({
+      item: { id: '01RULE', status: 'draft', publishedAt: '2026-11-10T00:00:00Z', liveRevisionId: null, data: {} },
+      _rev: 'rev-after-unpublish',
+    });
+    await expect(plugin.hooks['content:beforeSave']!.handler({ collection: 'policy_rule_versions', id: '01RULE', content: {} }, ctx)).rejects.toThrow('immutable');
+  });
+
+  it('allows a draft source version without a hand-entered revision hash and ignores supplied hash metadata', async () => {
     const plugin = createPlugin() as unknown as { hooks: Record<string, (event: unknown, context: unknown) => Promise<unknown>> };
-    const result = await plugin.hooks['content:beforeSave']!({ collection: 'policy_rule_versions', id: '01RULE', content: {} }, fakeContext());
-    expect(result).toMatchObject({ cancel: true });
+    const rule = versions.get('policy_rule_versions:01RULE')!;
+    versions.set('policy_rule_versions:01RULE', {
+      ...rule,
+      item: { ...rule.item, status: 'draft', data: { ...rule.item.data, revision_hash: 'incorrect-editor-value' } },
+    });
+    expect(await plugin.hooks['content:beforePublish']!({ collection: 'policy_rule_versions', content: { id: '01RULE' } }, fakeContext())).toBeUndefined();
+    versions.set('policy_rule_versions:01RULE', {
+      ...rule,
+      item: { ...rule.item, status: 'draft', data: { version_key: 'rule-v1', label: 'Rule' } },
+    });
+    expect(await plugin.hooks['content:beforePublish']!({ collection: 'policy_rule_versions', content: { id: '01RULE' } }, fakeContext())).toBeUndefined();
+    versions.set('policy_rule_versions:01RULE', rule);
   });
 
   it('fails closed when a newly selected dependency is unpublished or a relation read errors', async () => {
@@ -101,9 +136,23 @@ describe('native policy review plugin', () => {
   it('rejects author self-review and uses conditional protected writes for an independent reviewer', async () => {
     const plugin = createPlugin() as unknown as { routes: Record<string, { handler: (route: any) => Promise<any> }> };
     const ctx = fakeContext();
-    const base = { ...ctx, request: new Request('https://cms.test/review?assessmentId=01ASSESSMENT'), user: { id: 'author' }, input: {} };
+    const base = { ...ctx, request: new Request('https://cms.test/review?assessmentId=01ASSESSMENT'), user: { id: 'author', role: 40 }, input: {} };
+    const review = await plugin.routes.reviewAssessment!.handler(base);
+    expect(review.sources).toEqual(expect.arrayContaining([
+      expect.objectContaining({ collection: 'policy_offer_versions', id: '01OFFER', title: 'Offer', revision: 'offer-v1', contentHash: expect.any(String) }),
+      expect.objectContaining({ collection: 'policy_rule_versions', id: '01RULE', title: 'Rule', revision: 'rule-v1', contentHash: expect.any(String) }),
+      expect.objectContaining({ collection: 'policy_evidence', id: '01EVIDENCE', title: 'evidence-v1', revision: 'evidence-v1', contentHash: expect.any(String) }),
+    ]));
+    expect(review.sources.map((source: { contentHash: string }) => source.contentHash).sort())
+      .toEqual(review.dependencies.map((dependency: { contentHash: string }) => dependency.contentHash).sort());
     await expect(plugin.routes.approveAssessment!.handler({ ...base, input: { assessmentId, expectedRevision: 'rev-7', expectedApprovalRevision: null } })).rejects.toThrow('Review could not be completed');
-    const route = { ...base, user: { id: 'independent-reviewer' }, input: { assessmentId, expectedRevision: 'rev-7', expectedApprovalRevision: null } };
+    for (const role of [undefined, Number.NaN, '40', 20, 30]) {
+      await expect(plugin.routes.reviewAssessment!.handler({ ...base, user: { id: 'reviewer', role } }))
+        .rejects.toThrow('authenticated Editor or Admin');
+      await expect(plugin.routes.approveAssessment!.handler({ ...base, user: { id: 'reviewer', role }, input: { assessmentId, expectedRevision: 'rev-7', expectedApprovalRevision: null } }))
+        .rejects.toThrow('authenticated Editor or Admin');
+    }
+    const route = { ...base, user: { id: 'independent-reviewer', role: 40 }, input: { assessmentId, expectedRevision: 'rev-7', expectedApprovalRevision: null } };
     const result = await plugin.routes.approveAssessment!.handler(route);
     expect(result.reviewerId).toBe('independent-reviewer');
     expect(ctx.storage.approval_audit.compareAndSet).toHaveBeenCalledWith(expect.any(String), null, expect.objectContaining({ reviewerId: 'independent-reviewer' }));

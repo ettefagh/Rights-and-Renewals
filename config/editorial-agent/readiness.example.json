@@ -4,9 +4,9 @@
   "requiredRole": "Contributor",
   "requiredTokenScope": "mcp:tools:cmlab-editorial-proposals",
   "tools": ["propose_draft"],
-  "capabilities": ["hooks.content-policy:register"],
+  "capabilities": ["hooks.content-policy:register", "content:read"],
   "forbiddenTokenScopes": ["content:write", "content:publish", "schema:write", "plugins:manage"],
-  "draftCollection": "editorial_proposals",
+  "draftStorage": "cmlab-editorial-proposals/proposals (private plugin storage)",
   "connectionVerified": false,
   "credentialIssued": false,
   "accessRouting": "DEFERRED: current email Access policy covers /_emdash/*; native MCP OAuth interoperability is unverified"

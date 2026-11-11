@@ -28,7 +28,7 @@ type StorageCollection = {
 };
 
 type ProposalRuntime = {
-  proposals?: StorageCollection;
+  storage?: { proposals?: StorageCollection };
   content?: {
     get(collection: string, id: string): Promise<{
       id: string; status: string; authorId?: string | null; liveRevisionId?: string | null;
@@ -50,8 +50,8 @@ const keyFor = async (actorId: string, idempotencyKey: string) => `proposal-${aw
 
 /** Trusted host adapter backed by EmDash's namespaced plugin storage and content read API. */
 export function createEmDashEditorialProposalHost(runtime: ProposalRuntime): EditorialProposalHost {
-  if (!runtime.proposals) throw new Error('EmDash proposal storage is unavailable');
-  const storage = runtime.proposals;
+  if (!runtime.storage?.proposals) throw new Error('EmDash proposal storage is unavailable');
+  const storage = runtime.storage.proposals;
   return {
     async createOwnedDraft({ actorId, data, idempotencyKey }) {
       const parsed = editorialProposalInputSchema.safeParse({
@@ -145,10 +145,12 @@ export function createPlugin(_options: Record<string, never> = {}) {
       listReviewerDrafts: {
         input: listInput,
         request: { body: 'json', maxBytes: 256 },
-        permission: 'content:read',
-        handler: async ({ input, ...runtime }) => {
+        permission: 'content:publish_any',
+        handler: async ({ input, user, ...runtime }) => {
+          const parsedInput = listInput.safeParse(input);
+          if (!parsedInput.success) return { items: [] };
           const service = createEditorialProposalService(createEmDashEditorialProposalHost(runtime));
-          return { items: await service.listForReviewer(input.limit ?? 50) };
+          return { items: await service.listForReviewer(user ? { id: user.id, role: user.role } : undefined, parsedInput.data.limit ?? 50) };
         },
       },
     },

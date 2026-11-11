@@ -39,6 +39,30 @@ Project graph was absent. Attempted required local Qwen warm-up; endpoint timed 
 
 ## Progress
 
+### Resumption — 11 November 2026
+
+The user authorized development to resume after the wrap-up. Starting source is
+`2616b9f70479d63d44969e9821c60e48693b605e`, on the existing issue37 branch with
+a clean working tree. The earlier wrap-up document remains a historical checkpoint.
+The next acceptance gate is a passing showcase test suite, type check and build,
+followed by review of the repaired publication and private-proposal boundaries.
+Agent connection and credential issuance remain deferred. Production and remote
+database changes are excluded from this milestone.
+
+- Luna proposal owner: proposal service/plugin/tests and module declarations;
+  fix native storage context mapping and private queue authorization as well as
+  the preserved check failures.
+- Luna admin owner: React review page/entry typing; keep exact-revision approval
+  and separate native publication actions.
+- Luna publication owner: repair independently identified manual-hash requirement
+  and descriptor/hook mismatch, with regression evidence.
+- Root: dependency declarations/lockfile, optional telemetry environment adapter,
+  integration checks, documentation and independent review of worker changes.
+
+No worker may edit another owner's files. All edits are in this shared checkout;
+original donor worktrees remain untouched. The public wallet preview continues
+to identify the earlier UI-only commit until a new preview is explicitly verified.
+
 - Issue #37 created; isolated branch initialized.
 - Source inventory and UI merge advisory complete; no donor mutations.
 - Implementation, runtime checks and independent review pending.

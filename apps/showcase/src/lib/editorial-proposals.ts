@@ -85,6 +85,8 @@ export class ProposalConflictError extends Error {
 
 export function createEditorialProposalService(host?: EditorialProposalHost) {
   const isContributor = (role: number | string) => role === 20 || (typeof role === 'string' && role.toLowerCase() === 'contributor');
+  const isReviewer = (role: number | string) => role === 40 || role === 50
+    || (typeof role === 'string' && ['editor', 'admin'].includes(role.toLowerCase()));
   const sameProposal = (left: EditorialProposalInput, right: EditorialProposalInput) =>
     left.contractVersion === right.contractVersion && left.title === right.title && left.body === right.body
     && left.kind === right.kind && left.targetCollection === right.targetCollection
@@ -130,8 +132,8 @@ export function createEditorialProposalService(host?: EditorialProposalHost) {
       if (!isContributor(actor.role)) return [];
       return host.listOwnDrafts(actor.id, 50);
     },
-    async listForReviewer(limit = 50): Promise<ProposalDraft[]> {
-      if (!host) return [];
+    async listForReviewer(actor: ProposalActor | undefined, limit = 50): Promise<ProposalDraft[]> {
+      if (!actor?.id || !isReviewer(actor.role) || !host) return [];
       return host.listReviewerDrafts(Math.min(100, Math.max(1, Math.floor(limit))));
     },
   };

@@ -106,11 +106,11 @@ async function references(entry: CmsEntry, collection: string, field: string): P
   });
 }
 
-function mapSource(entry: CmsEntry, data: Record<string, unknown>): VersionedPolicySource {
+async function mapSource(entry: CmsEntry, data: Record<string, unknown>): Promise<VersionedPolicySource> {
   return {
     id: entryId(entry),
     versionKey: asString(data, 'version_key'),
-    revisionHash: asString(data, 'revision_hash'),
+    revisionHash: await sha256Json(sourceHashData(data)),
     publicationState: 'published',
     applicability: {
       country: nullableString(data, 'applicability_country'),
@@ -130,10 +130,9 @@ function sourceHashData(data: Record<string, unknown>): Record<string, unknown> 
   return canonicalContent(data);
 }
 
-async function isUsableSource(source: VersionedPolicySource, data: Record<string, unknown>): Promise<boolean> {
+function isUsableSource(source: VersionedPolicySource): boolean {
   return !!source.id && !!source.versionKey && /^[a-f0-9]{64}$/i.test(source.revisionHash)
-    && !!source.sourceUrl && !!source.observedAt && !!source.statement
-    && await sha256Json(sourceHashData(data)) === source.revisionHash;
+    && !!source.sourceUrl && !!source.observedAt && !!source.statement;
 }
 
 export async function loadPublishedPlanGraph(planId: string): Promise<PolicyGraphInput> {
@@ -154,15 +153,15 @@ export async function loadPublishedPlanGraph(planId: string): Promise<PolicyGrap
     for (const version of versionEntries) {
       const parents = await references(version, 'policy_offer_versions', 'offer');
       if (!parents.some((parent) => offerIds.has(targetId(parent) ?? ''))) continue;
-      const source = mapSource(version, version.data);
-      if (await isUsableSource(source, version.data)) offerVersions.push(source);
+      const source = await mapSource(version, version.data);
+      if (isUsableSource(source)) offerVersions.push(source);
     }
 
     const ruleEntries = await publishedEntries('policy_rule_versions');
     const ruleVersions: VersionedPolicySource[] = [];
     for (const entry of ruleEntries) {
-      const source = mapSource(entry, { ...entry.data, terms_statement: entry.data.statement });
-      if (await isUsableSource(source, entry.data)) ruleVersions.push(source);
+      const source = await mapSource(entry, entry.data);
+      if (isUsableSource(source)) ruleVersions.push(source);
     }
     const assessmentEntries = await publishedEntries('policy_assessments');
     const assessments: PolicyAssessment[] = [];
@@ -191,6 +190,12 @@ export async function loadPublishedPlanGraph(planId: string): Promise<PolicyGrap
       }
       dependencies.sort((a, b) => a.id.localeCompare(b.id));
       const assessmentFieldsHash = await sha256Json({ data: canonicalAssessmentData(data), selected });
+      const publicEvidence = await Promise.all(evidenceRefs.map(async (evidence) => ({
+        id: targetId(evidence) ?? '',
+        revisionHash: await sha256Json(canonicalContent(evidence.data)),
+        publicationState: 'published' as const,
+        ...(typeof evidence.data.public_excerpt === 'string' ? { publicExcerpt: evidence.data.public_excerpt } : {}),
+      })));
       assessments.push({
         id: entryId(entry),
         revision: assessmentFieldsHash,
@@ -199,12 +204,7 @@ export async function loadPublishedPlanGraph(planId: string): Promise<PolicyGrap
         offerVersionId: targetId(offerRefs[0]) ?? '',
         ruleVersionIds: ruleRefs.map((rule) => targetId(rule) ?? ''),
         dependencies,
-        evidence: evidenceRefs.map((evidence) => ({
-          id: targetId(evidence) ?? '',
-          revisionHash: asString(evidence.data, 'revision_hash'),
-          publicationState: 'published',
-          ...(typeof evidence.data.public_excerpt === 'string' ? { publicExcerpt: evidence.data.public_excerpt } : {}),
-        })),
+        evidence: publicEvidence,
         applicability: {
           country: nullableString(data, 'applicability_country'),
           effectiveFrom: nullableString(data, 'applicability_contract_from'),

@@ -440,7 +440,7 @@
 				},
 				{
 					"slug": "revision_hash",
-					"label": "Revision fingerprint (filled by review workflow)",
+					"label": "Legacy fingerprint (optional)",
 					"type": "string",
 					"required": false
 				},
@@ -595,7 +595,7 @@
 				},
 				{
 					"slug": "revision_hash",
-					"label": "Revision fingerprint (filled by review workflow)",
+					"label": "Legacy fingerprint (optional)",
 					"type": "string",
 					"required": false
 				},
@@ -702,7 +702,7 @@
 				},
 				{
 					"slug": "revision_hash",
-					"label": "Revision fingerprint (filled by review workflow)",
+					"label": "Legacy fingerprint (optional)",
 					"type": "string",
 					"required": false
 				},
@@ -777,7 +777,7 @@
 				},
 				{
 					"slug": "revision_hash",
-					"label": "Revision fingerprint (filled by review workflow)",
+					"label": "Legacy fingerprint (optional)",
 					"type": "string",
 					"required": false
 				},

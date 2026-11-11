@@ -23,10 +23,27 @@ function assessmentStatus(item: AssessmentSummary): string {
   return item.status === 'published' ? 'Published' : item.status === 'scheduled' ? 'Scheduled' : 'Draft';
 }
 
-function contextLabels(context: AssessmentContext | null, key: string): string {
-  const entries = context?.item.references?.[key]?.entries ?? [];
-  if (!entries.length) return 'No linked entries';
-  return entries.map((entry) => entry.title || entry.slug || entry.id).join(', ');
+function safeSourceUrl(value: string): string | undefined {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !url.username && !url.password ? url.href : undefined;
+  } catch { return undefined; }
+}
+
+function ReviewSources({ sources }: { sources: ReviewState['sources'] }) {
+  return <section aria-labelledby="review-sources-title">
+    <h3 id="review-sources-title" className="font-semibold">Linked published sources</h3>
+    <p>These snapshots are the sources checked by the review service for this assessment.</p>
+    {sources.length === 0 ? <p>Source snapshots are unavailable. Reload the review before approving.</p> : <ul className="space-y-4">
+      {sources.map((source) => <li key={`${source.collection}:${source.id}`}>
+        <h4><a href={`/_emdash/admin/content/${encodeURIComponent(source.collection)}/${encodeURIComponent(source.id)}`}>{source.title}</a></h4>
+        <p>{source.collection === 'policy_offer_versions' ? 'Offer terms' : source.collection === 'policy_rule_versions' ? 'Applicable rule' : 'Evidence'} · Version {source.revision}</p>
+        <p className="whitespace-pre-wrap">{source.statement || 'No excerpt is recorded. Open the source entry to inspect it.'}</p>
+        {safeSourceUrl(source.sourceUrl) && <p><a href={safeSourceUrl(source.sourceUrl)} target="_blank" rel="noopener noreferrer">Open cited source</a></p>}
+        <details><summary>Snapshot fingerprint</summary><code className="break-all">{source.contentHash}</code></details>
+      </li>)}
+    </ul>}
+  </section>;
 }
 
 function displayValue(value: unknown): string {
@@ -58,6 +75,7 @@ export function PolicyReviewPage() {
   const [error, setError] = React.useState('');
   const [notice, setNotice] = React.useState('');
   const [confirmed, setConfirmed] = React.useState(false);
+  const selectionRequest = React.useRef(0);
 
   const refreshList = React.useCallback(async () => {
     setLoadingList(true);
@@ -74,6 +92,7 @@ export function PolicyReviewPage() {
   React.useEffect(() => { void refreshList(); }, [refreshList]);
 
   const selectAssessment = React.useCallback(async (id: string) => {
+    const requestId = ++selectionRequest.current;
     setSelectedId(id);
     setState(null);
     setContext(null);
@@ -84,12 +103,14 @@ export function PolicyReviewPage() {
     setLoadingDetails(true);
     try {
       const [review, details] = await Promise.all([loadReviewState(id), loadAssessmentContext(id)]);
+      if (requestId !== selectionRequest.current) return;
       setState(review);
       setContext(details);
     } catch (cause) {
+      if (requestId !== selectionRequest.current) return;
       setError(cause instanceof Error ? cause.message : 'Could not load the selected assessment.');
     } finally {
-      setLoadingDetails(false);
+      if (requestId === selectionRequest.current) setLoadingDetails(false);
     }
   }, []);
 
@@ -147,7 +168,7 @@ export function PolicyReviewPage() {
               <tbody>
                 {assessments.map((item) => (
                   <tr key={item.id}>
-                    <th scope="row"><button type="button" aria-pressed={selectedId === item.id} onClick={() => void selectAssessment(item.id)}>{String(item.data.title ?? item.slug ?? item.id)}</button></th>
+                    <th scope="row"><button type="button" aria-pressed={selectedId === item.id} disabled={saving} onClick={() => void selectAssessment(item.id)}>{String(item.data.title ?? item.slug ?? item.id)}</button></th>
                     <td>{String(item.data.offer_label ?? item.data.offer_version_label ?? 'Open to inspect')}</td>
                     <td>{String(item.data.finding_state ?? 'Not stated')}</td>
                     <td>{assessmentStatus(item)}</td>
@@ -166,9 +187,7 @@ export function PolicyReviewPage() {
         {loadingDetails ? <p role="status" aria-live="polite">Loading exact revision and linked sources…</p> : state && context ? <>
           <p><strong>Content status:</strong> {assessmentStatus(selectedItem ?? { id: selectedId, status: context.item.status, data: state.assessment })}</p>
           <p><strong>Review period:</strong> {dateLabel(state.assessment.reviewed_at)} through {dateLabel(state.assessment.review_expires_at)}{reviewUnavailable ? ' · unavailable or expired; request a fresh assessment review' : ''}</p>
-          <p><strong>Offer version:</strong> {contextLabels(context, 'offer_version')}</p>
-          <p><strong>Rule versions:</strong> {contextLabels(context, 'rule_versions')}</p>
-          <p><strong>Evidence:</strong> {contextLabels(context, 'evidence')}</p>
+          <ReviewSources sources={state.sources ?? []} />
           {state.currentApproval && <p role="status">A review record exists through {dateLabel(state.currentApproval.expiresAt)}. The server checks whether it still matches this assessment and its linked sources.</p>}
           <details>
             <summary>Review details and revision comparison</summary>
@@ -180,7 +199,7 @@ export function PolicyReviewPage() {
             {!context.compare.hasChanges ? <p>No pending draft changes are recorded against the published version.</p> : changedFields(context).length ? <div className="overflow-x-auto"><table className="w-full text-left"><caption>Fields that differ between the published version and current draft</caption><thead><tr><th scope="col">Field</th><th scope="col">Published</th><th scope="col">Draft</th></tr></thead><tbody>{changedFields(context).map((key) => <tr key={key}><th scope="row">{key === '_references' ? 'Linked entries' : key.replaceAll('_', ' ')}</th><td>{key === '_references' ? 'Open the content editor to review linked entries' : displayValue(context.compare.live?.[key])}</td><td>{key === '_references' ? 'Open the content editor to review linked entries' : displayValue(context.compare.draft?.[key])}</td></tr>)}</tbody></table></div> : <p>The current draft differs from the published version only in linked entries. Review the linked offer and sources above and use the native content editor for details.</p>}
           </details>
           <p><a href={editorHref}>Open assessment in the native content editor</a></p>
-          <fieldset className="space-y-2" disabled={saving || reviewUnavailable}>
+          <fieldset className="space-y-2" disabled={saving || reviewUnavailable || !state.sources?.length}>
             <legend className="font-semibold">Record a review</legend>
             <label className="flex items-start gap-2">
               <input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.currentTarget.checked)} />

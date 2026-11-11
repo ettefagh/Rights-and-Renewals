@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
+import { PluginStorageRepository } from 'emdash';
+import { proposalQueueStorage } from '../../scripts/proposal-catalog.mjs';
 import {
   EDITORIAL_PROPOSAL_CONTRACT_VERSION,
   addEditorialProposalsCollection,
@@ -22,14 +24,14 @@ describe('editorial proposal service', () => {
   it('creates an EmDash native plugin with one narrow proposal tool and publication guards', async () => {
     const plugin = createPlugin();
     expect(Object.keys(plugin.mcp?.tools ?? {})).toEqual(['propose_draft']);
-    expect(plugin.capabilities).toEqual(['hooks.content-policy:register']);
+    expect(plugin.capabilities).toEqual(['hooks.content-policy:register', 'content:read']);
     expect(plugin.hooks['content:beforePublish']).toBeDefined();
     expect(plugin.hooks['content:beforeSchedule']).toBeDefined();
     expect(await plugin.hooks['content:beforePublish']!.handler({ collection: 'editorial_proposals' } as never, {} as never))
       .toMatchObject({ cancel: true });
     expect(await plugin.hooks['content:beforeSchedule']!.handler({ collection: 'editorial_proposals' } as never, {} as never))
       .toMatchObject({ cancel: true });
-    expect(Object.keys(plugin.routes)).toEqual(['proposeDraft']);
+    expect(Object.keys(plugin.routes)).toEqual(['proposeDraft', 'listOwnDrafts', 'listReviewerDrafts']);
   });
 
   it('requires a host-authenticated contributor and fails closed without the ownership adapter', async () => {
@@ -83,8 +85,62 @@ describe('editorial proposal service', () => {
   });
 
   it('does not let revision suggestions omit the expected revision or target id', async () => {
-    const service = createEditorialProposalService({ createOwnedDraft: vi.fn(), listOwnDrafts: vi.fn() });
+    const service = createEditorialProposalService({
+      createOwnedDraft: vi.fn(), listOwnDrafts: vi.fn(), listReviewerDrafts: vi.fn(),
+    });
     expect(await service.propose(actor, { ...valid, kind: 'revision_suggestion' })).toEqual({ ok: false, code: 'invalid_input' });
+  });
+
+  it('restricts the shared reviewer queue to authenticated editors and admins', async () => {
+    const listReviewerDrafts = vi.fn(async () => []);
+    const service = createEditorialProposalService({
+      createOwnedDraft: vi.fn(), listOwnDrafts: vi.fn(), listReviewerDrafts,
+    });
+    expect(await service.listForReviewer(actor)).toEqual([]);
+    expect(await service.listForReviewer(undefined)).toEqual([]);
+    expect(listReviewerDrafts).not.toHaveBeenCalled();
+    await service.listForReviewer({ id: 'editor-1', role: 40 });
+    await service.listForReviewer({ id: 'admin-1', role: 'admin' });
+    expect(listReviewerDrafts).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses EmDash route context storage for draft-only proposal persistence', async () => {
+    const compareAndSet = vi.fn(async () => ({ applied: true }));
+    const plugin = createPlugin();
+    const response = await plugin.routes.proposeDraft!.handler({
+      input: valid,
+      user: actor,
+      storage: { proposals: { compareAndSet, get: vi.fn(), query: vi.fn() } },
+    } as never);
+    expect(response).toMatchObject({ ok: true, status: 'draft' });
+    expect(compareAndSet).toHaveBeenCalledWith(expect.stringMatching(/^proposal-/), null, expect.objectContaining({
+      ownerId: actor.id,
+      proposalState: 'pending',
+      draft: expect.objectContaining({ ownerId: actor.id, status: 'draft' }),
+    }));
+  });
+
+  it('declares every indexed field used by both native proposal queue queries', async () => {
+    const repository = new PluginStorageRepository(
+      {
+        getExecutor: () => ({ adapter: {} }),
+        selectFrom: () => { throw new Error('native storage query reached database'); },
+      } as never,
+      'cmlab-editorial-proposals',
+      'proposals',
+      proposalQueueStorage.proposals.indexes,
+    );
+
+    await expect(repository.query({
+      where: { ownerId: actor.id, proposalState: 'pending' },
+      orderBy: { createdAt: 'desc' },
+      limit: 50,
+    })).rejects.toThrow('native storage query reached database');
+    await expect(repository.query({
+      where: { proposalState: 'pending' },
+      orderBy: { createdAt: 'desc' },
+      limit: 100,
+    })).rejects.toThrow('native storage query reached database');
   });
 
   it('adds its collection without replacing existing collections or duplicating it', () => {

@@ -21,12 +21,21 @@ export default defineConfig({
       storage: r2({ binding: 'MEDIA' }),
       plugins: [
         {
+          id: 'cmlab-editorial-proposals',
+          version: '1.0.0',
+          entrypoint: fileURLToPath(new URL('./src/lib/editorial-proposals-plugin.ts', import.meta.url)).replaceAll('\\', '/'),
+          format: 'native',
+          capabilities: ['hooks.content-policy:register', 'content:read'],
+          hooks: ['content:beforePublish', 'content:beforeSchedule'],
+          routes: ['proposeDraft', 'listOwnDrafts', 'listReviewerDrafts'],
+        },
+        {
           id: 'cmlab-policy-graph-review',
           version: '1.0.0',
           entrypoint: fileURLToPath(new URL('./src/lib/policy-graph-plugin.ts', import.meta.url)).replaceAll('\\', '/'),
           format: 'native',
-          capabilities: ['content:read', 'hooks.content-policy:register'],
-          hooks: ['content:beforePublish', 'content:beforeSchedule'],
+          capabilities: ['content:read', 'content:write', 'content:publish', 'hooks.content-policy:register'],
+          hooks: ['content:beforeSave', 'content:beforePublish', 'content:beforeSchedule'],
           routes: ['reviewAssessment', 'approveAssessment'],
         },
         {

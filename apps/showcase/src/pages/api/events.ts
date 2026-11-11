@@ -1,14 +1,10 @@
 import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
-import { createTelemetryHandler, type AnalyticsDataset, type EventRateLimiter, type PublishedEventRegistry } from '../../lib/telemetry';
+import { createTelemetryHandler, type PublishedEventRegistry } from '../../lib/telemetry';
+import { readTelemetryEnvironment, type TelemetryEnvironment } from '../../lib/telemetry-environment';
 import { buildPublishedEventRegistry } from '../../lib/telemetry-registry';
 
-export type TelemetryEnvironment = {
-  PUBLIC_EVENTS_ENABLED?: string;
-  PUBLIC_EVENTS_ORIGINS?: string;
-  ANALYTICS?: AnalyticsDataset;
-  PUBLIC_EVENTS_RATE_LIMITER?: EventRateLimiter;
-};
+export type { TelemetryEnvironment } from '../../lib/telemetry-environment';
 
 const emptyRegistry = (): PublishedEventRegistry => ({
   pageIds: new Set(), entityIds: new Set(), blockIds: new Set(), ctaIds: new Set(), revisions: new Set(),
@@ -36,15 +32,16 @@ export function createTelemetryConfig(environment: TelemetryEnvironment, publish
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  if (env.PUBLIC_EVENTS_ENABLED !== 'true') {
-    return createTelemetryHandler(createTelemetryConfig(env, emptyRegistry(), false))(request);
+  const environment = readTelemetryEnvironment(env);
+  if (environment.PUBLIC_EVENTS_ENABLED !== 'true') {
+    return createTelemetryHandler(createTelemetryConfig(environment, emptyRegistry(), false))(request);
   }
   let registry: PublishedEventRegistry;
   try {
     registry = await buildPublishedEventRegistry();
   } catch {
     registry = emptyRegistry();
-    return createTelemetryHandler(createTelemetryConfig(env, registry, false))(request);
+    return createTelemetryHandler(createTelemetryConfig(environment, registry, false))(request);
   }
-  return createTelemetryHandler(createTelemetryConfig(env, registry))(request);
+  return createTelemetryHandler(createTelemetryConfig(environment, registry))(request);
 };

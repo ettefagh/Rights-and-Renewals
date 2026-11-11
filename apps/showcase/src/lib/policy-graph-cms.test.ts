@@ -29,8 +29,8 @@ describe('published policy CMS projection', () => {
     const ruleContent = { version_key: 'rule-v1', applicability_country: 'DE', source_url: 'https://example.invalid/rule', observed_at: '2026-10-01T00:00:00Z', statement: 'Hypothetical rule.' };
     const assessmentContent = { applicability_country: 'DE', applicability_contract_from: '2026-01-01', applicability_channel: 'web', applicability_customer: 'consumer', terms_statement: 'Hypothetical assessment.', product_observation: 'Hypothetical observation.', applicability_state: 'applicable', terms_state: 'unclear', finding_state: 'unresolved', reviewed_at: '2026-10-02T00:00:00Z', review_expires_at: '2027-01-01T00:00:00Z' };
     const evidence = dbId('db-evidence', { ...evidenceContent, revision_hash: 'd'.repeat(64) });
-    const offerVersion = dbId('db-offer-version', { ...offerContent, revision_hash: await sha256Json(offerContent) });
-    const ruleVersion = dbId('db-rule-version', { ...ruleContent, revision_hash: await sha256Json(ruleContent) });
+    const offerVersion = dbId('db-offer-version', { ...offerContent, revision_hash: 'forged-editor-metadata' });
+    const ruleVersion = dbId('db-rule-version', ruleContent);
     const assessment = dbId('db-assessment', assessmentContent);
     assessment.data.slug = 'query-metadata-slug';
     assessment.data.references = { offer_version: ['metadata-enriched'] };
@@ -69,6 +69,9 @@ describe('published policy CMS projection', () => {
     const result = resolvePolicyPlan(graph, { country: 'DE', contractDate: '2026-10-01', channel: 'web', customerKind: 'consumer' });
     expect(result.findings).toHaveLength(1);
     expect(result.findings[0]).toMatchObject({ assessmentId: 'db-assessment', ruleVersionId: 'db-rule-version' });
+    expect(graph.offerVersions[0]?.revisionHash).toBe(await sha256Json(canonical(entries.policy_offer_versions![0]!.data)));
+    expect(graph.ruleVersions[0]?.revisionHash).toBe(await sha256Json(canonical(entries.policy_rule_versions![0]!.data)));
+    expect(graph.assessments[0]?.evidence[0]?.revisionHash).toBe(await sha256Json(canonical(links['policy_assessments|db-assessment|evidence']![0]!.data)));
     expect(cms.getEmDashReferences).toHaveBeenCalledWith('policy_offers', 'db-offer', 'plan', expect.any(Object));
     expect(runtime.withEmDashRuntime).toHaveBeenCalledTimes(1);
   });

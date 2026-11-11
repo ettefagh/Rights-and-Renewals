@@ -12,7 +12,10 @@ export function createPlugin() {
     capabilities: ['content:read'],
     admin: {
       entry: policyReviewConsoleAdminEntry,
-      pages: [{ path: '/review', label: 'Assessment review', icon: 'clipboard-text', group: 'Policy catalog' }],
+      pages: [
+        { path: '/review', label: 'Assessment review', icon: 'clipboard-text', group: 'Policy catalog' },
+        { path: '/proposals', label: 'Editorial proposals', icon: 'inbox', group: 'Editorial' },
+      ],
     },
   });
 }

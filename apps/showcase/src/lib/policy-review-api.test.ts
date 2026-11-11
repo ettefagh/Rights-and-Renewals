@@ -7,6 +7,7 @@ const state: ReviewState = {
   assessmentFieldsHash: 'server-returned-provenance',
   assessment: { title: 'Assessment' },
   dependencies: [{ id: 'evidence-a', revision: 'evidence-v2', contentHash: 'server-hash' }],
+  sources: [],
   expectedApprovalRevision: 'approval-revision-2',
   currentApproval: null,
 };

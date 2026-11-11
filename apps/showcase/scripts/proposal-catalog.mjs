@@ -6,7 +6,7 @@ export const proposalCollections = Object.freeze([
 export const proposalKinds = Object.freeze(['new_draft', 'revision_suggestion']);
 
 export const proposalQueueStorage = Object.freeze({
-  proposals: Object.freeze({ indexes: Object.freeze(['ownerId', 'createdAt']) }),
+  proposals: Object.freeze({ indexes: Object.freeze(['ownerId', 'createdAt', 'proposalState']) }),
 });
 
 export const proposalLimits = Object.freeze({

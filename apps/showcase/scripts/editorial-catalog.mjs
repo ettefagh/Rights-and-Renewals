@@ -40,7 +40,7 @@ export const editorialCollections = [
   common('policy_offer_versions', 'Offer Versions', [
     field('title', 'Version label', 'string', { required: true }),
     field('version_key', 'Stable version identity', 'string', { required: true, unique: true }),
-    field('revision_hash', 'Revision fingerprint (filled by review workflow)', 'string'),
+    field('revision_hash', 'Legacy fingerprint (optional)', 'string'),
     ref('offer', 'Offer', 'offer_versions', 'child', false),
     field('terms_statement', 'Terms statement', 'text', { required: true }),
     field('source_url', 'Source URL', 'url', { required: true }),
@@ -60,7 +60,7 @@ export const editorialCollections = [
   common('policy_rule_versions', 'Rule Versions', [
     field('title', 'Version label', 'string', { required: true }),
     field('version_key', 'Stable version identity', 'string', { required: true, unique: true }),
-    field('revision_hash', 'Revision fingerprint (filled by review workflow)', 'string'),
+    field('revision_hash', 'Legacy fingerprint (optional)', 'string'),
     ref('rule', 'Rule', 'rule_versions', 'child', false),
     field('statement', 'Rule statement', 'text', { required: true }),
     field('source_url', 'Official source URL', 'url', { required: true }),
@@ -75,7 +75,7 @@ export const editorialCollections = [
   common('policy_evidence', 'Policy Evidence', [
     field('title', 'Evidence title', 'string', { required: true }),
     field('stable_key', 'Stable identity', 'string', { required: true, unique: true }),
-    field('revision_hash', 'Revision fingerprint (filled by review workflow)', 'string'),
+    field('revision_hash', 'Legacy fingerprint (optional)', 'string'),
     field('evidence_kind', 'Evidence kind', 'select', { required: true, validation: { options: ['terms_excerpt', 'official_guidance', 'official_law', 'product_observation', 'other'] } }),
     field('public_excerpt', 'Public excerpt', 'text'),
     field('internal_notes', 'Internal notes', 'text'),
@@ -86,7 +86,7 @@ export const editorialCollections = [
   common('policy_assessments', 'Policy Assessments', [
     field('title', 'Assessment title', 'string', { required: true }),
     field('assessment_key', 'Stable assessment identity', 'string', { required: true }),
-    field('revision_hash', 'Revision fingerprint (filled by review workflow)', 'string'),
+    field('revision_hash', 'Legacy fingerprint (optional)', 'string'),
     ref('offer_version', 'Offer version', 'assessment_offer_versions', 'child', false),
     ref('rule_versions', 'Rule versions', 'assessment_rule_versions', 'child'),
     ref('evidence', 'Evidence', 'assessment_evidence', 'child'),

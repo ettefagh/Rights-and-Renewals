@@ -5,7 +5,7 @@ import type { ProtectedApproval } from './policy-graph.js';
 import { sha256Json } from './policy-graph.js';
 
 const REVIEW_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
-const EDITOR_ROLE_LEVEL = 40;
+const REVIEWER_ROLE_LEVELS = new Set([40, 50]);
 const REFERENCE_FIELDS = ['offer_version', 'rule_versions', 'evidence'] as const;
 const REFERENCE_COLLECTIONS = {
   offer_version: 'policy_offer_versions',
@@ -26,6 +26,13 @@ interface DependencySnapshot {
   contentHash: string;
 }
 
+interface ReviewSourceSnapshot extends DependencySnapshot {
+  collection: string;
+  title: string;
+  sourceUrl: string;
+  statement: string;
+}
+
 interface ApprovalRecord extends ProtectedApproval {
   dependencies: DependencySnapshot[];
   assessmentFieldsHash: string;
@@ -37,6 +44,8 @@ interface ContentVersion {
   item: {
     id: string;
     status: string;
+    publishedAt?: string | null;
+    liveRevisionId?: string | null;
     authorId?: string | null;
     data: Record<string, unknown>;
   };
@@ -56,12 +65,16 @@ function isStrictTimestamp(value: unknown): value is string {
 async function gateVersionEdit(event: ContentHookEvent, ctx: PluginContext) {
   if (!IMMUTABLE_VERSION_COLLECTIONS.has(event.collection) || !event.id) return;
   try {
-    if (!ctx.content?.getVersioned) return reject('Version edit is blocked because its current EmDash revision cannot be verified.');
+    if (!ctx.content?.getVersioned) throw new Error('EmDash content version API is unavailable.');
     const existing = await ctx.content.getVersioned(event.collection, event.id) as ContentVersion | null;
-    if (!existing) return reject('Version edit is blocked because its current EmDash revision cannot be verified.');
-    if (existing.item.status === 'published') return reject('Published policy versions and evidence are immutable; create a new version entry for changes.');
-  } catch {
-    return reject('Version edit is blocked because its current EmDash revision cannot be verified.');
+    if (!existing) throw new Error('The existing version could not be verified.');
+    if (existing.item.status === 'published' || existing.item.liveRevisionId || existing.item.publishedAt) {
+      throw new Error('Published policy versions and evidence are immutable; create a new version entry for changes.');
+    }
+  } catch (error) {
+    throw new Error(error instanceof Error && error.message.includes('immutable')
+      ? error.message
+      : 'Version edit is blocked because its current EmDash revision cannot be verified.');
   }
 }
 
@@ -94,6 +107,7 @@ async function currentBinding(ctx: PluginContext, assessmentId: string) {
   }
 
   const dependencies: DependencySnapshot[] = [];
+  const sources: ReviewSourceSnapshot[] = [];
   const selected: Record<(typeof REFERENCE_FIELDS)[number], string[]> = {
     offer_version: [], rule_versions: [], evidence: [],
   };
@@ -108,6 +122,20 @@ async function currentBinding(ctx: PluginContext, assessmentId: string) {
       if (typeof identity !== 'string' || identity.trim() === '') throw new Error(`Referenced ${collection} entry ${id} has no stable version identity.`);
       const contentHash = await sha256Json(canonicalContent(version.item.data));
       dependencies.push({ id, revision: identity, contentHash });
+      const data = version.item.data;
+      const title = [data.title, data.label, data.version_key, data.stable_key, id]
+        .find((value): value is string => typeof value === 'string' && value.trim() !== '')!;
+      const statement = [data.terms_statement, data.statement, data.public_excerpt, data.excerpt]
+        .find((value): value is string => typeof value === 'string' && value.trim() !== '') ?? '';
+      sources.push({
+        collection,
+        id,
+        title,
+        revision: identity,
+        sourceUrl: typeof data.source_url === 'string' ? data.source_url : '',
+        statement,
+        contentHash,
+      });
     }
   }
   if (selected.offer_version.length !== 1 || selected.rule_versions.length === 0 || selected.evidence.length === 0) {
@@ -115,12 +143,7 @@ async function currentBinding(ctx: PluginContext, assessmentId: string) {
   }
   dependencies.sort((a, b) => a.id.localeCompare(b.id));
   const assessmentFieldsHash = await sha256Json({ data: canonicalAssessmentData(current.item.data), selected });
-  return { current, dependencies, selected, assessmentFieldsHash };
-}
-
-async function declaredVersionHashMatches(data: Record<string, unknown>): Promise<boolean> {
-  const declaredHash = data.revision_hash;
-  return typeof declaredHash === 'string' && declaredHash === await sha256Json(canonicalContent(data));
+  return { current, dependencies, selected, assessmentFieldsHash, sources };
 }
 
 function canonicalContent(data: Record<string, unknown>): Record<string, unknown> {
@@ -147,7 +170,9 @@ async function gateAssessmentPublish(
     try {
       const current = await ctx.content.getVersioned(event.collection, id) as ContentVersion | null;
       if (current?.item.status === 'published') return reject('Published policy versions and evidence are immutable; create a new version entry for changes.');
-      if (!current || !await declaredVersionHashMatches(current.item.data)) return reject('Version publication is blocked because its declared revision hash does not match its canonical content.');
+      // Fingerprints are derived from canonical content by readers and reviewers.
+      // The optional revision_hash field is legacy/editor metadata, not authority.
+      if (!current) return reject('Version publication is blocked because its current EmDash revision cannot be verified.');
     } catch {
       return reject('Version publication is blocked because its current EmDash revision cannot be verified.');
     }
@@ -178,13 +203,13 @@ async function gateAssessmentPublish(
 const pluginDefinition = {
   id: 'cmlab-policy-graph-review',
   version: '1.0.0',
-  capabilities: ['content:read', 'content:write', 'hooks.content-policy:register'],
+  capabilities: ['content:read', 'content:write', 'content:publish', 'hooks.content-policy:register'],
   storage: {
     approvals: { indexes: ['assessmentId'] },
     approval_audit: { indexes: ['assessmentId', 'reviewerId', 'approvedAt'] },
   },
   hooks: {
-    'content:beforeSave': gateVersionEdit,
+    'content:beforeSave': { handler: gateVersionEdit, errorPolicy: 'abort' },
     'content:beforePublish': gateAssessmentPublish,
     'content:beforeSchedule': async (event, ctx) => REVIEWED_COLLECTIONS.has(event.collection)
       ? reject(event.collection === 'policy_assessments'
@@ -197,7 +222,7 @@ const pluginDefinition = {
       permission: 'content:publish_any',
       methods: ['GET'],
       handler: async (route) => {
-        if (!route.user || route.user.role < EDITOR_ROLE_LEVEL) throw new Error('An authenticated Editor or Admin reviewer is required.');
+        if (!route.user?.id || !REVIEWER_ROLE_LEVELS.has(route.user.role)) throw new Error('An authenticated Editor or Admin reviewer is required.');
         const assessmentId = new URL(route.request.url).searchParams.get('assessmentId')?.trim();
         if (!assessmentId) throw new Error('assessmentId is required.');
         if (!route.storage.approvals) throw new Error('The protected review store is unavailable.');
@@ -209,6 +234,7 @@ const pluginDefinition = {
           assessmentFieldsHash: binding.assessmentFieldsHash,
           assessment: binding.current.item.data,
           dependencies: binding.dependencies,
+          sources: binding.sources,
           expectedApprovalRevision: approval?.revision ?? null,
           currentApproval: approval ? {
             reviewerId: (approval.value as ApprovalRecord).reviewerId,
@@ -228,7 +254,7 @@ const pluginDefinition = {
         const parsed = approvalInputSchema.safeParse(route.input);
         if (!parsed.success) throw new Error('Assessment review input is invalid.');
         const input = parsed.data;
-        if (!user || user.role < EDITOR_ROLE_LEVEL) throw new Error('An authenticated Editor or Admin reviewer is required.');
+        if (!user?.id || !REVIEWER_ROLE_LEVELS.has(user.role)) throw new Error('An authenticated Editor or Admin reviewer is required.');
         const assessmentId = input.assessmentId;
         if (!route.content?.getVersioned || !route.storage.approvals || !route.storage.approval_audit) throw new Error('The review store is unavailable.');
         try {
