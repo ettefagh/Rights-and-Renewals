@@ -1,5 +1,10 @@
 # Issue 37 completion audit
 
+**User scope update:** current delivery is media/logos, minimal analytics and
+preview deployment. Other work is postponed according to
+[ISSUE37_DELIVERY_PHASES.md](ISSUE37_DELIVERY_PHASES.md), not cancelled or completed.
+The historical evidence below must not override that prioritization.
+
 The active goal includes implementation, verified content, isolated runtime proof,
 and GitHub handoff. None of those states implies the others. Current integrated
 changes after `cdfb7d1` are not yet committed or deployed.
