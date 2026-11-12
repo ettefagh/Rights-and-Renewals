@@ -126,12 +126,12 @@ function finiteNumber(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
-export type OmniCommand = 'add' | 'wiki' | 'tax' | 'cms' | 'emdash' | 'claim' | 'cancel';
+export type OmniCommand = 'add' | 'wiki' | 'tax' | 'claim' | 'cancel';
 
 export function parseOmniCommand(query: string): { command: OmniCommand | null; argument: string } | null {
   const trimmed = query.trim();
   if (!trimmed.startsWith('>')) return null;
   const [rawCommand = '', ...argument] = trimmed.slice(1).trim().split(/\s+/);
-  const aliases: Record<string, OmniCommand> = { emdash: 'emdash', cms: 'cms', add: 'add', wiki: 'wiki', tax: 'tax', claim: 'claim', cancel: 'cancel' };
+  const aliases: Record<string, OmniCommand> = { add: 'add', wiki: 'wiki', tax: 'tax', claim: 'claim', cancel: 'cancel' };
   return { command: aliases[rawCommand.toLocaleLowerCase('en-US')] ?? null, argument: argument.join(' ') };
 }

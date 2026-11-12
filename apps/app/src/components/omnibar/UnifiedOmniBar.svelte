@@ -5,7 +5,7 @@
   import { fetchPublishedWiki } from '../../lib/wiki-cms-client';
   import { getShowcaseUrl } from '../../lib/showcase-url';
   import { parseOmniCommand, projectWalletSearchItem, searchWalletItems, searchWikiPolicies, type OmniCommand, type WalletSearchProjection } from '../../lib/omnibar-search';
-  import { Search, Shield, Sparkles, Receipt, Zap, X, BookOpen, Camera } from 'lucide-svelte';
+  import { Search, Shield, Sparkles, Receipt, X, BookOpen, Camera } from 'lucide-svelte';
 
   type OmniResult = {
     id: string;
@@ -27,8 +27,6 @@
   let inputElement = $state<HTMLInputElement | null>(null);
   let wikiPolicies = $state.raw<PolicyWikiEntry[]>(policySeedData);
   let wikiSourceStatus = $state<'published' | 'offline'>('offline');
-
-  const cmsAdminUrl = getShowcaseUrl('/_emdash/admin');
 
   onMount(() => {
     void fetchPublishedWiki(getShowcaseUrl('/api/emdash/wiki'))
@@ -69,8 +67,7 @@
       return [
         action('add', 'Add an item', 'Capture a receipt or enter a purchase manually'),
         action('wiki', 'Open the Policy Wiki', 'Browse published guidance and the offline policy catalog'),
-        action('tax', 'Tax summary', 'Review tax deductible items'),
-        ...(cmsAdminUrl ? [action('cms', 'Open CMS', 'Open the editorial workspace')] : [])
+        action('tax', 'Tax summary', 'Review tax deductible items')
       ];
     }
 
@@ -83,8 +80,6 @@
             ? searchWikiPolicies(term, wikiPolicies, 8).map(({ item }) => ({ id: `wiki-${item.brandSlug}`, kind: 'wiki', title: item.brandName, subtitle: `${item.category} · ${item.legalNotes}`, badge: 'Wiki', wikiEntry: item }))
             : [action('wiki', 'Open the Policy Wiki', 'Browse published guidance and the offline policy catalog')];
         case 'tax': return term ? [] : [action('tax', 'Open tax summary', 'Review tax deductible items')];
-        case 'cms':
-        case 'emdash': return term ? [] : cmsAdminUrl ? [action('cms', 'Open CMS', 'Open the editorial workspace')] : [];
         case 'claim':
           return term
             ? searchWalletItems(term, walletStore.items, 8).map(({ item, projection }) => ({ id: `claim-${String(item.id)}`, kind: 'wallet', title: `Select for claim: ${projection.title}`, subtitle: `${projection.merchantOrProvider} · Review actions in item details`, badge: 'Claim', walletItem: item, walletProjection: projection, command: 'claim' }))
@@ -141,7 +136,6 @@
       case 'add': onCapture?.(result.argument || undefined); break;
       case 'wiki': onWikiSelect?.(); break;
       case 'tax': walletStore.setView('tax'); break;
-      case 'cms': if (cmsAdminUrl) window.open(cmsAdminUrl, '_blank', 'noopener,noreferrer'); break;
     }
   }
 
@@ -237,8 +231,6 @@
           <BookOpen size={16} class="row-icon text-coral" aria-hidden="true" />
         {:else if result.command === 'tax'}
           <Receipt size={16} class="row-icon text-pine" aria-hidden="true" />
-        {:else}
-          <Zap size={16} class="row-icon text-pine" aria-hidden="true" />
         {/if}
         <span class="row-info"><span class="row-title">{result.title}</span><span class="row-sub">{result.subtitle}</span></span>
         {#if result.badge}<span class="row-badge">{result.badge}</span>{/if}
@@ -249,8 +241,6 @@
     <p class="no-match-msg">
       {#if parseOmniCommand(query)?.command === 'tax' && parseOmniCommand(query)?.argument}
         Tax summary does not accept a year argument. Type <code>&gt;tax</code> to open it.
-      {:else if ['cms', 'emdash'].includes(parseOmniCommand(query)?.command ?? '') && parseOmniCommand(query)?.argument}
-        CMS does not accept an argument. Type <code>&gt;cms</code> to open it.
       {:else}
         No matching action or item for “{query.trim()}”. Try <code>&gt;claim headphones</code> or <code>&gt;cancel Spotify</code> to select a local item.
       {/if}

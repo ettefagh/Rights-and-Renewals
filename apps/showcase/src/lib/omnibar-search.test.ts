@@ -120,6 +120,8 @@ describe('omnibar search', () => {
     expect(parseOmniCommand('>claim headphones')).toEqual({ command: 'claim', argument: 'headphones' });
     expect(parseOmniCommand('>wiki Magenta Zuhause')).toEqual({ command: 'wiki', argument: 'Magenta Zuhause' });
     expect(parseOmniCommand('>import file.csv')).toEqual({ command: null, argument: 'file.csv' });
+    expect(parseOmniCommand('>cms')).toEqual({ command: null, argument: '' });
+    expect(parseOmniCommand('>emdash')).toEqual({ command: null, argument: '' });
     expect(parseOmniCommand('headphones')).toBeNull();
   });
 });

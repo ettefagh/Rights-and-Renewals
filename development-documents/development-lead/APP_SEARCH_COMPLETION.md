@@ -43,13 +43,18 @@ used as proof of app interaction.
   client with credentials omitted. The canonical bundled policies are the
   fallback. A visible source label distinguishes the two.
 - Wiki selections open the in-app company card. Saved items open their own
-  details. Empty search shows real Add/Wiki/Tax/CMS actions. No-match Add carries
+  details. Empty search shows real Add/Wiki/Tax actions. No-match Add carries
   the query into the new capture title, and an already-open capture is preserved.
-- Commands: `>add <title>`, `>wiki [brand]`, `>tax`, `>cms`/`>emdash`,
+- Commands: `>add <title>`, `>wiki [brand]`, `>tax`,
   `>claim <item>` and `>cancel <subscription>`. Claim/cancel show matching records
   for selection and review; they do not submit actions or open arbitrary URLs.
   Unsupported commands/arguments show guidance. Fake import/audit actions and
   unsupported tax-year promises were removed.
+
+Following consumer-UI feedback, the **Open CMS** suggestion and `>cms`/`>emdash`
+command handlers were removed from the app search. Duplicated header/footer CMS
+shortcuts were also removed from the consumer app. Public policy retrieval stays
+available; it does not expose an editorial-workspace action in the search menu.
 
 ## Validation
 

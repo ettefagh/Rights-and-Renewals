@@ -83,7 +83,6 @@
   }
 
   const DONUT_COLORS = ['#2F524C', '#D96B4B', '#0D9488', '#D97706', '#4F46E5'];
-  const showcaseAdminUrl = getShowcaseUrl('/_emdash/admin');
   const showcaseWikiUrl = getShowcaseUrl('/wiki');
 
   // Compute SVG donut chart segments for active subscriptions
@@ -258,21 +257,6 @@
             >
               <span>Sync / PIN</span>
             </button>
-            {#if showcaseAdminUrl}
-              <button
-                type="button"
-                class="notif-util-btn"
-                onclick={() => {
-                  isNotifCenterOpen = false;
-                  if (typeof window !== 'undefined') {
-                    window.open(showcaseAdminUrl, '_blank', 'noopener,noreferrer');
-                  }
-                }}
-                title="Open the EmDash editorial dashboard"
-              >
-                <span>⚡ EmDash</span>
-              </button>
-            {/if}
           </div>
         </div>
       {/if}
@@ -681,11 +665,6 @@
             {#if showcaseWikiUrl}
               <a href={showcaseWikiUrl} target="_blank" rel="noopener noreferrer" style="color: var(--color-pine-teal, #2F524C); font-size: 12px; font-weight: 700; text-decoration: underline;">
                 Public Wiki ↗
-              </a>
-            {/if}
-            {#if showcaseAdminUrl}
-              <a href={showcaseAdminUrl} target="_blank" rel="noopener noreferrer" style="color: var(--color-pine-teal, #2F524C); font-size: 12px; font-weight: 700; text-decoration: underline;">
-                ⚡ EmDash CMS Desk ↗
               </a>
             {/if}
           </div>
