@@ -39,3 +39,15 @@ export function getBrandMonogram(slug: string, displayName?: string): string {
   const second = words[1];
   return (second ? `${first[0] ?? '?'}${second[0] ?? '?'}` : first.slice(0, 2)).toUpperCase();
 }
+
+/** Accept absolute HTTPS URLs or the public, published-policy logo route. */
+export function isSafeBrandLogoUrl(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length === 0 || value.length > 2048 || /[\u0000-\u0020\u007f]/.test(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !!url.hostname && !url.username && !url.password;
+  } catch {
+    const match = /^\/api\/brand-policy-logos\/([a-z0-9]+(?:-[a-z0-9]+)*)$/.exec(value);
+    return Boolean(match);
+  }
+}

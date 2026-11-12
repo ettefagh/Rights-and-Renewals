@@ -347,7 +347,7 @@
           ><ArrowLeft size={17} aria-hidden="true" /> Back to archive</button>
 
           <div class="company-detail-heading">
-            <BrandLogo slug={entry.brandSlug} brandName={entry.brandName} size={52} decorative class="company-mark large" />
+            <BrandLogo slug={entry.brandSlug} brandName={entry.brandName} logoUrl={entry.logoUrl} size={52} decorative class="company-mark large" />
             <div>
               <p class="jurisdiction-label">{entry.category === 'subscription' ? 'Subscription' : 'Consumer goods'}</p>
               <h3 id="company-detail-title">{entry.brandName}</h3>
@@ -402,7 +402,7 @@
               data-testid={`wiki-company-${company.entry.brandSlug}`}
               onclick={() => openCompany(company.entry)}
             >
-              <BrandLogo slug={company.entry.brandSlug} brandName={company.entry.brandName} size={40} decorative class="company-mark" />
+              <BrandLogo slug={company.entry.brandSlug} brandName={company.entry.brandName} logoUrl={company.entry.logoUrl} size={40} decorative class="company-mark" />
               <span class="company-copy">
                 <strong>{company.entry.brandName}</strong>
                 <span>{company.entry.category === 'subscription' ? 'Subscription' : 'Consumer goods'}</span>

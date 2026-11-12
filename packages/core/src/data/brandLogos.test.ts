@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { getBrandLogo, getBrandMonogram } from './brandLogos.js';
+import { getBrandLogo, getBrandMonogram, isSafeBrandLogoUrl } from './brandLogos.js';
 import { policySeedData } from './policyWikiSeed.js';
 
 describe('brand logo lookup', () => {
@@ -30,5 +30,13 @@ describe('brand logo lookup', () => {
     expect(getBrandLogo('unlisted-brand')).toBeUndefined();
     expect(getBrandMonogram('gymshark')).toBe('GY');
     expect(getBrandMonogram('unlisted-brand', 'Unlisted Brand')).toBe('UB');
+  });
+
+  it('accepts HTTPS and the public policy-logo route while rejecting unsafe URLs', () => {
+    expect(isSafeBrandLogoUrl('https://cdn.example.test/spotify.svg')).toBe(true);
+    expect(isSafeBrandLogoUrl('/api/brand-policy-logos/spotify')).toBe(true);
+    expect(isSafeBrandLogoUrl('http://cdn.example.test/logo.png')).toBe(false);
+    expect(isSafeBrandLogoUrl('javascript:alert(1)')).toBe(false);
+    expect(isSafeBrandLogoUrl('/_emdash/api/media/file/01ABC_logo.png')).toBe(false);
   });
 });

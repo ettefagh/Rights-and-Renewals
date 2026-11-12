@@ -109,6 +109,8 @@ export interface PolicyWikiEntry {
   cancellationNoticeMonths: number; // Statutory max 1 month (BGB § 309 Nr. 9)
   cancellationButtonCompliant: boolean; // BGB § 312k 2-step button audit
   cancellationUrl?: string | undefined;
+  /** Optional HTTPS or EmDash media URL managed with the published CMS policy. */
+  logoUrl?: string | undefined;
   supportEmail?: string | undefined;
   legalNotes: string;
   verifiedDate: string; // ISO 8601 YYYY-MM-DD

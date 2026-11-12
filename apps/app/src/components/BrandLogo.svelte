@@ -4,15 +4,17 @@
   interface Props {
     slug: string;
     brandName?: string;
+    logoUrl?: string | undefined;
     size?: number;
     decorative?: boolean;
     class?: string;
   }
 
-  let { slug, brandName, size = 40, decorative = false, class: className = '' }: Props = $props();
+  let { slug, brandName, logoUrl, size = 40, decorative = false, class: className = '' }: Props = $props();
   let logo = $derived(getBrandLogo(slug));
   let label = $derived(brandName?.trim() || logo?.name || slug.replace(/[-_]+/g, ' '));
   let monogram = $derived(getBrandMonogram(slug, brandName));
+  let failedCmsLogoUrl = $state('');
   let basePath = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
 </script>
 
@@ -23,7 +25,9 @@
   aria-hidden={decorative ? 'true' : undefined}
   aria-label={decorative ? undefined : `${label} logo`}
 >
-  {#if logo?.file}
+  {#if logoUrl && failedCmsLogoUrl !== logoUrl}
+    <img src={logoUrl} alt="" width={size} height={size} loading="lazy" onerror={() => { failedCmsLogoUrl = logoUrl ?? ''; }} />
+  {:else if logo?.file}
     <img src={`${basePath}brand-logos/${logo.file}`} alt="" width={size} height={size} loading="lazy" />
   {:else}
     <span aria-hidden={decorative ? 'true' : undefined}>{monogram}</span>

@@ -227,7 +227,7 @@ const policySearchText = (brand: PolicyWikiEntry) =>
       <div class="policy-brand-list">
       {subscriptions.map((brand: PolicyWikiEntry) => (
         <a href={`/wiki/${brand.brandSlug}`} class="policy-brand-row" data-brand-row data-search={policySearchText(brand)} data-telemetry-policy-id={policyTelemetry.get(brand.brandSlug)?.entityId} data-telemetry-entity-revision={policyTelemetry.get(brand.brandSlug)?.revision}>
-          <span class="policy-brand-mark" aria-hidden="true"><BrandIcon slug={brand.brandSlug} brandName={brand.brandName} size={27} decorative /></span>
+          <span class="policy-brand-mark" aria-hidden="true"><BrandIcon slug={brand.brandSlug} brandName={brand.brandName} logoUrl={brand.logoUrl} size={27} decorative /></span>
           <span class="policy-brand-main"><strong>{brand.brandName}</strong><small>Subscription · cancellation policy</small></span>
           <span class="policy-brand-meta">{brand.cancellationButtonCompliant ? '§ 312k button listed' : 'Policy status under review'}</span>
           <ChevronRight size={19} aria-hidden="true" />
@@ -242,7 +242,7 @@ const policySearchText = (brand: PolicyWikiEntry) =>
       <div class="policy-brand-list">
       {hardware.map((brand: PolicyWikiEntry) => (
         <a href={`/wiki/${brand.brandSlug}`} class="policy-brand-row" data-brand-row data-search={policySearchText(brand)} data-telemetry-policy-id={policyTelemetry.get(brand.brandSlug)?.entityId} data-telemetry-entity-revision={policyTelemetry.get(brand.brandSlug)?.revision}>
-          <span class="policy-brand-mark" aria-hidden="true"><BrandIcon slug={brand.brandSlug} brandName={brand.brandName} size={27} decorative /></span>
+          <span class="policy-brand-mark" aria-hidden="true"><BrandIcon slug={brand.brandSlug} brandName={brand.brandName} logoUrl={brand.logoUrl} size={27} decorative /></span>
           <span class="policy-brand-main"><strong>{brand.brandName}</strong><small>Purchase · statutory warranty</small></span>
           <span class="policy-brand-meta">{brand.statutoryWarrantyMonths} months · § 438 BGB</span>
           <ChevronRight size={19} aria-hidden="true" />

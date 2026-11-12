@@ -224,10 +224,14 @@
 						]
 					},
 					"defaultValue": []
+				},
+				{
+					"slug": "logo",
+					"label": "Brand logo",
+					"type": "image",
+					"required": false
 				}
-			],
-			"group": "Policy catalog",
-			"icon": "shield-check"
+			]
 		},
 		{
 			"slug": "policy_providers",

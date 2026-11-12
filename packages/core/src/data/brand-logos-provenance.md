@@ -1,6 +1,6 @@
 # Brand logo provenance
 
-The logos are local build assets in `apps/app/public/brand-logos/` and `apps/showcase/public/brand-logos/`. The UI loads these files locally; no logo request is sent to a third party at runtime. Each SVG has a fixed `width`, `height`, and `viewBox` for stable layout.
+The source and fallback logos are local build assets in `apps/app/public/brand-logos/` and `apps/showcase/public/brand-logos/`. The CMS media importer creates raster derivatives for native EmDash Media, retaining source attribution and hashes. When a published Brand Policy has a CMS logo reference, the UI prefers the published-only logo endpoint; otherwise it uses these local fallback files. No third-party logo service is contacted at runtime. Each fallback SVG has a fixed `width`, `height`, and `viewBox` for stable layout.
 
 ## developer-icons
 

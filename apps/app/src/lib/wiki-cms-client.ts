@@ -1,4 +1,4 @@
-import type { PolicyWikiEntry } from '@cmlab/core';
+import { isSafeBrandLogoUrl, type PolicyWikiEntry } from '@cmlab/core';
 
 export interface WikiSource { label: string; url: string }
 export interface PublishedLaw { id: string; jurisdiction: string; title: string; summary: string; takeaways: string[]; sources: WikiSource[] }
@@ -79,7 +79,7 @@ function quiz(value: unknown): value is PublishedQuiz {
 }
 
 function policy(value: unknown): value is PolicyWikiEntry {
-  if (!record(value) || !exactKeys(value, ['brandSlug', 'brandName', 'category', 'statutoryWarrantyMonths', 'commercialGuaranteeMonths', 'cancellationNoticeMonths', 'cancellationButtonCompliant', 'legalNotes', 'verifiedDate', 'searchAliases'], ['cancellationUrl', 'supportEmail']) || !validId(value.brandSlug) || !boundedText(value.brandName, 180) ||
+  if (!record(value) || !exactKeys(value, ['brandSlug', 'brandName', 'category', 'statutoryWarrantyMonths', 'commercialGuaranteeMonths', 'cancellationNoticeMonths', 'cancellationButtonCompliant', 'legalNotes', 'verifiedDate', 'searchAliases'], ['cancellationUrl', 'logoUrl', 'supportEmail']) || !validId(value.brandSlug) || !boundedText(value.brandName, 180) ||
     !['subscription', 'hardware'].includes(String(value.category)) ||
     !Number.isInteger(value.statutoryWarrantyMonths) || Number(value.statutoryWarrantyMonths) < 0 || Number(value.statutoryWarrantyMonths) > 1200 ||
     !Number.isInteger(value.commercialGuaranteeMonths) || Number(value.commercialGuaranteeMonths) < 0 || Number(value.commercialGuaranteeMonths) > 1200 ||
@@ -88,6 +88,7 @@ function policy(value: unknown): value is PolicyWikiEntry {
     !/^\d{4}-\d{2}-\d{2}$/.test(String(value.verifiedDate)) || !Array.isArray(value.searchAliases) ||
     value.searchAliases.length > 30 || !value.searchAliases.every((item) => boundedText(item, 180))) return false;
   if (value.cancellationUrl !== undefined && !isSafeWikiUrl(value.cancellationUrl)) return false;
+  if (value.logoUrl !== undefined && !isSafeBrandLogoUrl(value.logoUrl)) return false;
   if (value.supportEmail !== undefined && (!boundedText(value.supportEmail, 254) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.supportEmail))) return false;
   return true;
 }
@@ -150,7 +151,14 @@ export async function fetchPublishedWiki(
     if (body.length > MAX_RESPONSE_CHARS) throw new Error('Published Wiki response is too large');
     let parsed: unknown;
     try { parsed = JSON.parse(body); } catch { throw new Error('Published Wiki response is not valid JSON'); }
-    return parsePublishedWiki(parsed);
+    const wiki = parsePublishedWiki(parsed);
+    const mediaBase = response.url || url;
+    return {
+      ...wiki,
+      policies: wiki.policies.map((entry) => entry.logoUrl?.startsWith('/')
+        ? { ...entry, logoUrl: new URL(entry.logoUrl, mediaBase).href }
+        : entry),
+    };
   } finally {
     clearTimeout(timeout);
   }

@@ -10,7 +10,7 @@ const emdash = vi.hoisted(() => ({
 
 vi.mock('emdash', () => emdash);
 
-import { getPublishedPolicies, getPublishedPolicy, POLICY_COLLECTION } from './policy-cms.js';
+import { getPublishedPolicies, getPublishedPolicy, getPublishedPolicyLogoMediaId, POLICY_COLLECTION } from './policy-cms.js';
 
 function policyEntry(slug: string, overrides: Record<string, unknown> = {}, status = 'published') {
   return {
@@ -110,5 +110,36 @@ describe('getPublishedPolicies', () => {
 
     expect(emdash.runWithContext).toHaveBeenCalledWith({ editMode: false }, expect.any(Function));
     expect(emdash.getEmDashEntry).toHaveBeenCalledWith(POLICY_COLLECTION, 'spotify');
+  });
+
+  it('maps a safe native EmDash image field and omits unsafe logo URLs', async () => {
+    emdash.getEmDashCollection.mockResolvedValue({
+      entries: [
+        policyEntry('spotify', { logo: { id: 'media-1', src: '/_emdash/api/media/file/01ABC_spotify.png', alt: 'Spotify', provider: 'local' } }),
+        policyEntry('apple', { logo: { id: 'media-2', src: 'javascript:alert(1)', provider: 'remote' } }),
+      ],
+      error: null,
+    });
+
+    const policies = await getPublishedPolicies();
+
+    expect(policies.find((policy) => policy.brandSlug === 'spotify')?.logoUrl)
+      .toBe('/api/brand-policy-logos/spotify');
+    expect(policies.find((policy) => policy.brandSlug === 'apple')).not.toHaveProperty('logoUrl');
+  });
+
+  it('exposes media IDs only from published policies, even during editor preview', async () => {
+    emdash.getRequestContext.mockReturnValue({ editMode: true, preview: { token: 'draft-preview' }, actor: 'editor' });
+    emdash.getEmDashEntry.mockImplementation(async (_collection: string, slug: string) => ({
+      entry: slug === 'spotify'
+        ? policyEntry(slug, { logo: { id: '01ARZ3NDEKTSV4RRFFQ69G5FAV', src: '/_emdash/api/media/file/01ARZ3NDEKTSV4RRFFQ69G5FAV.png', provider: 'local' } })
+        : null,
+      error: null,
+      isPreview: false,
+    }));
+
+    await expect(getPublishedPolicyLogoMediaId('spotify')).resolves.toBe('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+    await expect(getPublishedPolicyLogoMediaId('draft-brand')).resolves.toBeNull();
+    expect(emdash.runWithContext).toHaveBeenCalledWith({ editMode: false, actor: 'editor' }, expect.any(Function));
   });
 });
