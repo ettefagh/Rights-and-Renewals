@@ -1,10 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { readTelemetryEnvironment } from './telemetry-environment';
+import { isPublicMeasurementAvailable, readTelemetryEnvironment } from './telemetry-environment';
 import { createTelemetryHandler } from './telemetry';
 
 const published = { pageIds: new Set(['home']), entityIds: new Set<string>(), blockIds: new Set<string>(), ctaIds: new Set<string>(), revisions: new Set<string>() };
 
 describe('optional telemetry infrastructure', () => {
+  it('offers consent only for an enabled, fully bound deployment and its exact allowed origin', () => {
+    const environment = readTelemetryEnvironment({ PUBLIC_EVENTS_ENABLED: 'true', PUBLIC_EVENTS_ORIGINS: 'https://example.test', ANALYTICS: { writeDataPoint() {} }, PUBLIC_EVENTS_RATE_LIMITER: { async limit() { return { success: true }; } } });
+    expect(isPublicMeasurementAvailable(environment, 'https://example.test')).toBe(true);
+    expect(isPublicMeasurementAvailable(environment, 'https://other.test')).toBe(false);
+    expect(isPublicMeasurementAvailable({ ...environment, PUBLIC_EVENTS_ENABLED: 'false' }, 'https://example.test')).toBe(false);
+    const { ANALYTICS: _dataset, ...withoutDataset } = environment;
+    const { PUBLIC_EVENTS_RATE_LIMITER: _limiter, ...withoutLimiter } = environment;
+    expect(isPublicMeasurementAvailable(withoutDataset, 'https://example.test')).toBe(false);
+    expect(isPublicMeasurementAvailable(withoutLimiter, 'https://example.test')).toBe(false);
+  });
   it('keeps an unconfigured generated environment disabled', () => {
     const environment = readTelemetryEnvironment({ DB: {}, EMDASH_SITE_URL: 'https://example.test' });
     expect(environment.PUBLIC_EVENTS_ENABLED).toBeUndefined();

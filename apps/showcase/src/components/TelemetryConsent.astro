@@ -1,23 +1,49 @@
 ---
+import { env } from 'cloudflare:workers';
+import { isPublicMeasurementAvailable, readTelemetryEnvironment } from '../lib/telemetry-environment';
 interface Props {
   context?: 'public' | 'editor' | 'preview';
 }
 const { context = 'public' } = Astro.props;
+const available = context === 'public' && isPublicMeasurementAvailable(readTelemetryEnvironment(env), Astro.url.origin);
 ---
 
-{context === 'public' && (
+{available && (
   <>
-  <section aria-labelledby="telemetry-consent-title" data-telemetry-preferences>
-    <h2 id="telemetry-consent-title">Optional site measurement</h2>
-    <p>Allow anonymous, approximate counts of published page, block, and button events. No visitor ID is created.</p>
-    <label>
-      <input type="checkbox" data-telemetry-consent />
-      Allow optional site measurement
+  <section class="measurement-preferences" aria-labelledby="telemetry-consent-title" data-telemetry-preferences>
+    <h2 id="telemetry-consent-title">Optional usage statistics</h2>
+    <p id="telemetry-consent-description" class="measurement-description">Help us understand which pages and links are useful. We count views and selections without creating a visitor ID or fingerprint.</p>
+    <label class="measurement-choice">
+      <input type="checkbox" aria-describedby="telemetry-consent-description telemetry-consent-note" data-telemetry-consent />
+      <span>Allow optional usage statistics</span>
     </label>
-    <p role="status" aria-live="polite" data-telemetry-consent-status></p>
+    <p id="telemetry-consent-note" class="measurement-note">Off unless you choose to allow it. You can change your choice here at any time.</p>
+    <p class="measurement-status" role="status" aria-live="polite" data-telemetry-consent-status>Optional measurement disabled.</p>
   </section>
   <script>
     import '../scripts/telemetry';
   </script>
   </>
 )}
+
+<style>
+  .measurement-preferences {
+    box-sizing: border-box;
+    width: min(calc(100% - 2rem), 64rem);
+    margin: 2rem auto calc(7rem + env(safe-area-inset-bottom, 0px));
+    padding: 1.25rem;
+    border: 1px solid var(--color-border-subtle, #dbe5e1);
+    border-radius: 1rem;
+    background: var(--color-card-white, #fff);
+    color: var(--color-ink-primary, #0f172a);
+    text-align: left;
+  }
+  .measurement-preferences h2 { margin: 0; font-size: 1rem; line-height: 1.5; font-weight: 650; }
+  .measurement-description, .measurement-note, .measurement-status { margin: .5rem 0 0; color: var(--color-ink-secondary, #475569); font-size: .875rem; line-height: 1.6; }
+  .measurement-choice { display: flex; align-items: center; gap: .75rem; min-height: 44px; margin-top: .75rem; cursor: pointer; font-size: .9375rem; line-height: 1.5; }
+  .measurement-choice input { flex: 0 0 auto; width: 20px; height: 20px; margin: 0; accent-color: var(--color-pine-teal, #2f524c); cursor: pointer; }
+  .measurement-choice input:focus-visible { outline: 3px solid var(--color-pine-teal, #2f524c); outline-offset: 4px; }
+  .measurement-note, .measurement-status { font-size: .8125rem; }
+  .measurement-status { min-height: 1.5em; font-weight: 550; }
+  @media (max-width: 480px) { .measurement-preferences { padding: 1rem; } }
+</style>

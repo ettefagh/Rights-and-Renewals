@@ -7,6 +7,15 @@ export type TelemetryEnvironment = {
   PUBLIC_EVENTS_RATE_LIMITER?: EventRateLimiter;
 };
 
+/** Do not offer consent when this deployment cannot accept measurements. */
+export function isPublicMeasurementAvailable(environment: TelemetryEnvironment, origin: string): boolean {
+  const configured = environment.PUBLIC_EVENTS_ORIGINS;
+  if (environment.PUBLIC_EVENTS_ENABLED !== 'true' || !environment.ANALYTICS ||
+    !environment.PUBLIC_EVENTS_RATE_LIMITER || !configured || configured.length > 2048) return false;
+  const origins = configured.split(',').map((value) => value.trim()).filter(Boolean);
+  return origins.length <= 10 && origins.includes(origin);
+}
+
 function isDataset(value: unknown): value is AnalyticsDataset {
   return typeof value === 'object' && value !== null && 'writeDataPoint' in value
     && typeof value.writeDataPoint === 'function';

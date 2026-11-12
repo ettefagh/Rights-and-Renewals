@@ -8,7 +8,7 @@ const isRestrictedContext = () => location.pathname.startsWith('/_emdash/')
   || ['preview', 'previewToken', 'visual-editor'].some((key) => new URL(location.href).searchParams.has(key));
 
 function consented(): boolean {
-  if (isRestrictedContext()) return false;
+  if (isRestrictedContext() || !document.querySelector('[data-telemetry-preferences]')) return false;
   try { return localStorage.getItem(CONSENT_KEY) === 'yes'; } catch { return false; }
 }
 
@@ -82,6 +82,7 @@ if (page && !isRestrictedContext()) {
 document.querySelectorAll<HTMLInputElement>('[data-telemetry-consent]').forEach((checkbox) => {
   const status = checkbox.closest('[data-telemetry-preferences]')?.querySelector<HTMLElement>('[data-telemetry-consent-status]');
   checkbox.checked = consented();
+  if (status) status.textContent = checkbox.checked ? 'Optional measurement enabled.' : 'Optional measurement disabled.';
   checkbox.addEventListener('change', () => {
     try {
       if (checkbox.checked && !isRestrictedContext()) localStorage.setItem(CONSENT_KEY, 'yes');

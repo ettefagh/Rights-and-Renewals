@@ -2,8 +2,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 afterEach(() => { vi.unstubAllGlobals(); vi.resetModules(); });
 
-async function browserFixture(preview = false) {
+async function browserFixture(preview = false, available = true, savedConsent = false) {
   const preferences = new Map<string, string>();
+  if (savedConsent) preferences.set('cmlab-public-events-consent-v1', 'yes');
   const listeners = new Map<string, (event: Event) => void>();
   let onChange: () => void = () => {};
   const checkbox = {
@@ -22,14 +23,19 @@ async function browserFixture(preview = false) {
   vi.stubGlobal('window', { addEventListener: (name: string, callback: (event: Event) => void) => listeners.set(name, callback) });
   vi.stubGlobal('document', {
     documentElement: { dataset: { cmsContext: preview ? 'preview' : 'public' } },
-    querySelector: () => ({ dataset: { telemetryPage: 'page:wiki', telemetryRevision: 'sha256-test' } }),
-    querySelectorAll: (selector: string) => selector === '[data-telemetry-consent]' ? [checkbox] : [],
+    querySelector: (selector: string) => selector === '[data-telemetry-preferences]' && !available ? null : ({ dataset: { telemetryPage: 'page:wiki', telemetryRevision: 'sha256-test' } }),
+    querySelectorAll: (selector: string) => selector === '[data-telemetry-consent]' && available ? [checkbox] : [],
   });
   const module = await import('./telemetry');
   return { request, module, consent(value: boolean) { checkbox.checked = value; onChange(); } };
 }
 
 describe('browser telemetry consent boundary', () => {
+  it('sends nothing on a deployment without measurement even when an old consent preference exists', async () => {
+    const browser = await browserFixture(false, false, true);
+    await browser.module.emitPublicEvent({ name: 'page_view', pageId: 'page:wiki', revision: 'sha256-test' });
+    expect(browser.request).not.toHaveBeenCalled();
+  });
   it('sends no pre-consent events, emits a late page view once, and stops after revocation', async () => {
     const browser = await browserFixture();
     await browser.module.emitPublicEvent({ name: 'page_view', pageId: 'page:wiki' });
