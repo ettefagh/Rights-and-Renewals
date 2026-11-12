@@ -330,23 +330,24 @@
             {#if selectedDeadline}
               <aside class="deadline-detail" aria-label={`Details for ${selectedDeadline.title}`}>
                 <div class="deadline-detail-heading">
-                  <CalendarDays size={30} aria-hidden="true" />
+                  <CalendarDays size={24} aria-hidden="true" />
                   <div>
                     <h2>{selectedDeadline.title}</h2>
-                    <p>{selectedDeadline.category === 'subscription' ? 'Subscription' : 'Purchase protection'}</p>
+                    <p>{selectedDeadline.category === 'subscription' ? 'Subscription' : 'Warranty'} · {selectedDeadline.merchantOrProvider}</p>
                   </div>
                 </div>
                 <p class="deadline-date-panel">
                   <strong>{selectedDeadline.category === 'subscription' ? 'Next renewal' : 'Warranty end'}</strong>
-                  <span>{formatFriendlyDate(selectedDeadline.expiryDate, 'long')}</span>
+                  <time datetime={selectedDeadline.expiryDate} aria-label={formatFriendlyDate(selectedDeadline.expiryDate, 'long')}>{formatFriendlyDate(selectedDeadline.expiryDate, 'short')}</time>
                 </p>
-                <p class="deadline-merchant">{selectedDeadline.merchantOrProvider}</p>
+                <div class="deadline-actions">
                 {#if selectedDeadline.category === 'subscription'}
                   <button type="button" class="deadline-primary-action" onclick={() => walletStore.openCancellationModal(selectedDeadline!)}>Prepare cancellation</button>
                 {:else if selectedDeadline.hasProofOfPurchase}
                   <button type="button" class="deadline-primary-action" onclick={() => walletStore.openReceiptZoom(selectedDeadline!)}>View receipt</button>
                 {/if}
-                <button type="button" class="deadline-secondary-action" onclick={() => walletStore.selectItem(selectedDeadline)}>Open wallet item</button>
+                <button type="button" class="deadline-secondary-action" onclick={() => walletStore.selectItem(selectedDeadline)}>Open item</button>
+                </div>
               </aside>
             {/if}
           </div>
@@ -709,24 +710,6 @@
       <section class="col-12">
         <div class="capture-workspace">
           <QuickCaptureModal initialTitle={captureSearchTitle} onInitialTitleConsumed={() => (captureSearchTitle = '')} />
-          {#if selectedDeadline}
-            <aside class="capture-deadline-support" aria-label="Next upcoming deadline">
-              <div class="capture-support-icon"><CalendarDays size={21} aria-hidden="true" /></div>
-              <div>
-                <p>Next deadline</p>
-                <strong>{selectedDeadline.title}</strong>
-                <span>{selectedDeadline.category === 'subscription' ? 'Renewal' : 'Warranty ends'} · {formatFriendlyDate(selectedDeadline.expiryDate, 'short')}</span>
-              </div>
-              <button
-                type="button"
-                aria-label={`Open deadline for ${selectedDeadline.title}`}
-                onclick={() => {
-                  activeWorkspace = 'deadlines';
-                  walletStore.setView('dashboard');
-                }}
-              ><ChevronRight size={20} aria-hidden="true" /></button>
-            </aside>
-          {/if}
         </div>
       </section>
 
@@ -826,6 +809,8 @@
     --wallet-dock-left: max(12px, calc((100% - 370px) / 2));
     --wallet-dock-right: var(--wallet-dock-left);
     --wallet-dock-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    --wallet-dock-height: 70px;
+    --wallet-fab-size: 56px;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -864,21 +849,23 @@
   .deadline-row-copy span { color: var(--color-ink-secondary, #526561); font-size: 14px; }
   .deadline-countdown { white-space: nowrap; padding: 7px 10px; border-radius: 999px; background: #fff0dc; color: #a84f0c; font-weight: 700; font-size: 13px; }
   .deadline-countdown.critical { background: #ffeadb; color: #b9470b; }
-  .deadline-detail { min-height: 300px; padding: clamp(20px, 3vw, 32px); border-left: 1px solid var(--color-border-subtle, #d1d9d6); display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
-  .deadline-detail-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
-  .deadline-detail-heading > :first-child { color: #bd5b16; }
-  .deadline-detail-heading h2 { margin: 0; font-size: 28px; letter-spacing: -0.03em; }
-  .deadline-detail-heading p { margin: 3px 0 0; color: var(--color-ink-secondary, #526561); }
-  .deadline-date-panel { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 18px; border-radius: 14px; background: #fff0df; color: #7a380c; }
-  .deadline-merchant { margin: 0; color: var(--color-ink-secondary, #526561); }
+  .deadline-detail { min-width: 0; align-self: start; padding: 20px; border: 1px solid var(--color-border-subtle, #d1d9d6); border-radius: 16px; background: var(--color-card-white, #fff); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 2px 8px rgba(22, 51, 44, .04); }
+  .deadline-detail-heading { display: flex; align-items: flex-start; gap: 12px; }
+  .deadline-detail-heading > :first-child { color: #bd5b16; flex: 0 0 auto; }
+  .deadline-detail-heading h2 { margin: 0; font-size: 20px; line-height: 1.4; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+  .deadline-detail-heading p { margin: 4px 0 0; color: var(--color-ink-secondary, #526561); font-size: 13px; line-height: 1.5; }
+  .deadline-date-panel { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 0; padding: 12px; border-radius: 12px; background: #fff0df; color: #7a380c; font-size: 14px; }
+  .deadline-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
   .deadline-primary-action, .deadline-secondary-action { min-height: 50px; padding: 12px 18px; border-radius: 12px; font: inherit; font-weight: 700; cursor: pointer; }
   .deadline-primary-action { border: 1px solid var(--color-pine-teal, #126b56); background: var(--color-pine-teal, #126b56); color: #fff; }
   .deadline-secondary-action { border: 1px solid var(--color-pine-teal, #126b56); background: transparent; color: var(--color-pine-teal, #126b56); }
+  .deadline-actions button { flex: 0 1 auto; min-height: 44px; padding: 8px 12px; border-radius: 10px; font-size: 13px; }
+  .deadline-actions button:focus-visible { outline: 3px solid var(--color-pine-teal, #126b56); outline-offset: 3px; }
   .deadline-empty { display: grid; justify-items: start; gap: 8px; padding: 28px; border: 1px solid var(--color-border-subtle, #cbd5d1); border-radius: 16px; background: var(--color-card-white, #fff); }
   .deadline-empty h2, .deadline-empty p { margin: 0; }
   .deadline-empty p { color: var(--color-ink-secondary, #526561); }
 
-  .wallet-bottom-nav { position: fixed; z-index: var(--z-index-navbar, 200); left: var(--wallet-dock-left); right: calc(var(--wallet-dock-right) + 68px); bottom: var(--wallet-dock-bottom); display: flex; align-items: center; gap: 4px; padding: 7px; border: 1px solid var(--color-border-subtle, rgba(180, 196, 190, 0.82)); border-radius: 999px; background: var(--color-card-white, #fff); backdrop-filter: blur(16px); box-shadow: 0 8px 28px rgba(22, 51, 44, 0.14); }
+  .wallet-bottom-nav { box-sizing: border-box; height: var(--wallet-dock-height); position: fixed; z-index: var(--z-index-navbar, 200); left: var(--wallet-dock-left); right: calc(var(--wallet-dock-right) + var(--wallet-fab-size) + 12px); bottom: var(--wallet-dock-bottom); display: flex; align-items: center; gap: 4px; padding: 7px; border: 1px solid var(--color-border-subtle, rgba(180, 196, 190, 0.82)); border-radius: 999px; background: var(--color-card-white, #fff); backdrop-filter: blur(16px); box-shadow: 0 8px 28px rgba(22, 51, 44, 0.14); }
   .wallet-nav-link { flex: 1; min-width: 0; min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 13px; border: 0; border-radius: 999px; color: var(--color-ink-primary, #10201d); background: transparent; text-decoration: none; font: inherit; font-size: 12px; cursor: pointer; }
   .wallet-nav-link.active { background: rgba(29, 153, 116, 0.12); color: #086849; font-weight: 700; }
   .wallet-nav-link:focus-visible { outline: 3px solid #16765e; outline-offset: 2px; }
@@ -889,23 +876,15 @@
 
   :global([data-theme="dark"]) .wallet-nav-link.active { background: #1f4038; color: #c5f5e8; }
 
-  .capture-workspace { display: flex; flex-direction: column; gap: 16px; max-width: 1160px; margin: 0 auto; }
-  .capture-deadline-support { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--color-border-subtle, #cbd5d1); border-radius: 14px; background: var(--color-card-white, #fff); }
-  .capture-support-icon { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border-radius: 12px; color: #b95c15; background: #fff0df; }
-  .capture-deadline-support > div:nth-child(2) { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-  .capture-deadline-support p, .capture-deadline-support strong, .capture-deadline-support span { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .capture-deadline-support p, .capture-deadline-support span { color: var(--color-ink-secondary, #526561); font-size: 13px; }
-  .capture-deadline-support strong { font-size: 16px; }
-  .capture-deadline-support button { width: 48px; height: 48px; flex: 0 0 48px; display: grid; place-items: center; border: 0; border-radius: 12px; color: var(--color-pine-teal, #126b56); background: transparent; cursor: pointer; }
-  .capture-deadline-support button:focus-visible { outline: 3px solid #16765e; }
+  .capture-workspace { width: 100%; max-width: 760px; margin: 0 auto; }
 
   @media (max-width: 767px) {
-    .wallet-shell { --workspace-gutter: 16px; }
+    .wallet-shell { --workspace-gutter: 16px; --wallet-dock-height: 66px; }
     .deadlines-workspace { padding-block: 20px 26px; }
     .deadlines-heading { align-items: flex-start; }
     .today-date { padding-top: 7px; font-size: 13px; }
     .deadlines-master-detail { grid-template-columns: minmax(0, 1fr); }
-    .deadline-detail { border-left: 0; border-top: 1px solid var(--color-border-subtle, #d1d9d6); min-height: 0; padding: 20px 4px 4px; }
+    .deadline-detail { padding: 18px; }
     .deadline-row { padding: 12px; gap: 9px; }
     .deadline-row-copy strong { font-size: 15px; }
     .deadline-row-copy span { font-size: 12px; }
@@ -913,7 +892,6 @@
     .wallet-bottom-nav { padding: 5px; }
     .wallet-nav-link { min-height: 52px; }
     .wallet-shell { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
-    .capture-workspace { gap: 12px; }
   }
 
   @media (horizontal-viewport-segments: 2) {
@@ -925,11 +903,8 @@
     .search-command-row { max-width: calc(env(viewport-segment-width 0 0, 50vw) - 24px); }
     .deadlines-master-detail { grid-template-columns: minmax(0, calc(env(viewport-segment-width 0 0, 50vw) - var(--workspace-gutter) - 24px)) minmax(0, calc(env(viewport-segment-width 1 0, 50vw) - var(--workspace-gutter) - 24px)); gap: calc(env(viewport-segment-left 1 0, 50vw) - env(viewport-segment-right 0 0, 50vw) + 48px); }
     .deadline-list { padding-right: 18px; }
-    .deadline-detail { padding-left: 24px; }
     .wallet-nav-link { padding-inline: 4px; }
-    .capture-workspace { max-width: none; display: grid; grid-template-columns: minmax(0, calc(env(viewport-segment-width 0 0, 50vw) - 24px)) minmax(0, calc(env(viewport-segment-width 1 0, 50vw) - 24px)); gap: calc(env(viewport-segment-left 1 0, 50vw) - env(viewport-segment-right 0 0, 50vw) + 48px); align-items: start; }
-    .capture-workspace :global(.capture-panel) { grid-column: 1; }
-    .capture-deadline-support { grid-column: 2; margin-top: 64px; }
+    .capture-workspace { max-width: calc(env(viewport-segment-width 0 0, 50vw) - 24px); margin-inline: 0; }
   }
 
   @media (max-width: 360px) {
