@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { walletStore } from '../../state/wallet.svelte';
   import {
     PrefixTrie,
@@ -46,9 +46,32 @@
   let receiptPreviewUrl = $state<string | null>(null);
   let compressedBytes = $state<Uint8Array | null>(null);
   let receiptSha256 = $state<string>('');
+  let cameraInput: HTMLInputElement;
+  let fileInput: HTMLInputElement;
+  let receiptWorker: Worker | null = null;
+  let destroyed = false;
   let isCompressing = $state(false);
   let isSaving = $state(false);
   let errorMessage = $state('');
+
+  function removeReceipt() {
+    receiptWorker?.terminate();
+    receiptWorker = null;
+    if (receiptPreviewUrl) URL.revokeObjectURL(receiptPreviewUrl);
+    receiptFile = null;
+    receiptPreviewUrl = null;
+    compressedBytes = null;
+    receiptSha256 = '';
+    isCompressing = false;
+    errorMessage = '';
+  }
+
+  onDestroy(() => {
+    destroyed = true;
+    receiptWorker?.terminate();
+    receiptWorker = null;
+    if (receiptPreviewUrl) URL.revokeObjectURL(receiptPreviewUrl);
+  });
 
   // PrefixTrie autocomplete
   let trie = new PrefixTrie();
@@ -91,7 +114,14 @@
     if (!files || files.length === 0) return;
     const file = files[0];
     if (!file) return;
+    target.value = '';
+    if (isCompressing || isSaving) return;
+    if (file.type && !file.type.startsWith('image/')) {
+      errorMessage = 'Please choose a receipt image.';
+      return;
+    }
 
+    removeReceipt();
     receiptFile = file;
     receiptPreviewUrl = URL.createObjectURL(file);
     isCompressing = true;
@@ -99,13 +129,16 @@
 
     try {
       const arrayBuffer = await file.arrayBuffer();
+      if (destroyed || receiptFile !== file) return;
 
       const worker = new Worker(
         new URL('../../workers/image-compression.worker.ts', import.meta.url),
         { type: 'module' }
       );
+      receiptWorker = worker;
 
       worker.onmessage = (msg: MessageEvent) => {
+        if (receiptWorker !== worker) return;
         isCompressing = false;
         if (msg.data.error) {
           errorMessage = msg.data.error;
@@ -114,22 +147,33 @@
           receiptSha256 = msg.data.sha256Hex;
         }
         worker.terminate();
+        receiptWorker = null;
       };
 
       worker.onerror = () => {
+        if (receiptWorker !== worker) return;
         isCompressing = false;
         errorMessage = 'Worker compression failed';
         worker.terminate();
+        receiptWorker = null;
       };
 
       worker.postMessage({ fileBytes: arrayBuffer }, [arrayBuffer]);
     } catch (err: any) {
+      if (destroyed || receiptFile !== file) return;
+      receiptWorker?.terminate();
+      receiptWorker = null;
       isCompressing = false;
       errorMessage = err.message || 'Failed to read receipt file';
     }
   }
 
   async function handleSave() {
+    if (isSaving || isCompressing) return;
+    if (receiptFile && (!compressedBytes || !receiptSha256)) {
+      errorMessage = 'Choose a different receipt image or remove it before saving.';
+      return;
+    }
     if (!title.trim()) {
       errorMessage = 'Please enter a name.';
       return;
@@ -397,21 +441,23 @@
         <strong>Add receipt</strong>
       </div>
       <p class="receipt-desc">
-        Photo or file. Your receipt is processed and stored on this device.
+        Take a photo or choose an existing receipt image. Processed and stored on this device.
       </p>
 
       <div class="upload-controls">
-        <label class="file-upload-btn">
-          <Upload size={16} />
-          <span>{receiptFile ? 'Change receipt' : 'Photo or file'}</span>
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onchange={handleFileInput}
-            class="hidden-input"
-          />
-        </label>
+        <button type="button" class="file-upload-btn" onclick={() => cameraInput.click()} disabled={isCompressing || isSaving}>
+          <Camera size={16} aria-hidden="true" />
+          <span>Take photo</span>
+        </button>
+        <button type="button" class="file-upload-btn" onclick={() => fileInput.click()} disabled={isCompressing || isSaving}>
+          <Upload size={16} aria-hidden="true" />
+          <span>{receiptFile ? 'Choose another image' : 'Choose photo or file'}</span>
+        </button>
+        <input bind:this={cameraInput} type="file" accept="image/*" capture="environment" onchange={handleFileInput} class="hidden-input" aria-label="Take a receipt photo" />
+        <input bind:this={fileInput} type="file" accept="image/*" onchange={handleFileInput} class="hidden-input" aria-label="Choose a receipt image from photos or files" />
+        {#if receiptFile}
+          <button type="button" class="remove-receipt-btn" onclick={removeReceipt} disabled={isSaving}>Remove receipt</button>
+        {/if}
 
         {#if isCompressing}
           <span class="processing-hint">Optimizing receipt photo...</span>
@@ -681,6 +727,9 @@
   .hidden-input {
     display: none;
   }
+  .file-upload-btn:disabled { opacity: .6; cursor: wait; }
+  .file-upload-btn:focus-visible, .remove-receipt-btn:focus-visible { outline: 3px solid var(--color-pine-teal, #126b56); outline-offset: 3px; }
+  .remove-receipt-btn { min-height: 44px; border: 0; background: transparent; color: var(--color-ink-secondary, #475569); text-decoration: underline; cursor: pointer; }
 
   .processing-hint {
     font-size: 11px;
