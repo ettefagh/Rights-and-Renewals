@@ -23,7 +23,7 @@
 
   let title = $state('');
   let merchant = $state('');
-  let category = $state<'hardware' | 'subscription'>('subscription');
+  let category = $state<'hardware' | 'subscription'>('hardware');
   let billingCycle = $state<BillingCycle>('monthly');
   let paymentType = $state<PaymentMethodType>('auto_pay');
   let priceStr = $state('');
@@ -210,8 +210,8 @@
 <div class="capture-panel">
   <div class="capture-header">
     <div>
-      <h2 class="panel-title">Add Sub or Warranty</h2>
-      <p class="panel-subtitle">Stored locally on your device.</p>
+      <p class="panel-eyebrow">On this device</p>
+      <h2 class="panel-title">Quick Capture</h2>
     </div>
     <button
       type="button"
@@ -228,39 +228,39 @@
   {/if}
 
   <div class="capture-form">
-    <!-- Category Toggle: Sub vs Warranty -->
+    <!-- Manual entry type selection -->
     <div class="category-toggle-row">
       <button
         type="button"
         class="cat-btn"
         class:active={category === 'subscription'}
+        aria-pressed={category === 'subscription'}
         onclick={() => (category = 'subscription')}
       >
-        <Receipt size={16} />
-        <span>🔄 Sub (Recurring)</span>
+        <Receipt size={16} aria-hidden="true" />
+        <span>Subscription</span>
       </button>
       <button
         type="button"
         class="cat-btn"
         class:active={category === 'hardware'}
+        aria-pressed={category === 'hardware'}
         onclick={() => (category = 'hardware')}
       >
-        <Shield size={16} />
-        <span>🛡️ Warranty (2-Year Protection*)</span>
+        <Shield size={16} aria-hidden="true" />
+        <span>Purchase</span>
       </button>
     </div>
 
     <!-- Title / Item Name -->
     <div class="field-wrap">
       <label for="item-title" class="field-label">
-        {category === 'subscription' ? 'Subscription Name *' : 'Product Name *'}
+        Item *
       </label>
       <input
         id="item-title"
         type="text"
-        placeholder={category === 'subscription'
-          ? 'e.g. Spotify Student, Adobe Creative Cloud...'
-          : 'e.g. Apple MacBook Pro, Sony Headphones...'}
+        placeholder="Enter item name"
         bind:value={title}
         class="text-input"
         required
@@ -270,12 +270,12 @@
     <!-- Merchant with PrefixTrie Autocomplete -->
     <div class="field-wrap relative">
       <label for="item-merchant" class="field-label">
-        {category === 'subscription' ? 'Provider *' : 'Store / Brand *'}
+        {category === 'subscription' ? 'Provider *' : 'Store or brand *'}
       </label>
       <input
         id="item-merchant"
         type="text"
-        placeholder="e.g. Spotify, Apple Store, MediaMarkt..."
+        placeholder="Enter provider or store"
         value={merchant}
         oninput={(e) => handleMerchantInput((e.target as HTMLInputElement).value)}
         class="text-input"
@@ -332,7 +332,7 @@
         </div>
 
         <div class="field-wrap">
-          <label for="item-date" class="field-label">Start Date *</label>
+          <label for="item-date" class="field-label">Start date *</label>
           <input
             id="item-date"
             type="date"
@@ -356,7 +356,7 @@
     {:else}
       <div class="form-grid-2">
         <div class="field-wrap">
-          <label for="item-date" class="field-label">Purchase Date *</label>
+          <label for="item-date" class="field-label">Purchase date *</label>
           <input
             id="item-date"
             type="date"
@@ -383,16 +383,16 @@
     <div class="receipt-slot-card">
       <div class="receipt-header">
         <Camera size={18} class="text-pine" />
-        <strong>Original Receipt Photo*** (Offline Encrypted)</strong>
+        <strong>Add receipt</strong>
       </div>
       <p class="receipt-desc">
-        Compressed on-device and sealed with a tamper-proof verification fingerprint***.
+        Photo or file. Your receipt is processed and stored on this device.
       </p>
 
       <div class="upload-controls">
         <label class="file-upload-btn">
           <Upload size={16} />
-          <span>{receiptFile ? 'Change Receipt Photo' : 'Snap / Upload Receipt'}</span>
+          <span>{receiptFile ? 'Change receipt' : 'Photo or file'}</span>
           <input
             type="file"
             accept="image/*"
@@ -407,7 +407,7 @@
         {:else if receiptSha256}
           <div class="receipt-confirmed-badge">
             <Check size={14} color="#059669" />
-            <span>Verified Original Receipt***</span>
+            <span>Receipt fingerprint created</span>
           </div>
         {/if}
       </div>
@@ -423,8 +423,8 @@
     <div class="tax-card">
       <label class="tax-toggle-row">
         <div class="tax-info">
-          <strong>Include in Annual Tax Export (Work / Study Expense)</strong>
-          <span class="sub-hint">Optional tag for your year-end tax summary.</span>
+          <strong>Include in tax summary</strong>
+          <span class="sub-hint">Optional label for your records. Review before filing.</span>
         </div>
         <input type="checkbox" bind:checked={isTaxDeductible} class="switch-input" />
       </label>
@@ -474,7 +474,7 @@
       onclick={handleSave}
       disabled={isSaving || isCompressing}
     >
-      {isSaving ? 'Saving...' : 'Save Entry'}
+      {isSaving ? 'Saving...' : 'Save to vault'}
     </button>
   </div>
 </div>
@@ -505,12 +505,6 @@
     color: var(--color-ink-primary, #0F172A);
   }
 
-  .panel-subtitle {
-    margin: 2px 0 0;
-    font-size: var(--font-size-xs, 12px);
-    color: var(--color-ink-secondary, #475569);
-  }
-
   .close-btn {
     background: transparent;
     border: none;
@@ -532,6 +526,12 @@
     gap: 14px;
   }
 
+  .panel-eyebrow {
+    margin: 0 0 2px;
+    color: var(--color-ink-secondary, #475569);
+    font-size: 12px;
+  }
+
   .category-toggle-row {
     display: flex;
     gap: 8px;
@@ -539,7 +539,7 @@
 
   .cat-btn {
     flex: 1;
-    height: 42px;
+    min-height: 48px;
     border-radius: var(--radius-md, 12px);
     border: 1.5px solid var(--color-border-subtle, #E2E8F0);
     background: #FFFFFF;
@@ -577,7 +577,7 @@
   }
 
   .text-input {
-    height: 42px;
+    min-height: 48px;
     border: 1px solid var(--color-border-subtle, #E2E8F0);
     border-radius: var(--radius-sm, 8px);
     padding: 0 12px;
@@ -654,6 +654,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    min-height: 48px;
     padding: 8px 14px;
     border-radius: 8px;
     background: var(--color-pine-teal, #2F524C);
@@ -738,7 +739,7 @@
   }
 
   .submit-action-btn {
-    height: 44px;
+    min-height: 48px;
     border-radius: var(--radius-md, 12px);
     background: var(--color-pine-teal, #2F524C);
     color: #FFFFFF;
@@ -748,6 +749,26 @@
     cursor: pointer;
     margin-top: 8px;
     transition: background 150ms ease;
+  }
+
+  @media (max-width: 520px) {
+    .capture-panel {
+      padding: 12px;
+    }
+
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .category-toggle-row {
+      gap: 6px;
+    }
+
+    .cat-btn {
+      font-size: 12px;
+      gap: 4px;
+    }
   }
 
   .submit-action-btn:hover {

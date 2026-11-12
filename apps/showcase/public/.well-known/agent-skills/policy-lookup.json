@@ -3,7 +3,7 @@
   "name": "policy-lookup",
   "version": "1.0.0",
   "type": "skill-json",
-  "description": "Look up German statutory warranty rules, 12-month burden of proof transition cliff, and subscription cancellation terms for consumer brands.",
+  "description": "Look up cataloged German goods or subscription policies with statutory and available provider sources.",
   "invocation": {
     "type": "mcp",
     "endpoint": "https://rightsandrenewals.pages.dev/api/mcp",
@@ -15,11 +15,12 @@
     "properties": {
       "service_slug": {
         "type": "string",
-        "description": "Brand or service slug (e.g. 'spotify', 'apple', 'mediamarkt')"
+        "minLength": 1
       },
       "brand_slug": {
         "type": "string",
-        "description": "Alternative alias for service_slug"
+        "minLength": 1,
+        "description": "Alias for service_slug"
       },
       "category": {
         "type": "string",
@@ -27,12 +28,22 @@
           "hardware",
           "subscription"
         ],
-        "description": "Category filter for brand policy lookups"
+        "description": "Optional assertion of the catalog category"
       }
     },
-    "required": [
-      "service_slug"
-    ]
+    "anyOf": [
+      {
+        "required": [
+          "service_slug"
+        ]
+      },
+      {
+        "required": [
+          "brand_slug"
+        ]
+      }
+    ],
+    "additionalProperties": false
   },
   "examples": [
     {

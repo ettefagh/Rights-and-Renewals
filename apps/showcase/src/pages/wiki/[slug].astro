@@ -2,6 +2,7 @@
 import { policySeedData } from '@cmlab/core';
 import type { PolicyWikiEntry } from '@cmlab/core';
 import BrandIcon from '../../components/BrandIcon.svelte';
+import AudienceSwitch from '../../components/AudienceSwitch.astro';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
 
@@ -239,6 +240,7 @@ const legacyDeepLinkWallet = `https://app.cm-lab.pages.dev/#action=view&slug=${b
   </header>
 
   <main class="wiki-container">
+    <AudienceSwitch humanHref={`/wiki/${brand.brandSlug}`} machineHref={`/machine/view/wiki/${brand.brandSlug}`} />
     <!-- Breadcrumb -->
     <nav class="wiki-breadcrumb" aria-label="Breadcrumb">
       <a href="/">Home</a>

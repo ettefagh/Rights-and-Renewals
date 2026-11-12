@@ -19,12 +19,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rightsandrenewals.pages.dev/.well-known/oauth-protected-resource</loc>
-    <lastmod>2026-11-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json</loc>
     <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>

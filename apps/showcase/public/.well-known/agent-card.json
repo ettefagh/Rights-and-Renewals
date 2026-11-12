@@ -1,6 +1,6 @@
 {
   "name": "CM-LAB Rights & Renewals Agent",
-  "description": "Autonomous AI agent for sovereign consumer rights defense, contract lifecycle auditing, and statutory warranty enforcement.",
+  "description": "Public read-only reference for German consumer policies, statutory sources, and scoped subscription rules.",
   "version": "1.0.0",
   "documentationUrl": "https://rightsandrenewals.pages.dev/docs",
   "supportedInterfaces": [
@@ -11,7 +11,7 @@
     }
   ],
   "capabilities": {
-    "streaming": true,
+    "streaming": false,
     "pushNotifications": false,
     "extendedAgentCard": true
   },
@@ -27,7 +27,7 @@
     {
       "id": "policy-lookup",
       "name": "Search Consumer Rights",
-      "description": "Searches statutory consumer rights and cancellation terms across Germany, EU, UK, and US.",
+      "description": "Looks up German consumer policies and provider cancellation guidance where available.",
       "tags": [
         "consumer-rights",
         "legal",
@@ -39,29 +39,16 @@
       ]
     },
     {
-      "id": "claim-dossier-generate",
-      "name": "Generate Claim Dossier",
-      "description": "Compiles legally binding defect notices under BGB § 437/439 or cancellation letters.",
-      "tags": [
-        "warranty",
-        "claim",
-        "notice"
-      ],
-      "examples": [
-        "Generate a statutory defect notice for a cracked laptop screen bought 8 months ago."
-      ]
-    },
-    {
       "id": "bgb-statutory-calculator",
-      "name": "BGB Statutory Period Calculator",
-      "description": "Calculates statutory warranty deadlines, 12-month burden of proof transition, and notice periods under German BGB.",
+      "name": "German Civil Code Lookup",
+      "description": "Links official German Civil Code provisions and explains their scope.",
       "tags": [
         "calculator",
         "timeline",
         "bgb"
       ],
       "examples": [
-        "Calculate the burden of proof cliff date for an iPhone bought on 2024-03-15."
+        "When can the BGB § 477 presumption apply to consumer goods?"
       ]
     }
   ]

@@ -563,8 +563,8 @@ class OmnibarFSM:
 
 class MCPServerEngine:
     """
-    Model Context Protocol (MCP 2024-11-05 standard) JSON-RPC 2.0 server simulation.
-    Exposes `policy_lookup` and `claim_dossier_generate` tools.
+    Public MCP discovery and policy lookup simulation for student journey tests.
+    Use tests/mcp-reliability.mjs to exercise the actual HTTP handlers.
     """
 
     def __init__(self, brands: Optional[List[Dict[str, Any]]] = None):
@@ -593,8 +593,8 @@ class MCPServerEngine:
                 "jsonrpc": "2.0",
                 "id": req_id,
                 "result": {
-                    "protocolVersion": "2024-11-05",
-                    "serverInfo": {"name": "rights-and-renewals", "version": "1.0.0"},
+                    "protocolVersion": "2025-11-25",
+                    "serverInfo": {"name": "rights-and-renewals", "version": "2.0.0"},
                     "capabilities": {"tools": {}}
                 }
             }
@@ -604,33 +604,9 @@ class MCPServerEngine:
                 "jsonrpc": "2.0",
                 "id": req_id,
                 "result": {
-                    "tools": [
-                        {
-                            "name": "policy_lookup",
-                            "description": "Look up German statutory warranty and cancellation policies for a brand or service.",
-                            "inputSchema": {
-                                "type": "object",
-                                "properties": {
-                                    "service_slug": {"type": "string", "description": "Brand or service slug (e.g. 'spotify', 'apple')"}
-                                },
-                                "required": ["service_slug"]
-                            }
-                        },
-                        {
-                            "name": "claim_dossier_generate",
-                            "description": "Compile a deterministic German BGB § 437/439 statutory defect notice.",
-                            "inputSchema": {
-                                "type": "object",
-                                "properties": {
-                                    "brand_slug": {"type": "string"},
-                                    "item_name": {"type": "string"},
-                                    "purchase_date": {"type": "string", "format": "date"},
-                                    "defect_description": {"type": "string"}
-                                },
-                                "required": ["brand_slug", "item_name", "purchase_date", "defect_description"]
-                            }
-                        }
-                    ]
+                    "tools": json.loads(
+                        (REPO_ROOT / "apps/showcase/public/.well-known/mcp/server-card.json").read_text(encoding="utf8")
+                    )["tools"]
                 }
             }
 
@@ -653,52 +629,20 @@ class MCPServerEngine:
                         "id": req_id,
                         "result": {"content": [{"type": "text", "text": f"Brand slug '{slug}' not found in canonical dataset."}], "isError": True}
                     }
+                policy = dict(brand)
+                if policy["category"] == "subscription":
+                    policy.update(
+                        statutory_warranty_months=None,
+                        commercial_guarantee_months=None,
+                        reversed_burden_months=None,
+                        cancellation_button_compliant=None,
+                    )
                 return {
                     "jsonrpc": "2.0",
                     "id": req_id,
                     "result": {
-                        "content": [
-                            {"type": "text", "text": json.dumps(brand, ensure_ascii=False)}
-                        ]
-                    }
-                }
-
-            elif tool_name == "claim_dossier_generate":
-                slug = args.get("brand_slug", "").lower().strip()
-                item_name = args.get("item_name")
-                p_date_str = args.get("purchase_date")
-                defect_desc = args.get("defect_description")
-
-                if not (slug and item_name and p_date_str and defect_desc):
-                    return {
-                        "jsonrpc": "2.0",
-                        "id": req_id,
-                        "error": {"code": -32602, "message": "Missing required arguments for claim_dossier_generate"}
-                    }
-
-                try:
-                    p_date = datetime.date.fromisoformat(p_date_str)
-                except ValueError:
-                    return {
-                        "jsonrpc": "2.0",
-                        "id": req_id,
-                        "error": {"code": -32602, "message": "purchase_date must be in ISO 8601 YYYY-MM-DD format"}
-                    }
-
-                brand = self.brand_map.get(slug)
-                brand_name = (brand.get("brand_name") or slug.capitalize()) if brand else slug.capitalize()
-                dossier = BGBTimelineCalculator.generate_statutory_notice(
-                    brand_name=brand_name,
-                    item_name=item_name,
-                    purchase_date=p_date,
-                    defect_date=datetime.date.today(),
-                    defect_description=defect_desc
-                )
-                return {
-                    "jsonrpc": "2.0",
-                    "id": req_id,
-                    "result": {
-                        "content": [{"type": "text", "text": json.dumps(dossier, ensure_ascii=False)}]
+                        "content": [{"type": "text", "text": json.dumps(policy, ensure_ascii=False)}],
+                        "structuredContent": policy,
                     }
                 }
 
@@ -706,7 +650,7 @@ class MCPServerEngine:
                 return {
                     "jsonrpc": "2.0",
                     "id": req_id,
-                    "error": {"code": -32601, "message": f"Method/Tool '{tool_name}' not found"}
+                    "error": {"code": -32602, "message": f"Method/Tool '{tool_name}' not found"}
                 }
 
         else:

@@ -282,9 +282,7 @@ export class OmnibarDemoController {
 
   renderCommandMode(cmd) {
     const commands = [
-      { verb: '>claim', desc: 'Mängelrüge nach § 437/439 BGB generieren', example: '>claim MacBook' },
       { verb: '>cancel', desc: 'Vertragskündigung nach § 312k BGB vorbereiten', example: '>cancel Spotify' },
-      { verb: '>tax', desc: 'Werbungskosten-Report nach BMF 2022 kompilieren', example: '>tax 2026' },
       { verb: '>import', desc: 'Belegfoto mit GoBD SHA-256 Signatur einlesen', example: '>import Saturn' },
       { verb: '>audit', desc: 'Sicherheitsaudit der lokalen Vault-Datenbank ausführen', example: '>audit' }
     ];

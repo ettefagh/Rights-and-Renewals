@@ -1,21 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
 
-const SHOWCASE_MARKDOWN = `# Rights & Renewals (Showcase)
-
-> Sovereign Consumer Rights, Subscription & Warranty Wallet with Brand Policy Wiki and Open MCP Server.
-
-## Features & Capabilities
-- **Brand Policy Wiki**: Verified BGB §§ 437, 438, 477 warranty terms & § 312k cancellation rules for top 20 brands.
-- **Model Context Protocol (MCP)**: Native JSON-RPC 2.0 endpoints for AI agents.
-- **Agent Discovery**: API Catalog (RFC 9727), OAuth Protected Resource Metadata (RFC 9728), ARD AI Catalog, and WebMCP tools.
-
-## Discovery Resources
-- API Catalog: \`/.well-known/api-catalog\`
-- MCP Server Card: \`/.well-known/mcp/server-card.json\`
-- OAuth Metadata: \`/.well-known/oauth-protected-resource\`
-- Agent Skills: \`/.well-known/agent-skills/index.json\`
-- Agent Registration: \`/auth.md\`
-`;
+import { SHOWCASE_MARKDOWN } from './data/showcase-markdown';
 
 export const onRequest = defineMiddleware(async (context, next) => {
   // Capture Cloudflare Workers / Pages runtime bindings into globalThis.__CF_ENV__
@@ -31,10 +16,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const url = new URL(request.url);
   const accept = request.headers.get('Accept') || '';
 
+  const markdownRequested = url.searchParams.get('format') === 'markdown';
+
   // Content negotiation for AI agents requesting Markdown
-  if ((url.pathname === '/' || url.pathname === '/index.html') && accept.includes('text/markdown')) {
+  if ((url.pathname === '/' || url.pathname === '/index.html') && (markdownRequested || accept.includes('text/markdown'))) {
     let prefersMarkdown = true;
-    if (accept.includes('text/html')) {
+    if (!markdownRequested && accept.includes('text/html')) {
       let qMd = 1.0;
       let qHtml = 1.0;
       for (const part of accept.split(',')) {

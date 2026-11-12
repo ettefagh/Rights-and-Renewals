@@ -12,12 +12,12 @@
       "type": "mcp/server-card",
       "displayName": "Rights & Renewals MCP Server Card (SEP-2127)",
       "name": "Rights & Renewals MCP Server Card (SEP-2127)",
-      "description": "JSON-RPC 2.0 Model Context Protocol endpoint for consumer rights, statutory warranty lookups, and cancellation dossier generation.",
+      "description": "JSON-RPC 2.0 Model Context Protocol endpoint for public consumer policy and statutory information.",
       "url": "https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json",
       "representativeQueries": [
         "check gym subscription cancellation laws in Germany",
         "calculate statutory warranty period for defective electronics",
-        "generate legal cancellation notice for phone contract"
+        "call policy_lookup for Spotify subscription terms"
       ]
     },
     {
@@ -40,11 +40,10 @@
       "type": "mcp/streamable-http",
       "displayName": "Rights & Renewals Model Context Protocol API",
       "name": "Rights & Renewals Model Context Protocol API",
-      "description": "Streamable HTTP JSON-RPC 2.0 endpoint implementing 5 statutory tools for autonomous agents.",
+      "description": "Streamable HTTP JSON-RPC 2.0 endpoint for public consumer policy and statutory information.",
       "url": "https://rightsandrenewals.pages.dev/api/mcp",
       "representativeQueries": [
         "call policy_lookup for Spotify subscription terms",
-        "call claim_dossier_generate for defective MacBook",
         "call statutory_law_lookup for BGB § 477"
       ]
     },

@@ -89,9 +89,9 @@
         <div class="hero-pillars-grid">
           <div class="pillar-card">
             <div class="pillar-icon">🤖</div>
-            <h3 class="pillar-title">MCP Interface für Agenten</h3>
+            <h3 class="pillar-title">Read-only MCP Interface für Agenten</h3>
             <p class="pillar-desc">
-              JSON-RPC 2.0 Tools (<code>policy_lookup</code>, <code>claim_dossier_generate</code>)
+              JSON-RPC 2.0 tools (<code>policy_lookup</code>, <code>statutory_law_lookup</code>, <code>subscription_category_rules</code>)
               über Stdio und Edge-Endpoints (&lt;30ms SLA).
             </p>
           </div>
@@ -134,9 +134,9 @@
           <!-- Left Sub-Panel: MCP Protocol Console -->
           <div class="mcp-console-panel card">
             <div class="panel-header-row">
-              <div class="font-bold">⚡ MCP Wire Protocol Console</div>
+              <div class="font-bold">⚡ MCP Sample Console · local mock</div>
               <div id="mcp-latency-badge" class="latency-badge status-protected">
-                🟢 <strong>4.2ms</strong> <span class="badge-label">(SLA Pass &lt;30ms)</span>
+                🧪 <strong>sample</strong> <span class="badge-label">(local mock, not live timing)</span>
               </div>
             </div>
 
@@ -144,8 +144,9 @@
               <div class="form-group">
                 <label for="mcp-tool-select">MCP TOOL AUSWÄHLEN</label>
                 <select id="mcp-tool-select" class="form-select">
-                  <option value="policy_lookup">policy_lookup (BGB Policy &amp; § 312k Button)</option>
-                  <option value="claim_dossier_generate">claim_dossier_generate (§ 437 Mängelrüge)</option>
+                  <option value="policy_lookup">policy_lookup (sample catalog)</option>
+                  <option value="statutory_law_lookup">statutory_law_lookup (sample statute reference)</option>
+                  <option value="subscription_category_rules">subscription_category_rules (sample rules)</option>
                   <option value="tools/list">tools/list (MCP Introspection)</option>
                 </select>
               </div>
@@ -153,9 +154,9 @@
               <div class="form-group">
                 <label for="mcp-preset-select">BEISPIEL-SZENARIO LADEN</label>
                 <select id="mcp-preset-select" class="form-select">
-                  <option value="spotify">Spotify Student Kündigung (§ 312k)</option>
-                  <option value="apple_macbook">Apple MacBook Pro 16 M3 Mängelrüge (§ 437)</option>
-                  <option value="sony_headphones">Sony WH-1000XM5 Monat 11 Klippe (§ 477)</option>
+                  <option value="spotify">Spotify policy sample (local data)</option>
+                  <option value="law_477">BGB § 477 reference (sample)</option>
+                  <option value="subscription_rules">Subscription rules (sample)</option>
                   <option value="tools_list">tools/list Introspektion</option>
                 </select>
               </div>
@@ -187,7 +188,7 @@
 
             <!-- Wire Protocol Streamer -->
             <div class="stream-output-wrapper" id="mcp-stream-output" aria-live="polite">
-              <div class="stream-empty">Bereit für JSON-RPC 2.0 Aufrufe. Klicken Sie auf "Tool Call ausführen".</div>
+              <div class="stream-empty">Lokaler Mock · Beispieldaten, keine Live-Antwort. Wählen Sie ein Tool, um den Austausch zu sehen.</div>
             </div>
           </div>
 
@@ -205,7 +206,7 @@
           <h2 class="section-title">Multi-Domain Omnibar Such-Sandbox</h2>
           <p class="section-subtitle text-muted">
             Durchsuchen Sie in &lt;5ms 20 kuratierte Marken-Policies, gespeicherte Wallet-Belege
-            oder tippen Sie <code>&gt;</code> für Sofortbefehle (z. B. <code>&gt;claim</code>, <code>&gt;cancel</code>, <code>&gt;tax</code>).
+            oder tippen Sie <code>&gt;</code> für Sofortbefehle (z. B. <code>&gt;cancel</code>).
           </p>
         </div>
 

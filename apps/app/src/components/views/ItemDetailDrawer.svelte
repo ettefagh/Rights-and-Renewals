@@ -350,7 +350,7 @@
             <div class="cancellation-prompt-card">
               <div class="cancel-prompt-header">
                 <ShieldAlert size={16} class="text-pine" />
-                <span class="cancel-prompt-title">1-Click Cancel** &amp; Monthly Cancel Right**</span>
+                <span class="cancel-prompt-title">Cancellation options**</span>
               </div>
               <p class="cancel-prompt-desc">
                 Cancel directly via the provider's official cancellation page without dark patterns, or generate a ready-to-send cancellation notice.
@@ -445,8 +445,8 @@
             <div class="verified-receipt-card">
               <div class="verified-top">
                 <div class="verified-badge-cluster">
-                  <CheckCircle2 size={16} class="verified-icon" />
-                  <span class="verified-title">Verified Original Receipt***</span>
+                  <CheckCircle2 size={16} class="verified-icon" aria-hidden="true" />
+                  <span class="verified-title">Receipt saved on this device</span>
                 </div>
                 {#if item.receiptSha256}
                   <details class="audit-details">
@@ -456,7 +456,9 @@
                 {/if}
               </div>
               <span class="verified-caption">
-                Tamper-proof digital fingerprint stored locally for warranty &amp; tax proof.
+                {item.receiptSha256
+                  ? 'Receipt fingerprint stored locally.'
+                  : 'Receipt details stored locally.'}
               </span>
             </div>
           {/if}
@@ -511,7 +513,7 @@
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(2px);
     z-index: var(--z-index-drawer, 400);
     display: flex;
     justify-content: flex-end;
@@ -629,7 +631,9 @@
     border: none;
     cursor: pointer;
     color: var(--color-ink-tertiary, #94A3B8);
-    padding: 6px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
     border-radius: 6px;
   }
 
@@ -685,7 +689,7 @@
   }
 
   .field-input {
-    height: 40px;
+    min-height: 48px;
     padding: 0 12px;
     border-radius: 8px;
     border: 1px solid var(--color-border-subtle, #CBD5E1);
@@ -714,7 +718,7 @@
   }
 
   .type-seg-btn {
-    height: 38px;
+    min-height: 48px;
     border-radius: 8px;
     border: 1px solid #CBD5E1;
     background: #F8FAFC;
@@ -935,7 +939,7 @@
   }
 
   .edit-primary-btn {
-    height: 42px;
+    min-height: 48px;
     border-radius: var(--radius-md, 12px);
     background: #F1F5F9;
     color: var(--color-ink-primary, #0F172A);
@@ -954,7 +958,7 @@
   }
 
   .claim-action-btn {
-    height: 44px;
+    min-height: 48px;
     border-radius: var(--radius-md, 12px);
     background: var(--color-pine-teal, #2F524C);
     color: #FFFFFF;
@@ -968,7 +972,7 @@
   }
 
   .delete-action-btn {
-    height: 38px;
+    min-height: 48px;
     border-radius: var(--radius-md, 12px);
     background: transparent;
     border: 1px solid #CBD5E1;

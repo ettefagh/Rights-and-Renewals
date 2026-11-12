@@ -20,15 +20,8 @@ export class SimulatorController {
         statusGlyph: '⚠️',
         statusText: 'Warnung: Tag 325 von 365 — Beweislastumkehr endet in 40 Tagen',
         statutoryCite: 'BGB § 477 Abs. 1 (Verkäuferhaftung)',
-        actionType: 'claim',
-        actionLabel: '⚖️ 1-Tap Mängelrüge (§ 439)',
-        itemArgs: {
-          brand_slug: 'sony',
-          item_name: 'Sony WH-1000XM5 ANC Headphones',
-          purchase_date: '2025-12-15',
-          defect_description: 'Active Noise Canceling microphone feedback squeal',
-          issue_type: 'statutory_defect_claim'
-        }
+        actionType: 'notice',
+        actionLabel: '📝 Lokalen Entwurf ansehen',
       },
       {
         id: 'sim-spotify',
@@ -196,13 +189,9 @@ export class SimulatorController {
           args: item.itemArgs
         }
       }));
-    } else if (item.actionType === 'claim') {
-      window.dispatchEvent(new CustomEvent('mcp:trigger-tool', {
-        detail: {
-          tool: 'claim_dossier_generate',
-          args: item.itemArgs
-        }
-      }));
+    } else if (item.actionType === 'notice') {
+      const draft = `Lokaler Entwurf für ${item.title}\nKaufdatum: ${item.purchaseDate}\nRechtsgrundlage: ${item.statutoryCite}\n\nBitte ergänzen Sie die konkrete Mangelbeschreibung und prüfen Sie den Text vor dem Versand.`;
+      alert(`${draft}\n\nDer Entwurf bleibt in dieser Demo lokal und wird nicht versendet.`);
     }
   }
 
@@ -264,14 +253,8 @@ export class SimulatorController {
             statusGlyph: '🛡️',
             statusText: 'Geschützt: Tag 1 von 365 (Beweislast beim Verkäufer)',
             statutoryCite: 'BGB § 477 Abs. 1 & BGB § 438',
-            actionType: 'claim',
-            actionLabel: '⚖️ Mängelrüge generieren',
-            itemArgs: {
-              brand_slug: 'apple',
-              item_name: 'Apple iPad Pro 13" M4',
-              purchase_date: '2026-11-05',
-              defect_description: 'OLED Display Pixelanomalie bei Erstinbetriebnahme'
-            }
+            actionType: 'notice',
+            actionLabel: '📝 Lokalen Entwurf ansehen'
           };
 
           this.simulatedItems.unshift(newItem);
