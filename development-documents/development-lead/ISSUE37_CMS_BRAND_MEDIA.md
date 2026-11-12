@@ -57,7 +57,7 @@ Cloudflare protection on the administrator and native media API stays intact.
 
 ## Implementation verification
 
-The integrated showcase suite passed 169 tests. Focused core logo tests passed
+The integrated showcase suite passed 170 tests. Focused core logo tests passed
 4 tests. Worker checks reported no showcase errors/warnings and no app errors
 (six existing warnings outside the edited components). Independent source
 review found no high-severity issue.
@@ -69,5 +69,16 @@ link was skipped; its draft identity and content remain intact. Its logo is in
 the Media library, ready for editorial selection when that draft is reviewed.
 The `--skip-conflicting-drafts` option is explicit; without it conflicts abort.
 A repeat apply reused all 20 assets, staged/published zero revisions and moved
-the skipped logo into the same **Brand logos** folder. Public-logo streaming
-readback remains pending the request-scoped database fix deployment.
+the skipped logo into the same **Brand logos** folder.
+
+Production runtime `fa21dbf` deployed as Worker version
+`1f30e915-09bb-42c5-8f43-d8cb1a708d8f`. All 19 published logo URLs returned
+HTTP 200 with PNG MIME and valid PNG signatures. Unknown and unlinked Gymshark
+logo routes returned 404. Admin retained its Cloudflare Access 302 challenge.
+Anonymous routes use the supported `getDb` loader runtime, because neither
+public locals nor the optional request-context override necessarily contains DB.
+The final route correction passed 4 focused tests and showcase check (0/0), and
+the production build passed. The wallet was built/deployed from `aba5d5a` at
+`https://5cf1123a.rightsandrenewals-app.pages.dev` and its production alias returned
+200. Visual browser acceptance remains unverified; HTTP, API and binary checks
+do not replace it.
