@@ -2,7 +2,21 @@ import type { PolicyWikiEntry, WalletItem } from '@cmlab/core';
 
 export type SearchMatch<T> = { item: T; score: number };
 
-export function normalizeSearchText(value: string): string {
+export interface WalletSearchProjection {
+  title: string;
+  merchantOrProvider: string;
+  brandSlug: string;
+  category: string;
+  searchTokens: string[];
+  serialNumber: string;
+  notes: string;
+  priceLabel: string;
+}
+
+export type WalletSearchMatch<T> = SearchMatch<T> & { projection: WalletSearchProjection };
+
+export function normalizeSearchText(value: unknown): string {
+  if (typeof value !== 'string') return '';
   return value
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -11,7 +25,7 @@ export function normalizeSearchText(value: string): string {
     .trim();
 }
 
-function scoreFields(query: string, fields: string[]): number | null {
+function scoreFields(query: string, fields: unknown[]): number | null {
   const normalizedQuery = normalizeSearchText(query);
   const terms = normalizedQuery.split(/\s+/).filter(Boolean);
   if (!terms.length) return null;
@@ -29,18 +43,23 @@ function scoreFields(query: string, fields: string[]): number | null {
 
 export function searchWikiPolicies(
   query: string,
-  policies: PolicyWikiEntry[],
+  policies: readonly PolicyWikiEntry[],
   limit = 5
 ): SearchMatch<PolicyWikiEntry>[] {
   const boundedLimit = Math.max(0, Math.min(Math.floor(limit), 20));
   if (!normalizeSearchText(query) || boundedLimit === 0) return [];
 
   return policies
-    .map((item, index) => ({
-      item,
-      index,
-      score: scoreFields(query, [item.brandName, item.brandSlug, item.category, ...item.searchAliases])
-    }))
+    .map((item, index) => {
+      const record = asRecord(item);
+      if (!record) return { item, index, score: null };
+      const aliases = Array.isArray(record.searchAliases) ? record.searchAliases : [];
+      return {
+        item,
+        index,
+        score: scoreFields(query, [record.brandName, record.brandSlug, record.category, ...aliases])
+      };
+    })
     .filter((match): match is { item: PolicyWikiEntry; index: number; score: number } => match.score !== null)
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .slice(0, boundedLimit)
@@ -49,22 +68,62 @@ export function searchWikiPolicies(
 
 export function searchWalletItems(
   query: string,
-  items: WalletItem[],
+  items: readonly WalletItem[],
   limit = 5
-): SearchMatch<WalletItem>[] {
+): WalletSearchMatch<WalletItem>[] {
   const boundedLimit = Math.max(0, Math.min(Math.floor(limit), 20));
   if (!normalizeSearchText(query) || boundedLimit === 0) return [];
 
   return items
-    .map((item, index) => ({
-      item,
-      index,
-      score: scoreFields(query, [item.title, item.merchantOrProvider, item.brandSlug ?? '', item.category, ...item.searchTokens, item.notes ?? ''])
-    }))
-    .filter((match): match is { item: WalletItem; index: number; score: number } => match.score !== null)
+    .filter((item) => {
+      const id = asRecord(item)?.id;
+      return (typeof id === 'string' && id.trim().length > 0) ||
+        (typeof id === 'number' && Number.isFinite(id));
+    })
+    .map((item, index) => {
+      const projection = projectWalletSearchItem(item);
+      return {
+        item,
+        projection,
+        index,
+        score: scoreFields(query, [projection.title, projection.merchantOrProvider, projection.brandSlug, projection.category, ...projection.searchTokens, projection.serialNumber, projection.notes])
+      };
+    })
+    .filter((match): match is { item: WalletItem; projection: WalletSearchProjection; index: number; score: number } => match.score !== null)
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .slice(0, boundedLimit)
-    .map(({ item, score }) => ({ item, score }));
+    .map(({ item, projection, score }) => ({ item, projection, score }));
+}
+
+/** Read a current or legacy wallet row without mutating or migrating it. */
+export function projectWalletSearchItem(item: unknown): WalletSearchProjection {
+  const record = asRecord(item) ?? {};
+  const price = finiteNumber(record.priceGrossEur) ?? finiteNumber(record.priceEur);
+  const tokens = Array.isArray(record.searchTokens) ? record.searchTokens.filter((token): token is string => typeof token === 'string') : [];
+  return {
+    title: firstText(record.title, record.name) ?? 'Untitled item',
+    merchantOrProvider: firstText(record.merchantOrProvider, record.merchant) ?? 'Unknown provider',
+    brandSlug: firstText(record.brandSlug) ?? '',
+    category: firstText(record.category) ?? 'item',
+    searchTokens: tokens,
+    serialNumber: firstText(record.serialNumber) ?? '',
+    notes: firstText(record.notes) ?? '',
+    priceLabel: price === null ? 'Price unavailable' : `€${price.toFixed(2)}`
+  };
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function firstText(...values: unknown[]): string | null {
+  return values.find((value): value is string => typeof value === 'string' && value.trim().length > 0)?.trim() ?? null;
+}
+
+function finiteNumber(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
 export type OmniCommand = 'add' | 'wiki' | 'tax' | 'cms' | 'emdash' | 'claim' | 'cancel';

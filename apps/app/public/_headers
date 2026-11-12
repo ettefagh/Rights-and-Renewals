@@ -4,13 +4,15 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(self), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; worker-src 'self' blob:;
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com https://rightsandrenewals-showcase.padarhava.workers.dev; img-src 'self' data: blob: https://rightsandrenewals-showcase.padarhava.workers.dev; style-src 'self' 'unsafe-inline'; font-src 'self' data:; worker-src 'self' blob:;
 
 /
+  Cache-Control: no-cache, max-age=0, must-revalidate
   Link: </.well-known/api-catalog>; rel="api-catalog", </auth.md>; rel="service-doc"
   Vary: Accept
 
 /index.html
+  Cache-Control: no-cache, max-age=0, must-revalidate
   Link: </.well-known/api-catalog>; rel="api-catalog", </auth.md>; rel="service-doc"
   Vary: Accept
 

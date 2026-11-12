@@ -69,3 +69,32 @@ dialog. The CMS Wiki API returned 20 published policies with the exact productio
 wallet CORS origin. The immutable Pages hostname is not an added CMS CORS origin;
 use the production alias for live CMS catalog access. No CMS/database changes
 were needed for this app release.
+
+## Reported missing results follow-up
+
+The user's screenshot shows an older launcher label and layout than the bundle
+currently returned by production. An already-open page is not proof of the new
+bundle executing; browser inspection remains disabled, so this distinction is
+unresolved until the user reloads or browser access is enabled.
+
+Source inspection also found concrete current-search failure paths. The older
+vanilla app and current Dexie app both use `WarrantyWalletDB` version 1, but the
+older rows use `name`/`merchant`/`priceEur`. Spreading missing or invalid
+`searchTokens`, normalising non-string fields, and calling `toFixed` on an invalid
+price can abort the result computation. Serial-number search was also missing.
+The follow-up uses read-only compatible projections, not a database migration or
+storage reset. Unknown price remains unavailable rather than becoming zero.
+
+The static header policy did not allow the public CMS origin, but production's
+SSR homepage returned no CSP header, so this is not a verified cause of the
+reported failure. The static connect/image directives now include only the
+exact production CMS origin. The SSR app shell explicitly revalidates on load;
+no IndexedDB, receipt, local storage or authentication data is cleared.
+
+Follow-up verification: 177 integrated tests passed, including seven search
+cases covering mixed record shapes, missing/malformed tokens, unknown prices,
+serial numbers and independent Wiki matching. Rows without a usable string or
+numeric record ID are skipped rather than creating an unselectable result.
+App check again passed with zero errors and two existing EmailGate warnings.
+The edited omnibar passed Svelte autofix with no issues. Independent source
+review reported no material blocker; live browser reproduction remains blocked.

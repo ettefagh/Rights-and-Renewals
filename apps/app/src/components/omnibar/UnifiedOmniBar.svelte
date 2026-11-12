@@ -4,7 +4,7 @@
   import { walletStore } from '../../state/wallet.svelte';
   import { fetchPublishedWiki } from '../../lib/wiki-cms-client';
   import { getShowcaseUrl } from '../../lib/showcase-url';
-  import { parseOmniCommand, searchWalletItems, searchWikiPolicies, type OmniCommand } from '../../lib/omnibar-search';
+  import { parseOmniCommand, projectWalletSearchItem, searchWalletItems, searchWikiPolicies, type OmniCommand, type WalletSearchProjection } from '../../lib/omnibar-search';
   import { Search, Shield, Sparkles, Receipt, Zap, X, BookOpen, Camera } from 'lucide-svelte';
 
   type OmniResult = {
@@ -14,6 +14,7 @@
     subtitle: string;
     badge?: string;
     walletItem?: WalletItem;
+    walletProjection?: WalletSearchProjection;
     wikiEntry?: PolicyWikiEntry;
     command?: OmniCommand;
     argument?: string;
@@ -86,20 +87,20 @@
         case 'emdash': return term ? [] : cmsAdminUrl ? [action('cms', 'Open CMS', 'Open the editorial workspace')] : [];
         case 'claim':
           return term
-            ? searchWalletItems(term, walletStore.items, 8).map(({ item }) => ({ id: `claim-${item.id}`, kind: 'wallet', title: `Select for claim: ${item.title}`, subtitle: `${item.merchantOrProvider} · Review actions in item details`, badge: 'Claim', walletItem: item, command: 'claim' }))
+            ? searchWalletItems(term, walletStore.items, 8).map(({ item, projection }) => ({ id: `claim-${String(item.id)}`, kind: 'wallet', title: `Select for claim: ${projection.title}`, subtitle: `${projection.merchantOrProvider} · Review actions in item details`, badge: 'Claim', walletItem: item, walletProjection: projection, command: 'claim' }))
             : [];
         case 'cancel':
           return term
-            ? searchWalletItems(term, walletStore.digitalSubscriptions, 8).map(({ item }) => ({ id: `cancel-${item.id}`, kind: 'wallet', title: `Select subscription: ${item.title}`, subtitle: `${item.merchantOrProvider} · Review cancellation options in item details`, badge: 'Cancel', walletItem: item, command: 'cancel' }))
+            ? searchWalletItems(term, walletStore.items.filter((item) => projectWalletSearchItem(item).category === 'subscription'), 8).map(({ item, projection }) => ({ id: `cancel-${String(item.id)}`, kind: 'wallet', title: `Select subscription: ${projection.title}`, subtitle: `${projection.merchantOrProvider} · Review cancellation options in item details`, badge: 'Cancel', walletItem: item, walletProjection: projection, command: 'cancel' }))
             : [];
         default: return [];
       }
     }
 
-    const walletMatches = searchWalletItems(trimmed, walletStore.items, 8).map(({ item, score }) => ({
-      id: `wallet-${item.id}`, kind: 'wallet' as const, title: item.title,
-      subtitle: `${item.merchantOrProvider} · €${item.priceGrossEur.toFixed(2)}`,
-      badge: item.category, walletItem: item, score
+    const walletMatches = searchWalletItems(trimmed, walletStore.items, 8).map(({ item, projection, score }) => ({
+      id: `wallet-${String(item.id)}`, kind: 'wallet' as const, title: projection.title,
+      subtitle: `${projection.merchantOrProvider} · ${projection.priceLabel}`,
+      badge: projection.category, walletItem: item, walletProjection: projection, score
     }));
     const wikiMatches = searchWikiPolicies(trimmed, wikiPolicies, 8).map(({ item, score }) => ({
       id: `wiki-${item.brandSlug}`, kind: 'wiki' as const, title: item.brandName,

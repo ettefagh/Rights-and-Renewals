@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PolicyWikiEntry, WalletItem } from '@cmlab/core';
-import { normalizeSearchText, parseOmniCommand, searchWalletItems, searchWikiPolicies } from '../../../app/src/lib/omnibar-search';
+import { normalizeSearchText, parseOmniCommand, projectWalletSearchItem, searchWalletItems, searchWikiPolicies } from '../../../app/src/lib/omnibar-search';
 
 function policy(brandSlug: string, brandName: string, searchAliases: string[]): PolicyWikiEntry {
   return {
@@ -62,6 +62,58 @@ describe('omnibar search', () => {
     expect(searchWalletItems('NOISE cancelling', items, 2).map(({ item }) => item.id)).toEqual(['first', 'second']);
     expect(searchWalletItems('cancelling', items, 20)).toHaveLength(3);
     expect(searchWalletItems('headphones', items, 0)).toEqual([]);
+  });
+
+  it('searches mixed modern and legacy rows without requiring optional search tokens', () => {
+    const legacy = {
+      id: 12,
+      name: 'Kaffeemaschine',
+      merchant: 'Müller Markt',
+      category: 'hardware',
+      priceEur: 49.9,
+      serialNumber: 'SERIAL-LEGACY-12'
+    } as unknown as WalletItem;
+    const modern = walletItem({ id: 'modern-1', title: 'Mixer', serialNumber: 'SERIAL-MODERN-1' });
+
+    const matches = searchWalletItems('serial legacy', [modern, legacy]);
+    expect(matches).toHaveLength(1);
+    expect(matches[0]?.item).toBe(legacy);
+    expect(matches[0]?.projection).toMatchObject({
+      title: 'Kaffeemaschine',
+      merchantOrProvider: 'Müller Markt',
+      priceLabel: '€49.90',
+      serialNumber: 'SERIAL-LEGACY-12'
+    });
+    expect(searchWalletItems('SERIAL MODERN', [modern, legacy]).map(({ item }) => item.id)).toEqual(['modern-1']);
+  });
+
+  it('handles malformed tokens and unknown prices without throwing or coercing objects', () => {
+    const malformed = {
+      id: 'legacy-bad',
+      name: 'Unknown price item',
+      merchant: 'Old shop',
+      category: 'hardware',
+      searchTokens: { invalid: true },
+      priceEur: { amount: 99.95 }
+    } as unknown as WalletItem;
+    const rows = [malformed, null, { searchTokens: null, priceEur: Number.NaN }] as unknown as WalletItem[];
+
+    const match = searchWalletItems('unknown price', rows)[0];
+    expect(match?.item).toBe(malformed);
+    expect(match?.projection.priceLabel).toBe('Price unavailable');
+    expect(projectWalletSearchItem({ name: 'Only name', merchant: 4, priceEur: { amount: 5 } })).toMatchObject({
+      title: 'Only name',
+      merchantOrProvider: 'Unknown provider',
+      priceLabel: 'Price unavailable'
+    });
+    expect(normalizeSearchText({ invalid: true })).toBe('');
+    expect(searchWalletItems('item', rows).map(({ item }) => item.id)).toEqual(['legacy-bad']);
+  });
+
+  it('keeps Wiki search usable when wallet rows are malformed', () => {
+    const malformedRows = [null, { title: {}, merchant: 12, searchTokens: { invalid: true } }] as unknown as WalletItem[];
+    expect(searchWalletItems('spotify', malformedRows)).toEqual([]);
+    expect(searchWikiPolicies('spotify', [policy('spotify', 'Spotify', ['music streaming'])])).toHaveLength(1);
   });
 
   it('parses supported commands and preserves arguments without inventing commands', () => {
