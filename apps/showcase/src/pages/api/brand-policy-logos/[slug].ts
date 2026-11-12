@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getRequestContext, MediaRepository, type Database } from 'emdash';
+import { MediaRepository } from 'emdash';
+import { getDb } from 'emdash/runtime';
 import type { EmDashHandlers } from 'emdash/astro';
 import { getPublishedPolicyLogoMediaId } from '../../../lib/policy-cms.js';
 
@@ -71,11 +72,9 @@ export const GET: APIRoute = async ({ params, locals }) => {
     const mediaId = await getPublishedPolicyLogoMediaId(slug);
     if (!mediaId) return notFound();
 
-    // Public page middleware intentionally omits `locals.emdash.db` on its
-    // anonymous fast path; the request-scoped database is carried in EmDash's
-    // ALS context and is also what getEmDashEntry() used above.
-    const requestDb = emdash.db ?? getRequestContext()?.db;
-    if (!requestDb) return new Response('Media unavailable', { status: 503 });
+    // The native loader resolves both request overrides and the configured
+    // database on anonymous routes whose locals contain only storage.
+    const requestDb = emdash.db ?? await getDb();
     const media = await new MediaRepository(requestDb as EmDashHandlers['db']).findById(mediaId);
     if (!media || media.status !== 'ready' || !isSafeStorageKey(media.storageKey) ||
       !ALLOWED_IMAGE_TYPES.has(media.mimeType) || !media.size || media.size > MAX_LOGO_BYTES) {

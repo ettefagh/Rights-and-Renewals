@@ -15,6 +15,7 @@ const state = vi.hoisted(() => ({
   requestContext: { db: {} as object },
 }));
 
+vi.mock('emdash/runtime', () => ({ getDb: async () => state.requestContext.db }));
 vi.mock('emdash', async (importOriginal) => ({
   ...await importOriginal<typeof import('emdash')>(),
   getRequestContext: () => state.requestContext,
