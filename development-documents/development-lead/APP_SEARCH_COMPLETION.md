@@ -56,6 +56,14 @@ command handlers were removed from the app search. Duplicated header/footer CMS
 shortcuts were also removed from the consumer app. Public policy retrieval stays
 available; it does not expose an editorial-workspace action in the search menu.
 
+Consumer-action cleanup shipped at `ba7ef6ea7d5d4a97e11f0b6d277a68a95b6ba6d3`
+in Pages deployment `https://aff48974.rightsandrenewals-app.pages.dev`. The seven
+focused search tests passed, including unsupported CMS/EmDash command assertions.
+The app check passed (0 errors, 2 existing EmailGate warnings), edited Svelte
+autofixers found no issues, and the production build passed. Served production
+bundle `WalletApp.BWmy3uHN.js` matched local bytes and omitted both the Open CMS
+action and editorial-dashboard shortcut strings. The public Wiki remains intact.
+
 ## Validation
 
 Independent source review found no remaining material issue. The integrated

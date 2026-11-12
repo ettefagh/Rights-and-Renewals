@@ -23,3 +23,10 @@ intentional synchronous native file-input activation). No automated phone/PWA
 picker verification is claimed; the installed-device picker must be confirmed
 by the user after refreshing the updated app. No stored vault data is migrated
 or cleared.
+
+Production release `ba7ef6ea7d5d4a97e11f0b6d277a68a95b6ba6d3` includes picker fix
+`e8f2cf8` and subsequent consumer-navigation cleanup. Build passed and deployment
+`https://aff48974.rightsandrenewals-app.pages.dev` succeeded. Production homepage
+returned 200; served `WalletApp.BWmy3uHN.js` bytes matched the local build by
+SHA-256 and contained both source-choice labels. No native mobile picker test
+was run; this verifies publication rather than installed-device behavior.
