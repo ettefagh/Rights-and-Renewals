@@ -20,3 +20,12 @@ Verification: 179 integrated tests passed, including infrastructure availability
 and old-consent/no-panel cases. Browser visual/click verification remains limited
 by disabled local browser access. Production readback should confirm the panel
 is absent on McFIT and other shared routes and the events endpoint stays off.
+
+Production runtime `f915f903d75ad401d1bb0d70a482531ec485085b` built and deployed as
+Worker version `6295dcb4-284a-4793-9fba-4107e6f5930c`. Showcase check passed 0/0;
+the focused environment/client tests passed 8/8 after the test typing repair.
+Live McFIT, Wiki, home and agent setup requests returned 200 with no preference
+section or raw heading. Events remained disabled (404), admin Access challenge
+remained 302. Production storage/configuration was preserved. The styled enabled
+state has source/unit verification but no browser visual acceptance or new
+enabled-preview deployment is claimed in this follow-up.
