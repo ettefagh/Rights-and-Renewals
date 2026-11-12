@@ -59,3 +59,13 @@ passed with zero errors and two pre-existing EmailGate warnings. Official Svelte
 autofixer reported no issues on the edited Svelte components; its general
 suggestions about DOM refs/effects were reviewed as deliberate native-dialog
 integration. No browser interaction pass is claimed.
+
+Production app source `470ea0d7ce7c5272ba4b0f269a71450fecae1079` built successfully
+and deployed to `https://rightsandrenewals-app.pages.dev/`, with immutable Pages
+deployment `https://806cd576.rightsandrenewals-app.pages.dev`. Production homepage
+and immutable deployment returned 200. The production `WalletApp.mOA8AUI_.js`
+bytes matched the local built artifact by SHA-256 and contained the new search
+dialog. The CMS Wiki API returned 20 published policies with the exact production
+wallet CORS origin. The immutable Pages hostname is not an added CMS CORS origin;
+use the production alias for live CMS catalog access. No CMS/database changes
+were needed for this app release.
