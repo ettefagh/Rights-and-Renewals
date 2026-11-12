@@ -22,6 +22,11 @@
   } from 'lucide-svelte';
   import SubscriptionPlanPanel from '../views/SubscriptionPlanPanel.svelte';
 
+  let { initialTitle = '', onInitialTitleConsumed }: {
+    initialTitle?: string;
+    onInitialTitleConsumed?: () => void;
+  } = $props();
+
   let title = $state('');
   let merchant = $state('');
   let category = $state<'hardware' | 'subscription'>('hardware');
@@ -50,6 +55,8 @@
   let brandSuggestions = $state<string[]>([]);
 
   onMount(async () => {
+    title = initialTitle.trim().slice(0, 160);
+    onInitialTitleConsumed?.();
     try {
       const res = await fetch('/data/policy_wiki_seed_v1.json');
       if (res.ok) {

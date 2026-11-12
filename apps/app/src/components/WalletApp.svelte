@@ -46,6 +46,7 @@
   let isNotifCenterOpen = $state(false);
   let activeWorkspace = $state<'deadlines' | 'vault' | 'wiki'>('deadlines');
   let wikiTargetSlug = $state<string | null>(null);
+  let captureSearchTitle = $state('');
   let selectedDeadlineId = $state<string | null>(null);
 
   let deadlineItems = $derived.by(() =>
@@ -67,6 +68,18 @@
     if (workspace !== 'wiki') wikiTargetSlug = null;
     activeWorkspace = workspace;
     walletStore.setView('dashboard');
+  }
+
+  function openWikiFromSearch(slug?: string) {
+    wikiTargetSlug = slug ?? null;
+    activeWorkspace = 'wiki';
+    walletStore.setView('dashboard');
+  }
+
+  function openCaptureFromSearch(title = '') {
+    if (walletStore.currentView === 'capture') return;
+    captureSearchTitle = title.trim().slice(0, 160);
+    walletStore.setView('capture');
   }
 
   const DONUT_COLORS = ['#2F524C', '#D96B4B', '#0D9488', '#D97706', '#4F46E5'];
@@ -116,9 +129,15 @@
   }
 
   function handleKeydown(event: KeyboardEvent) {
+    if (event.isComposing || event.repeat || event.altKey) return;
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault();
       walletStore.isOmnibarOpen = !walletStore.isOmnibarOpen;
+    } else if (event.key === '/' && !event.metaKey && !event.ctrlKey && !walletStore.isOmnibarOpen) {
+      const target = event.target;
+      if (target instanceof HTMLElement && target.closest('input, textarea, select, [contenteditable], [role="textbox"], dialog')) return;
+      event.preventDefault();
+      walletStore.isOmnibarOpen = true;
     } else if (event.key === 'Escape' && isNotifCenterOpen) {
       isNotifCenterOpen = false;
     }
@@ -262,24 +281,21 @@
 
   <!-- Mandatory E2E Main Grid Contract: id="app-dashboard-grid" class="grid-12-col" -->
   <main id="app-dashboard-grid" class="grid-12-col">
-    <!-- Separated Search Bar Row (Mandatory E2E Combobox Contract: role="combobox" aria-expanded id="omnibar-root") -->
+    <!-- The launcher opens a dialog; its search input owns the combobox semantics. -->
     <section class="col-12 search-command-row">
-      <div
-        role="combobox"
-        aria-expanded={walletStore.isOmnibarOpen}
-        aria-haspopup="listbox"
-        aria-controls="omnibar-results"
-        id="omnibar-root"
-        class="omnibar-trigger-wrapper"
-      >
+      <div class="omnibar-trigger-wrapper">
         <button
+          id="omnibar-root"
           type="button"
           class="omnibar-trigger-btn"
+          aria-haspopup="dialog"
+          aria-expanded={walletStore.isOmnibarOpen}
+          aria-controls="omnibar-dialog"
           onclick={() => (walletStore.isOmnibarOpen = true)}
-          aria-keyshortcuts="Control+K Meta+K"
+          aria-keyshortcuts="Control+K Meta+K /"
         >
           <Search size={18} aria-hidden="true" />
-          <span>Search wallet</span>
+          <span>Search wallet and policies</span>
         </button>
       </div>
     </section>
@@ -713,7 +729,7 @@
     {:else if walletStore.currentView === 'capture'}
       <section class="col-12">
         <div class="capture-workspace">
-          <QuickCaptureModal />
+          <QuickCaptureModal initialTitle={captureSearchTitle} onInitialTitleConsumed={() => (captureSearchTitle = '')} />
           {#if selectedDeadline}
             <aside class="capture-deadline-support" aria-label="Next upcoming deadline">
               <div class="capture-support-icon"><CalendarDays size={21} aria-hidden="true" /></div>
@@ -793,7 +809,7 @@
   <FloatingActionMenu />
 
   <!-- Universal OmniBar Dialog -->
-  <UnifiedOmniBar />
+  <UnifiedOmniBar onWikiSelect={openWikiFromSearch} onCapture={openCaptureFromSearch} />
 
   <!-- Onboarding Wizard Modal -->
   <OnboardingModal
