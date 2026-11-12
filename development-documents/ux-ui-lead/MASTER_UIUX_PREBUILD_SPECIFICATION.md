@@ -1,267 +1,311 @@
-# Master UI/UX Pre-Build Specification & Developer Handoff Manual
+# 🎨 Master UI/UX Pre-Build Specification (`DOC-UX-01`)
 
-**Document Identifier:** `MASTER-UIUX-PREBUILD-SPEC-001`  
-**System Title:** ApexCloud Enterprise Data & Workflow Automation Platform  
-**Version:** `2.5.0-PROD`  
-**Governing Standards:** ISO 9241-210 (Human-Centred Design), W3C Design Tokens Community Group (DTCG), W3C WCAG 2.1 & 2.2 Level AA, W3C WAI-ARIA 1.2 / 1.3, RFC 7807 (Problem Details), IEEE 830 Software Requirements Standards  
-**Audience:** Chief Technology Officer, VP of Product, UI/UX Lead, Principal Frontend Engineers, Backend Architects, QA Leads  
-
----
-
-## 1. Executive Summary & Architectural Overview
-
-The modern digital product development lifecycle frequently breaks down at the boundary separating user experience design and software engineering. When software engineering begins against ambiguous, static mockups without verifiable contracts, development teams experience:
-1. **Pervasive Architectural Churn:** Repeated refactoring of client-side routing structures, API payloads, and global state machines caused by late-discovered interaction edge cases.
-2. **Visual & Design Fragmentation:** Inconsistent component styling, arbitrary pixel values, magic numbers, and divergent theming implementations.
-3. **Severe Accessibility Debt & Legal Exposure:** Violations of ADA Title III, Section 508, and the European Accessibility Act (EAA 2025) requiring disruptive post-launch retrofits.
-4. **Engineering Inefficiency:** Developers forced to invent missing states (loading, empty, error, offline) and UX micro-interactions on the fly.
-
-This **Master UI/UX Pre-Build Specification** serves as the authoritative, comprehensive executive manual governing the entire application before a single line of production code is written. Uniting twenty-eight (28) specialized pre-build specifications across four interconnected functional domains, this manual bridges user research, cognitive architecture, design token compilation, component variant contracts, responsive layout math, and automated quality assurance.
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ MASTER UI/UX PRE-BUILD ARCHITECTURAL ECOSYSTEM                              │
-│                                                                             │
-│  DOMAIN 1: User Research, Discovery & Strategy (F01 - F10)                  │
-│    Empirical user personas, JTBD opportunity scores, journey maps, VPC      │
-│    │                                                                        │
-│    ▼                                                                        │
-│  DOMAIN 2: Information Architecture & Interaction Design (F11 - F19)        │
-│    Unified sitemap, route registry, navigation models, screen inventory     │
-│    │                                                                        │
-│    ▼                                                                        │
-│  DOMAIN 3: Visual Design System & Design Tokens (F20 - F24)                 │
-│    W3C DTCG 3-tier tokens, component variants, universal 8-state matrix     │
-│    │                                                                        │
-│    ▼                                                                        │
-│  DOMAIN 4: Accessibility, API Contracts & QA Acceptance (F25 - F28)         │
-│    WCAG 2.2 AA contrast, 4xx/5xx error taxonomy, automated axe-core gates  │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+**Document Reference:** `DOC-UX-01`  
+**Academic Institution:** SRH University of Applied Sciences (*SRH Hochschule*)  
+**Course Module:** *Computer & Media Lab* (Wintersemester 2026) · **Instructor:** Prof. Franziska Schwarz  
+**Working Team:** **Team 6** (Peer Testing Partner: **Team 7**)  
+**Project:** *Warranty, Subscription & Tax-Ready Wallet + Policy Wiki (MCP/API-Enabled)*  
+**Active Milestone:** Session 5 — MVP Scope Lock & Working Core User Journey Gate  
+**Role Owner & Author:** **Prushti** — *UX/UI Lead (Member C, `26h` Sprint 1 Allocation)*  
+**Cross-Functional Sign-Off:** **Kyle** *(Development Lead)*, **Mojtaba** *(Quality / Media Lead)*, **AmirHossein** *(Product / Research Lead)*, **Jeetkumar** *(Project Manager)*
 
 ---
 
-## 2. Specification Inventory & Master Artifact Index
+## 1. Executive Design Mandate & Dual-Domain Architecture
 
-The pre-build governance framework consists of twenty-eight (28) discrete, production-grade specifications organized across the four core milestones. Each specification represents a mandatory pre-condition for software development.
+### 1.1 UX Vision & Consumer Lifecycle Engine
+University students and young professionals in Germany forfeit **€200–€800+ annually** due to faded thermal cash register receipts (*Thermopapier-Kassenbons*), forgotten recurring subscription renewal cutoffs, unfamiliarity with statutory German warranty cliffs (`BGB § 477 Abs. 1`), and unclaimed student/employee tax write-offs (`§ 9 EStG` / `BMF 22.02.2022`).
 
-### Domain 1: User Research, Problem Definition & Strategic Alignment (Milestone 1)
-| Feature ID | Document File Name | Industry Identifier | Primary Focus & Mandatory Artifacts | Downstream Engineering Consumers |
-|---|---|---|---|---|
-| **F01** | `01_product_vision_and_ux_charter.md` | `PV-UXC` | Product vision statement, North Star UX metrics, Google HEART framework metrics. | Engineering Leadership, Product Management |
-| **F02** | `02_target_audience_segmentation.md` | `TAS-UPM` | 4 user segments, demographic distribution, technical proficiency, accessibility profiles. | Frontend Architecture, Product Design |
-| **F03** | `03_user_persona_dossier.md` | `UPS-DOS` | Data Engineer (Elena), IT Admin (Marcus), VP Analytics (Sophia); mental models and jobs. | Product Teams, UX Designers |
-| **F04** | `04_empathy_mapping_analysis.md` | `EMS-CAS` | Sensory-cognitive quadrant analysis (Says, Thinks, Does, Feels) across core tasks. | Interaction Designers, Content Strategists |
-| **F05** | `05_jtbd_opportunity_matrix.md` | `JTBD-ODI` | 12 outcome statements with Christensen JTBD and ODI opportunity calculations. | Product Roadmapping, Feature Prioritization |
-| **F06** | `06_problem_statement_and_value_prop.md` | `PS-VPC` | Value Proposition Canvas, pain relievers, gain creators, and 3 formal problem statements. | Executive Leadership, System Architects |
-| **F07** | `07_e2e_user_journey_maps.md` | `E2E-UXJM` | Chronological journey stages, touchpoints, emotional dip analysis, pain-point hotspots. | Frontend Engineers, Product Managers |
-| **F08** | `08_competitive_ux_benchmarking.md` | `CUX-HEM` | Jakob Nielsen 10 Heuristics evaluation scoring ApexCloud against 3 market competitors. | Design System Guild, UI/UX Lead |
-| **F09** | `09_user_research_insights_repository.md` | `URS-REP` | Qualitative interview quotes, usability test metrics (SUS, SEQ), evidence-weight ranking. | User Researchers, UX Designers |
-| **F10** | `10_ux_phase_gate_governance_raci.md` | `UX-RACI` | Cross-functional RACI matrix, 4 phase-gate exit criteria, design sign-off protocol. | Project Managers, Engineering Managers |
+This Master UI/UX Pre-Build Specification governs the visual, spatial, interactive, and accessibility architecture for CM-LAB across its ratified **Dual-Domain & Modern Widget Dashboard Architecture** (`ADR-04`):
 
-### Domain 2: Information Architecture & Interaction Design (Milestone 2)
-| Feature ID | Document File Name | Industry Identifier | Primary Focus & Mandatory Artifacts | Downstream Engineering Consumers |
-|---|---|---|---|---|
-| **F11** | `01_app_information_architecture_sitemap.md` | `IA-SITEMAP` | Domain taxonomy, visual sitemap tree, canonical URI registry, RBAC access boundaries. | Client Router Architects, API Engineers |
-| **F12** | `02_navigation_model_and_view_hierarchy.md` | `NAV-MODEL` | Multi-breakpoint navigation patterns, backstack rules, modal presentation hierarchy. | Frontend State Management Engineers |
-| **F13** | `03_user_flows_and_decision_trees.md` | `USER-FLOWS` | End-to-end task flows, branch logic, error loops, boolean decision tables. | Full-Stack Engineers, QA Test Writers |
-| **F14** | `04_screen_inventory_and_content_matrix.md` | `SCREEN-INV` | Canonical SCR-XXX-### (24 screens) inventory taxonomy, visual hierarchy, 6 dynamic states. | Frontend Developers, Component Writers |
-| **F15** | `05_low_and_mid_fidelity_wireframes.md` | `WIREFRAMES` | Structural ASCII layout blueprints, 4/8/12-column responsive layout geometry. | Frontend Layout Engineers, UI Designers |
-| **F16** | `06_interaction_design_and_behavioral_specs.md` | `INTERACTION` | Pointer and gesture recognition, micro-interaction states, cubic-bezier timing. | UI Engineers, Interaction Developers |
-| **F17** | `07_form_validation_state_machine.md` | `FORM-STATE` | Formal state machine for forms (Pristine, Dirty, Validating, Valid, Invalid, Submitting). | Frontend Form Engineers, API Engineers |
-| **F18** | `08_global_system_state_matrix.md` | `SYS-STATE` | Standardized states for Empty, Loading, Error, Offline, 401 Expiry, 403, 404, 500. | Frontend Platform Infrastructure |
-| **F19** | `09_keyboard_nav_and_focus_specs.md` | `KEYBOARD-NAV` | DOM tab order sequences, modal focus trapping, roving tabindex, skip navigation links. | Accessibility Engineers, Frontend Teams |
+$$\text{Capture (<15s)} \longrightarrow \text{Store (100\% Local Vault)} \longrightarrow \text{Alert (09:00 Europe/Berlin)} \longrightarrow \text{Act (1-Tap BGB Dossier)}$$
 
-### Domain 3: Visual Design System & Design Tokens (Milestone 3)
-| Feature ID | Document File Name | Industry Identifier | Primary Focus & Mandatory Artifacts | Downstream Engineering Consumers |
-|---|---|---|---|---|
-| **F20** | `01_design_tokens_specification.md` | `DTCG-TOKENS` | W3C DTCG 3-tier token architecture, JSON token schemas, palettes, typography, spacing. | Design System Engineers, Mobile Developers |
-| **F21** | `02_component_library_and_variant_matrix.md` | `COMP-LIB` | Atomic taxonomy, variant matrices, strict TypeScript prop contracts, slot geometry. | Frontend Component Authors, Storybook Leads |
-| **F22** | `03_universal_component_state_matrix.md` | `STATE-MATRIX` | Universal 8-state lifecycle (Default through Empty), priority resolution hierarchy. | UI Developers, QA Automation Engineers |
-| **F23** | `04_responsive_grid_and_breakpoint_specs.md` | `RESPONSIVE` | 5-tier responsive breakpoints, margins, gutters, touch targets >=44x44px, safe area insets. | Responsive Layout Authors, CSS Engineers |
-| **F24** | `05_motion_design_and_animation_specs.md` | `MOTION-SPEC` | Duration tokens, cubic-bezier easing, GPU hardware acceleration, prefers-reduced-motion. | Animation Engineers, Frontend Performance Leads |
+### 1.2 Dual-Domain Topology (`[Project].pages.dev` vs. `app.[Project].pages.dev`)
 
-### Domain 4: Accessibility, API Alignment & Engineering Handoff (Milestone 4)
-| Feature ID | Document File Name | Industry Identifier | Primary Focus & Mandatory Artifacts | Downstream Engineering Consumers |
-|---|---|---|---|---|
-| **F25** | `01_wcag_accessibility_specifications.md` | `WCAG-SPEC` | WCAG 2.1 & 2.2 AA standards, 4.5:1/3:1 contrast, non-color visual cues, ARIA guidelines. | Accessibility Auditors, Frontend Engineers |
-| **F26** | `02_developer_handoff_and_inspect_package.md` | `DEV-HANDOFF` | 100% Figma Auto-Layout rules, naming parity, redlines, SVGO asset exports, WOFF2 fonts. | Frontend Sprints, Design Operations |
-| **F27** | `03_api_data_constraints_and_error_contract.md` | `API-CONTRACT` | Field character limits, i18n 40% expansion, truncation, RFC 7807 error-to-UI mapping. | Backend API Teams, Frontend Integration Leads |
-| **F28** | `04_qa_verification_and_acceptance_checklist.md` | `QA-ACCEPT` | Visual tolerances (+-1px, Delta E <= 1.0), cross-browser matrix, automated axe-core gates. | QA Test Automation Engineers, Release Gatekeepers |
+```mermaid
+flowchart TB
+    subgraph PublicShowcase["Domain 1: Main Showcase Webpage ([Project].pages.dev)"]
+        Hero["Dual-Interface Showcase Hero\n1) MCP Server (POST /api/mcp)\n2) Offline-First Wallet App"]
+        PreviewDash["Interactive Sandbox Preview Dashboard\n• Read-Only Sample Omni-Bar\n• Sample Calendar & BGB Cliff Widgets"]
+        WikiSSR["Public Policy Wiki (/wiki/[slug])\n0 KB JS Astro 6 Edge HTML · Top 20 Brands"]
+        McpIsland["Live MCP Explorer (<McpExplorerIsland client:load />)\nJSON-RPC 2.0 Sandbox · Zod -32602 Visualizer"]
+        Hero --> PreviewDash & WikiSSR & McpIsland
+    end
+
+    subgraph ModernApp["Domain 2: Modern Wallet Application (app.[Project].pages.dev)"]
+        Shell["Astro 6 Offline PWA Shell (public/_headers: camera=(self), NO COEP)"]
+        Island["Single Root Island: <WalletApp client:only='svelte' /> (~11.8 KB gzip)"]
+        Omni["Centerpiece: Unified Search / Activity / Request Omni-Bar\n• Policy Wiki Lookup (<10ms PrefixTrie)\n• Local Dexie.js Vault Search\n• Create / Import New Item Trigger (<15s Flow)"]
+        Widgets["Modular Dashboard & 3 Calendar Widget Types\n1) Monthly Renewal & Expiry Grid\n2) 24m/12m BGB § 477 Abs. 1 Cliff Timeline Bar\n3) 30 / 7 / 1-Day Expiration Countdown Stack"]
+        Views["6 Core Views (<16ms In-Memory Transitions)\nV1 Dashboard · V2 Quick Capture · V3 Item Vault\nV4 1-Tap Claim/Cancel · V5 Tax Summary · V6 Wiki/MCP"]
+
+        Shell --> Island
+        Island --> Omni & Widgets & Views
+    end
+
+    PublicShowcase ==>|"Launch Protected Vault CTA"| ModernApp
+```
+
+| Domain Surface | Target URL Pattern | Runtime & Rendering Boundary | Primary Audience & UX Purpose |
+| :--- | :--- | :--- | :--- |
+| **1. Main Showcase Webpage** | `[Project].pages.dev` | Astro 6 static/edge HTML (`0 KB` baseline JS) + isolated `<ShowcasePreviewIsland />` & `<McpExplorerIsland client:load />` | Introduces CM-LAB's **two primary interfaces** (**Authoritative MCP Server** and **Offline-First Wallet App**) to academic jurors, consumers, and AI developers; provides an interactive preview dashboard with sample modular calendar widgets, a preview Unified Omni-Bar, and SEO-indexed Policy Wiki brand pages (`/wiki/[slug]`). |
+| **2. Modern Wallet Application** | `app.[Project].pages.dev` | Astro 6 PWA shell mounting **Single Root Island** `<WalletApp client:only="svelte" />` (`~11.8 KB` gzipped Svelte 5 Runes) | 100% offline-first personal consumer safety net (`GDPR Art. 25`) structured around a **modern modular widget dashboard**, centered on the **Unified Search / Activity / Request Omni-Bar**, three distinct calendar/timeline widgets, encrypted local `Dexie.js v4` storage, and `<16ms` zero-flicker transitions across Views 1–6. |
 
 ---
 
-## 3. Cross-Milestone Traceability & Interface Contract Graph
+## 2. Centerpiece Interaction: Unified Search / Activity / Request Omni-Bar
 
-The strength of the pre-build documentation architecture lies in its relational integrity. Every design artifact links deterministically to its upstream origin and downstream implementation:
+Rather than scattering separate search boxes, brand directories, and `"Add"` buttons across disconnected screens, `app.[Project].pages.dev` elevates the **Unified Search / Activity / Request Omni-Bar (`OmniBar.svelte`)** as the primary interactive focal point at the top of the dashboard (mirrored in read-only demo mode on `[Project].pages.dev`).
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ END-TO-END SPECIFICATION TRACEABILITY PIPELINE                              │
-│                                                                             │
-│  [M1] User Personas (F03) & JTBD (F05)                                      │
-│    │ Directly defines actors and functional tasks for                       │
-│    ▼                                                                        │
-│  [M2] User Flows (F13) & Sitemap Registry (F11)                             │
-│    │ Directly dictates visual zones and route boundaries for                │
-│    ▼                                                                        │
-│  [M2] Screen Inventory SCR-XXX-### (F14)                                    │
-│    │ Directly scopes component instances required for                       │
-│    ▼                                                                        │
-│  [M3] Component Library & Variant Matrix (F21)                              │
-│    │ Implements states and visual decisions according to                    │
-│    ▼                                                                        │
-│  [M3] Universal 8-State Matrix (F22) & DTCG Tokens (F20)                    │
-│    │ Provides explicit redlines, inspect properties, and tokens for        │
-│    ▼                                                                        │
-│  [M4] Developer Handoff Package (F26) & API Constraints (F27)                │
-│    │ Validated against objective tolerances and automated gates by           │
-│    ▼                                                                        │
-│  [M4] QA Verification & Acceptance Framework (F28)                          │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+### 2.1 Tri-Modal Capability Contract
+Typing a single query (or pressing `/` or `Cmd/Ctrl + K` on desktop, or tapping the `48px`-tall sticky Omni-Bar on mobile) simultaneously evaluates three deterministic local streams in **`<10ms` total**:
 
-#### Key Inter-Module Interface Contracts:
-1. **Screen Inventory ID Parity (`SCR-XXX-###`):** All screen codes defined in `F14` (`SCR-AUTH-001` through `SCR-SETT-004`, 24 canonical screens) are referenced identically across Wireframes (`F15`), Component Library (`F21`), and QA Test Suites (`F28`).
-2. **Design Token Namespace Parity:** Every token namespace declared in `F20` (`color.*`, `font.*`, `spacing.*`, `elevation.*`) is bound directly into component CSS, verified in Developer Handoff (`F26`), and audited by Stylelint CI.
-3. **HTTP Error Envelope Alignment (RFC 7807):** Error status codes cataloged in Global System States (`F18`) map 1-to-1 with the API presentation taxonomy in `F27` and are tested via Mock Service Worker in QA verification (`F28`).
-4. **Ergonomic & Breakpoint Alignment:** The 5-tier responsive breakpoint model (`xs`, `sm`, `md`, `lg`, `xl`) defined in `F23` directly drives the multi-breakpoint navigation shell in `F12` and wireframe responsive reflow in `F15`.
+1. **Saved Local Vault & Activity Search (`Dexie.js v4`):**
+   * Matches `searchTokens` across stored hardware warranties, active subscriptions, `§ 9 EStG` tax-tagged items, and compiled `dispute_logs` activity records.
+   * Displays inline urgency badges (`Urgent <=7d`, `Expiring Soon 8–30d`, `Protected >30d`) and 1-tap deep-links to View 3 (Item Vault) or View 4 (Claim/Cancel Dossier).
+2. **Policy Wiki Brand Intelligence (`policy_wiki_seed_v1.json` via `PrefixTrie.ts`):**
+   * Queries the bundled 20-brand statutory knowledge base in `<2ms`.
+   * Surfaces statutory `BGB § 438 Abs. 1 Nr. 3` (24-month warranty), `BGB § 477 Abs. 1` (12-month *Beweislastumkehr*), `BGB § 309 Nr. 9` (1-month rolling subscription notice), and `BGB § 312k Abs. 6` dark-pattern compliance flags without network calls.
+3. **Create / Import New Item Action Suggestion (`<15s` Capture Trigger):**
+   * Dynamically renders an actionable creation row at the bottom (or top when zero saved matches exist): e.g., **`+ Log "Sony WH-1000XM4" in <15s (Auto-fills Hardware · 24m BGB § 438)`** alongside **`Attach Receipt Photo / PDF`**.
+   * Selecting this option opens **View 2 (`QuickCaptureModal`)** with Brand, Category, Statutory Warranty (`24m`), `12m` Burden-of-Proof Cliff Date, and `BMF 2022` *Arbeitsmittel* eligibility pre-populated—preserving our **`11.4s` unaided capture benchmark**.
 
 ---
 
-## 4. Phase-Gate Governance & Review Workflow
+## 3. Modular Dashboard & Distinct Calendar Widget Specifications
 
-Software development is governed by four sequential phase gates. Progression to the subsequent phase requires 100% formal sign-off from designated cross-functional stakeholders:
+To prevent cognitive overload while surfacing time-critical statutory deadlines (`Person 3`: *"I want reminders more than storage"*), **View 1** is engineered as a responsive **Modular Widget Grid** (`1-column` stack on `375px–412px` mobile; `12-column` Bento grid on `>=1024px` desktop) featuring **three distinct calendar and temporal widget types**:
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ 4-STAGE PHASE-GATE GOVERNANCE LIFECYCLE                                     │
-│                                                                             │
-│  STAGE 1: RESEARCH & STRATEGY GATE (Exit Milestone 1)                       │
-│    Deliverables: F01 through F10 finalized.                                 │
-│    Exit Criteria: Personas validated, JTBD opportunities scored, charter     │
-│    signed off by VP of Product and Lead Architect.                          │
-│    │                                                                        │
-│    ▼                                                                        │
-│  STAGE 2: INFORMATION ARCHITECTURE & INTERACTION GATE (Exit Milestone 2)    │
-│    Deliverables: F11 through F19 finalized.                                 │
-│    Exit Criteria: Sitemap frozen, canonical routes registered, user flows   │
-│    and decision trees verified, keyboard navigation order mapped.           │
-│    │                                                                        │
-│    ▼                                                                        │
-│  STAGE 3: DESIGN SYSTEM & DESIGN TOKENS GATE (Exit Milestone 3)             │
-│    Deliverables: F20 through F24 finalized.                                 │
-│    Exit Criteria: DTCG JSON tokens compiled via Style Dictionary,           │
-│    TypeScript prop interfaces approved, universal 8-states designed.        │
-│    │                                                                        │
-│    ▼                                                                        │
-│  STAGE 4: ACCESSIBILITY & ENGINEERING HANDOFF GATE (Exit Milestone 4)       │
-│    Deliverables: F25 through F28 finalized.                                 │
-│    Exit Criteria: 100% Figma Auto-Layout verified, WCAG AA contrast certified│
-│    API error taxonomy signed off, automated QA verification harness ready.  │
-│    │                                                                        │
-│    ▼                                                                        │
-│  PRODUCTION BUILD AUTHORIZATION: Engineering Sprints Begin                  │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-#### RACI Governance Matrix Summary
-- **UI/UX Design Lead:** **Accountable** for visual tokens, component library, state matrices, wireframes, and design QA sign-off.
-- **Frontend Tech Lead:** **Accountable** for component TypeScript contracts, routing implementation, and client build performance.
-- **Backend Architect:** **Accountable** for API contracts, RFC 7807 error envelopes, and data schema boundaries.
-- **QA Automation Lead:** **Accountable** for visual regression diffs, cross-browser certification, and automated axe-core test gates.
-- **VP of Product / Product Manager:** **Consulted** on user journeys, JTBD opportunity scoring, and feature prioritization.
+| Widget Type | Component Name | Visual & Temporal Representation | Statutory / Consumer Value |
+| :--- | :--- | :--- | :--- |
+| **Calendar Type 1: Monthly Renewal & Expiry Grid** | `MonthlyCalendarGrid.svelte` | Compact 7-column month matrix (`Mon–Sun`, German ISO week start) with semantic urgency dots (`#DC2626` Red, `#D97706` Amber, `#059669` Green) + non-color glyph indicators and **Same-Day Collision Clustering** (e.g., `"Nov 1 · 3 Renewals (€34.97)"`). | Prevents surprise multi-subscription debit days (`Scenario 4.5`) and shows exact `BGB § 309 Nr. 9` notice cutoffs on the calendar month. |
+| **Calendar Type 2: `24m / 12m BGB § 477` Cliff Timeline Bar** | `BgbCliffTimelineWidget.svelte` | Horizontal dual-segment statutory progress bar (`0m -> 12m -> 24m`) with an explicit **`Month 12 Beweislastumkehr Cliff`** marker and optional `+4m BGB § 475e Abs. 1` *Ablaufhemmung* extension cap (`Iteration C-3 #24`). | Eliminates the `71%` Round 1 peer-lab confusion between commercial *Garantie* and statutory *Gewährleistung*; visually warns users before Month 12 flips the burden of proof. |
+| **Calendar Type 3: `30 / 7 / 1-Day` Countdown Stack** | `UrgencyCountdownWidget.svelte` | Chronologically sorted live countdown cards driven by `new SvelteDate()` (`svelte/reactivity`) anchored to `09:00:00 Europe/Berlin` (`0h` CET/CEST DST drift). | Surfaces actionable `T-30d`, `T-7d`, and `T-1d` cutoffs with 1-tap routing into View 4 (`Mängelrüge` or `§ 312k Abs. 6 Kündigung`). |
 
 ---
 
-## 5. Pre-Flight Developer Checklist
+## 4. Comprehensive Specification of the 6 Core Application Views
 
-Before any engineering squad begins implementing a feature sprint, the tech lead and developers must complete and sign this pre-flight verification checklist:
+All interactive user workflows execute inside `<WalletApp client:only="svelte" />` (`Views 1–5`) paired with `View 6` (`Policy Wiki & MCP Explorer`), strictly respecting Team 6's **5 Non-Negotiable Red Lines** (`GOAL.md`):
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ PRE-FLIGHT DEVELOPER VERIFICATION CHECKLIST                                 │
-│                                                                             │
-│ 1. DESIGN TOKEN & STYLING READINESS                                         │
-│    [ ] Style Dictionary compilation pipeline executed without error.         │
-│    [ ] tokens.css generated with :root (Light) and [data-theme="dark"].     │
-│    [ ] Zero hardcoded hex colors or arbitrary pixel values in component CSS.│
-│    [ ] Modular typography scale applied using rem units and CSS clamp().     │
-│                                                                             │
-│ 2. COMPONENT ARCHITECTURE & CONTRACTS                                       │
-│    [ ] TypeScript component interfaces match F21 prop contracts.             │
-│    [ ] All 8 lifecycle states (Default -> Empty) explicitly implemented.    │
-│    [ ] Locked width/height during loading state (CLS = 0.00).               │
-│    [ ] Storybook stories cover 100% of defined component variants.          │
-│                                                                             │
-│ 3. RESPONSIVE GEOMETRY & ERGONOMICS                                         │
-│    [ ] 5-tier responsive breakpoints (xs, sm, md, lg, xl) configured.        │
-│    [ ] Mobile touch targets measure >= 44x44px under coarse pointer emulation│
-│    [ ] Safe area insets (env(safe-area-inset-*)) applied to mobile shells.  │
-│    [ ] Dynamic viewport units (100dvh) used for modals and slide-out drawers│
-│    [ ] Zero horizontal scrollbars (scrollWidth === clientWidth) at all widths│
-│                                                                             │
-│ 4. ACCESSIBILITY & INCLUSION GATES                                          │
-│    [ ] Native semantic HTML prioritized (<button>, <nav>, <main>, <dialog>).│
-│    [ ] WCAG contrast ratios >= 4.5:1 (text) and >= 3.0:1 (borders/icons).   │
-│    [ ] Non-suppressible 2px solid focus ring with 2px offset visible on Tab.│
-│    [ ] Modal dialogs trap focus internally; Esc key closes and restores.    │
-│    [ ] Automated axe-core scan returns 0 critical and 0 serious violations. │
-│    [ ] prefers-reduced-motion media query suppresses all sliding/zooming.   │
-│                                                                             │
-│ 5. API RESILIENCE & ERROR RECOVERY                                          │
-│    [ ] RFC 7807 problem details error envelopes parsed by HTTP interceptor. │
-│    [ ] 401 Unauthorized triggers non-destructive in-place re-auth modal.    │
-│    [ ] 422 Validation errors display inline messages with aria-invalid.     │
-│    [ ] Character limits enforced with single/multi-line ellipsis + tooltips.│
-│    [ ] Containers tolerate 30-40% internationalization (i18n) text expansion│
-│                                                                             │
-│ 6. QA ACCEPTANCE & VISUAL FIDELITY                                          │
-│    [ ] Visual regression pixel difference <= 0.1% against design baseline.  │
-│    [ ] Color difference Delta E <= 1.0 against token definitions.           │
-│    [ ] Certified across Tier 1 browsers (Chrome, Safari, Firefox, Edge).    │
-│    [ ] Formal sign-off recorded in sprint release ticket.                   │
-└─────────────────────────────────────────────────────────────────────────────┘
+### 4.1 View 1: Unified Modular Wallet Dashboard (`US-04`, `#7`)
+* **Layout Hierarchy:**
+  1. **Sticky Top Header & Offline Vault Shield:** Displays local encryption status (`AES-GCM-256 Local Vault · 0 Bytes Cloud PII`), Airplane-Mode readiness indicator, and notification permission fallback banner (`Scenario 3.4`).
+  2. **Centerpiece Unified Omni-Bar (`OmniBar.svelte`):** Instant search, Policy Wiki lookup, and `+ Quick Capture` trigger.
+  3. **Category & Statutory Filter Pills (`>=48x48px`):** Segmented radio pills (`All`, `Hardware`, `Subscriptions`, `Urgent <=30d`, `Tax § 9 EStG`) with live item counts.
+  4. **Modular Calendar Widgets:** `UrgencyCountdownWidget`, `MonthlyCalendarGrid`, and pinned `BgbCliffTimelineWidget` cards.
+* **Empty & Recovery States:** First-run onboarding card (`items.count() === 0`) with 1-tap sample seed or first-item capture; zero-match search state (`Screen 06`) preserving vault count reassurance and offering `+ Add "[Query]" to Wallet`.
+
+### 4.2 View 2: Quick Capture Modal — `<15s` Manual-First Flow (`US-01` `#4`, `US-02` `#5`)
+* **Empirical Layout (`Board C` Iterations `C-1 #22` & `C-2 #23`):**
+  * **Primary Row (Elevated Proof + Brand Typeahead):** `Item Name / Brand` combobox (`<10ms` `PrefixTrie` pills: `[Sony]`, `[Apple]`, `[Spotify]`, `[FitX]`, `[MediaMarkt]`) placed **directly adjacent** to the **Receipt Photo Vault Container** so users never tap `"Save"` before snapping their *Kassenbon* (`0% -> 100%` receipt attachment rate).
+  * **Core Metadata Row:** Segmented `Hardware (24m BGB § 438)` vs. `Subscription (1m BGB § 309 Nr. 9)` selector, `Purchase / Billing Date` (defaults to today in `Europe/Berlin`, blocks future hardware dates per `Scenario 1.4`), and `Price (EUR)`.
+  * **Media Intake Feedback (`Format 1`):** Live `120x120px` thumbnail rendered in `<500ms` via Mojtaba's Web Worker (`<=2048px`, `<1.5MB` WebP/JPEG) displaying the truncated 64-hex-char **GoBD `SHA-256` immutability stamp** (`GoBD Rn. 108–110`). Automatic HTML5 `<input type="file" accept="image/*,application/pdf" capture="environment">` fallback if `getUserMedia` is denied (`Scenario 2.4`).
+  * **German Tax Toggle (`Scenario 1.5`):** 1-tap `Werbungskosten (§ 9 EStG)` switch revealing `Arbeitsmittel | Fachliteratur | Software` and automatic `BMF 22.02.2022` 1-year *Sofortabschreibung* badge.
+  * **Zero-OCR Guardrail (`Red Line #1` / `ADR-01`):** Strictly zero cloud vision calls or camera OCR spinners.
+
+### 4.3 View 3: Item Detail & Receipt Vault (`US-02` `#5`, `Iteration C-3 #24`)
+* **Unified `BGB § 477` Timeline (`BgbCliffTimelineWidget`):** Single continuous 24-month bar clearly demarcating Months `0–12` (*Beweislastumkehr* active: retailer must prove item was defect-free at delivery) vs. Months `12–24` (*Gewährleistung* statutory claim window), with optional commercial guarantee overlay.
+* **Offline Pinch-to-Zoom Receipt Inspector (`Format 1`):** Hardware-accelerated HTML5 `<canvas>` modal managed via Svelte 5 `$effect` cleanup (`URL.revokeObjectURL`), supporting `1x–4x` two-finger pinch-to-zoom and double-tap zoom in **100% Airplane Mode** (`Scenario 2.2`).
+* **Direct Action Routing:** High-contrast Coral CTA (`#D96B4B`) launching View 4, alongside verified merchant RMA / `§ 312k BGB` cancellation deep-links.
+
+### 4.4 View 4: 1-Tap Statutory Claim & Cancellation Generator (`US-05` `#8`, `D-2` `#19`)
+* **Deterministic Legal Assembly (`Red Line #3` / `ADR-03 #29`):** Live bilingual (DE/EN) preview compiled strictly from AmirHossein's 5 verbatim templates (`DOC-PRD-02`)—zero generative LLM prose:
+  * Hardware *Mängelrüge* (`BGB §§ 434, 437 Nr. 1, 439 Abs. 1–4`, dynamic `§ 477 Abs. 1` presumption + 14-day *Nacherfüllung* deadline).
+  * Subscription ordinary termination (`BGB § 309 Nr. 9`), 14-day revocation (`§§ 312g, 355 BGB`), or **immediate extraordinary termination (`BGB § 312k Abs. 6`)** when `cancellation_button_compliant === false`.
+  * Missing-receipt civil proof fallback (`Scenario 5.3`) injecting `Kontoauszug` / `Bestellbestätigung` (`§ 286 ZPO`).
+* **Mandatory Safe-Harbor Footer (`Gate 7`):** Non-removable **BGH VIII ZR 285/18 (*LexFox*)** and `§§ 2, 3 RDG` notice embedded in both UI preview and exported artifacts.
+* **Dual Export & Transient Activation Fallback (`Format 2`, `Scenario 5.5`):** `<800ms` client-side PDF dossier export (embedding receipt photo + `SHA-256` exhibit hash) plus W3C transient-activation-safe `Copy Notice Text to Clipboard` and `.txt` download fallback.
+
+### 4.5 View 5: Subscriptions & German Tax Summary (`US-08` `#11`, `D-4` `#21`)
+* **Dual Financial Overview:** Cumulative monthly/annual recurring subscription burn widget paired with an itemized German *Werbungskosten* (`§ 9 EStG`) deduction ledger.
+* **BMF 22.02.2022 & Mixed-Use Allocation:** Highlights 100% 1-year immediate write-off (*Sofortabschreibung*) eligibility for computer hardware, peripherals, and study/work software, with interactive work/study usage percentage slider (e.g., `80%` deductible share) and UTF-8 BOM CSV export for WISO Steuer / Taxfix / ELSTER tables.
+* **Mandatory Tax Disclaimer (`Gate 7`):** Permanent `§§ 2, 3, 5 StBerG` non-advisory notice.
+
+### 4.6 View 6: Policy Wiki & MCP Explorer (`US-06` `#9`, `US-07` `#10`, `D-3` `#20`)
+* **View 6A — Public Brand Policy Directory (`/wiki` & `/wiki/[slug]`):** Zero-JS `.astro` reference cards for the Top 20 student brands (`Sony`, `Apple`, `Lenovo`, `Samsung`, `Anker`, `Bose`, `MediaMarkt`, `Saturn`, `Amazon`, `Spotify`, `Netflix`, `FitX`, `McFIT`, `Adobe`, `JetBrains`, `GitHub`, `OpenAI`, `iCloud+`, `bahn.bonus / DB`, `congstar`), displaying statutory vs. commercial rules and `§ 312k BGB` button audit badges.
+* **View 6B — Interactive MCP JSON-RPC 2.0 Console (`<McpExplorerIsland client:load />`):** Live developer & grader sandbox executing `tools/list`, `policy_lookup`, and `claim_dossier_generate` against `POST /api/mcp` (`<30ms` edge RTT), complete with malformed-payload presets to demonstrate deterministic **Zod `-32602 Invalid params`** quarantine (`Risk R-4 #16`).
+
+---
+
+## 5. Svelte 5 Runes Reactivity Architecture (`ADR-04`)
+
+Per `ADR-04`, pure `.astro` + imperative DOM scripts were vetoed for Views 1–5 to protect keyboard focus, ARIA live announcements, and 60fps canvas lifecycle safety. All stateful wallet views use **Svelte 5 Runes** (`~11.8 KB` gzipped runtime):
+
+* **`wallet.svelte.ts` Single Source of Truth:** Wraps `Dexie.js v4` `liveQuery` observables via `createSubscriber` (`svelte/reactivity`) into `$state.raw` collections, eliminating dual-store state drift on IndexedDB transaction rollbacks.
+* **Surgical `$derived` Signal Edges:** Prefix-Trie suggestions, statutory `BGB § 438`/`§ 477` dates, and urgency badge classifications recompute in **`1.4ms`** per keystroke without re-rendering sibling dashboard widgets.
+* **SSR-Safe Accessibility IDs (`$props.id()`):** Deterministic ARIA relationship bindings (`aria-controls`, `aria-activedescendant`, `aria-describedby`) across `OmniBar.svelte` and `QuickCaptureModal.svelte`.
+
+Below is the `svelte-autofixer`-verified (`0 issues, 0 suggestions`) reference implementation of the centerpiece **`OmniBar.svelte`** component:
+
+```svelte
+<script lang="ts">
+	interface OmniSuggestion {
+		id: string;
+		group: 'saved' | 'wiki' | 'create';
+		label: string;
+		sublabel: string;
+	}
+
+	interface Props {
+		suggestions?: OmniSuggestion[];
+		placeholder?: string;
+		onSelect?: (item: OmniSuggestion) => void;
+		onCreateNew?: (rawQuery: string) => void;
+	}
+
+	let {
+		suggestions = [],
+		placeholder = 'Search saved vault, Policy Wiki, or log a purchase...',
+		onSelect,
+		onCreateNew
+	}: Props = $props();
+
+	const uid = $props.id();
+	let query = $state('');
+	let isOpen = $state(false);
+	let activeIndex = $state(-1);
+
+	let hasQuery = $derived(query.trim().length > 0);
+	let visibleItems = $derived<OmniSuggestion[]>(
+		hasQuery
+			? [
+					...suggestions,
+					{
+						id: 'create-new-action',
+						group: 'create',
+						label: `Log "${query.trim()}" in <15s`,
+						sublabel: 'Open Quick Capture with BGB statutory defaults'
+					}
+				]
+			: []
+	);
+	let activeOptionId = $derived(
+		isOpen && activeIndex >= 0 && visibleItems[activeIndex]
+			? `${uid}-opt-${activeIndex}`
+			: undefined
+	);
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (!isOpen && (event.key === 'ArrowDown' || event.key === 'Enter') && hasQuery) {
+			isOpen = true;
+		}
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			activeIndex = visibleItems.length > 0 ? (activeIndex + 1) % visibleItems.length : -1;
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			activeIndex =
+				visibleItems.length > 0
+					? (activeIndex - 1 + visibleItems.length) % visibleItems.length
+					: -1;
+		} else if (event.key === 'Enter' && activeIndex >= 0 && visibleItems[activeIndex]) {
+			event.preventDefault();
+			const picked = visibleItems[activeIndex];
+			if (picked.group === 'create') {
+				onCreateNew?.(query.trim());
+			} else {
+				onSelect?.(picked);
+			}
+			isOpen = false;
+		} else if (event.key === 'Escape') {
+			isOpen = false;
+			activeIndex = -1;
+		}
+	}
+</script>
+
+<div class="omnibar-shell">
+	<label for="{uid}-input" class="sr-only">Unified Search, Policy Wiki, and Quick Capture</label>
+	<input
+		id="{uid}-input"
+		type="search"
+		role="combobox"
+		autocomplete="off"
+		aria-expanded={isOpen && visibleItems.length > 0}
+		aria-controls="{uid}-listbox"
+		aria-activedescendant={activeOptionId}
+		aria-autocomplete="list"
+		{placeholder}
+		bind:value={query}
+		onfocus={() => {
+			if (hasQuery) isOpen = true;
+		}}
+		oninput={() => {
+			isOpen = query.trim().length > 0;
+			activeIndex = 0;
+		}}
+		onkeydown={handleKeydown}
+	/>
+
+	{#if isOpen && visibleItems.length > 0}
+		<ul id="{uid}-listbox" role="listbox" aria-label="Unified Wallet and Policy Wiki Results">
+			{#each visibleItems as item, idx (item.id)}
+				<li
+					id="{uid}-opt-{idx}"
+					role="option"
+					aria-selected={idx === activeIndex}
+					class="omnibar-option"
+					onpointerdown={(e) => {
+						e.preventDefault();
+						if (item.group === 'create') {
+							onCreateNew?.(query.trim());
+						} else {
+							onSelect?.(item);
+						}
+						isOpen = false;
+					}}
+				>
+					<span class="opt-label">{item.label}</span>
+					<span class="opt-sublabel">{item.sublabel}</span>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+</div>
+
+<style>
+	.omnibar-shell {
+		position: relative;
+		width: 100%;
+	}
+	input[role='combobox'] {
+		min-height: var(--size-touch-min, 48px);
+		width: 100%;
+		background: var(--color-card-white, #ffffff);
+		color: var(--color-primary-teal, #2f524c);
+		border: 2px solid var(--color-primary-teal, #2f524c);
+		border-radius: var(--radius-md, 0.75rem);
+		padding: 0.75rem 1rem;
+	}
+	.omnibar-option {
+		min-height: var(--size-touch-min, 48px);
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: 0.5rem 1rem;
+	}
+</style>
 ```
 
 ---
 
-## 6. Maintenance, Versioning & Evolution Protocol
+## 6. Empirical Validation Traceability (`Board C` & Field Walkthroughs)
 
-The UI/UX Pre-Build Documentation Framework is a living engineering specification. To maintain architectural coherence across long-term product lifecycles, modifications are governed by the following protocol:
-
-### 1. Request for Comments (RFC) Process
-Any proposed change to design tokens, component APIs, or responsive breakpoints requires a formal RFC submission detailing:
-- Motivation and business rationale.
-- Downstream engineering impact (breaking vs non-breaking).
-- Accessibility evaluation against WCAG 2.2 AA.
-- Migration guide for affected frontend consumers.
-
-### 2. Semantic Versioning for Design Assets
-- **MAJOR (`v3.0.0`):** Breaking token renames, removal of component variants, structural layout grid changes.
-- **MINOR (`v2.6.0`):** Addition of new tokens, new component variants, non-breaking helper utilities.
-- **PATCH (`v2.5.1`):** Bug fixes in token values, documentation corrections, contrast adjustments.
-
-### 3. Design System Governance Council
-A bi-weekly review council comprising the UI/UX Lead, Frontend Tech Lead, Mobile Lead, and QA Automation Lead reviews all pending RFCs, evaluates automated regression test metrics, and authorizes release tags.
+| Validation Gate | Empirical Baseline (Round 1) | Root UX Revision Implemented by Prushti | Post-Iteration Measured Result | GitHub Traceability |
+| :--- | :--- | :--- | :--- | :---: |
+| **Team 7 Peer Lab — Capture Speed** | `38.0s` (*With help* — failed `<15s` SLA) | `C-1`: Prefix-Trie brand autocomplete + Omni-Bar quick-create pre-filling `24m BGB § 438` defaults | **`11.4s` (*Unaided* — `-70.0%` latency)** | `#22`, `#4` (`Gate 2`) |
+| **Team 7 Peer Lab — Receipt Proof** | `0%` attached on first tap | `C-2`: Elevated receipt camera/vault container beside `Item Name` with live `SHA-256` stamp | **`100%` unaided attachment** | `#23`, `#5` |
+| **Team 7 Peer Lab — BGB Clarity** | `29%` clarity (split tabs confusion) | `C-3`: Unified 24m timeline bar highlighting active `12m BGB § 477 Abs. 1` cliff | **`100%` unaided claim selection** | `#24`, `#7` |
+| **Walkthrough A (Participant Alpha)** | External field test (Airplane Mode, Pixel 7) | Offline PWA + `§ 9 EStG` / `BMF 2022` *Arbeitsmittel* toggle | **`12.1s` (Run 1) / `10.9s` (Run 2)** | `#25` |
+| **Walkthrough B (Participant Beta)** | External field test (7 active subscriptions) | Red `Urgent (7d)` badge + 1-tap `BGB § 312k Abs. 6` termination compiler | **`100%` unaided completion** | `#26` |
 
 ---
 
-## 7. Master Executive Approval & Sign-Off Attestation
+## 7. Companion UX/UI Specification Suite Index
 
-By signing below, the engineering, design, and product leadership certify that all twenty-eight (28) pre-build UI/UX specifications are complete, rigorously verified, and approved as the binding architectural contract for software development.
-
-```
-═══════════════════════════════════════════════════════════════════════════════
-                   FORMAL PRE-BUILD RELEASE AUTHORIZATION
-═══════════════════════════════════════════════════════════════════════════════
-
-UI/UX Design Lead:           _________________________   Date: _______________
-Principal Frontend Engineer:  _________________________   Date: _______________
-Principal Backend Architect:  _________________________   Date: _______________
-Lead QA Automation Engineer:  _________________________   Date: _______________
-Vice President of Product:   _________________________   Date: _______________
-
-Status: 100% SPECIFICATIONS RATIFIED — ENGINEERING SPRINT INITIATION AUTHORIZED
-═══════════════════════════════════════════════════════════════════════════════
-```
+1. [`USER_RESEARCH_SUMMARY.md`](./USER_RESEARCH_SUMMARY.md) (`DOC-UX-02`) — Persons 1–4 discovery synthesis, Consumer Friction Asymmetry, OCR spike rejection, Team 7 Peer Lab, and Walkthroughs Alpha & Beta.
+2. [`INFORMATION_ARCHITECTURE_AND_INTERACTION_SUMMARY.md`](./INFORMATION_ARCHITECTURE_AND_INTERACTION_SUMMARY.md) (`DOC-UX-03`) — Dual-domain sitemap, Single-Island routing, Unified Omni-Bar state machine & keyboard navigation, and calendar widget interactions.
+3. [`DESIGN_SYSTEM_AND_TOKENS_SUMMARY.md`](./DESIGN_SYSTEM_AND_TOKENS_SUMMARY.md) (`DOC-UX-04`) — W3C DTCG 3-tier tokens anchored on CM-LAB's official palette (`#2F524C` Teal, `#D96B4B` Coral, urgency semantics), typography, `>=48x48px` touch ergonomics, and Svelte 5 component matrices.
+4. [`ACCESSIBILITY_AND_ENGINEERING_HANDOFF_SUMMARY.md`](./ACCESSIBILITY_AND_ENGINEERING_HANDOFF_SUMMARY.md) (`DOC-UX-05`) — WCAG 2.1 AA (`Gate 6`), ARIA combobox/listbox contracts, focus traps, Airplane Mode offline UX, `Permissions-Policy: camera=(self)` mobile Safari safety (`Red Line #4`), and handoff contracts to Kyle & Mojtaba.
+5. [`TEST_INFRA_OVERVIEW.md`](./TEST_INFRA_OVERVIEW.md) (`DOC-UX-06`) — Storybook 10.5+ CSF (`@storybook/addon-svelte-csf`, `@storybook/addon-a11y`, `@storybook/addon-vitest`), Vitest component suite, and `<15s` stopwatch verification protocol (`Gate 2`).

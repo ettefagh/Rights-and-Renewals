@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schemas.agentskills.io/skill/0.2.0/schema.json",
+  "name": "claim-dossier-generate",
+  "version": "1.0.0",
+  "type": "skill-json",
+  "description": "Compile a deterministic German BGB § 437/439 statutory defect notice or § 312k contract termination letter with legal safe-harbor disclaimer.",
+  "invocation": {
+    "type": "mcp",
+    "endpoint": "https://rightsandrenewals.pages.dev/api/mcp",
+    "tool": "claim_dossier_generate",
+    "method": "POST"
+  },
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "brand_slug": {
+        "type": "string",
+        "description": "Brand identifier (e.g. 'apple', 'sony')"
+      },
+      "service_slug": {
+        "type": "string",
+        "description": "Alias for brand_slug"
+      },
+      "item_name": {
+        "type": "string",
+        "description": "Full product name (e.g. 'MacBook Air M2 13-inch')"
+      },
+      "purchase_date": {
+        "type": "string",
+        "format": "date",
+        "description": "Purchase date in ISO 8601 format (YYYY-MM-DD)"
+      },
+      "defect_description": {
+        "type": "string",
+        "description": "Factual description of defect or failure"
+      },
+      "issue_type": {
+        "type": "string",
+        "enum": [
+          "statutory_defect_claim",
+          "contract_cancellation"
+        ],
+        "description": "Legal claim type"
+      }
+    },
+    "required": [
+      "brand_slug",
+      "item_name",
+      "purchase_date",
+      "defect_description"
+    ]
+  },
+  "examples": [
+    {
+      "intent": "Generate defect claim letter for a flickering monitor",
+      "arguments": {
+        "brand_slug": "apple",
+        "item_name": "Studio Display",
+        "purchase_date": "2024-05-10",
+        "defect_description": "Display backlight flickering intermittently after 6 months of use",
+        "issue_type": "statutory_defect_claim"
+      }
+    }
+  ]
+}

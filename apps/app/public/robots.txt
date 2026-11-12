@@ -1,0 +1,89 @@
+# ==============================================================================
+# CM-LAB Sovereign Rights & Renewals App (RFC 9309 Compliant)
+# Domain: https://rightsandrenewals-app.pages.dev
+# Governance: RFC 9309, contentsignals.org, EU Directive 2019/790 Art. 4
+# ==============================================================================
+
+# Content Signals Policy Statement:
+# ANY RESTRICTIONS EXPRESSED VIA CONTENT SIGNALS ARE EXPRESS RESERVATIONS OF RIGHTS
+# UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT.
+
+# ------------------------------------------------------------------------------
+# 1. Standard Fallback Directive
+# ------------------------------------------------------------------------------
+User-agent: *
+Allow: /
+Disallow: /api/auth/
+Allow: /.well-known/
+Allow: /auth.md
+Content-Signal: search=yes, ai-train=no, ai-input=yes
+
+# ------------------------------------------------------------------------------
+# 2. AI Search & Grounding Crawlers (Citation & Real-Time Retrieval)
+# ------------------------------------------------------------------------------
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/auth/
+Content-Signal: search=yes, ai-train=no, ai-input=yes
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /api/auth/
+Content-Signal: search=yes, ai-train=no, ai-input=yes
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/auth/
+Content-Signal: search=yes, ai-train=no, ai-input=yes
+
+# ------------------------------------------------------------------------------
+# 3. User-Prompted AI Fetchers (Direct User Link Ingestion)
+# ------------------------------------------------------------------------------
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/auth/
+Content-Signal: search=yes, ai-train=no, ai-input=yes
+
+User-agent: Claude-User
+Allow: /
+Disallow: /api/auth/
+Content-Signal: search=yes, ai-train=no, ai-input=yes
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /api/auth/
+Content-Signal: search=yes, ai-train=no, ai-input=yes
+
+# ------------------------------------------------------------------------------
+# 4. AI Training & Foundation Model Crawlers (Explicit Non-Commercial Policy)
+# ------------------------------------------------------------------------------
+User-agent: GPTBot
+Disallow: /
+Content-Signal: search=no, ai-train=no, ai-input=no
+
+User-agent: ClaudeBot
+Disallow: /
+Content-Signal: search=no, ai-train=no, ai-input=no
+
+User-agent: Google-Extended
+Disallow: /
+Content-Signal: search=no, ai-train=no, ai-input=no
+
+User-agent: Applebot-Extended
+Disallow: /
+Content-Signal: search=no, ai-train=no, ai-input=no
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+# ------------------------------------------------------------------------------
+# 5. Sitemaps & Agent Discovery Pointers
+# ------------------------------------------------------------------------------
+Sitemap: https://rightsandrenewals-app.pages.dev/sitemap.xml
+Agentmap: https://rightsandrenewals-app.pages.dev/.well-known/ai-catalog.json

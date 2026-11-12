@@ -1,0 +1,170 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  "version": "1.0",
+  "serverInfo": {
+    "name": "rights-and-renewals",
+    "version": "1.0.0",
+    "title": "Rights & Renewals MCP Server",
+    "description": "Sovereign consumer rights lookup, statutory warranty defense, contract renewal tracking, and automated cancellation letter generation."
+  },
+  "title": "Rights & Renewals MCP Server",
+  "description": "Authoritative Model Context Protocol server for German statutory consumer warranty rights (BGB §§ 434, 437, 438, 477), subscription cancellation laws (BGB § 309 Nr. 9, § 312k), and tax deductibility evaluation (BMF 2022).",
+  "url": "https://rightsandrenewals.pages.dev/api/mcp",
+  "websiteUrl": "https://rightsandrenewals.pages.dev/agent-setup",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://rightsandrenewals.pages.dev/api/mcp"
+  },
+  "transports": [
+    {
+      "type": "streamable-http",
+      "url": "https://rightsandrenewals.pages.dev/api/mcp",
+      "formats": ["application/json"]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://rightsandrenewals.pages.dev/api/mcp",
+      "protocolVersions": [
+        "2024-11-05",
+        "2025-11-25"
+      ]
+    }
+  ],
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    }
+  },
+  "tools": [
+    {
+      "name": "policy_lookup",
+      "description": "Look up German statutory warranty, 12m burden of proof cliff, and cancellation policies for a brand or service.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "service_slug": {
+            "type": "string",
+            "description": "Brand or service slug (e.g. 'spotify', 'apple', 'mediamarkt')"
+          },
+          "brand_slug": {
+            "type": "string",
+            "description": "Alias for service_slug for dual-slug compatibility"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "hardware",
+              "subscription"
+            ]
+          }
+        },
+        "required": [
+          "service_slug"
+        ]
+      }
+    },
+    {
+      "name": "claim_dossier_generate",
+      "description": "Compile a deterministic German BGB § 437/439 statutory defect notice or § 312k cancellation letter with LexFox safe-harbor disclaimer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "brand_slug": {
+            "type": "string",
+            "description": "Slug of the vendor or service"
+          },
+          "defect_description": {
+            "type": "string",
+            "description": "Description of the defect or cancellation rationale"
+          },
+          "purchase_date": {
+            "type": "string",
+            "description": "ISO 8601 date string (YYYY-MM-DD)"
+          },
+          "remedy_type": {
+            "type": "string",
+            "enum": [
+              "repair",
+              "replacement",
+              "cancellation"
+            ]
+          }
+        },
+        "required": [
+          "brand_slug",
+          "defect_description"
+        ]
+      }
+    },
+    {
+      "name": "statutory_law_lookup",
+      "description": "Look up verbatim German statutory consumer law clauses (BGB §§ 437, 438, 477, 309 Nr. 9, 312k) and legal guidance.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "section": {
+            "type": "string",
+            "description": "Statutory section code, e.g. '477', '312k', '309', '437', '438'"
+          }
+        },
+        "required": [
+          "section"
+        ]
+      }
+    },
+    {
+      "name": "subscription_category_rules",
+      "description": "Retrieve legal renewal rules, maximum statutory notice periods, and mandatory cancellation button requirements for a subscription category.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Category name, e.g. 'streaming', 'telecom', 'software', 'fitness'"
+          }
+        },
+        "required": [
+          "category"
+        ]
+      }
+    },
+    {
+      "name": "tax_deductibility_check",
+      "description": "Evaluate digital equipment or subscription tax deductibility under German law (§ 9 EStG, BMF 22.02.2022 Sofortabschreibung).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "item_name": {
+            "type": "string",
+            "description": "Name or model of the device or software"
+          },
+          "price_eur": {
+            "type": "number",
+            "description": "Gross purchase price in EUR"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "hardware",
+              "software",
+              "subscription"
+            ]
+          }
+        },
+        "required": [
+          "item_name",
+          "price_eur"
+        ]
+      }
+    }
+  ]
+}

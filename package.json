@@ -1,0 +1,16 @@
+{
+  "name": "cm-lab-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "pnpm --filter @cmlab/core test",
+    "test:core": "pnpm --filter @cmlab/core test",
+    "test:coverage": "pnpm --filter @cmlab/core test:coverage",
+    "build": "pnpm -r --filter \"./packages/**\" build",
+    "typecheck": "pnpm --filter @cmlab/core typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}

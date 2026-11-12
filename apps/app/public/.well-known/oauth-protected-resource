@@ -1,0 +1,28 @@
+{
+  "resource": "https://rightsandrenewals-app.pages.dev",
+  "authorization_servers": [
+    "https://rightsandrenewals-app.pages.dev",
+    "https://rightsandrenewals.pages.dev",
+    "https://api.workos.com"
+  ],
+  "scopes_supported": [
+    "openid",
+    "profile",
+    "email",
+    "offline_access",
+    "vault:read",
+    "vault:write",
+    "policy:read",
+    "rights:read",
+    "rights:search",
+    "cancellation:generate",
+    "wallet:sync"
+  ],
+  "bearer_methods_supported": [
+    "header"
+  ],
+  "resource_documentation": "https://rightsandrenewals-app.pages.dev/auth.md",
+  "resource_policy": "https://rightsandrenewals-app.pages.dev/privacy",
+  "resource_tos": "https://rightsandrenewals-app.pages.dev/terms",
+  "jwks_uri": "https://rightsandrenewals-app.pages.dev/.well-known/jwks.json"
+}

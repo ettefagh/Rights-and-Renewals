@@ -1,0 +1,932 @@
+---
+import '../../styles/tokens.css';
+import '../../styles/main.css';
+
+export const prerender = true;
+
+const promptText = "Fetch and execute the appropriate instructions to set me up for Rights & Renewals from https://rightsandrenewals.pages.dev/agent-setup/prompt.md";
+---
+
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Rights &amp; Renewals · Agent Setup</title>
+  <meta name="description" content="Connect your AI coding agent to Rights & Renewals. 1-click installer commands and copyable configuration snippets for Claude Code, Claude Desktop, Cursor, Windsurf, VS Code / Continue, and Gemini CLI." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+  <!-- AI-Agent Discovery Links (RFC 8288 / ARD / SEP-2127 / AgentSkills) -->
+  <link rel="ai-catalog" href="/.well-known/ai-catalog.json" />
+  <link rel="mcp-server-card" href="/.well-known/mcp/server-card.json" />
+  <link rel="agent-skills" href="/.well-known/agent-skills/index.json" />
+  <link rel="service-desc" href="/api/mcp" />
+
+  <!-- Zero-FOUC Theme Initialization -->
+  <script is:inline>
+    (function() {
+      try {
+        const saved = localStorage.getItem('cmlab-theme');
+        const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', saved || (systemDark ? 'dark' : 'light'));
+      } catch (e) {}
+    })();
+
+    window.toggleTheme = function() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('cmlab-theme', next); } catch (e) {}
+    };
+  </script>
+
+  <!-- W3C DTCG 3-Tier Design System Stylesheets -->
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/main.css" />
+
+  <style>
+    .agent-setup-hero {
+      padding: var(--space-12, 48px) var(--space-4, 16px);
+      text-align: center;
+      background: linear-gradient(180deg, var(--color-bg-canvas, #ffffff) 0%, var(--color-bg-subtle, #f8fafc) 100%);
+      border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
+    }
+    .agent-setup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: var(--color-bg-surface, #ffffff);
+      border: 1px solid var(--color-border-subtle, #e2e8f0);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-primary-text, #2563eb);
+      margin-bottom: var(--space-4, 16px);
+    }
+    .agent-setup-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-3, 12px);
+      color: var(--color-text-primary, #0f172a);
+    }
+    .agent-setup-description {
+      max-width: 680px;
+      margin: 0 auto var(--space-6, 24px) auto;
+      font-size: 1.125rem;
+      color: var(--color-text-secondary, #475569);
+      line-height: 1.6;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--space-3, 12px);
+    }
+    .copy-prompt-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      background: var(--color-primary-default, #2563eb);
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+    .copy-prompt-btn:hover {
+      background: var(--color-primary-hover, #1d4ed8);
+      transform: translateY(-1px);
+    }
+    .copy-prompt-btn:focus-visible {
+      outline: 2px solid var(--color-primary-default, #2563eb);
+      outline-offset: 2px;
+    }
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: var(--space-8, 32px) 0 var(--space-6, 24px) 0;
+    }
+    .filter-chip {
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 1px solid var(--color-border-subtle, #e2e8f0);
+      background: var(--color-bg-surface, #ffffff);
+      color: var(--color-text-secondary, #475569);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-chip[aria-pressed="true"], .filter-chip.active {
+      background: var(--color-primary-default, #2563eb);
+      color: #ffffff;
+      border-color: var(--color-primary-default, #2563eb);
+    }
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-5, 20px);
+      margin-bottom: var(--space-12, 48px);
+    }
+    .agent-card {
+      border: 1px solid var(--color-border-subtle, #e2e8f0);
+      border-radius: 12px;
+      padding: var(--space-5, 20px);
+      background: var(--color-bg-surface, #ffffff);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .agent-card:hover {
+      border-color: var(--color-primary-default, #2563eb);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      transform: translateY(-2px);
+    }
+    .agent-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: var(--space-3, 12px);
+    }
+    .agent-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      background: var(--color-bg-subtle, #f1f5f9);
+    }
+    .agent-meta-vendor {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted, #64748b);
+    }
+    .agent-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text-primary, #0f172a);
+    }
+    .agent-summary {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary, #475569);
+      line-height: 1.5;
+      margin-bottom: var(--space-4, 16px);
+      flex-grow: 1;
+    }
+    .capability-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: var(--space-4, 16px);
+    }
+    .cap-pill {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--color-bg-subtle, #f1f5f9);
+      color: var(--color-text-secondary, #475569);
+      font-weight: 500;
+    }
+    .card-action-link {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-primary-default, #2563eb);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tabs-container {
+      margin-top: var(--space-8, 32px);
+      background: var(--color-bg-surface, #ffffff);
+      border: 1px solid var(--color-border-subtle, #e2e8f0);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .tablist {
+      display: flex;
+      flex-wrap: wrap;
+      background: var(--color-bg-subtle, #f8fafc);
+      border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
+      padding: 4px 4px 0 4px;
+      gap: 4px;
+    }
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      background: transparent;
+      color: var(--color-text-secondary, #475569);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover {
+      color: var(--color-text-primary, #0f172a);
+    }
+    .tab-btn[aria-selected="true"] {
+      background: var(--color-bg-surface, #ffffff);
+      color: var(--color-primary-default, #2563eb);
+      border-color: var(--color-border-subtle, #e2e8f0);
+      border-bottom: 2px solid var(--color-primary-default, #2563eb);
+      margin-bottom: -1px;
+    }
+    .tabpanel {
+      padding: var(--space-6, 24px);
+    }
+    .tabpanel[hidden] {
+      display: none;
+    }
+    .step-item {
+      margin-bottom: var(--space-6, 24px);
+    }
+    .step-label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text-primary, #0f172a);
+      margin-bottom: var(--space-2, 8px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary-default, #2563eb);
+      color: #ffffff;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .code-box {
+      position: relative;
+      background: var(--color-code-bg, #0f172a);
+      color: var(--color-code-text, #f8fafc);
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: var(--space-2, 8px) 0;
+    }
+    .code-box pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .btn-copy-code {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-copy-code:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .btn-copy-code.copied {
+      background: #10b981;
+      border-color: #10b981;
+    }
+    .tools-accordion {
+      margin-top: var(--space-10, 40px);
+      border: 1px solid var(--color-border-subtle, #e2e8f0);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .accordion-header {
+      padding: 16px 20px;
+      background: var(--color-bg-subtle, #f8fafc);
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .accordion-body {
+      padding: 20px;
+      background: var(--color-bg-surface, #ffffff);
+    }
+    .tool-entry {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
+    }
+    .tool-entry:last-child {
+      border-bottom: none;
+    }
+    .tool-name {
+      font-family: var(--font-mono, monospace);
+      font-weight: 700;
+      color: var(--color-primary-text, #2563eb);
+    }
+  </style>
+</head>
+<body class="showcase-shell">
+
+  <!-- ========================================================================
+       STICKY UTILITY HEADER
+       ======================================================================== -->
+  <header role="banner" id="app-header" class="showcase-header">
+    <div class="layout-container header-inner">
+      <a href="/" class="brand-link" aria-label="Rights & Renewals Home" style="display: inline-flex; align-items: center; gap: 10px;">
+        <img src="/favicon.svg" alt="Rights & Renewals Icon" width="32" height="32" style="border-radius: 8px; display: block;" />
+        <span class="brand-name">Rights &amp; Renewals</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="/" class="nav-item">Überblick</a>
+        <a href="/#mcp-playground" class="nav-item">MCP Playground</a>
+        <a href="/#omnibar-section" class="nav-item">Omnibar</a>
+        <a href="/wiki" class="nav-item">Brand Policy Wiki</a>
+        <a href="/emdash" class="nav-item">EmDash CMS</a>
+        <a href="/agent-setup" class="nav-item active" aria-current="page">Agent Setup</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Theme umschalten" title="Theme umschalten">
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+        </button>
+        <a href="https://rightsandrenewals-app.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
+          📱 Zur App ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="agent-setup-main">
+    <!-- HERO SECTION -->
+    <section class="agent-setup-hero">
+      <div class="layout-container">
+        <div class="agent-setup-badge">
+          <span>⚡ Model Context Protocol</span> · <span>JSON-RPC 2.0</span> · <span>5 Tools</span>
+        </div>
+        <h1 class="agent-setup-title">Agent Setup</h1>
+        <p class="agent-setup-description">
+          Connect your AI coding agent to <strong>Rights &amp; Renewals</strong>. Query German consumer statutory law (BGB §§ 437, 477, 312k), warranty burden-of-proof cliffs, and tax deductibility proofs in real-time.
+        </p>
+
+        <div class="hero-actions">
+          <button
+            type="button"
+            class="copy-prompt-btn"
+            id="hero-copy-prompt-btn"
+            data-prompt={promptText}
+            aria-label="Copy unified setup prompt for AI coding agents"
+          >
+            📋 Copy prompt
+          </button>
+          <a href="#agents-catalog" class="btn btn-outline">
+            Browse agents ↓
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout-container" style="padding-top: var(--space-6, 24px); padding-bottom: var(--space-16, 64px);">
+
+      <!-- WORKFLOW FILTER BAR -->
+      <div class="filter-bar" role="group" aria-label="Filter agents by workflow" id="agents-catalog">
+        <button type="button" class="filter-chip active" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" class="filter-chip" data-filter="terminal" aria-pressed="false">Terminal</button>
+        <button type="button" class="filter-chip" data-filter="ide" aria-pressed="false">IDE</button>
+        <button type="button" class="filter-chip" data-filter="cloud" aria-pressed="false">Cloud</button>
+        <button type="button" class="filter-chip" data-filter="extension" aria-pressed="false">Extension</button>
+      </div>
+
+      <!-- 6-AGENT CATALOG CARD GRID -->
+      <div class="catalog-grid" id="agent-grid">
+        <!-- 1. Claude Code -->
+        <article class="agent-card" id="agent-card-claude-code" data-workflows="terminal cloud" data-target-tab="tab-claude-code">
+          <div>
+            <div class="agent-card-header">
+              <div class="agent-icon">🟧</div>
+              <div>
+                <div class="agent-meta-vendor">Anthropic</div>
+                <div class="agent-title">Claude Code</div>
+              </div>
+            </div>
+            <p class="agent-summary">Agentic terminal tool that builds, debugs, and inspects codebases directly from your shell.</p>
+            <div class="capability-pills">
+              <span class="cap-pill">Terminal</span>
+              <span class="cap-pill">Cloud</span>
+            </div>
+          </div>
+          <span class="card-action-link">View guide →</span>
+        </article>
+
+        <!-- 2. Claude Desktop -->
+        <article class="agent-card" id="agent-card-claude-desktop" data-workflows="cloud standalone" data-target-tab="tab-claude-desktop">
+          <div>
+            <div class="agent-card-header">
+              <div class="agent-icon">🟪</div>
+              <div>
+                <div class="agent-meta-vendor">Anthropic</div>
+                <div class="agent-title">Claude Desktop</div>
+              </div>
+            </div>
+            <p class="agent-summary">Standalone desktop app integrating MCP servers through local stdio mcp-remote bridge.</p>
+            <div class="capability-pills">
+              <span class="cap-pill">Standalone</span>
+              <span class="cap-pill">Cloud</span>
+            </div>
+          </div>
+          <span class="card-action-link">View guide →</span>
+        </article>
+
+        <!-- 3. Cursor -->
+        <article class="agent-card" id="agent-card-cursor" data-workflows="ide terminal" data-target-tab="tab-cursor">
+          <div>
+            <div class="agent-card-header">
+              <div class="agent-icon">🔷</div>
+              <div>
+                <div class="agent-meta-vendor">Anysphere</div>
+                <div class="agent-title">Cursor IDE</div>
+              </div>
+            </div>
+            <p class="agent-summary">AI-first code editor with native remote HTTP/SSE MCP server connections via .cursor/mcp.json.</p>
+            <div class="capability-pills">
+              <span class="cap-pill">IDE</span>
+              <span class="cap-pill">Terminal</span>
+            </div>
+          </div>
+          <span class="card-action-link">View guide →</span>
+        </article>
+
+        <!-- 4. Windsurf -->
+        <article class="agent-card" id="agent-card-windsurf" data-workflows="ide cloud" data-target-tab="tab-windsurf">
+          <div>
+            <div class="agent-card-header">
+              <div class="agent-icon">🌊</div>
+              <div>
+                <div class="agent-meta-vendor">Codeium</div>
+                <div class="agent-title">Windsurf</div>
+              </div>
+            </div>
+            <p class="agent-summary">Cascade-powered AI IDE supporting remote MCP servers via mcp_config.json with serverUrl syntax.</p>
+            <div class="capability-pills">
+              <span class="cap-pill">IDE</span>
+              <span class="cap-pill">Cloud</span>
+            </div>
+          </div>
+          <span class="card-action-link">View guide →</span>
+        </article>
+
+        <!-- 5. VS Code / Continue -->
+        <article class="agent-card" id="agent-card-continue" data-workflows="extension ide" data-target-tab="tab-continue">
+          <div>
+            <div class="agent-card-header">
+              <div class="agent-icon">🟢</div>
+              <div>
+                <div class="agent-meta-vendor">Continue.dev</div>
+                <div class="agent-title">VS Code / Continue</div>
+              </div>
+            </div>
+            <p class="agent-summary">Open-source AI code assistant extension supporting SSE transport configurations.</p>
+            <div class="capability-pills">
+              <span class="cap-pill">Extension</span>
+              <span class="cap-pill">IDE</span>
+            </div>
+          </div>
+          <span class="card-action-link">View guide →</span>
+        </article>
+
+        <!-- 6. Gemini CLI -->
+        <article class="agent-card" id="agent-card-gemini" data-workflows="terminal cloud" data-target-tab="tab-gemini">
+          <div>
+            <div class="agent-card-header">
+              <div class="agent-icon">♊</div>
+              <div>
+                <div class="agent-meta-vendor">Google</div>
+                <div class="agent-title">Gemini CLI</div>
+              </div>
+            </div>
+            <p class="agent-summary">Terminal assistant with 1-click MCP tool registration via http transport or settings.json.</p>
+            <div class="capability-pills">
+              <span class="cap-pill">Terminal</span>
+              <span class="cap-pill">Cloud</span>
+            </div>
+          </div>
+          <span class="card-action-link">View guide →</span>
+        </article>
+      </div>
+
+      <!-- DETAILED TABBED GUIDES -->
+      <section class="tabs-container" id="agent-tabs-section">
+        <div class="tablist" role="tablist" aria-label="AI Agents Setup Guides">
+          <button type="button" role="tab" class="tab-btn" id="tab-claude-code" aria-selected="true" aria-controls="panel-claude-code">Claude Code</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-claude-desktop" aria-selected="false" aria-controls="panel-claude-desktop">Claude Desktop</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-cursor" aria-selected="false" aria-controls="panel-cursor">Cursor</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-windsurf" aria-selected="false" aria-controls="panel-windsurf">Windsurf</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-continue" aria-selected="false" aria-controls="panel-continue">VS Code / Continue</button>
+          <button type="button" role="tab" class="tab-btn" id="tab-gemini" aria-selected="false" aria-controls="panel-gemini">Gemini CLI</button>
+        </div>
+
+        <!-- 1. Claude Code Panel -->
+        <div role="tabpanel" class="tabpanel" id="panel-claude-code" aria-labelledby="tab-claude-code">
+          <h2>Claude Code Configuration</h2>
+          <p class="text-secondary">Run the 1-click terminal command to add the Rights & Renewals MCP server directly to Claude Code.</p>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">1</span> 1-Click Terminal Command</div>
+            <div class="code-box">
+              <button type="button" class="btn-copy-code" data-clipboard="claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Claude Code CLI command">Copy</button>
+              <pre><code>claude mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp</code></pre>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">2</span> Verify Connection</div>
+            <p class="text-secondary text-sm">Launch Claude Code and run <code>/mcp</code> to verify all 5 tools are connected.</p>
+          </div>
+        </div>
+
+        <!-- 2. Claude Desktop Panel -->
+        <div role="tabpanel" class="tabpanel" id="panel-claude-desktop" aria-labelledby="tab-claude-desktop" hidden>
+          <h2>Claude Desktop Configuration</h2>
+          <p class="text-secondary">Claude Desktop connects to remote HTTP MCP endpoints via a local stdio bridge using <code>mcp-remote</code>.</p>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">1</span> Configuration File Location</div>
+            <p class="text-secondary text-sm">
+              macOS: <code>~/Library/Application Support/Claude/claude_desktop_config.json</code><br />
+              Windows: <code>%APPDATA%\Claude\claude_desktop_config.json</code>
+            </p>
+          </div>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">2</span> Add to claude_desktop_config.json</div>
+            <div class="code-box">
+              <button type="button" class="btn-copy-code" data-clipboard={`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://rightsandrenewals.pages.dev/api/mcp"
+      ]
+    }
+  }
+}`} aria-label="Copy Claude Desktop config JSON">Copy</button>
+              <pre><code>{`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://rightsandrenewals.pages.dev/api/mcp"
+      ]
+    }
+  }
+}`}</code></pre>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">3</span> Restart Claude Desktop</div>
+            <p class="text-secondary text-sm">Restart Claude Desktop completely to reload configuration.</p>
+          </div>
+        </div>
+
+        <!-- 3. Cursor Panel -->
+        <div role="tabpanel" class="tabpanel" id="panel-cursor" aria-labelledby="tab-cursor" hidden>
+          <h2>Cursor IDE Configuration</h2>
+          <p class="text-secondary">Cursor connects natively to remote MCP endpoints via project configuration or global settings.</p>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">1</span> Project File: .cursor/mcp.json</div>
+            <div class="code-box">
+              <button type="button" class="btn-copy-code" data-clipboard={`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}`} aria-label="Copy Cursor MCP JSON config">Copy</button>
+              <pre><code>{`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}`}</code></pre>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">2</span> Or Cursor Settings UI</div>
+            <p class="text-secondary text-sm">Open <strong>Cursor Settings &gt; Features &gt; MCP &gt; Add New MCP Server</strong> with Name: <code>rights-and-renewals</code>, Type: <code>sse</code> or <code>http</code>, and URL: <code>https://rightsandrenewals.pages.dev/api/mcp</code>.</p>
+          </div>
+        </div>
+
+        <!-- 4. Windsurf Panel -->
+        <div role="tabpanel" class="tabpanel" id="panel-windsurf" aria-labelledby="tab-windsurf" hidden>
+          <h2>Windsurf (Codeium) Configuration</h2>
+          <p class="text-secondary">Windsurf's Cascade AI requires the <code>serverUrl</code> attribute key in <code>mcp_config.json</code>.</p>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">1</span> Configuration File Location</div>
+            <p class="text-secondary text-sm">
+              macOS / Linux: <code>~/.codeium/windsurf/mcp_config.json</code><br />
+              Windows: <code>%USERPROFILE%\.codeium\windsurf\mcp_config.json</code>
+            </p>
+          </div>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">2</span> Add to mcp_config.json</div>
+            <div class="code-box">
+              <button type="button" class="btn-copy-code" data-clipboard={`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}`} aria-label="Copy Windsurf MCP JSON config">Copy</button>
+              <pre><code>{`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "serverUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}`}</code></pre>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">3</span> Refresh Cascade MCP Panel</div>
+            <p class="text-secondary text-sm">Click the Refresh button in the Cascade MCP panel to discover all tools.</p>
+          </div>
+        </div>
+
+        <!-- 5. VS Code / Continue Panel -->
+        <div role="tabpanel" class="tabpanel" id="panel-continue" aria-labelledby="tab-continue" hidden>
+          <h2>VS Code / Continue Configuration</h2>
+          <p class="text-secondary">Configure the Continue extension with SSE transport pointing to Rights &amp; Renewals.</p>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">1</span> Configuration File: ~/.continue/config.json</div>
+            <div class="code-box">
+              <button type="button" class="btn-copy-code" data-clipboard={`{
+  "mcpServers": [
+    {
+      "name": "rights-and-renewals",
+      "transport": {
+        "type": "sse",
+        "url": "https://rightsandrenewals.pages.dev/api/mcp"
+      }
+    }
+  ]
+}`} aria-label="Copy Continue JSON config">Copy</button>
+              <pre><code>{`{
+  "mcpServers": [
+    {
+      "name": "rights-and-renewals",
+      "transport": {
+        "type": "sse",
+        "url": "https://rightsandrenewals.pages.dev/api/mcp"
+      }
+    }
+  ]
+}`}</code></pre>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">2</span> Activate Agent Mode</div>
+            <p class="text-secondary text-sm">Ensure <strong>Agent Mode</strong> is selected in the Continue chat input dropdown for tools to be callable.</p>
+          </div>
+        </div>
+
+        <!-- 6. Gemini CLI Panel -->
+        <div role="tabpanel" class="tabpanel" id="panel-gemini" aria-labelledby="tab-gemini" hidden>
+          <h2>Google Gemini CLI Configuration</h2>
+          <p class="text-secondary">Register Rights &amp; Renewals via 1-click CLI installer or settings.json with <code>httpUrl</code>.</p>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">1</span> 1-Click Terminal Command</div>
+            <div class="code-box">
+              <button type="button" class="btn-copy-code" data-clipboard="gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp" aria-label="Copy Gemini CLI command">Copy</button>
+              <pre><code>gemini mcp add --transport http rights-and-renewals https://rightsandrenewals.pages.dev/api/mcp</code></pre>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-label"><span class="step-num">2</span> Or settings.json Configuration</div>
+            <div class="code-box">
+              <button type="button" class="btn-copy-code" data-clipboard={`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "httpUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}`} aria-label="Copy Gemini settings.json snippet">Copy</button>
+              <pre><code>{`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "httpUrl": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}`}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOOLS ACCORDION -->
+      <section class="tools-accordion">
+        <details>
+          <summary class="accordion-header">
+            <span>Available MCP Tools &amp; Capabilities (5 Tools)</span>
+            <span>▼</span>
+          </summary>
+          <div class="accordion-body">
+            <div class="tool-entry">
+              <div class="tool-name">policy_lookup</div>
+              <p class="text-sm text-secondary">Query verified brand cancellation policies, statutory warranty periods (24m), commercial guarantees, and direct cancellation URLs.</p>
+            </div>
+            <div class="tool-entry">
+              <div class="tool-name">claim_dossier_generate</div>
+              <p class="text-sm text-secondary">Deterministic German BGB § 437/439 defect notice or § 312k cancellation letter with LexFox disclaimer and § 477 burden of proof calculation.</p>
+            </div>
+            <div class="tool-entry">
+              <div class="tool-name">statutory_law_lookup</div>
+              <p class="text-sm text-secondary">Verbatim German Civil Code (BGB §§ 434, 437, 438, 439, 475e, 477, 309 Nr. 9, 312k, 355) text and consumer summaries.</p>
+            </div>
+            <div class="tool-entry">
+              <div class="tool-name">subscription_category_rules</div>
+              <p class="text-sm text-secondary">Statutory maximum initial contract term (24m) and rolling 1-month cancellation notice windows under BGB § 309 Nr. 9 &amp; § 312k.</p>
+            </div>
+            <div class="tool-entry">
+              <div class="tool-name">tax_deductibility_check</div>
+              <p class="text-sm text-secondary">German income tax deductibility as Werbungskosten under § 9 EStG and BMF 22.02.2022 digital asset Sofortabschreibung.</p>
+            </div>
+          </div>
+        </details>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Accessible Screen Reader Announcer -->
+  <div class="sr-only" aria-live="polite" id="copy-announcer"></div>
+
+  <!-- Client-Side Tabs, Filters, and Clipboard Controller -->
+  <script is:inline>
+    // Copy-to-clipboard handler with visual feedback and ARIA live announcement
+    async function copyText(text, btn) {
+      const announcer = document.getElementById('copy-announcer');
+      let success = false;
+      if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(text);
+          success = true;
+        } catch (e) {}
+      }
+      if (!success) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+          success = document.execCommand('copy');
+        } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      if (success) {
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        if (announcer) {
+          announcer.textContent = 'Copied to clipboard successfully';
+        }
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('copied');
+        }, 2000);
+      }
+    }
+
+    // Bind prompt button
+    const promptBtn = document.getElementById('hero-copy-prompt-btn');
+    if (promptBtn) {
+      promptBtn.addEventListener('click', () => {
+        const text = promptBtn.getAttribute('data-prompt') || '';
+        copyText(text, promptBtn);
+      });
+    }
+
+    // Bind code snippet copy buttons
+    document.querySelectorAll('.btn-copy-code').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.getAttribute('data-clipboard') || '';
+        copyText(text, btn);
+      });
+    });
+
+    // Workflow Filter Chips
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const agentCards = document.querySelectorAll('.agent-card');
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => {
+          c.classList.remove('active');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        chip.classList.add('active');
+        chip.setAttribute('aria-pressed', 'true');
+
+        const filter = chip.getAttribute('data-filter') || 'all';
+        agentCards.forEach(card => {
+          if (filter === 'all') {
+            card.style.display = 'flex';
+          } else {
+            const workflows = (card.getAttribute('data-workflows') || '').split(' ');
+            if (workflows.includes(filter)) {
+              card.style.display = 'flex';
+            } else {
+              card.style.display = 'none';
+            }
+          }
+        });
+      });
+    });
+
+    // Tab switcher
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tabpanel');
+
+    function activateTab(tabId) {
+      tabButtons.forEach(btn => {
+        const isTarget = btn.id === tabId;
+        btn.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+      });
+      tabPanels.forEach(panel => {
+        const labelledBy = panel.getAttribute('aria-labelledby');
+        if (labelledBy === tabId) {
+          panel.removeAttribute('hidden');
+        } else {
+          panel.setAttribute('hidden', '');
+        }
+      });
+    }
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        activateTab(btn.id);
+      });
+    });
+
+    // Clicking card opens tab
+    agentCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const targetTab = card.getAttribute('data-target-tab');
+        if (targetTab) {
+          activateTab(targetTab);
+          const tabsSection = document.getElementById('agent-tabs-section');
+          if (tabsSection) {
+            tabsSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+    });
+  </script>
+
+  <!-- WebMCP Auto-Registration -->
+  <script>
+    import '../components/webmcp.ts';
+  </script>
+</body>
+</html>

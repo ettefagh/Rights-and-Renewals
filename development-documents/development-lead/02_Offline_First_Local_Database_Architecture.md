@@ -539,7 +539,7 @@ export class WalletDatabase extends Dexie {
 
 /**
  * Singleton database instance export.
- * Shared across React query hooks, background workers, and MCP server tools.
+ * Shared across Svelte 5 Runes stores, background workers, and MCP server tools (ADR-04).
  */
 export const db = new WalletDatabase();
 ```
@@ -1176,17 +1176,16 @@ A major vulnerability on mobile devices (specifically WebKit/Mobile Safari on iO
 
 ---
 
-### 5.2 Production React 19 Hook: `useReceiptBlobUrl` with Deterministic Cleanup
-To completely prevent memory leaks, the frontend consumes receipts through a custom React 19 hook that enforces strict lifecycle revocation:
+### 5.2 Production Svelte 5 Runes Reactive Module: `ReceiptBlobState` with Deterministic Cleanup
+To completely prevent memory leaks, the frontend consumes receipts through a custom Svelte 5 reactive module that enforces strict lifecycle revocation:
 
 ```typescript
-// src/hooks/useReceiptBlobUrl.ts
+// src/services/receiptBlob.svelte.ts
 
-import { useState, useEffect } from 'react';
 import { db } from '../database/WalletDatabase';
 import { CryptoVaultService } from '../services/CryptoVaultService';
 
-interface UseReceiptBlobUrlResult {
+export interface ReceiptBlobStateResult {
   readonly objectUrl: string | null;
   readonly isLoading: boolean;
   readonly error: Error | null;
@@ -1194,79 +1193,77 @@ interface UseReceiptBlobUrlResult {
 }
 
 /**
- * Production React 19 Hook for safely decrypting and displaying receipt blobs.
- * Automatically revokes object URLs upon unmount or blobId change to prevent mobile RAM exhaustion.
+ * Production Svelte 5 Runes Module for safely decrypting and displaying receipt blobs.
+ * Automatically revokes object URLs upon effect cleanup or blobId change to prevent mobile RAM exhaustion.
  */
-export function useReceiptBlobUrl(blobId?: string): UseReceiptBlobUrlResult {
-  const [objectUrl, setObjectUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(Boolean(blobId));
-  const [error, setError] = useState<Error | null>(null);
-  const [sha256Verified, setSha256Verified] = useState<boolean>(false);
+export class ReceiptBlobState {
+  objectUrl = $state<string | null>(null);
+  isLoading = $state<boolean>(false);
+  error = $state<Error | null>(null);
+  sha256Verified = $state<boolean>(false);
 
-  useEffect(() => {
-    if (!blobId) {
-      setObjectUrl(null);
-      setIsLoading(false);
-      setError(null);
-      setSha256Verified(false);
-      return;
-    }
-
-    let isSubscribed = true;
-    let activeObjectUrl: string | null = null;
-
-    async function hydrateReceipt() {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // 1. Fetch encrypted blob from Dexie
-        const blobRecord = await db.receipt_blobs.get(blobId!);
-        if (!blobRecord) {
-          throw new Error(`Receipt record ${blobId} not found in local vault.`);
-        }
-
-        // 2. Decrypt ciphertext and verify GoBD SHA-256 checksum
-        const decryptedArrayBuffer = await CryptoVaultService.decryptAndVerifyBinaryPayload(
-          blobRecord.encryptedCiphertext,
-          blobRecord.iv,
-          blobRecord.sha256Hex
-        );
-
-        if (!isSubscribed) return;
-
-        // 3. Instantiate native Blob and allocate safe Object URL
-        const mimeType = blobRecord.mimeType || 'image/webp';
-        const fileBlob = new Blob([decryptedArrayBuffer], { type: mimeType });
-        activeObjectUrl = URL.createObjectURL(fileBlob);
-
-        setObjectUrl(activeObjectUrl);
-        setSha256Verified(true);
-      } catch (err: any) {
-        if (isSubscribed) {
-          console.error('[HydrationError] Failed to hydrate receipt blob:', err);
-          setError(err instanceof Error ? err : new Error(String(err)));
-        }
-      } finally {
-        if (isSubscribed) {
-          setIsLoading(false);
-        }
+  constructor(getBlobId: () => string | undefined) {
+    $effect(() => {
+      const id = getBlobId();
+      if (!id) {
+        this.objectUrl = null;
+        this.isLoading = false;
+        this.error = null;
+        this.sha256Verified = false;
+        return;
       }
-    }
 
-    hydrateReceipt();
+      let activeObjectUrl: string | null = null;
+      let cancelled = false;
+      this.isLoading = true;
+      this.error = null;
 
-    // Cleanup: revoke Object URL immediately upon component unmount or ID change
-    return () => {
-      isSubscribed = false;
-      if (activeObjectUrl) {
-        URL.revokeObjectURL(activeObjectUrl);
-        activeObjectUrl = null;
-      }
-    };
-  }, [blobId]);
+      (async () => {
+        try {
+          // 1. Fetch encrypted blob from Dexie
+          const blobRecord = await db.receipt_blobs.get(id);
+          if (!blobRecord) {
+            throw new Error(`Receipt record ${id} not found in local vault.`);
+          }
 
-  return { objectUrl, isLoading, error, sha256Verified };
+          // 2. Decrypt ciphertext and verify GoBD SHA-256 checksum
+          const decryptedArrayBuffer = await CryptoVaultService.decryptAndVerifyBinaryPayload(
+            blobRecord.encryptedCiphertext,
+            blobRecord.iv,
+            blobRecord.sha256Hex
+          );
+
+          if (cancelled) return;
+
+          // 3. Instantiate native Blob and allocate safe Object URL
+          const mimeType = blobRecord.mimeType || 'image/webp';
+          const fileBlob = new Blob([decryptedArrayBuffer], { type: mimeType });
+          activeObjectUrl = URL.createObjectURL(fileBlob);
+
+          this.objectUrl = activeObjectUrl;
+          this.sha256Verified = true;
+        } catch (err: unknown) {
+          if (!cancelled) {
+            console.error('[HydrationError] Failed to hydrate receipt blob:', err);
+            this.error = err instanceof Error ? err : new Error(String(err));
+          }
+        } finally {
+          if (!cancelled) {
+            this.isLoading = false;
+          }
+        }
+      })();
+
+      // Cleanup: revoke Object URL immediately upon effect cleanup or ID change
+      return () => {
+        cancelled = true;
+        if (activeObjectUrl) {
+          URL.revokeObjectURL(activeObjectUrl);
+          activeObjectUrl = null;
+        }
+      };
+    });
+  }
 }
 ```
 

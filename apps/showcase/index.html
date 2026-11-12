@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CM-LAB · Two Faces of Ground Truth · MCP Server &amp; Consumer Wallet Showcase</title>
+  <meta name="description" content="Showcase webpage demonstrating the Model Context Protocol (MCP 2024-11-05) interface and the offline-first German consumer warranty & subscription wallet.">
+
+  <!-- Zero-FOUC Theme Initialization -->
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('cmlab-theme');
+        const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', saved || (systemDark ? 'dark' : 'light'));
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- W3C DTCG 3-Tier Design System Stylesheets -->
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body class="showcase-shell">
+
+  <!-- ========================================================================
+       STICKY UTILITY HEADER
+       ======================================================================== -->
+  <header role="banner" id="app-header" class="showcase-header">
+    <div class="layout-container header-inner">
+      <a href="#" class="brand-link" aria-label="CM-LAB Home">
+        <span class="brand-logo-icon" aria-hidden="true">🛡️</span>
+        <span class="brand-name">CM-LAB</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#hero" class="nav-item">Überblick</a>
+        <a href="#mcp-playground" class="nav-item">MCP Playground</a>
+        <a href="#omnibar-section" class="nav-item">Omnibar Suche</a>
+        <a href="#calendars-section" class="nav-item">Fristen-Kalender</a>
+        <a href="#dashboard-widgets" class="nav-item">Widgets &amp; GoBD</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn-compact btn-outline" data-action="open-quick-connect" id="header-connect-btn">
+          ⚡ Agent anbinden
+        </button>
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Theme umschalten" title="Theme umschalten">
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+        </button>
+        <a href="https://app.[Project].page.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
+          📱 Zur App ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MAIN SHOWCASE CONTENT
+       ======================================================================== -->
+  <main id="showcase-main">
+
+    <!-- HERO SECTION: TWO FACES OF GROUND TRUTH -->
+    <section id="hero" class="hero-section">
+      <div class="layout-container hero-inner">
+        <div class="hero-pill-badge">
+          <span>🏛️ BGB §§ 437, 477, 312k</span> · <span>MCP 2024-11-05</span> · <span>GoBD Rn. 108–110</span>
+        </div>
+
+        <h1 class="hero-title">
+          Two Faces of the Same <span class="text-gradient">Ground Truth</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Statutarische deutsche Verbraucherrechte, GoBD-konforme Belegintegrität und Steuerintelligenz —
+          symmetrisch erschließbar für <strong>menschliche Verbraucher</strong> via Offline-First-Web-App und
+          <strong>autonome KI-Agenten</strong> via Model Context Protocol (MCP JSON-RPC 2.0).
+        </p>
+
+        <div class="hero-ctas">
+          <a href="#mcp-playground" class="btn btn-primary">
+            ⚡ MCP Console testen ↓
+          </a>
+          <a href="https://app.[Project].page.dev/#/quick-add?brand=Sony&name=Sony+WH-1000XM5&price=279&category=hardware" class="btn btn-accent" target="_blank" rel="noopener noreferrer">
+            📱 Standalone Web-App öffnen ↗
+          </a>
+        </div>
+
+        <div class="hero-pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-icon">🤖</div>
+            <h3 class="pillar-title">MCP Interface für Agenten</h3>
+            <p class="pillar-desc">
+              JSON-RPC 2.0 Tools (<code>policy_lookup</code>, <code>claim_dossier_generate</code>)
+              über Stdio und Edge-Endpoints (&lt;30ms SLA).
+            </p>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-icon">📱</div>
+            <h3 class="pillar-title">Menschliche App-Erfahrung</h3>
+            <p class="pillar-desc">
+              100dvh Offline-First-Shell mit prominenter Omnibar, 3 Kalendertypen und 1-Tap Kündigung (§ 312k BGB).
+            </p>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-icon">⚖️</div>
+            <h3 class="pillar-title">Deterministische Rechtslogik</h3>
+            <p class="pillar-desc">
+              Exakte Berechnung der 12-Monats-Beweislastumkehr (§ 477 Abs. 1 BGB) und LexFox-konforme Safe-Harbor-Hinweise.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- URGENT ATTENTION NOTIFICATION BANNER -->
+    <div class="layout-container" style="margin-top: var(--space-8);">
+      <div id="urgent-attention-widget" role="region" aria-label="Dringender Handlungsbedarf"></div>
+    </div>
+
+    <!-- SPLIT-SCREEN MCP PLAYGROUND (FEATURE 5) -->
+    <section id="mcp-playground" class="playground-section">
+      <div class="layout-container">
+        <div class="section-header">
+          <span class="section-tag">FEATURE 5 · INTERACTIVE BENCHMARK</span>
+          <h2 class="section-title">Split-Screen MCP Protocol Playground</h2>
+          <p class="section-subtitle text-muted">
+            Testen Sie Live-Toolaufrufe über den clientseitigen Mock MCP Transport oder Cloudflare Edge Worker.
+            Aktionen im rechten App-Simulator spiegeln sich in Echtzeit im linken Protokoll-Streamer wider.
+          </p>
+        </div>
+
+        <div class="playground-grid">
+          <!-- Left Sub-Panel: MCP Protocol Console -->
+          <div class="mcp-console-panel card">
+            <div class="panel-header-row">
+              <div class="font-bold">⚡ MCP Wire Protocol Console</div>
+              <div id="mcp-latency-badge" class="latency-badge status-protected">
+                🟢 <strong>4.2ms</strong> <span class="badge-label">(SLA Pass &lt;30ms)</span>
+              </div>
+            </div>
+
+            <div class="controls-row">
+              <div class="form-group">
+                <label for="mcp-tool-select">MCP TOOL AUSWÄHLEN</label>
+                <select id="mcp-tool-select" class="form-select">
+                  <option value="policy_lookup">policy_lookup (BGB Policy &amp; § 312k Button)</option>
+                  <option value="claim_dossier_generate">claim_dossier_generate (§ 437 Mängelrüge)</option>
+                  <option value="tools/list">tools/list (MCP Introspection)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="mcp-preset-select">BEISPIEL-SZENARIO LADEN</label>
+                <select id="mcp-preset-select" class="form-select">
+                  <option value="spotify">Spotify Student Kündigung (§ 312k)</option>
+                  <option value="apple_macbook">Apple MacBook Pro 16 M3 Mängelrüge (§ 437)</option>
+                  <option value="sony_headphones">Sony WH-1000XM5 Monat 11 Klippe (§ 477)</option>
+                  <option value="tools_list">tools/list Introspektion</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="mcp-args-editor">JSON-RPC ARGUMENT EDITOR</label>
+              <textarea id="mcp-args-editor" class="form-textarea" spellcheck="false"></textarea>
+            </div>
+
+            <div class="actions-bar">
+              <div class="actions-left">
+                <button id="mcp-run-btn" class="btn-compact btn-primary">
+                  ▶ Tool Call ausführen
+                </button>
+                <button id="mcp-copy-curl-btn" class="btn-compact btn-outline">
+                  📋 cURL kopieren
+                </button>
+              </div>
+              <div class="actions-right">
+                <button id="mcp-open-claude-btn" class="btn-compact btn-outline">
+                  ⚙ In Claude Desktop
+                </button>
+                <button id="mcp-clear-stream-btn" class="btn-compact btn-outline" title="Stream leeren">
+                  🧹 Leeren
+                </button>
+              </div>
+            </div>
+
+            <!-- Wire Protocol Streamer -->
+            <div class="stream-output-wrapper" id="mcp-stream-output" aria-live="polite">
+              <div class="stream-empty">Bereit für JSON-RPC 2.0 Aufrufe. Klicken Sie auf "Tool Call ausführen".</div>
+            </div>
+          </div>
+
+          <!-- Right Sub-Panel: Live App Simulator -->
+          <div class="app-simulator-panel card" id="app-simulator-root"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOWCASE UNIFIED OMNIBAR SEARCH (FEATURE 10) -->
+    <section id="omnibar-section" class="omnibar-section">
+      <div class="layout-container">
+        <div class="section-header">
+          <span class="section-tag">FEATURE 10 · UNIVERSAL OMNIBAR</span>
+          <h2 class="section-title">Multi-Domain Omnibar Such-Sandbox</h2>
+          <p class="section-subtitle text-muted">
+            Durchsuchen Sie in &lt;5ms 20 kuratierte Marken-Policies, gespeicherte Wallet-Belege
+            oder tippen Sie <code>&gt;</code> für Sofortbefehle (z. B. <code>&gt;claim</code>, <code>&gt;cancel</code>, <code>&gt;tax</code>).
+          </p>
+        </div>
+
+        <div id="showcase-omnibar-root"></div>
+      </div>
+    </section>
+
+    <!-- THREE DISTINCT CALENDAR ARCHITECTURES (FEATURES 7, 8, 9) -->
+    <section id="calendars-section" class="calendar-section">
+      <div class="layout-container">
+        <div id="calendar-suite-root"></div>
+      </div>
+    </section>
+
+    <!-- MODULAR DASHBOARD WIDGETS (FEATURE 6, 18) -->
+    <section id="dashboard-widgets" class="widgets-section">
+      <div class="layout-container">
+        <div class="section-header">
+          <span class="section-tag">FEATURES 6 &amp; 18 · MODULAR DASHBOARD</span>
+          <h2 class="section-title">Finanz-, Steuer- &amp; GoBD-Kryptonachweise</h2>
+          <p class="section-subtitle text-muted">
+            Revisionssichere Beleg-Hashes nach GoBD Rn. 108–110 und automatisierte Sofortabschreibungs-Übersicht.
+          </p>
+        </div>
+
+        <div class="widgets-grid">
+          <div id="spend-radar-widget"></div>
+          <div id="gobd-feed-widget" style="grid-column: span 2;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAFE-HARBOR LEGAL NOTICE (BGH VIII ZR 285/18) -->
+    <section class="safe-harbor-section">
+      <div class="layout-container">
+        <div id="safe-harbor-footer-root"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       AI AGENT QUICK-CONNECT DRAWER (DIALOG)
+       ======================================================================== -->
+  <dialog id="quick-connect-modal" class="drawer-modal" aria-labelledby="drawer-modal-title">
+    <div class="drawer-header">
+      <h3 id="drawer-modal-title">🤖 AI Agent Quick-Connect (MCP 2024-11-05)</h3>
+      <button id="drawer-close-btn" class="btn-compact btn-outline" aria-label="Schließen">✕</button>
+    </div>
+
+    <div class="drawer-tabs" role="tablist">
+      <button class="drawer-tab active" data-tab="claude" role="tab">Claude Desktop</button>
+      <button class="drawer-tab" data-tab="cursor" role="tab">Cursor IDE</button>
+      <button class="drawer-tab" data-tab="edge" role="tab">Edge Worker (HTTP)</button>
+      <button class="drawer-tab" data-tab="stdio" role="tab">Stdio CLI</button>
+    </div>
+
+    <div class="drawer-tab-content">
+      <!-- Tab 1: Claude Desktop -->
+      <div id="drawer-panel-claude" class="drawer-tab-panel active">
+        <p class="text-muted" style="font-size: 13px;">
+          Fügen Sie diese Konfiguration in Ihre <code>claude_desktop_config.json</code> ein:
+        </p>
+        <pre class="drawer-pre" id="code-claude-config">{
+  "mcpServers": {
+    "cmlab-warranty": {
+      "command": "npx",
+      "args": ["-y", "@cmlab/warranty-mcp-server"]
+    }
+  }
+}</pre>
+        <button class="btn-compact btn-primary btn-copy-config" data-target="code-claude-config">
+          📋 Konfiguration kopieren
+        </button>
+      </div>
+
+      <!-- Tab 2: Cursor IDE -->
+      <div id="drawer-panel-cursor" class="drawer-tab-panel">
+        <p class="text-muted" style="font-size: 13px;">
+          Fügen Sie diesen Server in <code>Settings &gt; Features &gt; MCP</code> in Cursor hinzu:
+        </p>
+        <pre class="drawer-pre" id="code-cursor-config">{
+  "mcpServers": {
+    "cmlab-warranty": {
+      "url": "https://[project].page.dev/api/mcp/sse"
+    }
+  }
+}</pre>
+        <button class="btn-compact btn-primary btn-copy-config" data-target="code-cursor-config">
+          📋 Cursor JSON kopieren
+        </button>
+      </div>
+
+      <!-- Tab 3: Edge Worker -->
+      <div id="drawer-panel-edge" class="drawer-tab-panel">
+        <p class="text-muted" style="font-size: 13px;">
+          Cloudflare Pages Function JSON-RPC 2.0 Edge Endpoint:
+        </p>
+        <pre class="drawer-pre" id="code-edge-config">POST https://[project].page.dev/api/mcp
+Content-Type: application/json
+
+{
+  "jsonrpc": "2.0",
+  "id": "demo-1",
+  "method": "tools/call",
+  "params": {
+    "name": "policy_lookup",
+    "arguments": { "service_slug": "spotify" }
+  }
+}</pre>
+        <button class="btn-compact btn-primary btn-copy-config" data-target="code-edge-config">
+          📋 Endpoint-Details kopieren
+        </button>
+      </div>
+
+      <!-- Tab 4: Stdio CLI -->
+      <div id="drawer-panel-stdio" class="drawer-tab-panel">
+        <p class="text-muted" style="font-size: 13px;">
+          Direkter Start über die lokale Node.js Stdio Schnittstelle:
+        </p>
+        <pre class="drawer-pre" id="code-stdio-config">npx @cmlab/warranty-mcp-server</pre>
+        <button class="btn-compact btn-primary btn-copy-config" data-target="code-stdio-config">
+          📋 Befehl kopieren
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ========================================================================
+       FOOTER
+       ======================================================================== -->
+  <footer role="contentinfo" class="showcase-footer">
+    <div class="layout-container footer-inner">
+      <div class="footer-left">
+        <strong>CM-LAB · Computer &amp; Media Lab</strong>
+        <span class="text-muted">SRH Hochschule Heidelberg / Berlin · WiSe 2026</span>
+      </div>
+      <div class="footer-links">
+        <a href="#hero">Nach oben ↑</a>
+        <a href="https://github.com/SRH-CM-LAB/CM-LAB" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <a href="https://app.[Project].page.dev/" target="_blank" rel="noopener noreferrer">Client App ↗</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Bootstrap Modules -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

@@ -30,7 +30,7 @@ All engineering decisions under this mandate strictly enforce an **offline-first
 | 2. OFFLINE STORAGE (US-02)| Sandboxed Dexie.js (IndexedDB) / SQLite schema, migrations & CRUD (6h) |
 | 3. ALERT ENGINE (US-03)   | Proactive 30/7/1-Day push alarms & Dynamic CEST/CET DST recalibration  |
 | 4. SUB-15s ENGINE (US-01) | In-memory Prefix-Trie brand typeahead (<10ms) & form state machine     |
-| 5. REACTIVE STATE ENGINE  | Zustand v5 stores, Immer mutations, Dexie hydration & memoized filters |
+| 5. REACTIVE STATE ENGINE  | Svelte 5 Runes stores ($state.raw + createSubscriber), Dexie liveQuery hydration & memoized filters (ADR-04) |
 | 6. MCP SERVER (US-07)     | JSON-RPC 2.0 stdio/SSE endpoints, Zod validation & -32602 error safety |
 +----------------------------------------------------------------------------------------------------+
 ```
@@ -59,7 +59,7 @@ To ensure absolute role clarity, eliminate coordination overhead, and maintain v
 |                          | * Zero OCR pipeline code in MVP     | * Statutory PDF / text compiler  |
 |                          |   (OCR is WON'T-HAVE #12 / ADR-01)  | * Vitest / QA Gherkin test suite |
 +--------------------------+-------------------------------------+----------------------------------+
-| vs. UX / UI Lead         | * Zustand v5 state machines & logic | * Figma wireframes & interactive |
+| vs. UX / UI Lead         | * Svelte 5 Runes state machines & logic (ADR-04) | * Figma wireframes & interactive |
 | (Prushti — 26h)          | * Prefix-Trie autocomplete algorithm|   design system specifications   |
 |                          | * Form validation engines (<15s)    | * Design tokens (Teal, Coral)    |
 |                          | * Deep-link routing logic           | * Mobile touch targets (>=48px)  |
@@ -98,7 +98,7 @@ Kyle is assigned as primary owner or technical co-owner on **13 GitHub Issues** 
 | **#2** | `[Panel A Core Story US2] Proactive Dual Expiry & Auto-Renewal Alert Engine` | Core Story | 8 SP | `3. In Progress` | Primary owner for AC2. Implements background notification scheduler, dynamic DST recalibration, and deep-link router. |
 | **#5** | `[Backlog US-02] Receipt Attachment Vault (Offline Storage & DB)` | Backlog | 5 SP | `3. In Progress` | **6h Direct Implementation.** IndexedDB database configuration, blob tables, Dexie schema migrations, and quota management. |
 | **#6** | `[Backlog US-03] Dual Expiry & Renewal Reminders (30/7/1-Day Alerts)` | Backlog | 5 SP | `2. Ready` | **16h Direct Implementation.** Complete ProactiveAlertScheduler engine, DST wall-clock math, and in-app fallback states. |
-| **#10** | `[Backlog US-07] Open MCP / API Interface for AI Agents (JSON-RPC 2.0)` | Backlog | 5 SP | `1. Backlog` | Pre-architectured for Session 6. Standalone Node.js/TypeScript JSON-RPC 2.0 server with `policy_lookup` and `claim_dossier_generate`. |
+| **#10** | `[Backlog US-07] Open MCP / API Interface for AI Agents (JSON-RPC 2.0)` | Backlog | 5 SP | `1. Backlog` | Cloudflare Worker `POST /api/mcp` edge endpoint (`<31.5ms p95` over `policy_wiki_seed_v1.json`) + standalone TypeScript `stdio` JSON-RPC 2.0 server with `policy_lookup` and `claim_dossier_generate`. |
 | **#12** | `[Backlog US-09] [WON'T-HAVE] Automated OCR Receipt Scanning` | Backlog | 13 SP | `1. Backlog` | **Explicitly Deferred to Phase 2.** Guardrail enforcement preventing premature OCR integration. |
 | **#13** | `[Risk R-1] OCR Cost Trap & Onboarding Churn Guardrail` | Risk | — | `4. In Review` | Technical guardrail enforcing manual-first `<15s` architecture against OCR failure modes. |
 | **#16** | `[Risk R-4] MCP Protocol Fragility & Schema Hallucinations` | Risk | — | `2. Ready` | Runtime typed Zod validation and standard `-32602` error handling for AI agent integrations. |

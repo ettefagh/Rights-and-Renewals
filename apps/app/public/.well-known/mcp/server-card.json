@@ -1,0 +1,184 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  "serverInfo": {
+    "name": "cmlab-sovereign-vault-mcp",
+    "version": "1.0.0",
+    "description": "Sovereign consumer rights lookup, statutory warranty defense, contract renewal tracking, and automated cancellation letter generation."
+  },
+  "title": "CM-LAB Sovereign Rights App MCP Server",
+  "description": "Sovereign consumer rights lookup, statutory warranty defense, contract renewal tracking, and automated cancellation letter generation.",
+  "url": "https://rightsandrenewals-app.pages.dev/api/mcp",
+  "websiteUrl": "https://rightsandrenewals-app.pages.dev/",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://rightsandrenewals-app.pages.dev/api/mcp"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://rightsandrenewals-app.pages.dev/api/mcp",
+      "protocolVersions": [
+        "2024-11-05",
+        "2025-11-25"
+      ]
+    }
+  ],
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    }
+  },
+  "tools": [
+    {
+      "name": "policy_lookup",
+      "description": "Look up German statutory warranty, 12m burden of proof cliff, and cancellation policies for a brand or service.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "service_slug": {
+            "type": "string",
+            "description": "Brand or service slug (e.g. 'spotify', 'apple', 'mediamarkt')"
+          },
+          "brand_slug": {
+            "type": "string",
+            "description": "Alias for service_slug for dual-slug compatibility"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "hardware",
+              "subscription"
+            ]
+          }
+        },
+        "required": [
+          "service_slug"
+        ]
+      }
+    },
+    {
+      "name": "claim_dossier_generate",
+      "description": "Compile a deterministic German BGB § 437/439 statutory defect notice or § 312k cancellation letter with LexFox safe-harbor disclaimer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "brand_slug": {
+            "type": "string",
+            "description": "Brand identifier (e.g. 'apple', 'sony')"
+          },
+          "service_slug": {
+            "type": "string",
+            "description": "Alias for brand_slug"
+          },
+          "item_name": {
+            "type": "string",
+            "description": "Full product name"
+          },
+          "purchase_date": {
+            "type": "string",
+            "format": "date",
+            "description": "ISO 8601 YYYY-MM-DD"
+          },
+          "defect_description": {
+            "type": "string",
+            "description": "Factual defect description"
+          },
+          "issue_type": {
+            "type": "string",
+            "enum": [
+              "statutory_defect_claim",
+              "contract_cancellation"
+            ]
+          }
+        },
+        "required": [
+          "brand_slug",
+          "item_name",
+          "purchase_date",
+          "defect_description"
+        ]
+      }
+    },
+    {
+      "name": "statutory_law_lookup",
+      "description": "Look up statutory text and consumer rights summaries for German civil code sections (BGB §§ 434, 437, 438, 439, 475e, 477, 309 Nr. 9, 312k, 355).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "statute_section": {
+            "type": "string",
+            "enum": [
+              "434",
+              "437",
+              "438",
+              "439",
+              "475e",
+              "477",
+              "309_nr_9",
+              "312k",
+              "355"
+            ]
+          }
+        },
+        "required": [
+          "statute_section"
+        ]
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "rights://germany/bgb-civil-code",
+      "name": "German Civil Code (BGB) Consumer Protection Statutes",
+      "description": "Full text and commentary on BGB §§ 434, 437, 438, 439, 477, 309 Nr. 9, 312k",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "rights://wiki/brands-catalog",
+      "name": "Canonical Brand Cancellation & Warranty Wiki Seed",
+      "description": "Directory of 20 canonical student brands with customer service endpoints, cancellation buttons, and statutory dispute addresses",
+      "mimeType": "application/json"
+    }
+  ],
+  "prompts": [
+    {
+      "name": "analyze_defect_claim",
+      "description": "Analyze whether a consumer's purchased product defect falls within the 12-month statutory burden-of-proof reversal window under BGB § 477.",
+      "arguments": [
+        {
+          "name": "purchase_date",
+          "description": "Date of item purchase (YYYY-MM-DD)",
+          "required": true
+        },
+        {
+          "name": "brand",
+          "description": "Manufacturer or merchant name",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "draft_cancellation_letter",
+      "description": "Draft a legally binding subscription cancellation notice invoking German BGB § 312k Kündigungsbutton legislation.",
+      "arguments": [
+        {
+          "name": "service_name",
+          "description": "Name of the subscription provider",
+          "required": true
+        },
+        {
+          "name": "contract_id",
+          "description": "Customer account or contract number",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

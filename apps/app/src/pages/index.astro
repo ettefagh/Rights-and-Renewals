@@ -1,0 +1,133 @@
+---
+import WalletApp from '../components/WalletApp.svelte';
+
+export const prerender = false;
+
+const accept = Astro.request.headers.get('accept') || '';
+let prefersMarkdown = false;
+if (accept.includes('text/markdown')) {
+  prefersMarkdown = true;
+  if (accept.includes('text/html')) {
+    let qMd = 1.0;
+    let qHtml = 1.0;
+    for (const part of accept.split(',')) {
+      const p = part.trim();
+      if (p.startsWith('text/markdown')) {
+        const m = p.match(/q=([0-9.]+)/);
+        if (m) qMd = parseFloat(m[1]);
+      } else if (p.startsWith('text/html')) {
+        const m = p.match(/q=([0-9.]+)/);
+        if (m) qHtml = parseFloat(m[1]);
+      }
+    }
+    if (qHtml > qMd) prefersMarkdown = false;
+  }
+}
+
+if (prefersMarkdown) {
+  return new Response(`# Rights & Renewals Sovereign App
+
+> Offline-first, encrypted consumer rights vault, warranty countdown tracker, and § 312k cancellation generator.
+
+## Core Capabilities
+- **Encrypted Local Vault**: Client-side AES-GCM-256 storage for purchase receipts and warranties.
+- **Statutory Deadlines**: 12-month Beweislastumkehr (§ 477 Abs. 1 BGB) & 24-month Gewährleistung (§ 438 BGB).
+- **Dual-Rail Cancellation**: Deterministic DIN 5008 PDF dossier compilation and verified cancellation button links (§ 312k BGB).
+- **WebMCP Integration**: In-browser tools \`vault_lookup\` and \`notice_generate\` exposed via \`document.modelContext\`.
+
+## Discovery Resources
+- API Catalog: \`/.well-known/api-catalog\`
+- MCP Server Card: \`/.well-known/mcp/server-card.json\`
+- OAuth Metadata: \`/.well-known/oauth-protected-resource\`
+- Agent Registration: \`/auth.md\`
+`, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'Vary': 'Accept',
+      'Link': '</.well-known/api-catalog>; rel="api-catalog", </auth.md>; rel="service-doc"',
+      'Access-Control-Allow-Origin': '*',
+      'x-markdown-tokens': '195'
+    }
+  });
+}
+---
+
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B3B4C" />
+  <meta name="description" content="Rights & Renewals (CM-LAB): Sovereign Consumer Rights, Subscription & Tax-Ready Wallet PWA" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>Rights &amp; Renewals — BGB Fristen, Kündigung &amp; Steuern</title>
+
+  <style is:global>
+    @import '@cmlab/design-tokens/tokens.css';
+
+    :root {
+      --height-viewport: 100dvh;
+      --padding-safe-bottom: env(safe-area-inset-bottom, 16px);
+      --padding-safe-top: env(safe-area-inset-top, 0px);
+      box-sizing: border-box;
+    }
+
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100dvh;
+      background-color: var(--color-surface-canvas, #F4F7F6);
+      color: var(--color-text-primary, #0F172A);
+      font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 12-Column Responsive Grid Contract */
+    .grid-12-col {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: var(--space-4, 16px);
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: var(--space-4, 16px);
+      padding-bottom: calc(var(--space-12, 48px) + var(--padding-safe-bottom));
+    }
+
+    @media (max-width: 768px) {
+      .grid-12-col {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3, 12px);
+        padding: var(--space-3, 12px);
+      }
+    }
+  </style>
+</head>
+<body class="app-shell">
+  <!-- Greenfield Svelte 5 Single Root Island Router -->
+  <WalletApp client:only="svelte" />
+
+  <noscript>
+    <header role="banner" id="app-header">
+      <div role="combobox" aria-expanded="false" id="omnibar-root"></div>
+    </header>
+    <main id="app-dashboard-grid" class="grid-12-col">
+      <div style="padding: 24px; text-align: center; color: #7F1D1D; background: #FEE2E2; margin: 20px; border-radius: 8px;">
+        <h2>JavaScript Required</h2>
+        <p>CM-LAB Sovereign Consumer Wallet requires JavaScript for 100% client-side IndexedDB encryption and BGB statutory calculations.</p>
+      </div>
+    </main>
+  </noscript>
+</body>
+</html>

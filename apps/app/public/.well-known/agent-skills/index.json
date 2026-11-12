@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "version": "0.2.0",
+  "skills": [
+    {
+      "name": "policy-lookup",
+      "type": "skill-json",
+      "description": "Look up German statutory warranty rules, 12-month burden of proof transition cliff, and subscription cancellation terms for consumer brands.",
+      "url": "/.well-known/agent-skills/policy-lookup.json",
+      "sha256": "7f00a98db69e786525cce0ea4ff7d8625c55e6f7a419cb3841980f2c503937db",
+      "digest": "sha256:7f00a98db69e786525cce0ea4ff7d8625c55e6f7a419cb3841980f2c503937db"
+    },
+    {
+      "name": "claim-dossier-generate",
+      "type": "skill-json",
+      "description": "Compile a deterministic German BGB § 437/439 statutory defect notice or § 312k contract termination letter with legal safe-harbor disclaimer.",
+      "url": "/.well-known/agent-skills/claim-dossier-generate.json",
+      "sha256": "3ff9c3475e9354f501888910ba6306164f5677f5a7b87279ea098a3a94743af3",
+      "digest": "sha256:3ff9c3475e9354f501888910ba6306164f5677f5a7b87279ea098a3a94743af3"
+    },
+    {
+      "name": "bgb-statutory-calculator",
+      "type": "skill-json",
+      "description": "Calculate statutory warranty deadlines under BGB § 438 (24-month limitation), § 477 (12-month burden of proof transition), and tacit contract renewal windows under § 309 Nr. 9 & § 312k.",
+      "url": "/.well-known/agent-skills/bgb-statutory-calculator.json",
+      "sha256": "bd1a047738214f057ce40cbb8e6559104537ae5aa807680528cd83e68975993f",
+      "digest": "sha256:bd1a047738214f057ce40cbb8e6559104537ae5aa807680528cd83e68975993f"
+    }
+  ]
+}

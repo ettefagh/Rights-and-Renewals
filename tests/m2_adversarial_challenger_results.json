@@ -1,0 +1,268 @@
+{
+  "total": 52,
+  "passed": 52,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "DOM-01: index.astro specifies viewport-fit=cover for mobile display notches",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "DOM-02: index.astro specifies --height-viewport: 100dvh and min-height: 100dvh",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "DOM-03: index.astro handles safe-area-inset-bottom for iOS thumb navigation",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "DOM-04: WalletApp.svelte renders <header role=\"banner\" id=\"app-header\">",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "DOM-05: WalletApp.svelte renders <div role=\"combobox\" id=\"omnibar-root\" aria-expanded=...>",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "DOM-06: WalletApp.svelte renders <main id=\"app-dashboard-grid\" class=\"grid-12-col\">",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "DOM-07: Built distribution dist/_worker.js preserves viewport-fit=cover",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "DOM-08: Built distribution dist/_worker.js preserves critical element IDs and contracts",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-01: Initial state is IDLE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-02: Opening Omnibar transitions to FOCUSED_EMPTY",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-03: Closing Omnibar returns to IDLE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-04: >claim transitions to COMMAND_MODE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-05: >claim parsed with verb=claim",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-06: >cancel transitions to COMMAND_MODE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-07: >cancel parsed with verb=cancel",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-08: >tax 2026 transitions to COMMAND_MODE",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-09: >tax 2026 parsed with verb=tax, arg=2026",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-10: >import parsed correctly",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-11: >audit parsed correctly",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-12: Searching Netflix (wiki only) yields WIKI_MATCHES",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-13: Searching MacBook (vault only) yields VAULT_MATCHES",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-14: Searching Spotify (both) yields HYBRID_MATCHES",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-15: Non-existent item yields NO_MATCH_SUGGESTION",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-16: Whitespace-padded command parsed cleanly",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-17: HTML/XSS injection payload safely evaluated as NO_MATCH_SUGGESTION",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-18: 50,000-char ReDoS string processed in 0.07ms (<50ms)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "FSM-19: Unicode & multi-byte characters handled gracefully",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-01: WalletDatabase initializes all 5 stores: items, receipt_blobs, alarm_schedules, policy_wiki, dispute_history",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-02: Compound index [category+expiryDate] retrieves hardware item",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-03: Tax-deductible items filtered by purchaseDate",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-04: Multi-entry index *searchTokens matches sub-item",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-05: ACID transaction aborts and cleanly rolls back state",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-06: Pre-encryption GoBD SHA-256 matches computed digest",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-07: Unmodified blob decrypts with identical GoBD SHA-256",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-08: Bit-flipped ciphertext is rejected during AES-GCM authentication tag verification",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "VAULT-09: Forged SHA-256 hash triggers GoBDIntegrityError",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-01: foldIcalLine strictly respects 75-octet limit across ASCII, umlauts, and emojis",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-02: escapeIcalText correctly escapes commas, semicolons, backslashes, and newlines",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-03: Subscriptions feed conforms to 75-octet ceiling (Max observed: 75 bytes)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-04: Subscriptions feed specifies correct X-WR-CALNAME: CM-LAB Subscriptions & Cancellation Guard",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-05: Subscriptions feed contains valid VCALENDAR envelope",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-03: Warranties feed conforms to 75-octet ceiling (Max observed: 75 bytes)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-04: Warranties feed specifies correct X-WR-CALNAME: CM-LAB Warranties & Legal Deadlines",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-05: Warranties feed contains valid VCALENDAR envelope",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-06: Subscriptions feed contains recurring RRULE, cancellation cutoff, and § 309 Nr. 9 BGB alarms",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "ICAL-07: Warranties feed includes Day 14, Day 335 (§ 477), and Month 24 statutory milestones with alarms",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "SEC-01: apps/app/public/_headers exists",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "SEC-02: Permissions-Policy explicitly allows camera=(self) for HTML5 receipt capture",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "SEC-03: Cross-Origin-Embedder-Policy: require-corp is STRICTLY ABSENT (preserves Mobile Safari canvas video streams)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "SEC-04: Baseline hardening headers (nosniff, HSTS) are active",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "GOV-01: Zero student names in apps/app/src (Found: 0)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "GOV-02: Zero student names in packages/core/src (Found: 0)",
+      "status": "PASS",
+      "details": ""
+    }
+  ],
+  "findings": []
+}

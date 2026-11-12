@@ -1,0 +1,92 @@
+{
+  "$schema": "https://agentic-discovery.org/schemas/ard-v1.0.json",
+  "specVersion": "1.0",
+  "host": "rightsandrenewals.pages.dev",
+  "title": "Rights & Renewals Agentic Resource Catalog",
+  "name": "Rights & Renewals",
+  "description": "Sovereign consumer rights, statutory warranty defense, contract renewal tracking, and Model Context Protocol endpoints for autonomous AI systems.",
+  "entries": [
+    {
+      "id": "mcp-server-card",
+      "identifier": "urn:air:rightsandrenewals.pages.dev:server:mcp",
+      "type": "mcp/server-card",
+      "displayName": "Rights & Renewals MCP Server Card (SEP-2127)",
+      "name": "Rights & Renewals MCP Server Card (SEP-2127)",
+      "description": "JSON-RPC 2.0 Model Context Protocol endpoint for consumer rights, statutory warranty lookups, and cancellation dossier generation.",
+      "url": "https://rightsandrenewals.pages.dev/.well-known/mcp/server-card.json",
+      "representativeQueries": [
+        "check gym subscription cancellation laws in Germany",
+        "calculate statutory warranty period for defective electronics",
+        "generate legal cancellation notice for phone contract"
+      ]
+    },
+    {
+      "id": "agent-skills",
+      "identifier": "urn:air:rightsandrenewals.pages.dev:skills:agent-skills",
+      "type": "agent-skills/index",
+      "displayName": "Rights & Renewals Agent Skills Directory",
+      "name": "Rights & Renewals Agent Skills Directory",
+      "description": "Agent skills index containing deterministic consumer protection workflows and calculators.",
+      "url": "https://rightsandrenewals.pages.dev/.well-known/agent-skills/index.json",
+      "representativeQueries": [
+        "discover agent skills for consumer rights protection",
+        "automate contract renewal notification and defense",
+        "calculate statutory warranty deadlines"
+      ]
+    },
+    {
+      "id": "api-mcp",
+      "identifier": "urn:air:rightsandrenewals.pages.dev:api:mcp",
+      "type": "mcp/streamable-http",
+      "displayName": "Rights & Renewals Model Context Protocol API",
+      "name": "Rights & Renewals Model Context Protocol API",
+      "description": "Streamable HTTP JSON-RPC 2.0 endpoint implementing 5 statutory tools for autonomous agents.",
+      "url": "https://rightsandrenewals.pages.dev/api/mcp",
+      "representativeQueries": [
+        "call policy_lookup for Spotify subscription terms",
+        "call claim_dossier_generate for defective MacBook",
+        "call statutory_law_lookup for BGB § 477"
+      ]
+    },
+    {
+      "id": "agent-setup",
+      "identifier": "urn:air:rightsandrenewals.pages.dev:docs:agent-setup",
+      "type": "documentation/agent-setup",
+      "displayName": "Rights & Renewals Multi-Agent Setup Guide",
+      "name": "Rights & Renewals Multi-Agent Setup Guide",
+      "description": "Cloudflare-styled multi-agent installer and configuration reference for Claude Code, Claude Desktop, Cursor, Windsurf, VS Code, and Gemini CLI.",
+      "url": "https://rightsandrenewals.pages.dev/agent-setup",
+      "representativeQueries": [
+        "how to install Rights & Renewals MCP server in Cursor",
+        "Claude Code command for Rights & Renewals",
+        "Windsurf mcp_config.json configuration"
+      ]
+    },
+    {
+      "id": "agent-setup-prompt",
+      "identifier": "urn:air:rightsandrenewals.pages.dev:docs:prompt",
+      "type": "documentation/agent-prompt",
+      "displayName": "Rights & Renewals Autonomous Agent Bootstrap Prompt",
+      "name": "Rights & Renewals Autonomous Agent Bootstrap Prompt",
+      "description": "Machine-actionable instructions enabling agents to configure their own MCP connection in 1 step.",
+      "url": "https://rightsandrenewals.pages.dev/agent-setup/prompt.md",
+      "representativeQueries": [
+        "bootstrap Rights & Renewals tools autonomously",
+        "fetch agent setup prompt markdown"
+      ]
+    },
+    {
+      "id": "api-catalog",
+      "identifier": "urn:air:rightsandrenewals.pages.dev:api:catalog",
+      "type": "application/linkset+json",
+      "displayName": "Rights & Renewals RFC 9727 API Catalog",
+      "name": "Rights & Renewals RFC 9727 API Catalog",
+      "description": "Linkset directory connecting machine-readable API definitions, service descriptions, and operational health status.",
+      "url": "https://rightsandrenewals.pages.dev/.well-known/api-catalog",
+      "representativeQueries": [
+        "discover API endpoints for consumer rights service",
+        "fetch OpenAPI schema and service documentation"
+      ]
+    }
+  ]
+}

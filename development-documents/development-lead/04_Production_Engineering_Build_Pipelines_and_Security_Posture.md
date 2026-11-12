@@ -15,7 +15,7 @@
 As **Development Lead (Kyle)** for **Team 6**, this technical specification defines the production engineering foundation, automated verification pipelines, and client-side security architecture for the **Warranty, Subscription & Tax-Ready Wallet + Policy Wiki (MCP/API-Enabled)**.
 
 Following the core architectural pivot formalized in **ADR-01** (relocating from error-prone, network-heavy cloud OCR to an instant manual-first 3-field entry flow with client receipt photo backup) and **ADR-03** (deterministic statutory notice compilation over conversational LLMs), the engineering mandate demands:
-1. **Zero Runtime Exceptions & Compile-Time Safety:** Enforcing maximum-strictness TypeScript 5.x compiler options alongside ESLint 9 and React 19 standards to prevent runtime type errors on mobile devices.
+1. **Zero Runtime Exceptions & Compile-Time Safety:** Enforcing maximum-strictness TypeScript 5.x compiler options alongside ESLint 9 and Svelte 5 runes standards to prevent runtime type errors on mobile devices.
 2. **Instant Offline Readiness:** Guaranteeing sub-100ms cold boot and 100% offline functionality via Vite 6 PWA Workbox precaching of all application assets, typography, and the Top 20 Brand Policy Wiki knowledge seed.
 3. **Automated 7-Gate Definition of Done (`#30`):** A strict GitHub Actions CI/CD gatekeeper validating every pull request against speed budgets, unit/integration contracts, MCP JSON-RPC 2.0 specifications, mobile accessibility standards, and statutory regulatory fences.
 4. **Zero-Knowledge Client Hardening:** Enforcing strict W3C Content Security Policies (CSP) to mathematically guarantee zero outbound data exfiltration, resilient fallbacks across browser permission boundaries, and rigorous threat modeling against client-side injection and prototype pollution.
@@ -142,7 +142,7 @@ export function measurePerformanceBudget(
 
 ---
 
-## 2. Strict TypeScript 5.x, Vite 6 & React 19 Build Pipeline Architecture
+## 2. Strict TypeScript 5.x, Astro 6 & Svelte 5 Build Pipeline Architecture (ADR-04)
 
 To achieve zero runtime type errors and guarantee that sensitive financial and statutory warranty records are never corrupted by undefined property access or faulty type narrowing, the build pipeline enforces extreme compiler constraints.
 
@@ -167,7 +167,7 @@ The configuration explicitly enables `noUncheckedIndexedAccess`, `noImplicitOver
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "extends": "./.astro/tsconfig.json",
 
     /* Maximum Strictness & Static Integrity Flags */
     "strict": true,
@@ -206,14 +206,14 @@ The build configuration leverages Vite 6 and `vite-plugin-pwa` to guarantee inst
 ```typescript
 // vite.config.ts
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import svelte from '@astrojs/svelte';
 import { VitePWA } from 'vite-plugin-pwa';
 import compression from 'vite-plugin-compression';
 import path from 'node:path';
 
 export default defineConfig({
   plugins: [
-    react(),
+    svelte(),
     // Gzip Compression
     compression({
       algorithm: 'gzip',
@@ -315,8 +315,8 @@ export default defineConfig({
       output: {
         // Deterministic chunk segregation for optimal browser HTTP/2 caching
         manualChunks(id: string) {
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
-            return 'vendor-react';
+          if (id.includes('node_modules/svelte')) {
+            return 'vendor-svelte';
           }
           if (id.includes('node_modules/idb') || id.includes('node_modules/localforage')) {
             return 'vendor-db';
@@ -339,34 +339,35 @@ export default defineConfig({
 
 ### 2.3 ESLint 9 Flat Config (`eslint.config.mjs`) & Accessibility Enforcement
 
-ESLint 9 enforces strict type-checked TypeScript linting, React 19 rules of hooks, and compile-time **WCAG 2.1 AA** accessibility validation via `eslint-plugin-jsx-a11y`.
+ESLint 9 enforces strict type-checked TypeScript linting, Svelte 5 runes compiler rules via `eslint-plugin-svelte`, Astro 6 rules via `eslint-plugin-astro`, and compile-time **WCAG 2.1 AA** accessibility validation.
 
 ```javascript
 // eslint.config.mjs
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import reactPlugin from 'eslint-plugin-react';
-import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
+import sveltePlugin from 'eslint-plugin-svelte';
+import svelteParser from 'svelte-eslint-parser';
+import astroPlugin from 'eslint-plugin-astro';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'coverage', 'node_modules', '*.config.ts', '*.config.mjs'],
+    ignores: ['dist', '.astro', '.wrangler', 'coverage', 'node_modules', '*.config.ts', '*.config.mjs'],
   },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
+  ...sveltePlugin.configs['flat/recommended'],
+  ...astroPlugin.configs['flat/recommended'],
   {
+    files: ['**/*.svelte'],
     languageOptions: {
+      parser: svelteParser,
       parserOptions: {
+        parser: tseslint.parser,
         project: ['./tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
+        extraFileExtensions: ['.svelte'],
       },
-    },
-    plugins: {
-      react: reactPlugin,
-      'react-hooks': reactHooksPlugin,
-      'jsx-a11y': jsxA11yPlugin,
     },
     rules: {
       // TypeScript Integrity
@@ -382,35 +383,12 @@ export default tseslint.config(
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/no-unnecessary-condition': 'error',
 
-      // React 19 Hooks
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'error',
-
-      // WCAG 2.1 AA Accessibility Compile-Time Gates
-      'jsx-a11y/alt-text': 'error',
-      'jsx-a11y/anchor-has-content': 'error',
-      'jsx-a11y/aria-props': 'error',
-      'jsx-a11y/aria-proptypes': 'error',
-      'jsx-a11y/aria-role': ['error', { ignoreNonDOM: false }],
-      'jsx-a11y/aria-unsupported-elements': 'error',
-      'jsx-a11y/click-events-have-key-events': 'error',
-      'jsx-a11y/control-has-associated-label': 'error',
-      'jsx-a11y/interactive-supports-focus': 'error',
-      'jsx-a11y/label-has-associated-control': [
-        'error',
-        {
-          assert: 'both',
-          depth: 3,
-        },
-      ],
-      'jsx-a11y/no-noninteractive-element-interactions': 'error',
-      'jsx-a11y/role-has-required-aria-props': 'error',
-      'jsx-a11y/tabindex-no-positive': 'error',
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
+      // Svelte 5 Runes & WCAG 2.1 AA Accessibility Compile-Time Gates
+      'svelte/valid-compile': 'error',
+      'svelte/no-at-html-tags': 'error',
+      'svelte/button-has-type': 'error',
+      'svelte/require-each-key': 'error',
+      'svelte/valid-each-key': 'error',
     },
   }
 );
@@ -840,76 +818,57 @@ If an asynchronous operation (e.g. a Web Worker compiling a complex claim dossie
 DOMException: NotAllowedError: Document is not focused or user gesture missing.
 ```
 
-The production React 19 component below solves this issue by maintaining the generated document in memory and rendering a resilient recovery interface with:
+The production Svelte 5 component below solves this issue by maintaining the generated document in memory and rendering a resilient recovery interface with:
 1. A fresh, direct user click handler that immediately re-actuates `navigator.clipboard.writeText()`.
 2. A selectable `<textarea readonly>` fallback element.
 3. A zero-network `.txt` file download fallback using a `data:text/plain;charset=utf-8` Blob anchor click.
 
-```tsx
-// src/components/ClaimExportModal.tsx
-import React, { useState, useRef, useTransition } from 'react';
+```svelte
+<!-- src/components/ClaimExportModal.svelte -->
+<script lang="ts">
+  interface Props {
+    claimNoticeText: string;
+    itemName: string;
+    onClose: () => void;
+  }
 
-interface ClaimExportModalProps {
-  claimNoticeText: string;
-  itemName: string;
-  onClose: () => void;
-}
+  let { claimNoticeText, itemName, onClose }: Props = $props();
 
-export const ClaimExportModal: React.FC<ClaimExportModalProps> = ({
-  claimNoticeText,
-  itemName,
-  onClose,
-}) => {
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'fallback_required'>('idle');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [, startTransition] = useTransition();
+  let copyStatus = $state<'idle' | 'success' | 'fallback_required'>('idle');
+  let errorMessage = $state<string | null>(null);
+  let textAreaRef = $state<HTMLTextAreaElement | null>(null);
 
-  /**
-   * Primary copy handler: Executed directly within the synchronous click handler
-   * to preserve W3C Transient User Activation.
-   */
-  const handleDirectCopy = async (): Promise<void> => {
+  async function handleDirectCopy(): Promise<void> {
     try {
       if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') {
         throw new Error('Clipboard API unsupported in browser context');
       }
 
       await navigator.clipboard.writeText(claimNoticeText);
-      startTransition(() => {
-        setCopyStatus('success');
-        setErrorMessage(null);
-      });
+      copyStatus = 'success';
+      errorMessage = null;
     } catch (err: unknown) {
-      console.warn('[Clipboard] Direct writeText failed (likely expired user activation). Reverting to fallback:', err);
-      startTransition(() => {
-        setCopyStatus('fallback_required');
-        setErrorMessage(
-          err instanceof DOMException && err.name === 'NotAllowedError'
-            ? 'Browser clipboard permission expired. Please select text manually or download below.'
-            : 'Clipboard write failed. Please use manual copy.'
-        );
-      });
+      console.warn('[Clipboard] Direct writeText failed. Reverting to fallback:', err);
+      copyStatus = 'fallback_required';
+      errorMessage =
+        err instanceof DOMException && err.name === 'NotAllowedError'
+          ? 'Browser clipboard permission expired. Please select text manually or download below.'
+          : 'Clipboard write failed. Please use manual copy.';
 
-      // Highlight and select readonly textarea as immediate secondary mitigation
-      if (textAreaRef.current) {
-        textAreaRef.current.focus();
-        textAreaRef.current.select();
+      if (textAreaRef) {
+        textAreaRef.focus();
+        textAreaRef.select();
       }
     }
-  };
+  }
 
-  /**
-   * File Download Fallback: Programmatic download of plain-text claim dossier
-   * completely offline via data URI Blob anchor.
-   */
-  const handleDownloadTxt = (): void => {
+  function handleDownloadTxt(): void {
     const sanitizedTitle = itemName.replace(/[^a-zA-Z0-9_-]/g, '_');
     const fileName = `Maengelruege_BGB_${sanitizedTitle}_${new Date().toISOString().slice(0, 10)}.txt`;
-    
+
     const blob = new Blob([claimNoticeText], { type: 'text/plain;charset=utf-8' });
     const downloadUrl = URL.createObjectURL(blob);
-    
+
     const anchor = document.createElement('a');
     anchor.href = downloadUrl;
     anchor.download = fileName;
@@ -917,75 +876,39 @@ export const ClaimExportModal: React.FC<ClaimExportModalProps> = ({
     anchor.click();
     document.body.removeChild(anchor);
     URL.revokeObjectURL(downloadUrl);
-  };
+  }
+</script>
 
-  return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="claim-modal-title"
-    >
-      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl">
-        <h2 id="claim-modal-title" className="text-xl font-bold text-[#2F524C]">
-          Statutory Claim Dossier (§§ 437, 439 BGB)
-        </h2>
+<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="claim-export-title">
+  <div class="modal-card">
+    <header class="modal-header">
+      <h2 id="claim-export-title">Export Statutory Defect Claim</h2>
+      <button class="close-btn" onclick={onClose} aria-label="Close modal">×</button>
+    </header>
 
-        <p className="mt-2 text-sm text-gray-600">
-          This document has been compiled deterministically. Copy the text directly to your clipboard or download it as a plain-text file.
-        </p>
+    <div class="modal-body">
+      <textarea
+        bind:this={textAreaRef}
+        readonly
+        value={claimNoticeText}
+        rows={10}
+        class="claim-preview-textarea"
+        aria-label="Generated legal claim notice text"
+      ></textarea>
 
-        {/* Read-only Text Area for Direct Inspection & Manual Fallback */}
-        <div className="mt-4">
-          <label htmlFor="claim-text-preview" className="sr-only">
-            Claim Notice Text
-          </label>
-          <textarea
-            id="claim-text-preview"
-            ref={textAreaRef}
-            readOnly
-            value={claimNoticeText}
-            rows={8}
-            className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 font-mono text-xs text-gray-800 focus:border-[#D96B4B] focus:outline-none focus:ring-1 focus:ring-[#D96B4B]"
-          />
-        </div>
-
-        {errorMessage && (
-          <div className="mt-3 rounded-md bg-amber-50 p-2.5 text-xs text-amber-800" role="alert">
-            {errorMessage}
-          </div>
-        )}
-
-        {/* Action Controls preserving W3C Touch Target & Contrast Rules */}
-        <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-[48px] min-w-[48px] rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
-          >
-            Close
-          </button>
-
-          <button
-            type="button"
-            onClick={handleDownloadTxt}
-            className="min-h-[48px] min-w-[48px] rounded-lg border border-[#2F524C] px-4 py-2 text-sm font-semibold text-[#2F524C] hover:bg-[#2F524C]/10"
-          >
-            Download .TXT
-          </button>
-
-          <button
-            type="button"
-            onClick={() => void handleDirectCopy()}
-            className="min-h-[48px] min-w-[48px] rounded-lg bg-[#D96B4B] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#C25B3D] focus:ring-2 focus:ring-[#D96B4B] focus:ring-offset-2"
-          >
-            {copyStatus === 'success' ? '✓ Copied to Clipboard' : 'Copy to Clipboard'}
-          </button>
-        </div>
-      </div>
+      {#if copyStatus === 'success'}
+        <div class="alert alert-success" role="status">Notice copied to clipboard successfully!</div>
+      {:else if copyStatus === 'fallback_required'}
+        <div class="alert alert-warning" role="alert">{errorMessage}</div>
+      {/if}
     </div>
-  );
-};
+
+    <footer class="modal-actions">
+      <button type="button" class="btn-secondary" onclick={handleDownloadTxt}>Download .txt</button>
+      <button type="button" class="btn-primary" onclick={handleDirectCopy}>Copy to Clipboard</button>
+    </footer>
+  </div>
+</div>
 ```
 
 ---

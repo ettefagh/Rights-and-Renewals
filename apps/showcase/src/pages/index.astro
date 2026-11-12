@@ -1,0 +1,389 @@
+---
+import ShowcaseVaultScene from '../components/3d/ShowcaseVaultScene.svelte';
+import '../../styles/tokens.css';
+import '../../styles/main.css';
+
+export const prerender = false;
+
+const accept = Astro.request.headers.get('accept') || '';
+let prefersMarkdown = false;
+if (accept.includes('text/markdown')) {
+  prefersMarkdown = true;
+  if (accept.includes('text/html')) {
+    let qMd = 1.0;
+    let qHtml = 1.0;
+    for (const part of accept.split(',')) {
+      const p = part.trim();
+      if (p.startsWith('text/markdown')) {
+        const m = p.match(/q=([0-9.]+)/);
+        if (m) qMd = parseFloat(m[1]);
+      } else if (p.startsWith('text/html')) {
+        const m = p.match(/q=([0-9.]+)/);
+        if (m) qHtml = parseFloat(m[1]);
+      }
+    }
+    if (qHtml > qMd) prefersMarkdown = false;
+  }
+}
+
+if (prefersMarkdown) {
+  return new Response(`# Rights & Renewals (Showcase)
+
+> Sovereign Consumer Rights, Subscription & Warranty Wallet with Brand Policy Wiki and Open MCP Server.
+
+## Features & Capabilities
+- **Brand Policy Wiki**: Verified BGB §§ 437, 438, 477 warranty terms & § 312k cancellation rules for top 20 brands.
+- **Model Context Protocol (MCP)**: Native JSON-RPC 2.0 endpoints for AI agents.
+- **Agent Discovery**: API Catalog (RFC 9727), OAuth Protected Resource Metadata (RFC 9728), ARD AI Catalog, and WebMCP tools.
+
+## Discovery Resources
+- API Catalog: \`/.well-known/api-catalog\`
+- MCP Server Card: \`/.well-known/mcp/server-card.json\`
+- OAuth Metadata: \`/.well-known/oauth-protected-resource\`
+- Agent Skills: \`/.well-known/agent-skills/index.json\`
+- Agent Registration: \`/auth.md\`
+`, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'Vary': 'Accept',
+      'Link': '</.well-known/api-catalog>; rel="api-catalog", </auth.md>; rel="service-doc"',
+      'Access-Control-Allow-Origin': '*',
+      'x-markdown-tokens': '180'
+    }
+  });
+}
+---
+
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Rights &amp; Renewals · CM-LAB · MCP Server &amp; Consumer Wallet Showcase</title>
+  <meta name="description" content="Rights & Renewals: Showcase webpage demonstrating the Model Context Protocol (MCP 2024-11-05) interface and the offline-first German consumer warranty & subscription wallet." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+  <!-- AI-Agent Discovery Standards Links (RFC 8288 / ARD / SEP-2127 / AgentSkills) -->
+  <link rel="ai-catalog" href="/.well-known/ai-catalog.json" />
+  <link rel="mcp-server-card" href="/.well-known/mcp/server-card.json" />
+  <link rel="agent-skills" href="/.well-known/agent-skills/index.json" />
+  <link rel="service-desc" href="/api/mcp" />
+
+  <!-- Zero-FOUC Theme Initialization -->
+  <script is:inline>
+    (function() {
+      try {
+        const saved = localStorage.getItem('cmlab-theme');
+        const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', saved || (systemDark ? 'dark' : 'light'));
+      } catch (e) {}
+    })();
+
+    window.toggleTheme = function() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('cmlab-theme', next); } catch (e) {}
+    };
+  </script>
+
+  <!-- W3C DTCG 3-Tier Design System Stylesheets -->
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body class="showcase-shell">
+
+  <!-- ========================================================================
+       STICKY UTILITY HEADER
+       ======================================================================== -->
+  <header role="banner" id="app-header" class="showcase-header">
+    <div class="layout-container header-inner">
+      <a href="/" class="brand-link" aria-label="Rights & Renewals Home" style="display: inline-flex; align-items: center; gap: 10px;">
+        <img src="/favicon.svg" alt="Rights & Renewals Icon" width="32" height="32" style="border-radius: 8px; display: block;" />
+        <span class="brand-name">Rights &amp; Renewals</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#hero" class="nav-item">Überblick</a>
+        <a href="#mcp-playground" class="nav-item">MCP Playground</a>
+        <a href="#omnibar-section" class="nav-item">Omnibar Suche</a>
+        <a href="#calendars-section" class="nav-item">Fristen-Kalender</a>
+        <a href="#dashboard-widgets" class="nav-item">Widgets &amp; GoBD</a>
+        <a href="/wiki" class="nav-item">Brand Policy Wiki</a>
+        <a href="/emdash" class="nav-item">EmDash CMS</a>
+        <a href="/agent-setup" class="nav-item">Agent Setup</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="/agent-setup" class="btn-compact btn-outline" data-action="open-quick-connect" id="header-connect-btn">
+          ⚡ Agent anbinden
+        </a>
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="window.toggleTheme()" aria-label="Theme umschalten" title="Theme umschalten">
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+        </button>
+        <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
+          📱 Zur App ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MAIN SHOWCASE CONTENT
+       ======================================================================== -->
+  <main id="showcase-main">
+
+    <!-- HERO SECTION: TWO FACES OF GROUND TRUTH -->
+    <section id="hero" class="hero-section">
+      <div class="layout-container hero-inner">
+        <div class="hero-pill-badge">
+          <span>🏛️ BGB §§ 437, 477, 312k</span> · <span>MCP 2024-11-05</span> · <span>GoBD Rn. 108–110</span>
+        </div>
+
+        <h1 class="hero-title">
+          Two Faces of the Same <span class="text-gradient">Ground Truth</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Statutarische deutsche Verbraucherrechte, GoBD-konforme Belegintegrität und Steuerintelligenz —
+          symmetrisch erschließbar für <strong>menschliche Verbraucher</strong> via Offline-First-Web-App und
+          <strong>autonome KI-Agenten</strong> via Model Context Protocol (MCP JSON-RPC 2.0).
+        </p>
+
+        <!-- Threlte 8 3D Vault Card Interactive Hero Canvas -->
+        <div class="hero-3d-scene-container" style="max-width: 580px; margin: var(--space-6, 24px) auto;">
+          <ShowcaseVaultScene client:load />
+        </div>
+
+        <div class="hero-ctas">
+          <a href="#mcp-playground" class="btn btn-primary">
+            ⚡ MCP Console testen ↓
+          </a>
+          <a href="https://rightsandrenewals-app.pages.dev/#action=quick-add&brand=Sony&name=Sony+WH-1000XM5&price=279&category=hardware" data-legacy-url="https://app.cm-lab.pages.dev/#action=quick-add&brand=Sony&name=Sony+WH-1000XM5&price=279&category=hardware" class="btn btn-accent" target="_blank" rel="noopener noreferrer">
+            📱 Standalone Web-App öffnen ↗
+          </a>
+          <a href="/wiki" class="btn btn-outline">
+            📖 Brand Policy Wiki (Top 20) →
+          </a>
+        </div>
+
+        <div class="hero-pillars-grid">
+          <div class="pillar-card pillar-card-primary">
+            <div>
+              <span class="pillar-kicker">01 · SYMMETRIC PROTOCOL ENGINE · MCP 2024-11-05</span>
+              <h3 class="pillar-title" style="font-size: 18px; margin-top: 6px;">Dual-Surface Consumer Ground Truth</h3>
+              <p class="pillar-desc" style="margin-top: 6px;">
+                Dieselbe deterministische BGB-Engine speist sowohl die lokale <strong>100dvh Offline-First Wallet PWA</strong> (Dexie.js v4 + WebCrypto AES-GCM-256) als auch autonome KI-Agenten über JSON-RPC 2.0 (<code>policy_lookup</code>, <code>claim_dossier_generate</code>) mit &lt;30ms Edge-Latenz.
+              </p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+              <span class="hero-pill-badge" style="margin: 0;">Zero Cloud Plaintext (Art. 25 DSGVO)</span>
+              <span class="hero-pill-badge" style="margin: 0;">Dual RFC 5545 iCal Feeds</span>
+            </div>
+          </div>
+          <div class="pillar-card">
+            <span class="pillar-kicker">02 · CONSUMER WALLET SHELL</span>
+            <h3 class="pillar-title">Omnibar, 3 Kalender &amp; § 312k Guard</h3>
+            <p class="pillar-desc">
+              Manuelle &lt;15s Belegerfassung ohne Cloud-OCR, 3 spezialisierte Fristen-Kalender und direkter 1-Tap Kündigungsbutton.
+            </p>
+          </div>
+          <div class="pillar-card">
+            <span class="pillar-kicker">03 · SAFE-HARBOR RECHTSLOGIK</span>
+            <h3 class="pillar-title">§ 477 Beweislast &amp; LexFox-Schutz</h3>
+            <p class="pillar-desc">
+              Taggenaue Berechnung der 12-Monats-Beweislastumkehr (§ 477 Abs. 1 BGB) und 5 verifizierte BGB-Mustervorlagen (RDG §§ 2, 3).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- URGENT ATTENTION NOTIFICATION BANNER -->
+    <div class="layout-container" style="margin-top: var(--space-8);">
+      <div id="urgent-attention-widget" role="region" aria-label="Dringender Handlungsbedarf"></div>
+    </div>
+
+    <!-- SPLIT-SCREEN MCP PLAYGROUND (FEATURE 5) -->
+    <section id="mcp-playground" class="playground-section">
+      <div class="layout-container">
+        <div class="section-header">
+          <span class="section-tag">FEATURE 5 · INTERACTIVE BENCHMARK</span>
+          <h2 class="section-title">Split-Screen MCP Protocol Playground</h2>
+          <p class="section-subtitle text-muted">
+            Testen Sie Live-Toolaufrufe über den clientseitigen Mock MCP Transport oder Cloudflare Edge Worker.
+            Aktionen im rechten App-Simulator spiegeln sich in Echtzeit im linken Protokoll-Streamer wider.
+          </p>
+        </div>
+
+        <div class="playground-grid">
+          <!-- Left Sub-Panel: MCP Protocol Console -->
+          <div class="mcp-console-panel card">
+            <div class="panel-header-row">
+              <div class="font-bold">⚡ MCP Wire Protocol Console</div>
+              <div id="mcp-latency-badge" class="latency-badge status-protected">
+                🟢 <strong>4.2ms</strong> <span class="badge-label">(SLA Pass &lt;30ms)</span>
+              </div>
+            </div>
+
+            <div class="controls-row">
+              <div class="form-group">
+                <label for="mcp-tool-select">MCP TOOL AUSWÄHLEN</label>
+                <select id="mcp-tool-select" class="form-select">
+                  <option value="policy_lookup">policy_lookup (BGB Policy &amp; § 312k Button)</option>
+                  <option value="claim_dossier_generate">claim_dossier_generate (§ 437 Mängelrüge)</option>
+                  <option value="tools/list">tools/list (MCP Introspection)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="mcp-preset-select">BEISPIEL-SZENARIO LADEN</label>
+                <select id="mcp-preset-select" class="form-select">
+                  <option value="spotify">Spotify Student Kündigung (§ 312k)</option>
+                  <option value="apple_macbook">Apple MacBook Pro 16 M3 Mängelrüge (§ 437)</option>
+                  <option value="sony_headphones">Sony WH-1000XM5 Monat 11 Klippe (§ 477)</option>
+                  <option value="tools_list">tools/list Introspektion</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="mcp-args-editor">JSON-RPC ARGUMENT EDITOR</label>
+              <textarea id="mcp-args-editor" class="form-textarea" spellcheck="false"></textarea>
+            </div>
+
+            <div class="actions-bar">
+              <div class="actions-left">
+                <button id="mcp-run-btn" class="btn-compact btn-primary">
+                  ▶ Tool Call ausführen
+                </button>
+                <button id="mcp-copy-curl-btn" class="btn-compact btn-outline">
+                  📋 cURL kopieren
+                </button>
+              </div>
+              <div class="actions-right">
+                <button id="mcp-open-claude-btn" class="btn-compact btn-outline">
+                  ⚙ In Claude Desktop
+                </button>
+                <button id="mcp-clear-stream-btn" class="btn-compact btn-outline" title="Stream leeren">
+                  🧹 Leeren
+                </button>
+              </div>
+            </div>
+
+            <!-- Wire Protocol Streamer -->
+            <div class="stream-output-wrapper" id="mcp-stream-output" aria-live="polite">
+              <div class="stream-empty">Bereit für JSON-RPC 2.0 Aufrufe. Klicken Sie auf "Tool Call ausführen".</div>
+            </div>
+          </div>
+
+          <!-- Right Sub-Panel: Live App Simulator -->
+          <div class="app-simulator-panel card" id="app-simulator-root"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOWCASE UNIFIED OMNIBAR SEARCH (FEATURE 10) -->
+    <section id="omnibar-section" class="omnibar-section">
+      <div class="layout-container">
+        <div class="section-header">
+          <span class="section-tag">FEATURE 10 · UNIVERSAL OMNIBAR</span>
+          <h2 class="section-title">Multi-Domain Omnibar Such-Sandbox</h2>
+          <p class="section-subtitle text-muted">
+            Durchsuchen Sie in &lt;5ms 20 kuratierte Marken-Policies, gespeicherte Wallet-Belege
+            oder tippen Sie <code>&gt;</code> für Sofortbefehle (z. B. <code>&gt;claim</code>, <code>&gt;cancel</code>, <code>&gt;tax</code>).
+          </p>
+        </div>
+
+        <div id="showcase-omnibar-root"></div>
+      </div>
+    </section>
+
+    <!-- THREE DISTINCT CALENDAR ARCHITECTURES (FEATURES 7, 8, 9) -->
+    <section id="calendars-section" class="calendar-section">
+      <div class="layout-container">
+        <div id="calendar-suite-root"></div>
+      </div>
+    </section>
+
+    <!-- MODULAR DASHBOARD WIDGETS (FEATURE 6, 18) -->
+    <section id="dashboard-widgets" class="widgets-section">
+      <div class="layout-container">
+        <div class="section-header">
+          <span class="section-tag">FEATURES 6 &amp; 18 · MODULAR DASHBOARD</span>
+          <h2 class="section-title">Finanz-, Steuer- &amp; GoBD-Kryptonachweise</h2>
+          <p class="section-subtitle text-muted">
+            Revisionssichere Beleg-Hashes nach GoBD Rn. 108–110 und automatisierte Sofortabschreibungs-Übersicht.
+          </p>
+        </div>
+
+        <div class="widgets-grid">
+          <div id="spend-radar-widget"></div>
+          <div id="gobd-feed-widget" style="grid-column: span 2;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAFE-HARBOR LEGAL NOTICE (BGH VIII ZR 285/18) -->
+    <section class="safe-harbor-section">
+      <div class="layout-container">
+        <div id="safe-harbor-footer-root"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- QUICK-CONNECT MODAL DIALOG -->
+  <dialog id="quick-connect-modal" class="modal-dialog">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h3 class="modal-title">⚡ AI Agent Quick-Connect Configuration</h3>
+        <button class="modal-close-btn" data-action="close-modal" aria-label="Schließen">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted text-sm">
+          Binden Sie diesen Rights & Renewals Model Context Protocol (MCP) Server direkt an Ihre bevorzugten KI-Entwicklungsumgebungen an.
+        </p>
+
+        <div class="config-tabs">
+          <div class="config-section">
+            <h4 class="font-bold">Claude Desktop</h4>
+            <pre class="code-block"><code>{`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://rightsandrenewals.pages.dev/api/mcp"]
+    }
+  }
+}`}</code></pre>
+          </div>
+
+          <div class="config-section" style="margin-top: var(--space-4);">
+            <h4 class="font-bold">Cursor IDE</h4>
+            <pre class="code-block"><code>{`{
+  "mcpServers": {
+    "rights-and-renewals": {
+      "url": "https://rightsandrenewals.pages.dev/api/mcp"
+    }
+  }
+}`}</code></pre>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="/agent-setup" class="btn btn-primary" style="font-size: 0.88rem;">Alle 6 Agenten konfigurieren →</a>
+        <button class="btn btn-outline" data-action="close-modal">Schließen</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Initialize Client Controllers -->
+  <script>
+    import '../main.js';
+    import '../components/webmcp.ts';
+  </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+---
+import { policySeedData } from '@cmlab/core';
+import type { PolicyWikiEntry } from '@cmlab/core';
+import BrandIcon from '../../components/BrandIcon.svelte';
+import '../../../styles/tokens.css';
+import '../../../styles/main.css';
+
+export const prerender = true;
+
+const subscriptions = policySeedData.filter((b: PolicyWikiEntry) => b.category === 'subscription');
+const hardware = policySeedData.filter((b: PolicyWikiEntry) => b.category === 'hardware');
+---
+
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Rights &amp; Renewals · Brand Policy Wiki · Top 20 Markenverzeichnis</title>
+  <meta name="description" content="Rights & Renewals — Verifizierte BGB-Kündigungsfristen (§ 309 Nr. 9, § 312k BGB) und Gewährleistungsrichtlinien (§ 438, § 477 BGB) für die 20 relevantesten Marken." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+  <script is:inline>
+    (function() {
+      try {
+        const saved = localStorage.getItem('cmlab-theme');
+        const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', saved || (systemDark ? 'dark' : 'light'));
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/main.css" />
+
+  <style>
+    .wiki-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--space-8, 32px) var(--space-4, 16px) var(--space-16, 64px);
+    }
+    .wiki-hero {
+      text-align: center;
+      margin-bottom: var(--space-10, 40px);
+    }
+    .wiki-hero h1 {
+      font-size: var(--font-size-4xl, 36px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-3, 12px);
+      color: var(--color-text-primary, #0F1C19);
+    }
+    .wiki-hero p {
+      font-size: var(--font-size-lg, 18px);
+      color: var(--color-text-secondary, #475569);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .category-section-title {
+      font-size: var(--font-size-2xl, 24px);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin: var(--space-8, 32px) 0 var(--space-4, 16px);
+      color: var(--color-text-primary, #0F1C19);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 8px);
+    }
+    .brand-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-4, 16px);
+    }
+    .brand-card {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease;
+    }
+    .brand-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--elevation-md);
+      border-color: var(--color-brand-primary);
+    }
+    .brand-card:active {
+      transform: scale(0.98) translateY(1px);
+    }
+    .brand-card-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3, 12px);
+    }
+    .brand-card-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-surface-subtle, #F1F5F9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-teal, #2F524C);
+      flex-shrink: 0;
+      border: 1px solid var(--color-border-subtle, #E2E8F0);
+    }
+    .brand-card-name {
+      font-size: var(--font-size-md, 16px);
+      font-weight: 700;
+      color: var(--color-text-primary, #0F1C19);
+      margin: 0;
+    }
+    .brand-card-category {
+      font-size: 12px;
+      color: var(--color-text-muted, #64748B);
+    }
+    .brand-card-meta {
+      font-size: 13px;
+      color: var(--color-text-secondary, #334155);
+      line-height: 1.4;
+      flex: 1;
+    }
+    .brand-card-action {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-primary-teal, #2F524C);
+      padding-top: var(--space-2, 8px);
+      border-top: 1px solid var(--color-border-subtle, #E2E8F0);
+    }
+  </style>
+</head>
+<body class="showcase-shell">
+
+  <!-- Header -->
+  <header role="banner" id="app-header" class="showcase-header">
+    <div class="layout-container header-inner">
+      <a href="/" class="brand-link" aria-label="Rights & Renewals Home">
+        <img src="/favicon.svg" alt="Rights & Renewals Logo" width="32" height="32" style="border-radius: 8px; flex-shrink: 0;" />
+        <span class="brand-name">Rights &amp; Renewals</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="/" class="nav-item">Showcase</a>
+        <a href="/wiki" class="nav-item font-bold">Brand Policy Wiki</a>
+        <a href="/emdash" class="nav-item">EmDash CMS</a>
+        <a href="/#mcp-playground" class="nav-item">MCP Console</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" class="btn-compact btn-primary" target="_blank" rel="noopener noreferrer">
+          📱 Zur Wallet-App ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wiki-container">
+    <div class="wiki-hero">
+      <div class="hero-pill-badge" style="margin-bottom: var(--space-4, 16px);">
+        <span>🏛️ BGB §§ 309, 312k, 438, 477</span> · <span>20 Kuratierte Marken</span> · <span>Zero-Auth Static</span>
+      </div>
+      <h1>Brand Policy Wiki</h1>
+      <p>
+        Deterministische Rechtsfakten, Kündigungsfristen und gesetzliche Gewährleistungsregeln für Studierende und Verbraucher in Deutschland — ohne Tracking, ohne Cookies und ohne Login.
+      </p>
+    </div>
+
+    <!-- Subscriptions Section -->
+    <h2 class="category-section-title">🔄 Abonnements &amp; Digitale Dienste ({subscriptions.length})</h2>
+    <div class="brand-grid">
+      {subscriptions.map((brand: PolicyWikiEntry) => (
+        <a href={`/wiki/${brand.brandSlug}`} class="brand-card">
+          <div class="brand-card-top">
+            <div class="brand-card-avatar" aria-hidden="true">
+              <BrandIcon slug={brand.brandSlug} size={28} />
+            </div>
+            <div>
+              <h3 class="brand-card-name">{brand.brandName}</h3>
+              <span class="brand-card-category">Kündigungsfrist: Max. {brand.cancellationNoticeMonths} Monat</span>
+            </div>
+          </div>
+          <div class="brand-card-meta">
+            {brand.cancellationButtonCompliant ? '✓ § 312k Kündigungsbutton konform' : 'Kündigungsprüfung ausstehend'}
+          </div>
+          <div class="brand-card-action">
+            <span>Rechte &amp; Button prüfen</span>
+            <span>→</span>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Hardware Section -->
+    <h2 class="category-section-title" style="margin-top: var(--space-12, 48px);">📦 Hardware &amp; Elektronik ({hardware.length})</h2>
+    <div class="brand-grid">
+      {hardware.map((brand: PolicyWikiEntry) => (
+        <a href={`/wiki/${brand.brandSlug}`} class="brand-card">
+          <div class="brand-card-top">
+            <div class="brand-card-avatar" aria-hidden="true">
+              <BrandIcon slug={brand.brandSlug} size={28} />
+            </div>
+            <div>
+              <h3 class="brand-card-name">{brand.brandName}</h3>
+              <span class="brand-card-category">{brand.statutoryWarrantyMonths}m Mängelhaftung (§ 438)</span>
+            </div>
+          </div>
+          <div class="brand-card-meta">
+            12m Beweislastumkehr (§ 477 Abs. 1 BGB) {brand.commercialGuaranteeMonths > 0 ? `+ ${brand.commercialGuaranteeMonths}m Garantie` : ''}
+          </div>
+          <div class="brand-card-action">
+            <span>Garantie &amp; BGB Details</span>
+            <span>→</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+
+</body>
+</html>

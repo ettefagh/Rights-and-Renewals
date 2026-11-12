@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <!-- Rounded Mint App Icon Background -->
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="#72EB9A"/>
+  <!-- Serrated Receipt Body -->
+  <path
+    d="M14 17C14 13.6863 16.6863 11 20 11H36C39.3137 11 42 13.6863 42 17V29.5C37.5 30.2 34 34.1 34 38.8C34 42.1 35.7 45 38.2 46.7L34.5 50L30.5 46.8L26.5 50L22.5 46.8L18.5 50L14 46.5V17Z"
+    fill="#FFFFFF"
+    stroke="#0B3B4C"
+    stroke-width="3.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- 3 Receipt Text Lines -->
+  <line x1="20.5" y1="19.5" x2="35.5" y2="19.5" stroke="#0B3B4C" stroke-width="3.6" stroke-linecap="round"/>
+  <line x1="20.5" y1="26.5" x2="29.5" y2="26.5" stroke="#0B3B4C" stroke-width="3.6" stroke-linecap="round"/>
+  <line x1="20.5" y1="33.5" x2="26.5" y2="33.5" stroke="#0B3B4C" stroke-width="3.6" stroke-linecap="round"/>
+  <!-- Emerald Renewal Loop Arrows -->
+  <path
+    d="M32.5 40.5C32.5 34.4249 37.4249 29.5 43.5 29.5C46.9 29.5 49.95 31.05 51.95 33.5"
+    stroke="#11D66C"
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+  <path
+    d="M52 29.5V34.2H47.3"
+    stroke="#11D66C"
+    stroke-width="3.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M54.5 40.5C54.5 46.5751 49.5751 51.5 43.5 51.5C40.1 51.5 37.05 49.95 35.05 47.5"
+    stroke="#11D66C"
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+  <path
+    d="M35 51.5V46.8H39.7"
+    stroke="#11D66C"
+    stroke-width="3.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Center Checkmark -->
+  <path
+    d="M39.8 40.8L42.5 43.5L47.8 38.2"
+    stroke="#0B3B4C"
+    stroke-width="3.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

@@ -33,14 +33,14 @@ The **Warranty Wallet Model Context Protocol (MCP) Server** functions as the ope
 
 * **Deterministic Knowledge Graph Ground Truth:** Instantaneous, verified retrieval of statutory warranty timelines, mandatory cancellation windows (§ 309 Nr. 9 BGB), and direct cancellation portal deep-links (§ 312k BGB).
 * **Deterministic Document Compilation:** Algorithmic assembly of statutory notices of defect (*Mängelrüge*) and formal subscription termination letters (*Kündigungsschreiben*) citing exact BGB statutes, calculating chronological proof burdens, and embedding mandatory statutory disclaimers.
-* **Dual Consumer & Agent Value:** The server serves both autonomous external AI agents (Claude Desktop, Cursor, Gemini CLI, local terminal agents) and internal client views, directly powering **View 6: Policy Wiki Directory & MCP Endpoint Explorer** in the React 19 frontend application.
+* **Dual Consumer & Agent Value:** The server serves both autonomous external AI agents (Claude Desktop, Cursor, Gemini CLI, local terminal agents) and internal client views, directly powering **View 6: Policy Wiki Directory & MCP Endpoint Explorer** in the Svelte 5 frontend application.
 
 ```mermaid
 flowchart LR
     subgraph HostAgents["Client Tier / Autonomous Agents"]
         Claude["Claude Desktop / Cursor\n(Local Desktop Agent)"]
         CLI["Gemini CLI / Terminal\n(Autonomous Script)"]
-        View6["View 6: React 19\n(MCP Endpoint Explorer)"]
+        View6["View 6: Svelte 5\n(MCP Endpoint Explorer)"]
     end
 
     subgraph Transports["Dual Transport Layer"]
@@ -210,7 +210,7 @@ The Warranty Wallet MCP server supports two independent transport adapters:
 
 | Parameter | Standard Input / Output (`stdio`) | Server-Sent Events (`SSE`) / HTTP Bridge |
 | :--- | :--- | :--- |
-| **Primary Target** | Local Desktop Agents (Claude Desktop, Cursor, CLI) | React 19 Frontend (View 6 Explorer Console) |
+| **Primary Target** | Local Desktop Agents (Claude Desktop, Cursor, CLI) | Svelte 5 Frontend (View 6 Explorer Console) |
 | **Execution Medium** | Standard OS Process Pipes (`stdin` / `stdout`) | Localhost HTTP (`http://127.0.0.1:3001/sse`) |
 | **Framing** | Newline-delimited JSON (`\n`) | Event stream chunks (`event: message\ndata: ...\n\n`) |
 | **Client Transport** | StdioClientTransport (`@modelcontextprotocol/sdk`) | EventSource + HTTP POST loopback |
@@ -233,7 +233,7 @@ Used for seamless configuration inside `claude_desktop_config.json`:
 ```
 
 #### HTTP SSE / POST Loopback Bridge (`SSE`)
-Powers **View 6 (Policy Wiki Directory & MCP Endpoint Explorer)** inside the React 19 application.
+Powers **View 6 (Policy Wiki Directory & MCP Endpoint Explorer)** inside the Svelte 5 application (ADR-04).
 1. The client opens an `EventSource` connection to `GET /sse`, receiving an endpoint URI containing a session ID: `http://127.0.0.1:3001/messages?sessionId=<uuid>`.
 2. All JSON-RPC requests (`tools/list`, `tools/call`) are transmitted via HTTP POST to `/messages?sessionId=<uuid>`.
 3. Execution outputs and notifications stream back across the established SSE channel.
@@ -1515,17 +1515,15 @@ if (process.env.NODE_ENV !== "test") {
 
 ---
 
-### 6.2 View 6 Integration: React 19 Client Hook (`useMcpExplorer`)
-The following React 19 custom hook (`useMcpExplorer.ts`) establishes an interactive testing console inside **View 6 (Policy Wiki Directory & MCP Endpoint Explorer)**:
+### 6.2 View 6 Integration: Svelte 5 Runes State (`mcpExplorer.svelte.ts`)
+The following Svelte 5 reactive class (`mcpExplorer.svelte.ts`) establishes an interactive testing console inside **View 6 (Policy Wiki Directory & MCP Endpoint Explorer)** connecting to the Cloudflare Worker `POST /api/mcp` endpoint:
 
 ```typescript
 /**
- * React 19 Hook: useMcpExplorer
+ * Svelte 5 Runes State: McpExplorerState (mcpExplorer.svelte.ts)
  * Powers View 6 (Policy Wiki Directory & MCP Endpoint Explorer)
- * Connects to the loopback MCP Bridge, executes tools, and logs round-trip latency.
+ * Connects to the Cloudflare Worker POST /api/mcp edge endpoint, executes tools, and logs round-trip latency.
  */
-
-import { useState, useCallback, useEffect } from 'react';
 
 export interface McpToolCallRequest {
   tool: 'policy_lookup' | 'claim_dossier_generate';
@@ -1542,59 +1540,44 @@ export interface McpExplorerLogEntry {
   status: 'pending' | 'success' | 'error';
 }
 
-export interface UseMcpExplorerResult {
-  isConnected: boolean;
-  logs: McpExplorerLogEntry[];
-  availableTools: Array<{ name: string; description: string; inputSchema: object }>;
-  isExecuting: boolean;
-  lastResponse: unknown | null;
-  executeToolCall: (request: McpToolCallRequest) => Promise<unknown>;
-  clearLogs: () => void;
-}
+export class McpExplorerState {
+  isConnected = $state<boolean>(false);
+  logs = $state<McpExplorerLogEntry[]>([]);
+  availableTools = $state<Array<{ name: string; description: string; inputSchema: object }>>([]);
+  isExecuting = $state<boolean>(false);
+  lastResponse = $state<unknown | null>(null);
 
-export function useMcpExplorer(endpointUrl = 'http://127.0.0.1:3001'): UseMcpExplorerResult {
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [logs, setLogs] = useState<McpExplorerLogEntry[]>([]);
-  const [isExecuting, setIsExecuting] = useState<boolean>(false);
-  const [lastResponse, setLastResponse] = useState<unknown | null>(null);
-  const [availableTools, setAvailableTools] = useState<Array<{ name: string; description: string; inputSchema: object }>>([]);
+  constructor(private endpointUrl = '/api/mcp') {
+    this.initializeExplorer();
+  }
 
-  // Fetch registered tools from MCP server on mount
-  useEffect(() => {
-    let mounted = true;
+  async initializeExplorer(): Promise<void> {
+    try {
+      const response = await fetch(this.endpointUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'init-tools-list',
+          method: 'tools/list',
+          params: {}
+        })
+      });
 
-    async function initializeExplorer() {
-      try {
-        const response = await fetch(`${endpointUrl}/rpc`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 'init-tools-list',
-            method: 'tools/list',
-            params: {}
-          })
-        });
-
-        if (response.ok && mounted) {
-          const data = await response.json();
-          if (data.result && data.result.tools) {
-            setAvailableTools(data.result.tools);
-            setIsConnected(true);
-          }
+      if (response.ok) {
+        const data = await response.json();
+        if (data.result && data.result.tools) {
+          this.availableTools = data.result.tools;
+          this.isConnected = true;
         }
-      } catch {
-        if (mounted) setIsConnected(false);
       }
+    } catch {
+      this.isConnected = false;
     }
+  }
 
-    initializeExplorer();
-    return () => { mounted = false; };
-  }, [endpointUrl]);
-
-  // Execute interactive tool call with stopwatch latency tracking
-  const executeToolCall = useCallback(async ({ tool, params }: McpToolCallRequest) => {
-    setIsExecuting(true);
+  async executeToolCall({ tool, params }: McpToolCallRequest): Promise<unknown> {
+    this.isExecuting = true;
     const reqId = `req-${Date.now().toString(36)}`;
     const startTime = performance.now();
 
@@ -1608,7 +1591,7 @@ export function useMcpExplorer(endpointUrl = 'http://127.0.0.1:3001'): UseMcpExp
       }
     };
 
-    setLogs((prev) => [
+    this.logs = [
       {
         id: reqId,
         timestamp: new Date().toLocaleTimeString(),
@@ -1617,11 +1600,11 @@ export function useMcpExplorer(endpointUrl = 'http://127.0.0.1:3001'): UseMcpExp
         payload: outboundEnvelope,
         status: 'pending'
       },
-      ...prev
-    ]);
+      ...this.logs
+    ];
 
     try {
-      const response = await fetch(`${endpointUrl}/rpc`, {
+      const response = await fetch(this.endpointUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(outboundEnvelope)
@@ -1631,29 +1614,27 @@ export function useMcpExplorer(endpointUrl = 'http://127.0.0.1:3001'): UseMcpExp
       const latencyMs = Math.round(responseTime - startTime);
       const data = await response.json();
 
-      setLastResponse(data);
-      setLogs((prev) =>
-        prev.map((entry) =>
-          entry.id === reqId
-            ? {
-                ...entry,
-                status: data.error ? 'error' : 'success',
-                latencyMs,
-                payload: outboundEnvelope
-              }
-            : entry
-        ).concat([
-          {
-            id: `res-${reqId}`,
-            timestamp: new Date().toLocaleTimeString(),
-            direction: 'inbound',
-            method: `tools/call:response`,
-            payload: data,
-            latencyMs,
-            status: data.error ? 'error' : 'success'
-          }
-        ])
-      );
+      this.lastResponse = data;
+      this.logs = this.logs.map((entry) =>
+        entry.id === reqId
+          ? {
+              ...entry,
+              status: (data.error ? 'error' : 'success') as 'error' | 'success',
+              latencyMs,
+              payload: outboundEnvelope
+            }
+          : entry
+      ).concat([
+        {
+          id: `res-${reqId}`,
+          timestamp: new Date().toLocaleTimeString(),
+          direction: 'inbound',
+          method: 'tools/call:response',
+          payload: data,
+          latencyMs,
+          status: data.error ? 'error' : 'success'
+        }
+      ]);
 
       return data;
     } catch (err) {
@@ -1663,7 +1644,7 @@ export function useMcpExplorer(endpointUrl = 'http://127.0.0.1:3001'): UseMcpExp
         message: err instanceof Error ? err.message : 'Unknown communication error'
       };
 
-      setLogs((prev) => [
+      this.logs = [
         {
           id: `res-${reqId}`,
           timestamp: new Date().toLocaleTimeString(),
@@ -1673,29 +1654,21 @@ export function useMcpExplorer(endpointUrl = 'http://127.0.0.1:3001'): UseMcpExp
           latencyMs,
           status: 'error'
         },
-        ...prev
-      ]);
+        ...this.logs
+      ];
       throw err;
     } finally {
-      setIsExecuting(false);
+      this.isExecuting = false;
     }
-  }, [endpointUrl]);
+  }
 
-  const clearLogs = useCallback(() => {
-    setLogs([]);
-    setLastResponse(null);
-  }, []);
-
-  return {
-    isConnected,
-    logs,
-    availableTools,
-    isExecuting,
-    lastResponse,
-    executeToolCall,
-    clearLogs
-  };
+  clearLogs(): void {
+    this.logs = [];
+    this.lastResponse = null;
+  }
 }
+
+export const mcpExplorerState = new McpExplorerState();
 ```
 
 ---
