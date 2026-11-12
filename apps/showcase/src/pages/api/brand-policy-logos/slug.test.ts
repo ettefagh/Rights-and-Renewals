@@ -12,10 +12,12 @@ const state = vi.hoisted(() => ({
   findById: vi.fn(),
   download: vi.fn(),
   getPublishedPolicyLogoMediaId: vi.fn(),
+  requestContext: { db: {} as object },
 }));
 
 vi.mock('emdash', async (importOriginal) => ({
   ...await importOriginal<typeof import('emdash')>(),
+  getRequestContext: () => state.requestContext,
   MediaRepository: class {
     findById(id: string) { return state.findById(id); }
   },

@@ -27,9 +27,9 @@ Static files alone did not satisfy CMS management.
 6. Tests and exact deployed source are reported separately from remote import
    evidence. An authentication blocker is not called completion.
 
-## Current external dependency
+## Authentication
 
-Wrangler is authenticated, but the EmDash CLI has no administrator session.
+Wrangler and the EmDash CLI are authenticated following administrator approval.
 The protected CMS API requires both existing Cloudflare Access and native EmDash
 authorization. Use their normal sign-in flows; do not bypass either control or
 write fabricated Media rows directly into D1.
@@ -60,5 +60,14 @@ Cloudflare protection on the administrator and native media API stays intact.
 The integrated showcase suite passed 169 tests. Focused core logo tests passed
 4 tests. Worker checks reported no showcase errors/warnings and no app errors
 (six existing warnings outside the edited components). Independent source
-review found no high-severity issue. Remote import and deployed logo-stream
-evidence remain pending native EmDash device authorization.
+review found no high-severity issue.
+
+Native authenticated import uploaded 20 ready Media items and published 19
+logo-only brand revisions. All 20 policies retained their non-logo data. Gymshark
+had an existing non-logo draft (including a cancellation finding), so its policy
+link was skipped; its draft identity and content remain intact. Its logo is in
+the Media library, ready for editorial selection when that draft is reviewed.
+The `--skip-conflicting-drafts` option is explicit; without it conflicts abort.
+A repeat apply reused all 20 assets, staged/published zero revisions and moved
+the skipped logo into the same **Brand logos** folder. Public-logo streaming
+readback remains pending the request-scoped database fix deployment.

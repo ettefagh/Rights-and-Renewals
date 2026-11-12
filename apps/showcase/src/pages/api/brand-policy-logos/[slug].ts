@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { MediaRepository } from 'emdash';
+import { getRequestContext, MediaRepository, type Database } from 'emdash';
+import type { EmDashHandlers } from 'emdash/astro';
 import { getPublishedPolicyLogoMediaId } from '../../../lib/policy-cms.js';
 
 export const prerender = false;
@@ -64,13 +65,18 @@ export const GET: APIRoute = async ({ params, locals }) => {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return notFound();
 
   const emdash = locals.emdash;
-  if (!emdash?.db || !emdash.storage) return new Response('Media unavailable', { status: 503 });
+  if (!emdash?.storage) return new Response('Media unavailable', { status: 503 });
 
   try {
     const mediaId = await getPublishedPolicyLogoMediaId(slug);
     if (!mediaId) return notFound();
 
-    const media = await new MediaRepository(emdash.db).findById(mediaId);
+    // Public page middleware intentionally omits `locals.emdash.db` on its
+    // anonymous fast path; the request-scoped database is carried in EmDash's
+    // ALS context and is also what getEmDashEntry() used above.
+    const requestDb = emdash.db ?? getRequestContext()?.db;
+    if (!requestDb) return new Response('Media unavailable', { status: 503 });
+    const media = await new MediaRepository(requestDb as EmDashHandlers['db']).findById(mediaId);
     if (!media || media.status !== 'ready' || !isSafeStorageKey(media.storageKey) ||
       !ALLOWED_IMAGE_TYPES.has(media.mimeType) || !media.size || media.size > MAX_LOGO_BYTES) {
       return notFound();

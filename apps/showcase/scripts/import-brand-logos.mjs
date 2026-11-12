@@ -8,6 +8,7 @@ import { runBrandLogoImport } from './brand-logo-importer.mjs';
 
 const apply = process.argv.includes('--apply');
 const publishLogoOnly = process.argv.includes('--publish-logo-only');
+const skipConflictingDrafts = process.argv.includes('--skip-conflicting-drafts');
 if (publishLogoOnly && !apply) throw new Error('--publish-logo-only requires --apply.');
 const baseUrl = process.env.EMDASH_URL;
 if (!baseUrl) throw new Error('Set EMDASH_URL to the EmDash site before running this importer.');
@@ -69,5 +70,6 @@ await runBrandLogoImport({
   entries,
   apply,
   publishLogoOnly,
+  skipConflictingDrafts,
   log: (message) => process.stdout.write(message),
 });

@@ -46,7 +46,7 @@ async function collectPolicyStatuses(client, slugs) {
  * Import the logo as native EmDash media and stage only the optional `logo`
  * field on each existing published policy. It never publishes content.
  */
-export async function runBrandLogoImport({ client, entries, apply = false, publishLogoOnly = false, log = () => {} }) {
+export async function runBrandLogoImport({ client, entries, apply = false, publishLogoOnly = false, skipConflictingDrafts = false, log = () => {} }) {
   const collection = await client.collection(POLICY_COLLECTION);
   const existingLogoField = collection.fields?.find((field) => field.slug === LOGO_FIELD.slug);
   if (existingLogoField && (existingLogoField.type !== LOGO_FIELD.type || existingLogoField.required)) {
@@ -67,22 +67,25 @@ export async function runBrandLogoImport({ client, entries, apply = false, publi
     }
     const item = await client.get(POLICY_COLLECTION, published[0].id);
     let draft;
+    let skipReason;
     if (item.draftRevisionId) {
       const comparison = await client.compare(POLICY_COLLECTION, item.id);
       draft = comparison.draft;
       if (!draft || !comparison.live) {
-        throw new Error(`Import stopped: ${entry.slug} has an unreadable pending draft; review it in EmDash.`);
+        if (!skipConflictingDrafts) throw new Error(`Import stopped: ${entry.slug} has an unreadable pending draft; review it in EmDash.`);
+        skipReason = 'pending draft could not be verified';
       }
-      if (!isDeepStrictEqual(withoutLogo(comparison.live), withoutLogo(draft))) {
-        throw new Error(`Import stopped: ${entry.slug} has pending non-logo editorial changes; review its draft before importing logos.`);
+      if (draft && comparison.live && !isDeepStrictEqual(withoutLogo(comparison.live), withoutLogo(draft))) {
+        if (!skipConflictingDrafts) throw new Error(`Import stopped: ${entry.slug} has pending non-logo editorial changes; review its draft before importing logos.`);
+        skipReason = 'pending non-logo editorial changes';
       }
     }
-    policies.set(entry.slug, { item, draft });
+    policies.set(entry.slug, { item, draft, skipReason });
   }
 
   const mediaItems = await collectMedia(client);
   const planned = entries.map((entry) => {
-    const { item, draft } = policies.get(entry.slug);
+    const { item, draft, skipReason } = policies.get(entry.slug);
     const found = mediaItems.filter((media) => media.filename === entry.asset.filename);
     if (found.length > 1) {
       throw new Error(`Import stopped: multiple media items use ${entry.asset.filename}; resolve the duplicate before importing.`);
@@ -95,6 +98,7 @@ export async function runBrandLogoImport({ client, entries, apply = false, publi
       throw new Error(`Import stopped: existing media ${entry.asset.filename} has a different MIME type, dimensions, or byte size; resolve it before importing.`);
     }
     const desired = media ? imageReference(media, entry.asset) : null;
+    if (skipReason) return { entry, item, media, alreadyLinked: false, skipReason };
     const publishedLogo = item.data?.logo;
     const draftLogo = draft?.logo;
     const selectedLogo = draftLogo ?? publishedLogo;
@@ -109,14 +113,19 @@ export async function runBrandLogoImport({ client, entries, apply = false, publi
   });
 
   const missingMedia = planned.filter(({ media }) => !media).length;
-  const missingLinks = planned.filter(({ alreadyLinked }) => !alreadyLinked).length;
+  const missingLinks = planned.filter(({ alreadyLinked, skipReason }) => !alreadyLinked && !skipReason).length;
+  const skippedCount = planned.filter(({ skipReason }) => skipReason).length;
   if (!apply) {
     if (!existingLogoField) log('Would add optional image field brand_policies.logo.\n');
-    for (const { entry, media, alreadyLinked } of planned) {
+    for (const { entry, media, alreadyLinked, skipReason } of planned) {
+      if (skipReason) {
+        log(`Skip policy link for ${entry.slug}: ${skipReason}; media will still be imported.\n`);
+        continue;
+      }
       log(`${media ? 'Reuse' : 'Upload'} ${entry.asset.filename}; ${alreadyLinked ? 'logo already staged' : 'stage logo on ' + entry.slug} draft.\n`);
     }
-    log(`Dry run: ${missingMedia} media uploads and ${missingLinks} logo draft updates are ready. No writes performed. Re-run with --apply to import and stage; add --publish-logo-only to publish verified logo-only changes.\n`);
-    return { dryRun: true, uploaded: 0, reused: planned.length - missingMedia, staged: 0, alreadyLinked: planned.length - missingLinks, published: 0 };
+    log(`Dry run: ${missingMedia} media uploads, ${missingLinks} logo draft updates, and ${skippedCount} policy links skipped are ready. No writes performed. Re-run with --apply to import and stage; add --publish-logo-only to publish verified logo-only changes.\n`);
+    return { dryRun: true, uploaded: 0, reused: planned.length - missingMedia, staged: 0, alreadyLinked: planned.length - missingLinks - skippedCount, skipped: skippedCount, published: 0 };
   }
 
   if (!existingLogoField) {
@@ -144,6 +153,7 @@ export async function runBrandLogoImport({ client, entries, apply = false, publi
   let staged = 0;
   let reused = 0;
   let alreadyLinked = 0;
+  let skipped = 0;
   for (const plan of planned) {
     let media = plan.media;
     if (!media) {
@@ -161,6 +171,11 @@ export async function runBrandLogoImport({ client, entries, apply = false, publi
     if (media.folderId !== folder.id) {
       await client.mediaSetFolder(media.id, folder.id);
       media = { ...media, folderId: folder.id };
+    }
+    if (plan.skipReason) {
+      skipped++;
+      log(`Imported media for ${plan.entry.slug} but skipped its policy link: ${plan.skipReason}.\n`);
+      continue;
     }
 
     const reference = imageReference(media, plan.entry.asset);
@@ -192,6 +207,7 @@ export async function runBrandLogoImport({ client, entries, apply = false, publi
   if (publishLogoOnly) {
     const pending = [];
     for (const plan of planned) {
+      if (plan.skipReason) continue;
       const fresh = await client.get(POLICY_COLLECTION, plan.item.id);
       if (!fresh.draftRevisionId) continue;
       const comparison = await client.compare(POLICY_COLLECTION, plan.item.id);
@@ -225,6 +241,6 @@ export async function runBrandLogoImport({ client, entries, apply = false, publi
     }
   }
 
-  log(`Import complete: ${uploaded} uploaded, ${reused} reused, ${staged} draft links staged, ${alreadyLinked} already linked, ${published} published.\n`);
-  return { dryRun: false, uploaded, reused, staged, alreadyLinked, published };
+  log(`Import complete: ${uploaded} uploaded, ${reused} reused, ${staged} draft links staged, ${alreadyLinked} already linked, ${skipped} policy links skipped, ${published} published.\n`);
+  return { dryRun: false, uploaded, reused, staged, alreadyLinked, skipped, published };
 }
