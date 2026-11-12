@@ -6,6 +6,8 @@ Schema baseline: 12 November 2026, repository revision `70772ff5cb18e2422691c2c9
 
 CMS: [open the editorial workspace](https://rightsandrenewals-showcase.padarhava.workers.dev/_emdash/admin/). Complete Cloudflare Access and native EmDash sign-in normally.
 
+For AI-assisted editorial work, use the compact [rights-renewals-cms-editor skill](../skills/rights-renewals-cms-editor/SKILL.md). Its read-only field lookup loads only the requested collection or fields instead of this full handbook.
+
 Navigate: [choose a collection](#1-start-here) · [research and findings](#2-how-to-investigate-a-policy) · [connect plans and rules](#3-connect-companies-plans-and-shared-rules) · [create/update workflow](#4-adding-and-updating-safely) · [logos](#5-media-and-brand-logos) · [webpages](#6-webpage-editing) · [learning and quizzes](#7-learning-content-and-quizzes) · [publication checklist](#8-publish-checklist) · [troubleshooting](#9-troubleshooting) · [all fields](#11-complete-field-reference).
 
 ## 1. Start here

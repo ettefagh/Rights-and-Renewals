@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rights & Renewals CMS Editor"
+  short_description: "Research and update sourced CMS content safely"
+  default_prompt: "Use $rights-renewals-cms-editor to research and prepare a scoped CMS content update."
