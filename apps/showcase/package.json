@@ -16,6 +16,10 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "emdash:sync-policy-seed": "node scripts/sync-policy-seed.mjs",
     "emdash:import-policies": "node scripts/import-policy-content.mjs",
+    "emdash:import-brand-logos": "node scripts/import-brand-logos.mjs",
+    "emdash:sync-editorial-seed": "node scripts/sync-editorial-seed.mjs",
+    "emdash:import-editorial": "node scripts/import-editorial-content.mjs",
+    "emdash:types": "node scripts/generate-emdash-types.mjs",
     "serve": "python -m http.server 3000 --directory dist",
     "test:e2e": "python ../../tests/e2e/runner.py"
   },
@@ -34,6 +38,7 @@
     "lucide-svelte": "^1.0.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "sharp": "^0.34.5",
     "svelte": "^5.0.0",
     "three": "^0.170.0",
     "unplugin-icons": "^24.0.0",
@@ -42,6 +47,8 @@
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261109.1",
     "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@types/three": "^0.170.0",
     "svelte-check": "^4.0.0",
     "typescript": "^5.8.2",

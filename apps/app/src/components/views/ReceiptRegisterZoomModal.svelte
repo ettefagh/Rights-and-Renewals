@@ -97,8 +97,9 @@
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
     if (activePointers.size === 2) {
-      const pts = Array.from(activePointers.values());
-      initialDistance = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      const [first, second] = Array.from(activePointers.values());
+      if (!first || !second) return;
+      initialDistance = Math.hypot(first.x - second.x, first.y - second.y);
       initialScale = scale;
     }
   }
@@ -108,8 +109,9 @@
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
     if (activePointers.size === 2 && initialDistance > 0) {
-      const pts = Array.from(activePointers.values());
-      const currentDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      const [first, second] = Array.from(activePointers.values());
+      if (!first || !second) return;
+      const currentDist = Math.hypot(first.x - second.x, first.y - second.y);
       scale = Math.min(Math.max(initialScale * (currentDist / initialDistance), 0.8), 4.0);
     } else if (activePointers.size === 1 && scale > 1.0) {
       posX += e.movementX;

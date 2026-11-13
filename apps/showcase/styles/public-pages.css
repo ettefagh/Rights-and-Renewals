@@ -1,0 +1,183 @@
+/* Shared public-page treatment for the Policy Wiki and agent setup. */
+.agent-setup-page .agent-setup-hero {
+  padding: clamp(32px, 6vw, 68px) 0;
+  background: var(--color-surface-canvas);
+  text-align: left;
+}
+
+.agent-setup-page .agent-setup-hero > .layout-container { max-width: 1080px; }
+
+.agent-setup-page .agent-setup-badge {
+  background: var(--color-status-protected-bg);
+  border-color: var(--color-status-protected-border);
+  color: var(--color-status-protected-text);
+}
+
+.agent-setup-page .agent-setup-title {
+  margin: 0 0 12px;
+  color: var(--color-text-primary);
+  font-size: clamp(2.2rem, 5vw, 3.7rem);
+  letter-spacing: -.05em;
+  line-height: 1.05;
+}
+
+.agent-setup-page .agent-setup-description {
+  max-width: 72ch;
+  margin: 0 0 24px;
+  color: var(--color-text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.agent-setup-page .hero-actions { justify-content: flex-start; }
+
+.agent-setup-page .copy-prompt-btn {
+  min-height: 48px;
+  padding-inline: 18px;
+  border-radius: 12px;
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+}
+
+.agent-setup-page .copy-prompt-btn:hover { background: var(--color-brand-primary-hover); }
+
+.agent-setup-page .copy-prompt-btn:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 3px;
+}
+
+.agent-setup-page .catalog-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.agent-setup-page .agent-card {
+  min-height: 180px;
+  border-color: var(--color-border-subtle);
+  border-radius: 16px;
+  background: var(--color-surface-card);
+}
+
+.agent-setup-page .agent-card:hover {
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--elevation-md);
+}
+
+.agent-setup-page .agent-icon {
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-subtle);
+}
+
+.agent-setup-page .agent-meta-vendor,
+.agent-setup-page .agent-summary { color: var(--color-text-secondary); }
+
+.agent-setup-page .agent-title { color: var(--color-text-primary); }
+.agent-setup-page .card-action-link { color: var(--color-brand-primary); }
+
+.agent-setup-page .filter-chip {
+  min-height: 48px;
+  padding-inline: 16px;
+  border-color: var(--color-border-subtle);
+  background: var(--color-surface-card);
+  color: var(--color-text-secondary);
+}
+
+.agent-setup-page .filter-chip[aria-pressed="true"],
+.agent-setup-page .filter-chip.active {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+}
+
+.agent-setup-page .tabs-container,
+.agent-setup-page .tools-accordion {
+  border-color: var(--color-border-subtle);
+  border-radius: 16px;
+  background: var(--color-surface-card);
+  box-shadow: var(--elevation-sm);
+}
+
+.agent-setup-page .tablist,
+.agent-setup-page .accordion-header { background: var(--color-surface-subtle); }
+
+.agent-setup-page .tablist { overflow-x: auto; flex-wrap: nowrap; }
+
+.agent-setup-page .tab-btn {
+  min-height: 48px;
+  flex: 0 0 auto;
+  color: var(--color-text-secondary);
+}
+
+.agent-setup-page .tab-btn[aria-selected="true"] {
+  background: var(--color-surface-card);
+  color: var(--color-brand-primary);
+  border-bottom-color: var(--color-brand-primary);
+}
+
+.agent-setup-page .tabpanel,
+.agent-setup-page .accordion-body { background: var(--color-surface-card); }
+
+.agent-setup-page .step-num { background: var(--color-brand-primary); }
+.agent-setup-page .tool-name { color: var(--color-brand-primary); }
+
+.agent-setup-page .btn-copy-code {
+  min-width: 48px;
+  min-height: 40px;
+  border-color: rgb(255 255 255 / 28%);
+}
+
+.wiki-detail-page .wiki-container {
+  width: min(100% - 32px, 980px);
+  max-width: none;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+}
+
+.wiki-detail-page .wiki-header-card,
+.wiki-detail-page .info-card {
+  border-color: var(--color-border-subtle);
+  border-radius: 18px;
+  background: var(--color-surface-card);
+  box-shadow: var(--elevation-sm);
+}
+
+.wiki-detail-page .brand-avatar {
+  border-color: var(--color-border-subtle);
+  background: var(--color-surface-subtle);
+}
+
+.wiki-detail-page .brand-title-wrap h1,
+.wiki-detail-page .info-card h2,
+.wiki-detail-page .stat-value { color: var(--color-text-primary); }
+
+.wiki-detail-page .badge-teal {
+  background: var(--color-primitive-pine-100);
+  color: var(--color-primitive-pine-900);
+}
+
+.wiki-detail-page .badge-coral {
+  background: var(--color-primitive-coral-100);
+  color: var(--color-primitive-coral-900);
+}
+
+.wiki-detail-page .action-button-row .btn {
+  min-height: 48px;
+  border-radius: 12px;
+}
+
+.wiki-detail-page .stat-item { gap: 12px; }
+.wiki-detail-page .stat-label { color: var(--color-text-secondary); }
+.wiki-detail-page .legal-text-box,
+.wiki-detail-page .safe-harbor-box {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 620px) {
+  .agent-setup-page .catalog-grid { grid-template-columns: minmax(0, 1fr); }
+  .agent-setup-page .filter-bar { justify-content: flex-start; }
+  .agent-setup-page .tabpanel { padding: 18px; }
+  .wiki-detail-page .wiki-container { width: min(100% - 24px, 980px); }
+  .wiki-detail-page .wiki-header-card { padding: 18px; }
+  .wiki-detail-page .stat-item { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .wiki-detail-page .action-button-row { display: grid; grid-template-columns: minmax(0, 1fr); }
+}

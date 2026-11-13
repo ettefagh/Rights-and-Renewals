@@ -1,0 +1,109 @@
+{
+  "svelteVersion": "5.57.3",
+  "headAtRun": "dd1e53b249c7511becea66dbf388e428fdefb157",
+  "workingTree": "issue37 dirty integration; not a final exact-commit acceptance",
+  "results": [
+    {
+      "file": "WalletApp.svelte",
+      "issues": [],
+      "suggestions": [
+        "Consider using the `class` attribute instead of the `class:` directive for \"critical\" on the `span` element, e.g. `class={['notif-item-dot', { critical: days <= 7 }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"selected\" on the `button` element, e.g. `class={['deadline-row', { selected: selectedDeadline?.id === item.id }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"critical\" on the `span` element, e.g. `class={['deadline-countdown', { critical: days <= 7 }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"urgent\", \"soon\" on the `span` element, e.g. `class={['notif-status-dot', { urgent: days <= 7, soon: days > 7 && days <= 30 }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"invoice\" on the `span` element, e.g. `class={['payment-badge', { invoice: sub.paymentType === 'invoice' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"urgent\", \"soon\" on the `span` element, e.g. `class={['notif-status-dot', { urgent: cov.tone === 'urgent', soon: cov.tone === 'warning' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"easy\" on the `span` element, e.g. `class={['easy-claim-pill', { easy: cov.isWithinEasyClaim12m }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"warning\" on the `div` element, e.g. `class={['coverage-bar-fill', { warning: cov.pctRemaining <= 25 }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"active\" on the `button` element, e.g. `class={['wallet-nav-link', { active: walletStore.currentView === 'dashboard' && activeWorkspace === 'deadlines' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"active\" on the `button` element, e.g. `class={['wallet-nav-link', { active: walletStore.currentView === 'dashboard' && activeWorkspace === 'vault' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"active\" on the `button` element, e.g. `class={['wallet-nav-link', { active: walletStore.currentView === 'dashboard' && activeWorkspace === 'wiki' }]}`."
+      ]
+    },
+    {
+      "file": "capture/QuickCaptureModal.svelte",
+      "issues": [],
+      "suggestions": [
+        "Consider using the `class` attribute instead of the `class:` directive for \"active\" on the `button` element, e.g. `class={['cat-btn', { active: category === 'hardware' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"active\" on the `button` element, e.g. `class={['cat-btn', { active: category === 'subscription' }]}`."
+      ]
+    },
+    {
+      "file": "views/ClaimCancelDossierView.svelte",
+      "issues": [],
+      "suggestions": [
+        "Consider using the `class` attribute instead of the `class:` directive for \"active\" on the `button` element, e.g. `class={['template-option', { active: selectedTemplate === tmpl.id }]}`."
+      ]
+    },
+    {
+      "file": "views/ItemDetailDrawer.svelte",
+      "issues": [],
+      "suggestions": [
+        "Consider using the `class` attribute instead of the `class:` directive for \"sub\" on the `span` element, e.g. `class={['category-pill', { sub: item.category === 'subscription' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"active\" on the `button` element, e.g. `class={['edit-toggle-btn', { active: walletStore.isEditingDrawer }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"selected\" on the `button` element, e.g. `class={['type-seg-btn', { selected: activeEditCategory === 'subscription' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"selected\" on the `button` element, e.g. `class={['type-seg-btn', { selected: activeEditCategory === 'hardware' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"invoice\" on the `span` element, e.g. `class={['payment-indicator-pill', { invoice: item.paymentType === 'invoice' }]}`."
+      ]
+    },
+    {
+      "file": "views/ReceiptRegisterZoomModal.svelte",
+      "issues": [],
+      "suggestions": []
+    },
+    {
+      "file": "views/TaxSummaryExportView.svelte",
+      "issues": [],
+      "suggestions": [
+        "Consider using the `class` attribute instead of the `class:` directive for \"sofort\" on the `span` element, e.g. `class={['rule-badge', { sofort: row.isSofortabschreibung }]}`."
+      ]
+    },
+    {
+      "file": "widgets/MonthlyCalendarGrid.svelte",
+      "issues": [],
+      "suggestions": []
+    },
+    {
+      "file": "widgets/StatutoryTimelineBar.svelte",
+      "issues": [],
+      "suggestions": [
+        "Consider using the `class` attribute instead of the `class:` directive for \"warning\" on the `span` element, e.g. `class={['timeline-badge', { warning: milestones.isPast12m }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"amber\" on the `span` element, e.g. `class={['status-dot', { amber: milestones.isPast12m }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"amber\" on the `div` element, e.g. `class={['timeline-fill', { amber: milestones.isPast12m }]}`."
+      ]
+    },
+    {
+      "file": "widgets/UrgencyCountdownWidget.svelte",
+      "issues": [],
+      "suggestions": [
+        "Consider using the `class` attribute instead of the `class:` directive for \"critical\", \"warning\" on the `span` element, e.g. `class={['row-dot', { critical: days <= 7, warning: days > 7 }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"invoice\" on the `span` element, e.g. `class={['payment-chip', { invoice: paymentType === 'invoice' }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"copied\" on the `button` element, e.g. `class={['quick-action-btn copy', { copied: copiedSerialId === item.id }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"critical\" on the `span` element, e.g. `class={['countdown-badge', { critical: days <= 7 }]}`."
+      ]
+    },
+    {
+      "file": "apps/app/src/components/views/PolicyWikiView.svelte",
+      "issues": [],
+      "suggestions": [
+        "Consider using the `class` attribute instead of the `class:` directive for \"active\" on the `button` element, e.g. `class={{ active: activeSection === section.id }}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"selected\" on the `label` element, e.g. `class={['quiz-option', { selected: selectedAnswer === option.id }]}`.",
+        "Consider using the `class` attribute instead of the `class:` directive for \"correct\" on the `div` element, e.g. `class={['quiz-feedback', { correct: selectedOption.id === currentQuestion.correctOptionId }]}`.",
+        "The usage of `bind:this` can often be replaced with an easier to read `action` or even better an `attachment`. Consider using the latter if possible."
+      ],
+      "require_another_tool_call_after_fixing": true
+    },
+    {
+      "file": "apps/app/src/components/BrandLogo.svelte",
+      "issues": [],
+      "suggestions": [],
+      "require_another_tool_call_after_fixing": false
+    },
+    {
+      "file": "apps/showcase/src/components/BrandIcon.svelte",
+      "issues": [],
+      "suggestions": [],
+      "require_another_tool_call_after_fixing": false
+    }
+  ]
+}

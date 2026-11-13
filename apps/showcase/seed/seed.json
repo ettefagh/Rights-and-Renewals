@@ -75,8 +75,35 @@
 					"label": "Content",
 					"type": "portableText",
 					"searchable": true
+				},
+				{
+					"slug": "description",
+					"label": "Description",
+					"type": "text",
+					"required": false,
+					"validation": {
+						"maxLength": 320
+					},
+					"searchable": true
+				},
+				{
+					"slug": "sections",
+					"label": "Page sections",
+					"type": "blocks",
+					"validation": {
+						"maxItems": 30,
+						"allowedTypes": [
+							"hero",
+							"copy_section",
+							"feature_list",
+							"faq",
+							"cta"
+						]
+					}
 				}
-			]
+			],
+			"group": "Website",
+			"icon": "globe"
 		},
 		{
 			"slug": "brand_policies",
@@ -197,8 +224,1106 @@
 						]
 					},
 					"defaultValue": []
+				},
+				{
+					"slug": "logo",
+					"label": "Brand logo",
+					"type": "image",
+					"required": false
 				}
 			]
+		},
+		{
+			"slug": "policy_providers",
+			"label": "Policy Providers",
+			"labelSingular": "Policy Provider",
+			"urlPattern": "/policy_providers/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Name",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "summary",
+					"label": "Editorial summary",
+					"type": "text"
+				},
+				{
+					"slug": "stable_key",
+					"label": "Stable identity",
+					"type": "string",
+					"required": true,
+					"unique": true
+				},
+				{
+					"slug": "official_site",
+					"label": "Official site",
+					"type": "url"
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "policy_services",
+			"label": "Policy Services",
+			"labelSingular": "Policy Service",
+			"urlPattern": "/policy_services/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Name",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "summary",
+					"label": "Editorial summary",
+					"type": "text"
+				},
+				{
+					"slug": "stable_key",
+					"label": "Stable identity",
+					"type": "string",
+					"required": true,
+					"unique": true
+				},
+				{
+					"slug": "provider",
+					"label": "Provider",
+					"type": "reference",
+					"validation": {
+						"relation": "provider_services",
+						"relationSide": "child",
+						"multiple": false
+					}
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "policy_plans",
+			"label": "Policy Plans",
+			"labelSingular": "Policy Plan",
+			"urlPattern": "/policy_plans/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Name",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "summary",
+					"label": "Editorial summary",
+					"type": "text"
+				},
+				{
+					"slug": "stable_key",
+					"label": "Stable identity",
+					"type": "string",
+					"required": true,
+					"unique": true
+				},
+				{
+					"slug": "service",
+					"label": "Service",
+					"type": "reference",
+					"validation": {
+						"relation": "service_plans",
+						"relationSide": "child",
+						"multiple": false
+					}
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "policy_offers",
+			"label": "Policy Offers",
+			"labelSingular": "Policy Offer",
+			"urlPattern": "/policy_offers/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Name",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "summary",
+					"label": "Editorial summary",
+					"type": "text"
+				},
+				{
+					"slug": "stable_key",
+					"label": "Stable identity",
+					"type": "string",
+					"required": true,
+					"unique": true
+				},
+				{
+					"slug": "plan",
+					"label": "Plan",
+					"type": "reference",
+					"validation": {
+						"relation": "plan_offers",
+						"relationSide": "child",
+						"multiple": false
+					}
+				},
+				{
+					"slug": "offer_key",
+					"label": "Offer identity",
+					"type": "string",
+					"required": true
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "policy_offer_versions",
+			"label": "Offer Versions",
+			"labelSingular": "Offer Version",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Version label",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "version_key",
+					"label": "Stable version identity",
+					"type": "string",
+					"required": true,
+					"unique": true
+				},
+				{
+					"slug": "revision_hash",
+					"label": "Legacy fingerprint (optional)",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "offer",
+					"label": "Offer",
+					"type": "reference",
+					"validation": {
+						"relation": "offer_versions",
+						"relationSide": "child",
+						"multiple": false
+					}
+				},
+				{
+					"slug": "terms_statement",
+					"label": "Terms statement",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "source_url",
+					"label": "Source URL",
+					"type": "url",
+					"required": true
+				},
+				{
+					"slug": "source_published_at",
+					"label": "Source published at",
+					"type": "datetime"
+				},
+				{
+					"slug": "observed_at",
+					"label": "Observed at",
+					"type": "datetime",
+					"required": true
+				},
+				{
+					"slug": "effective_from",
+					"label": "Effective from",
+					"type": "datetime"
+				},
+				{
+					"slug": "effective_to",
+					"label": "Effective to",
+					"type": "datetime"
+				},
+				{
+					"slug": "applicability_country",
+					"label": "Country code",
+					"type": "string"
+				},
+				{
+					"slug": "applicability_channel",
+					"label": "Signup channel",
+					"type": "select",
+					"validation": {
+						"options": [
+							"web",
+							"app",
+							"phone",
+							"in_person",
+							"other"
+						]
+					}
+				},
+				{
+					"slug": "applicability_customer",
+					"label": "Customer kind",
+					"type": "select",
+					"validation": {
+						"options": [
+							"consumer",
+							"business"
+						]
+					}
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "policy_rules",
+			"label": "Policy Rules",
+			"labelSingular": "Policy Rule",
+			"urlPattern": "/policy_rules/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Name",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "summary",
+					"label": "Editorial summary",
+					"type": "text"
+				},
+				{
+					"slug": "stable_key",
+					"label": "Stable identity",
+					"type": "string",
+					"required": true,
+					"unique": true
+				},
+				{
+					"slug": "rule_key",
+					"label": "Rule identity",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "official_source_url",
+					"label": "Official source",
+					"type": "url",
+					"required": true
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "policy_rule_versions",
+			"label": "Rule Versions",
+			"labelSingular": "Rule Version",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Version label",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "version_key",
+					"label": "Stable version identity",
+					"type": "string",
+					"required": true,
+					"unique": true
+				},
+				{
+					"slug": "revision_hash",
+					"label": "Legacy fingerprint (optional)",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "rule",
+					"label": "Rule",
+					"type": "reference",
+					"validation": {
+						"relation": "rule_versions",
+						"relationSide": "child",
+						"multiple": false
+					}
+				},
+				{
+					"slug": "statement",
+					"label": "Rule statement",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "source_url",
+					"label": "Official source URL",
+					"type": "url",
+					"required": true
+				},
+				{
+					"slug": "source_published_at",
+					"label": "Source published at",
+					"type": "datetime"
+				},
+				{
+					"slug": "observed_at",
+					"label": "Observed at",
+					"type": "datetime",
+					"required": true
+				},
+				{
+					"slug": "effective_from",
+					"label": "Effective from",
+					"type": "datetime"
+				},
+				{
+					"slug": "effective_to",
+					"label": "Effective to",
+					"type": "datetime"
+				},
+				{
+					"slug": "applicability_country",
+					"label": "Country code",
+					"type": "string"
+				},
+				{
+					"slug": "applicability_channel",
+					"label": "Signup channel",
+					"type": "select",
+					"validation": {
+						"options": [
+							"web",
+							"app",
+							"phone",
+							"in_person",
+							"other"
+						]
+					}
+				},
+				{
+					"slug": "applicability_customer",
+					"label": "Customer kind",
+					"type": "select",
+					"validation": {
+						"options": [
+							"consumer",
+							"business"
+						]
+					}
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "policy_evidence",
+			"label": "Policy Evidence",
+			"labelSingular": "Policy Evidence",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Evidence title",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "stable_key",
+					"label": "Stable identity",
+					"type": "string",
+					"required": true,
+					"unique": true
+				},
+				{
+					"slug": "revision_hash",
+					"label": "Legacy fingerprint (optional)",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "evidence_kind",
+					"label": "Evidence kind",
+					"type": "select",
+					"required": true,
+					"validation": {
+						"options": [
+							"terms_excerpt",
+							"official_guidance",
+							"official_law",
+							"product_observation",
+							"other"
+						]
+					}
+				},
+				{
+					"slug": "public_excerpt",
+					"label": "Public excerpt",
+					"type": "text"
+				},
+				{
+					"slug": "internal_notes",
+					"label": "Internal notes",
+					"type": "text"
+				},
+				{
+					"slug": "source_url",
+					"label": "Source URL",
+					"type": "url",
+					"required": true
+				},
+				{
+					"slug": "source_published_at",
+					"label": "Source published at",
+					"type": "datetime"
+				},
+				{
+					"slug": "observed_at",
+					"label": "Observed at",
+					"type": "datetime",
+					"required": true
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "policy_assessments",
+			"label": "Policy Assessments",
+			"labelSingular": "Policy Assessment",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Assessment title",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "assessment_key",
+					"label": "Stable assessment identity",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "revision_hash",
+					"label": "Legacy fingerprint (optional)",
+					"type": "string",
+					"required": false
+				},
+				{
+					"slug": "offer_version",
+					"label": "Offer version",
+					"type": "reference",
+					"validation": {
+						"relation": "assessment_offer_versions",
+						"relationSide": "child",
+						"multiple": false
+					}
+				},
+				{
+					"slug": "rule_versions",
+					"label": "Rule versions",
+					"type": "reference",
+					"validation": {
+						"relation": "assessment_rule_versions",
+						"relationSide": "child",
+						"multiple": true
+					}
+				},
+				{
+					"slug": "evidence",
+					"label": "Evidence",
+					"type": "reference",
+					"validation": {
+						"relation": "assessment_evidence",
+						"relationSide": "child",
+						"multiple": true
+					}
+				},
+				{
+					"slug": "applicability_country",
+					"label": "Country code",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "applicability_contract_from",
+					"label": "Contract from",
+					"type": "datetime"
+				},
+				{
+					"slug": "applicability_contract_to",
+					"label": "Contract to",
+					"type": "datetime"
+				},
+				{
+					"slug": "applicability_channel",
+					"label": "Signup channel",
+					"type": "select",
+					"validation": {
+						"options": [
+							"web",
+							"app",
+							"phone",
+							"in_person",
+							"other"
+						]
+					}
+				},
+				{
+					"slug": "applicability_customer",
+					"label": "Customer kind",
+					"type": "select",
+					"validation": {
+						"options": [
+							"consumer",
+							"business"
+						]
+					}
+				},
+				{
+					"slug": "terms_statement",
+					"label": "Terms statement",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "product_observation",
+					"label": "Product observation",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "applicability_state",
+					"label": "Applicability",
+					"type": "select",
+					"required": true,
+					"validation": {
+						"options": [
+							"applicable",
+							"not_applicable",
+							"needs_information",
+							"ambiguous"
+						]
+					}
+				},
+				{
+					"slug": "terms_state",
+					"label": "Terms statement state",
+					"type": "select",
+					"required": true,
+					"validation": {
+						"options": [
+							"found",
+							"not_found",
+							"unclear",
+							"not_assessed"
+						]
+					}
+				},
+				{
+					"slug": "finding_state",
+					"label": "Editorial finding",
+					"type": "select",
+					"required": true,
+					"validation": {
+						"options": [
+							"no_issue_identified",
+							"missing_required_disclosure",
+							"implementation_gap",
+							"possible_conflict",
+							"unresolved",
+							"not_assessed"
+						]
+					}
+				},
+				{
+					"slug": "reviewed_at",
+					"label": "Reviewed at",
+					"type": "datetime",
+					"required": true
+				},
+				{
+					"slug": "review_expires_at",
+					"label": "Review expires at",
+					"type": "datetime",
+					"required": true
+				}
+			],
+			"group": "Policy catalog",
+			"icon": "database"
+		},
+		{
+			"slug": "law_guides",
+			"label": "Law guides",
+			"labelSingular": "Law guide",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "stable_id",
+					"label": "Stable guide ID",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 100
+					}
+				},
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 180
+					}
+				},
+				{
+					"slug": "jurisdiction",
+					"label": "Jurisdiction",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 180
+					}
+				},
+				{
+					"slug": "summary",
+					"label": "Summary",
+					"type": "text",
+					"required": true,
+					"validation": {
+						"maxLength": 2400
+					}
+				},
+				{
+					"slug": "takeaways",
+					"label": "Takeaways",
+					"type": "repeater",
+					"validation": {
+						"minItems": 0,
+						"maxItems": 20,
+						"subFields": [
+							{
+								"slug": "text",
+								"label": "Takeaway",
+								"type": "text",
+								"required": true,
+								"validation": {
+									"maxLength": 1000
+								}
+							}
+						]
+					}
+				},
+				{
+					"slug": "sources",
+					"label": "Official sources",
+					"type": "repeater",
+					"validation": {
+						"minItems": 0,
+						"maxItems": 30,
+						"subFields": [
+							{
+								"slug": "label",
+								"label": "Source label",
+								"type": "string",
+								"required": true,
+								"validation": {
+									"maxLength": 180
+								}
+							},
+							{
+								"slug": "url",
+								"label": "Official source URL",
+								"type": "url",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "reviewed_on",
+					"label": "Reviewed on",
+					"type": "datetime",
+					"required": true
+				}
+			],
+			"group": "Learning",
+			"icon": "book-open"
+		},
+		{
+			"slug": "glossary_terms",
+			"label": "Glossary",
+			"labelSingular": "Glossary term",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search"
+			],
+			"fields": [
+				{
+					"slug": "stable_id",
+					"label": "Stable term ID",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 100
+					}
+				},
+				{
+					"slug": "title",
+					"label": "Term",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 180
+					}
+				},
+				{
+					"slug": "label",
+					"label": "Short label",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 180
+					}
+				},
+				{
+					"slug": "description",
+					"label": "Description",
+					"type": "text",
+					"required": true,
+					"validation": {
+						"maxLength": 2400
+					}
+				},
+				{
+					"slug": "sources",
+					"label": "Official sources",
+					"type": "repeater",
+					"validation": {
+						"minItems": 0,
+						"maxItems": 30,
+						"subFields": [
+							{
+								"slug": "label",
+								"label": "Source label",
+								"type": "string",
+								"required": true,
+								"validation": {
+									"maxLength": 180
+								}
+							},
+							{
+								"slug": "url",
+								"label": "Official source URL",
+								"type": "url",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "reviewed_on",
+					"label": "Reviewed on",
+					"type": "datetime",
+					"required": true
+				}
+			],
+			"group": "Learning",
+			"icon": "book-open"
+		},
+		{
+			"slug": "quizzes",
+			"label": "Learning quizzes",
+			"labelSingular": "Learning quiz",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview"
+			],
+			"fields": [
+				{
+					"slug": "stable_id",
+					"label": "Stable quiz ID",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 100
+					}
+				},
+				{
+					"slug": "content_version",
+					"label": "Immutable content version",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 120
+					}
+				},
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 180
+					}
+				},
+				{
+					"slug": "description",
+					"label": "Description",
+					"type": "text",
+					"required": true,
+					"validation": {
+						"maxLength": 1200
+					}
+				},
+				{
+					"slug": "question_ids",
+					"label": "Ordered question IDs",
+					"type": "repeater",
+					"validation": {
+						"minItems": 0,
+						"maxItems": 20,
+						"subFields": [
+							{
+								"slug": "id",
+								"label": "Stable question ID",
+								"type": "string",
+								"required": true,
+								"validation": {
+									"maxLength": 120
+								}
+							}
+						]
+					}
+				},
+				{
+					"slug": "reviewed_on",
+					"label": "Reviewed on",
+					"type": "datetime",
+					"required": true
+				}
+			],
+			"group": "Learning",
+			"icon": "graduation-cap"
+		},
+		{
+			"slug": "quiz_questions",
+			"label": "Quiz questions",
+			"labelSingular": "Quiz question",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview"
+			],
+			"fields": [
+				{
+					"slug": "stable_id",
+					"label": "Stable question ID",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 120
+					}
+				},
+				{
+					"slug": "quiz_id",
+					"label": "Quiz ID",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 100
+					}
+				},
+				{
+					"slug": "quiz_reference",
+					"label": "Quiz",
+					"type": "reference",
+					"validation": {
+						"relation": "quiz_questions"
+					}
+				},
+				{
+					"slug": "order",
+					"label": "Order",
+					"type": "integer",
+					"required": true,
+					"validation": {
+						"min": 0,
+						"max": 19
+					}
+				},
+				{
+					"slug": "prompt",
+					"label": "Prompt",
+					"type": "text",
+					"required": true,
+					"validation": {
+						"maxLength": 1200
+					}
+				},
+				{
+					"slug": "options",
+					"label": "Answer choices",
+					"type": "repeater",
+					"validation": {
+						"minItems": 0,
+						"maxItems": 8,
+						"subFields": [
+							{
+								"slug": "id",
+								"label": "Stable answer ID",
+								"type": "string",
+								"required": true,
+								"validation": {
+									"maxLength": 20
+								}
+							},
+							{
+								"slug": "label",
+								"label": "Answer label",
+								"type": "text",
+								"required": true,
+								"validation": {
+									"maxLength": 500
+								}
+							}
+						]
+					}
+				},
+				{
+					"slug": "correct_option_id",
+					"label": "Correct answer ID",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 20
+					}
+				},
+				{
+					"slug": "explanation",
+					"label": "Explanation",
+					"type": "text",
+					"required": true,
+					"validation": {
+						"maxLength": 1800
+					}
+				},
+				{
+					"slug": "source_label",
+					"label": "Source label",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 180
+					}
+				},
+				{
+					"slug": "source_url",
+					"label": "Official source URL",
+					"type": "url",
+					"required": true
+				},
+				{
+					"slug": "source_law_guide",
+					"label": "Related law guide",
+					"type": "reference",
+					"validation": {
+						"relation": "quiz_question_law_guide"
+					}
+				},
+				{
+					"slug": "reviewed_on",
+					"label": "Reviewed on",
+					"type": "datetime",
+					"required": true
+				}
+			],
+			"group": "Learning",
+			"icon": "question"
 		}
 	],
 	"taxonomies": [
@@ -311,6 +1436,80 @@
 								}
 							],
 							"_key": "k0"
+						}
+					]
+				}
+			},
+			{
+				"id": "page-home",
+				"slug": "home",
+				"status": "published",
+				"data": {
+					"slug": "home",
+					"title": "Rights & Renewals",
+					"description": "Save receipts on your device and track the dates that matter for purchases and subscriptions in Germany.",
+					"sections": [
+						{
+							"_type": "hero",
+							"_version": 1,
+							"_key": "home-hero-v1",
+							"heading": "Keep the receipt. Know the deadline.",
+							"body": "Track purchases and subscriptions in a wallet that keeps your receipts on your device.",
+							"cta_label": "Open the wallet",
+							"cta_url": "https://rightsandrenewals-app.pages.dev/",
+							"cta_id": "home-open-wallet"
+						},
+						{
+							"_type": "copy_section",
+							"_version": 1,
+							"_key": "home-wiki-v1",
+							"heading": "Look up a policy",
+							"body": "Browse sourced policy information and learning materials in the Policy Wiki.",
+							"cta_label": "Browse the Policy Wiki",
+							"cta_url": "/wiki",
+							"cta_id": "home-policy-wiki"
+						},
+						{
+							"_type": "feature_list",
+							"_version": 1,
+							"_key": "home-wallet-steps-v1",
+							"heading": "How the wallet works",
+							"items": [
+								{
+									"title": "Save a purchase",
+									"body": "Add a purchase or subscription and attach a receipt photo if you have one."
+								},
+								{
+									"title": "Review dates",
+									"body": "See upcoming dates alongside the purchases and subscriptions they belong to."
+								},
+								{
+									"title": "Prepare a next step",
+									"body": "Find provider information or prepare a draft to review before sending."
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-agent-setup",
+				"slug": "agent-setup",
+				"status": "published",
+				"data": {
+					"slug": "agent-setup",
+					"title": "Agent setup",
+					"description": "Connect an agent to the public read-only Rights & Renewals MCP endpoint.",
+					"sections": [
+						{
+							"_type": "hero",
+							"_version": 1,
+							"_key": "agent-setup-hero-v1",
+							"heading": "Connect an agent to public information",
+							"body": "The public MCP endpoint supports read-only brand policy, statute and subscription-rule lookups. Private receipts stay in your device wallet.",
+							"cta_label": "Read the setup prompt",
+							"cta_url": "/agent-setup/prompt.md",
+							"cta_id": "agent-setup-prompt"
 						}
 					]
 				}
@@ -935,6 +2134,1255 @@
 					]
 				}
 			}
-		]
-	}
+		],
+		"law_guides": [
+			{
+				"id": "law_guides-online-cancellation",
+				"slug": "online-cancellation",
+				"status": "published",
+				"data": {
+					"slug": "online-cancellation",
+					"stable_id": "online-cancellation",
+					"title": "Online cancellation button",
+					"jurisdiction": "Germany · BGB",
+					"summary": "BGB § 312k covers paid continuing consumer contracts that a business lets consumers conclude on its website, subject to statutory exceptions.",
+					"takeaways": [
+						{
+							"text": "The covered website must provide an easy-to-find cancellation button and a confirmation step. The consumer should receive an electronic confirmation."
+						},
+						{
+							"text": "If the required button and confirmation page are not provided, a consumer can generally cancel the covered contract at any time without notice. This is not a universal rule for every contract."
+						}
+					],
+					"sources": [
+						{
+							"label": "BGB § 312k",
+							"url": "https://www.gesetze-im-internet.de/bgb/__312k.html"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "law_guides-subscription-renewals",
+				"slug": "subscription-renewals",
+				"status": "published",
+				"data": {
+					"slug": "subscription-renewals",
+					"stable_id": "subscription-renewals",
+					"title": "Renewal terms for recurring services",
+					"jurisdiction": "Germany · BGB",
+					"summary": "BGB § 309 No. 9 limits certain standard contract terms for regular supplies of goods and services.",
+					"takeaways": [
+						{
+							"text": "For covered terms, an initial binding term may not exceed two years. After that, a tacit renewal must be indefinite and cancellable at any time with no more than one month’s notice."
+						},
+						{
+							"text": "The rule has exceptions, including insurance and certain contracts for goods sold together. Check the contract and the type of service."
+						},
+						{
+							"text": "For contracts formed before 1 March 2022, transitional rules may affect which version applies. Check EGBGB Article 229 § 60."
+						}
+					],
+					"sources": [
+						{
+							"label": "BGB § 309 No. 9",
+							"url": "https://www.gesetze-im-internet.de/bgb/__309.html"
+						},
+						{
+							"label": "EGBGB Article 229 § 60",
+							"url": "https://www.gesetze-im-internet.de/bgbeg/art_229__60.html"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "law_guides-withdrawal",
+				"slug": "withdrawal",
+				"status": "published",
+				"data": {
+					"slug": "withdrawal",
+					"stable_id": "withdrawal",
+					"title": "Withdrawal is different from cancellation",
+					"jurisdiction": "Germany · distance contracts",
+					"summary": "A withdrawal right can apply to qualifying distance or off-premises contracts. It is separate from ending an ongoing subscription.",
+					"takeaways": [
+						{
+							"text": "A 14-day period generally applies to qualifying contracts, but statutory exceptions apply and the starting point depends on the contract and what was bought."
+						},
+						{
+							"text": "Do not treat withdrawal as a general right to cancel any subscription at any time."
+						}
+					],
+					"sources": [
+						{
+							"label": "BGB § 312g",
+							"url": "https://www.gesetze-im-internet.de/bgb/__312g.html"
+						},
+						{
+							"label": "BGB § 355",
+							"url": "https://www.gesetze-im-internet.de/bgb/__355.html"
+						},
+						{
+							"label": "BGB § 356",
+							"url": "https://www.gesetze-im-internet.de/bgb/__356.html"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "law_guides-statutory-defect-rights",
+				"slug": "statutory-defect-rights",
+				"status": "published",
+				"data": {
+					"slug": "statutory-defect-rights",
+					"stable_id": "statutory-defect-rights",
+					"title": "Statutory rights for faulty goods",
+					"jurisdiction": "Germany · consumer goods",
+					"summary": "For a consumer purchase from a trader, statutory defect rights are generally asserted against the seller. They are separate from a manufacturer’s commercial guarantee.",
+					"takeaways": [
+						{
+							"text": "Repair or replacement is generally the first remedy. Price reduction or ending the contract may be available under statutory conditions."
+						},
+						{
+							"text": "For ordinary goods, defect claims are generally subject to a two-year limitation period from delivery. Exceptions and special rules apply."
+						},
+						{
+							"text": "If a defect appears within the first year, it is generally presumed to have existed at delivery unless an exception applies. This affects proof; it does not guarantee an automatic refund."
+						}
+					],
+					"sources": [
+						{
+							"label": "BGB § 437",
+							"url": "https://www.gesetze-im-internet.de/bgb/__437.html"
+						},
+						{
+							"label": "BGB § 439",
+							"url": "https://www.gesetze-im-internet.de/bgb/__439.html"
+						},
+						{
+							"label": "BGB § 438",
+							"url": "https://www.gesetze-im-internet.de/bgb/__438.html"
+						},
+						{
+							"label": "BGB § 477",
+							"url": "https://www.gesetze-im-internet.de/bgb/__477.html"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "law_guides-commercial-guarantees",
+				"slug": "commercial-guarantees",
+				"status": "published",
+				"data": {
+					"slug": "commercial-guarantees",
+					"stable_id": "commercial-guarantees",
+					"title": "Commercial guarantees",
+					"jurisdiction": "Germany · BGB",
+					"summary": "A commercial guarantee is a voluntary promise by its named guarantor, with its own coverage and claim procedure.",
+					"takeaways": [
+						{
+							"text": "A guarantee adds to statutory seller rights; it does not replace or reduce them."
+						},
+						{
+							"text": "Check who gave the guarantee, which product it covers, how long it lasts and how to make a claim."
+						}
+					],
+					"sources": [
+						{
+							"label": "BGB § 443",
+							"url": "https://www.gesetze-im-internet.de/bgb/__443.html"
+						},
+						{
+							"label": "BGB § 479",
+							"url": "https://www.gesetze-im-internet.de/bgb/__479.html"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "law_guides-eu-goods",
+				"slug": "eu-goods",
+				"status": "published",
+				"data": {
+					"slug": "eu-goods",
+					"stable_id": "eu-goods",
+					"title": "EU rules for goods conformity",
+					"jurisdiction": "European Union · sale of goods",
+					"summary": "Directive (EU) 2019/771 sets a shared EU framework for consumer sales of goods. National law implements the rules, so local details can differ.",
+					"takeaways": [
+						{
+							"text": "The Directive generally makes the seller liable for a lack of conformity that appears within two years of delivery."
+						},
+						{
+							"text": "It provides a one-year presumption about when a defect existed, while allowing Member States to provide a longer period. Use the national law that applies to the purchase."
+						}
+					],
+					"sources": [
+						{
+							"label": "Directive (EU) 2019/771",
+							"url": "https://eur-lex.europa.eu/eli/dir/2019/771/oj/eng"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "law_guides-cross-border",
+				"slug": "cross-border",
+				"status": "published",
+				"data": {
+					"slug": "cross-border",
+					"stable_id": "cross-border",
+					"title": "Which law applies across borders?",
+					"jurisdiction": "European Union · cross-border contracts",
+					"summary": "Rome I can preserve a consumer’s mandatory home-country protections when a trader directs activity to the country where the consumer habitually lives.",
+					"takeaways": [
+						{
+							"text": "This protection depends on the facts and the contract being within the rule’s scope. A chosen-law clause does not automatically settle the question."
+						},
+						{
+							"text": "Check the country, seller, purchase channel and contract before relying on a national rule."
+						}
+					],
+					"sources": [
+						{
+							"label": "Rome I Regulation, Article 6",
+							"url": "https://eur-lex.europa.eu/eli/reg/2008/593/oj/eng"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			}
+		],
+		"glossary_terms": [
+			{
+				"id": "glossary_terms-defect-rights",
+				"slug": "defect-rights",
+				"status": "published",
+				"data": {
+					"slug": "defect-rights",
+					"stable_id": "defect-rights",
+					"title": "Statutory defect rights",
+					"label": "Gewährleistung · Germany",
+					"description": "Ordinary consumer-goods defect claims are generally subject to a two-year limitation period from delivery. A defect appearing within the first year is generally presumed to have existed at delivery, subject to exceptions. That presumption concerns proof, not an automatic refund.",
+					"sources": [
+						{
+							"label": "BGB § 438",
+							"url": "https://www.gesetze-im-internet.de/bgb/__438.html"
+						},
+						{
+							"label": "BGB § 477",
+							"url": "https://www.gesetze-im-internet.de/bgb/__477.html"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "glossary_terms-renewal-cancellation",
+				"slug": "renewal-cancellation",
+				"status": "published",
+				"data": {
+					"slug": "renewal-cancellation",
+					"stable_id": "renewal-cancellation",
+					"title": "Renewal and cancellation",
+					"label": "BGB §§ 309 and 312k · Germany",
+					"description": "Some recurring-service renewal terms are limited to an indefinite renewal with no more than one month’s notice after the initial term. Covered online contracts may also require a cancellation button. Contract type and statutory exceptions matter.",
+					"sources": [
+						{
+							"label": "BGB § 309 No. 9",
+							"url": "https://www.gesetze-im-internet.de/bgb/__309.html"
+						},
+						{
+							"label": "BGB § 312k",
+							"url": "https://www.gesetze-im-internet.de/bgb/__312k.html"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "glossary_terms-receipt-fingerprint",
+				"slug": "receipt-fingerprint",
+				"status": "published",
+				"data": {
+					"slug": "receipt-fingerprint",
+					"stable_id": "receipt-fingerprint",
+					"title": "Receipt fingerprint integrity",
+					"label": "On-device record · SHA-256",
+					"description": "The app stores a SHA-256 digest with the encrypted receipt and checks the decrypted bytes against it. Comparing a newly computed digest with the stored digest can detect changes to the saved bytes; it does not prove who issued the receipt, when it was created, or that the starting image was truthful.",
+					"sources": [],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			}
+		],
+		"quizzes": [
+			{
+				"id": "quizzes-subscriptions",
+				"slug": "subscriptions",
+				"status": "published",
+				"data": {
+					"slug": "subscriptions",
+					"stable_id": "subscriptions",
+					"content_version": "subscriptions-2026-11-10-v1",
+					"title": "Subscriptions",
+					"description": "Practice the difference between ending a contract and withdrawing from it.",
+					"question_ids": [
+						{
+							"id": "termination-or-withdrawal"
+						},
+						{
+							"id": "missing-online-button"
+						},
+						{
+							"id": "renewal-notice"
+						},
+						{
+							"id": "trial-details"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "quizzes-warranties",
+				"slug": "warranties",
+				"status": "published",
+				"data": {
+					"slug": "warranties",
+					"stable_id": "warranties",
+					"content_version": "warranties-2026-11-10-v1",
+					"title": "Warranties & faulty goods",
+					"description": "Learn who to contact and what a time limit or guarantee actually means.",
+					"question_ids": [
+						{
+							"id": "first-year-presumption"
+						},
+						{
+							"id": "seller-or-manufacturer"
+						},
+						{
+							"id": "commercial-guarantee"
+						},
+						{
+							"id": "purchase-records"
+						}
+					],
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			}
+		],
+		"quiz_questions": [
+			{
+				"id": "quiz_questions-termination-or-withdrawal",
+				"slug": "termination-or-withdrawal",
+				"status": "published",
+				"data": {
+					"slug": "termination-or-withdrawal",
+					"stable_id": "termination-or-withdrawal",
+					"quiz_id": "subscriptions",
+					"order": 0,
+					"prompt": "You want to stop an ongoing streaming plan. What is cancellation (Kündigung)?",
+					"options": [
+						{
+							"id": "a",
+							"label": "Ending an ongoing contract for the future"
+						},
+						{
+							"id": "b",
+							"label": "Undoing any purchase within 14 days, without exceptions"
+						},
+						{
+							"id": "c",
+							"label": "Asking the bank to reverse every payment"
+						},
+						{
+							"id": "d",
+							"label": "Deleting the app from your phone"
+						}
+					],
+					"correct_option_id": "a",
+					"explanation": "Cancellation ends an ongoing contract. Withdrawal can apply to a qualifying new distance contract, but it has separate conditions and exceptions.",
+					"source_label": "BGB §§ 312g and 355",
+					"source_url": "https://www.gesetze-im-internet.de/bgb/__355.html",
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "quiz_questions-missing-online-button",
+				"slug": "missing-online-button",
+				"status": "published",
+				"data": {
+					"slug": "missing-online-button",
+					"stable_id": "missing-online-button",
+					"quiz_id": "subscriptions",
+					"order": 1,
+					"prompt": "A paid continuing contract was offered and concluded on a trader’s website. If the required cancellation flow is missing, what may § 312k allow?",
+					"options": [
+						{
+							"id": "a",
+							"label": "A full refund of every past payment"
+						},
+						{
+							"id": "b",
+							"label": "Cancellation of the covered contract at any time without notice"
+						},
+						{
+							"id": "c",
+							"label": "Cancellation only at the end of the original term"
+						},
+						{
+							"id": "d",
+							"label": "No change; online cancellation rules never apply"
+						}
+					],
+					"correct_option_id": "b",
+					"explanation": "For contracts within § 312k and outside its exceptions, missing required buttons and confirmation page can let a consumer cancel without a notice period.",
+					"source_label": "BGB § 312k",
+					"source_url": "https://www.gesetze-im-internet.de/bgb/__312k.html",
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "quiz_questions-renewal-notice",
+				"slug": "renewal-notice",
+				"status": "published",
+				"data": {
+					"slug": "renewal-notice",
+					"stable_id": "renewal-notice",
+					"quiz_id": "subscriptions",
+					"order": 2,
+					"prompt": "For a covered recurring service, what can a standard renewal clause generally provide after the initial term?",
+					"options": [
+						{
+							"id": "a",
+							"label": "An indefinite renewal cancellable at any time with no more than one month’s notice"
+						},
+						{
+							"id": "b",
+							"label": "A new two-year fixed term in every case"
+						},
+						{
+							"id": "c",
+							"label": "A three-month cancellation period in every case"
+						},
+						{
+							"id": "d",
+							"label": "No cancellation rights at all"
+						}
+					],
+					"correct_option_id": "a",
+					"explanation": "BGB § 309 No. 9 limits certain standard terms for recurring supplies of goods and services. Exceptions and the contract type matter.",
+					"source_label": "BGB § 309 No. 9",
+					"source_url": "https://www.gesetze-im-internet.de/bgb/__309.html",
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "quiz_questions-trial-details",
+				"slug": "trial-details",
+				"status": "published",
+				"data": {
+					"slug": "trial-details",
+					"stable_id": "trial-details",
+					"quiz_id": "subscriptions",
+					"order": 3,
+					"prompt": "Before starting a free trial, which details are useful to record?",
+					"options": [
+						{
+							"id": "a",
+							"label": "Trial end date, paid price, renewal timing and how to cancel"
+						},
+						{
+							"id": "b",
+							"label": "Only the app icon colour"
+						},
+						{
+							"id": "c",
+							"label": "The company’s office opening hours"
+						},
+						{
+							"id": "d",
+							"label": "Nothing; every trial ends automatically"
+						}
+					],
+					"correct_option_id": "a",
+					"explanation": "Save the trial end date, price after trial, renewal timing and cancellation route. A covered online contract may also have a § 312k cancellation button; contract terms still matter.",
+					"source_label": "BGB § 312k",
+					"source_url": "https://www.gesetze-im-internet.de/bgb/__312k.html",
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "quiz_questions-first-year-presumption",
+				"slug": "first-year-presumption",
+				"status": "published",
+				"data": {
+					"slug": "first-year-presumption",
+					"stable_id": "first-year-presumption",
+					"quiz_id": "warranties",
+					"order": 0,
+					"prompt": "A defect appears in a product within one year of delivery. What does the German presumption generally do?",
+					"options": [
+						{
+							"id": "a",
+							"label": "Guarantee an immediate refund"
+						},
+						{
+							"id": "b",
+							"label": "Presume the defect existed at delivery, subject to exceptions"
+						},
+						{
+							"id": "c",
+							"label": "Prove that the manufacturer caused the defect"
+						},
+						{
+							"id": "d",
+							"label": "Extend every commercial guarantee to two years"
+						}
+					],
+					"correct_option_id": "b",
+					"explanation": "The presumption concerns when the defect existed. It does not decide the remedy or guarantee a refund.",
+					"source_label": "BGB § 477",
+					"source_url": "https://www.gesetze-im-internet.de/bgb/__477.html",
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "quiz_questions-seller-or-manufacturer",
+				"slug": "seller-or-manufacturer",
+				"status": "published",
+				"data": {
+					"slug": "seller-or-manufacturer",
+					"stable_id": "seller-or-manufacturer",
+					"quiz_id": "warranties",
+					"order": 1,
+					"prompt": "For statutory defect rights on a consumer purchase from a trader, who is normally responsible?",
+					"options": [
+						{
+							"id": "a",
+							"label": "The seller under the purchase contract"
+						},
+						{
+							"id": "b",
+							"label": "Only the manufacturer"
+						},
+						{
+							"id": "c",
+							"label": "The delivery company in every case"
+						},
+						{
+							"id": "d",
+							"label": "The payment provider"
+						}
+					],
+					"correct_option_id": "a",
+					"explanation": "Statutory defect rights are generally asserted against the seller. A separate commercial guarantee may name a different guarantor.",
+					"source_label": "BGB § 437",
+					"source_url": "https://www.gesetze-im-internet.de/bgb/__437.html",
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "quiz_questions-commercial-guarantee",
+				"slug": "commercial-guarantee",
+				"status": "published",
+				"data": {
+					"slug": "commercial-guarantee",
+					"stable_id": "commercial-guarantee",
+					"quiz_id": "warranties",
+					"order": 2,
+					"prompt": "A manufacturer’s voluntary commercial guarantee has expired. What does that tell you about statutory rights against the seller?",
+					"options": [
+						{
+							"id": "a",
+							"label": "They always expire at the same time"
+						},
+						{
+							"id": "b",
+							"label": "They may still exist under separate statutory rules"
+						},
+						{
+							"id": "c",
+							"label": "The seller must provide a new manufacturer guarantee"
+						},
+						{
+							"id": "d",
+							"label": "The purchase is automatically refunded"
+						}
+					],
+					"correct_option_id": "b",
+					"explanation": "A commercial guarantee is separate from statutory seller rights. Check the purchase date, defect, seller and applicable limitation rules.",
+					"source_label": "BGB §§ 443 and 479",
+					"source_url": "https://www.gesetze-im-internet.de/bgb/__443.html",
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			},
+			{
+				"id": "quiz_questions-purchase-records",
+				"slug": "purchase-records",
+				"status": "published",
+				"data": {
+					"slug": "purchase-records",
+					"stable_id": "purchase-records",
+					"quiz_id": "warranties",
+					"order": 3,
+					"prompt": "Which records are useful to keep after buying a product?",
+					"options": [
+						{
+							"id": "a",
+							"label": "Receipt or order confirmation, plus product and guarantee details"
+						},
+						{
+							"id": "b",
+							"label": "Only the delivery box"
+						},
+						{
+							"id": "c",
+							"label": "Only a screenshot of the shop homepage"
+						},
+						{
+							"id": "d",
+							"label": "No records; the seller always has everything"
+						}
+					],
+					"correct_option_id": "a",
+					"explanation": "Keep proof of purchase and the product or guarantee terms so you can identify the seller, item and any separate guarantor when you make a claim.",
+					"source_label": "BGB § 479",
+					"source_url": "https://www.gesetze-im-internet.de/bgb/__479.html",
+					"reviewed_on": "2026-11-10T00:00:00.000Z"
+				}
+			}
+		],
+		"policy_providers": [
+			{
+				"id": "policy_providers-spotify",
+				"slug": "spotify",
+				"status": "published",
+				"data": {
+					"title": "Spotify",
+					"stable_key": "provider:spotify"
+				}
+			},
+			{
+				"id": "policy_providers-netflix",
+				"slug": "netflix",
+				"status": "published",
+				"data": {
+					"title": "Netflix",
+					"stable_key": "provider:netflix"
+				}
+			},
+			{
+				"id": "policy_providers-amazon-prime",
+				"slug": "amazon-prime",
+				"status": "published",
+				"data": {
+					"title": "Amazon Prime Student",
+					"stable_key": "provider:amazon-prime"
+				}
+			},
+			{
+				"id": "policy_providers-adobe",
+				"slug": "adobe",
+				"status": "published",
+				"data": {
+					"title": "Adobe Creative Cloud",
+					"stable_key": "provider:adobe"
+				}
+			},
+			{
+				"id": "policy_providers-fitx",
+				"slug": "fitx",
+				"status": "published",
+				"data": {
+					"title": "FitX Fitness",
+					"stable_key": "provider:fitx"
+				}
+			},
+			{
+				"id": "policy_providers-mcfit",
+				"slug": "mcfit",
+				"status": "published",
+				"data": {
+					"title": "McFIT (RSG Group)",
+					"stable_key": "provider:mcfit"
+				}
+			},
+			{
+				"id": "policy_providers-jetbrains",
+				"slug": "jetbrains",
+				"status": "published",
+				"data": {
+					"title": "JetBrains",
+					"stable_key": "provider:jetbrains"
+				}
+			},
+			{
+				"id": "policy_providers-github-copilot",
+				"slug": "github-copilot",
+				"status": "published",
+				"data": {
+					"title": "GitHub Copilot",
+					"stable_key": "provider:github-copilot"
+				}
+			},
+			{
+				"id": "policy_providers-chatgpt-plus",
+				"slug": "chatgpt-plus",
+				"status": "published",
+				"data": {
+					"title": "ChatGPT Plus (OpenAI)",
+					"stable_key": "provider:chatgpt-plus"
+				}
+			},
+			{
+				"id": "policy_providers-icloud",
+				"slug": "icloud",
+				"status": "published",
+				"data": {
+					"title": "Apple iCloud+",
+					"stable_key": "provider:icloud"
+				}
+			},
+			{
+				"id": "policy_providers-apple",
+				"slug": "apple",
+				"status": "published",
+				"data": {
+					"title": "Apple",
+					"stable_key": "provider:apple"
+				}
+			},
+			{
+				"id": "policy_providers-sony",
+				"slug": "sony",
+				"status": "published",
+				"data": {
+					"title": "Sony Europe",
+					"stable_key": "provider:sony"
+				}
+			},
+			{
+				"id": "policy_providers-samsung",
+				"slug": "samsung",
+				"status": "published",
+				"data": {
+					"title": "Samsung Electronics",
+					"stable_key": "provider:samsung"
+				}
+			},
+			{
+				"id": "policy_providers-mediamarkt",
+				"slug": "mediamarkt",
+				"status": "published",
+				"data": {
+					"title": "MediaMarkt",
+					"stable_key": "provider:mediamarkt"
+				}
+			},
+			{
+				"id": "policy_providers-saturn",
+				"slug": "saturn",
+				"status": "published",
+				"data": {
+					"title": "Saturn",
+					"stable_key": "provider:saturn"
+				}
+			},
+			{
+				"id": "policy_providers-anker",
+				"slug": "anker",
+				"status": "published",
+				"data": {
+					"title": "Anker Innovations",
+					"stable_key": "provider:anker"
+				}
+			},
+			{
+				"id": "policy_providers-lenovo",
+				"slug": "lenovo",
+				"status": "published",
+				"data": {
+					"title": "Lenovo Germany",
+					"stable_key": "provider:lenovo"
+				}
+			},
+			{
+				"id": "policy_providers-dyson",
+				"slug": "dyson",
+				"status": "published",
+				"data": {
+					"title": "Dyson Germany",
+					"stable_key": "provider:dyson"
+				}
+			},
+			{
+				"id": "policy_providers-bose",
+				"slug": "bose",
+				"status": "published",
+				"data": {
+					"title": "Bose Germany",
+					"stable_key": "provider:bose"
+				}
+			},
+			{
+				"id": "policy_providers-nintendo",
+				"slug": "nintendo",
+				"status": "published",
+				"data": {
+					"title": "Nintendo of Europe",
+					"stable_key": "provider:nintendo"
+				}
+			}
+		],
+		"policy_services": [],
+		"policy_plans": [],
+		"policy_offers": [],
+		"policy_offer_versions": [],
+		"policy_rules": [],
+		"policy_rule_versions": [],
+		"policy_evidence": [],
+		"policy_assessments": []
+	},
+	"relations": [
+		{
+			"slug": "provider_services",
+			"parentCollection": "policy_providers",
+			"childCollection": "policy_services",
+			"parentLabel": "Providers",
+			"childLabel": "Services",
+			"parentLabelSingular": "Provider",
+			"childLabelSingular": "Service",
+			"maxChildrenPerParent": null,
+			"maxParentsPerChild": 1
+		},
+		{
+			"slug": "service_plans",
+			"parentCollection": "policy_services",
+			"childCollection": "policy_plans",
+			"parentLabel": "Services",
+			"childLabel": "Plans",
+			"parentLabelSingular": "Service",
+			"childLabelSingular": "Plan",
+			"maxChildrenPerParent": null,
+			"maxParentsPerChild": 1
+		},
+		{
+			"slug": "plan_offers",
+			"parentCollection": "policy_plans",
+			"childCollection": "policy_offers",
+			"parentLabel": "Plans",
+			"childLabel": "Offers",
+			"parentLabelSingular": "Plan",
+			"childLabelSingular": "Offer",
+			"maxChildrenPerParent": null,
+			"maxParentsPerChild": 1
+		},
+		{
+			"slug": "offer_versions",
+			"parentCollection": "policy_offers",
+			"childCollection": "policy_offer_versions",
+			"parentLabel": "Offers",
+			"childLabel": "Versions",
+			"parentLabelSingular": "Offer",
+			"childLabelSingular": "Version",
+			"maxChildrenPerParent": null,
+			"maxParentsPerChild": 1
+		},
+		{
+			"slug": "rule_versions",
+			"parentCollection": "policy_rules",
+			"childCollection": "policy_rule_versions",
+			"parentLabel": "Rules",
+			"childLabel": "Versions",
+			"parentLabelSingular": "Rule",
+			"childLabelSingular": "Version",
+			"maxChildrenPerParent": null,
+			"maxParentsPerChild": 1
+		},
+		{
+			"slug": "assessment_offer_versions",
+			"parentCollection": "policy_offer_versions",
+			"childCollection": "policy_assessments",
+			"parentLabel": "Offer Versions",
+			"childLabel": "Assessments",
+			"parentLabelSingular": "Offer Version",
+			"childLabelSingular": "Assessment",
+			"maxChildrenPerParent": null,
+			"maxParentsPerChild": 1
+		},
+		{
+			"slug": "assessment_rule_versions",
+			"parentCollection": "policy_rule_versions",
+			"childCollection": "policy_assessments",
+			"parentLabel": "Rule Versions",
+			"childLabel": "Assessments",
+			"parentLabelSingular": "Rule Version",
+			"childLabelSingular": "Assessment",
+			"maxChildrenPerParent": null,
+			"maxParentsPerChild": 1
+		},
+		{
+			"slug": "assessment_evidence",
+			"parentCollection": "policy_evidence",
+			"childCollection": "policy_assessments",
+			"parentLabel": "Evidence",
+			"childLabel": "Assessments",
+			"parentLabelSingular": "Evidenc",
+			"childLabelSingular": "Assessment",
+			"maxChildrenPerParent": null,
+			"maxParentsPerChild": 1
+		},
+		{
+			"slug": "quiz_questions",
+			"parentCollection": "quizzes",
+			"childCollection": "quiz_questions",
+			"parentLabel": "Quizzes",
+			"parentLabelSingular": "Quiz",
+			"childLabel": "Questions",
+			"childLabelSingular": "Question"
+		},
+		{
+			"slug": "quiz_question_law_guide",
+			"parentCollection": "law_guides",
+			"childCollection": "quiz_questions",
+			"parentLabel": "Law guides",
+			"parentLabelSingular": "Law guide",
+			"childLabel": "Questions",
+			"childLabelSingular": "Question"
+		}
+	],
+	"blockTypes": [
+		{
+			"slug": "hero",
+			"label": "Hero",
+			"category": "Website",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
+						{
+							"slug": "heading",
+							"label": "Heading",
+							"type": "string",
+							"required": true,
+							"validation": {
+								"maxLength": 180
+							}
+						},
+						{
+							"slug": "body",
+							"label": "Body",
+							"type": "text",
+							"required": false,
+							"validation": {
+								"maxLength": 1200
+							}
+						},
+						{
+							"slug": "cta_label",
+							"label": "CTA label",
+							"type": "string",
+							"required": false,
+							"validation": {
+								"maxLength": 100
+							}
+						},
+						{
+							"slug": "cta_url",
+							"label": "CTA link",
+							"type": "url"
+						},
+						{
+							"slug": "cta_id",
+							"label": "Stable CTA ID",
+							"type": "string",
+							"required": false,
+							"validation": {
+								"maxLength": 120
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"slug": "copy_section",
+			"label": "Copy section",
+			"category": "Website",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
+						{
+							"slug": "heading",
+							"label": "Heading",
+							"type": "string",
+							"required": false,
+							"validation": {
+								"maxLength": 180
+							}
+						},
+						{
+							"slug": "body",
+							"label": "Body",
+							"type": "text",
+							"required": false,
+							"validation": {
+								"maxLength": 4000
+							}
+						},
+						{
+							"slug": "cta_label",
+							"label": "CTA label",
+							"type": "string",
+							"required": false,
+							"validation": {
+								"maxLength": 100
+							}
+						},
+						{
+							"slug": "cta_url",
+							"label": "CTA link",
+							"type": "url"
+						},
+						{
+							"slug": "cta_id",
+							"label": "Stable CTA ID",
+							"type": "string",
+							"required": false,
+							"validation": {
+								"maxLength": 120
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"slug": "feature_list",
+			"label": "Feature list",
+			"category": "Website",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
+						{
+							"slug": "heading",
+							"label": "Heading",
+							"type": "string",
+							"required": false,
+							"validation": {
+								"maxLength": 180
+							}
+						},
+						{
+							"slug": "items",
+							"label": "Features",
+							"type": "repeater",
+							"validation": {
+								"minItems": 1,
+								"maxItems": 12,
+								"subFields": [
+									{
+										"slug": "title",
+										"label": "Title",
+										"type": "string",
+										"required": true,
+										"validation": {
+											"maxLength": 180
+										}
+									},
+									{
+										"slug": "body",
+										"label": "Body",
+										"type": "text",
+										"required": true,
+										"validation": {
+											"maxLength": 1000
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"slug": "faq",
+			"label": "FAQ",
+			"category": "Website",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
+						{
+							"slug": "heading",
+							"label": "Heading",
+							"type": "string",
+							"required": false,
+							"validation": {
+								"maxLength": 180
+							}
+						},
+						{
+							"slug": "questions",
+							"label": "Questions",
+							"type": "repeater",
+							"validation": {
+								"minItems": 1,
+								"maxItems": 12,
+								"subFields": [
+									{
+										"slug": "question",
+										"label": "Question",
+										"type": "string",
+										"required": true,
+										"validation": {
+											"maxLength": 500
+										}
+									},
+									{
+										"slug": "answer",
+										"label": "Answer",
+										"type": "text",
+										"required": true,
+										"validation": {
+											"maxLength": 2000
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"slug": "cta",
+			"label": "Call to action",
+			"category": "Website",
+			"currentVersion": 1,
+			"versions": [
+				{
+					"version": 1,
+					"fields": [
+						{
+							"slug": "placement",
+							"label": "Placement",
+							"type": "select",
+							"validation": {
+								"options": [
+									"content",
+									"home-intro",
+									"agent-intro"
+								]
+							}
+						},
+						{
+							"slug": "heading",
+							"label": "Heading",
+							"type": "string",
+							"required": false,
+							"validation": {
+								"maxLength": 180
+							}
+						},
+						{
+							"slug": "body",
+							"label": "Body",
+							"type": "text",
+							"required": false,
+							"validation": {
+								"maxLength": 1200
+							}
+						},
+						{
+							"slug": "cta_label",
+							"label": "CTA label",
+							"type": "string",
+							"required": true,
+							"validation": {
+								"maxLength": 100
+							}
+						},
+						{
+							"slug": "cta_url",
+							"label": "CTA link",
+							"type": "url"
+						},
+						{
+							"slug": "cta_id",
+							"label": "Stable CTA ID",
+							"type": "string",
+							"required": true,
+							"validation": {
+								"maxLength": 120
+							}
+						}
+					]
+				}
+			]
+		}
+	]
 }

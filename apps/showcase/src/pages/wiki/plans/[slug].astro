@@ -1,0 +1,50 @@
+---
+import PlanFindings from '../../../components/editorial/PlanFindings.astro';
+import TelemetryConsent from '../../../components/TelemetryConsent.astro';
+import { planTelemetryMetadata } from '../../../lib/telemetry-page-metadata.js';
+import { parsePolicyContext, loadPublishedPlanSummary, resolvePublishedPlanProjection } from '../../../lib/policy-graph-cms.js';
+import '../../../../styles/tokens.css';
+import '../../../../styles/main.css';
+
+export const prerender = false;
+
+const slug = Astro.params.slug ?? '';
+let plan;
+let projection;
+try {
+  plan = await loadPublishedPlanSummary(slug);
+  if (!plan) return Astro.rewrite('/404');
+  projection = await resolvePublishedPlanProjection(slug, parsePolicyContext(Astro.url.searchParams));
+} catch (error) {
+  if (error instanceof TypeError) return new Response('Invalid plan context.', { status: 400 });
+  console.error('[policy-plan-page] Published plan read failed.', error);
+  return new Response('Published plan information is temporarily unavailable.', { status: 503 });
+}
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+const telemetry = await planTelemetryMetadata(plan);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{plan.title} · Plan policy review</title>
+    <meta name="description" content={plan.summary || `Published policy review for ${plan.title}.`} />
+  </head>
+  <body>
+    <main class="plan-page" data-telemetry-page={telemetry.pageId} data-telemetry-revision={telemetry.revision}>
+      <nav aria-label="Breadcrumb"><a href="/wiki">Policy Wiki</a> / <span>{plan.title}</span></nav>
+      <header><h1>{plan.title}</h1>{plan.summary && <p>{plan.summary}</p>}</header>
+      <PlanFindings result={projection} />
+    </main>
+    <TelemetryConsent />
+  </body>
+</html>
+
+<style>
+  .plan-page { max-width: 54rem; margin: auto; padding: 2rem 1.25rem 4rem; }
+  nav { margin-bottom: 1.5rem; color: #53615d; }
+  header { border-bottom: 2px solid #2f524c; padding-bottom: 1rem; }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); }
+</style>

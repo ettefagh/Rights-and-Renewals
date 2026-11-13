@@ -83,6 +83,12 @@ export const policyFields = [
     },
     defaultValue: [],
   },
+  {
+    slug: 'logo',
+    label: 'Brand logo',
+    type: 'image',
+    required: false,
+  },
 ];
 
 export const policyCollection = {

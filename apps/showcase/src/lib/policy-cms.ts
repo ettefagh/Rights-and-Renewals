@@ -12,6 +12,7 @@ export interface CmsPolicyFields {
   cancellation_notice_months: number;
   cancellation_button_compliant: boolean;
   cancellation_url?: string | null;
+  logo?: { id?: string; src?: string; alt?: string; provider?: string } | null;
   support_email?: string | null;
   legal_notes: string;
   verified_date: string;
@@ -47,6 +48,14 @@ function optionalEmail(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
   const trimmed = value.trim();
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed) ? trimmed : undefined;
+}
+
+function policyLogoMediaId(value: unknown): string | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const media = value as { id?: unknown; provider?: unknown };
+  if (media.provider !== undefined && media.provider !== 'local') return undefined;
+  const id = media.id;
+  return typeof id === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(id) ? id : undefined;
 }
 
 async function runWithoutDraftVisibility<T>(read: () => Promise<T>): Promise<T> {
@@ -87,6 +96,7 @@ function mapPolicyEntry(entry: CmsPolicyEntry): PolicyWikiEntry {
   const verifiedDate = dateValidation.date;
 
   const cancellationUrl = optionalSafeUrl(data.cancellation_url);
+  const logoUrl = policyLogoMediaId(data.logo) ? `/api/brand-policy-logos/${slug}` : undefined;
   const supportEmail = optionalEmail(data.support_email);
   if (data.support_email != null && data.support_email !== '' && !supportEmail) {
     throw new Error(`EmDash policy '${slug}' has an invalid support_email field.`);
@@ -100,6 +110,7 @@ function mapPolicyEntry(entry: CmsPolicyEntry): PolicyWikiEntry {
     cancellationNoticeMonths: requiredWholeNumber(data.cancellation_notice_months, 'cancellation_notice_months', slug),
     cancellationButtonCompliant: data.cancellation_button_compliant,
     ...(cancellationUrl ? { cancellationUrl } : {}),
+    ...(logoUrl ? { logoUrl } : {}),
     ...(supportEmail ? { supportEmail } : {}),
     legalNotes: requiredString(data.legal_notes, 'legal_notes', slug),
     verifiedDate,
@@ -107,6 +118,22 @@ function mapPolicyEntry(entry: CmsPolicyEntry): PolicyWikiEntry {
       .map((item) => (item as { alias: string }).alias.trim())
       .filter(Boolean),
   };
+}
+
+/** Return the native media id only when the published policy currently references it. */
+export async function getPublishedPolicyLogoMediaId(slug: string): Promise<string | null> {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return null;
+  return runWithoutDraftVisibility(async () => {
+    const { entry, error, isPreview } = await getEmDashEntry<typeof POLICY_COLLECTION, CmsPolicyFields>(POLICY_COLLECTION, slug);
+    if (error) throw error;
+    if (!entry || isPreview) return null;
+    try {
+      mapPolicyEntry(entry);
+      return policyLogoMediaId(entry.data.logo) ?? null;
+    } catch {
+      return null;
+    }
+  });
 }
 
 export async function getPublishedPolicies(): Promise<PolicyWikiEntry[]> {

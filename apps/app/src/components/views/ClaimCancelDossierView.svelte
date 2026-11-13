@@ -109,7 +109,13 @@
     </button>
     <div class="header-titles">
       <p class="page-eyebrow">Draft · review before sending</p>
-      <h2 class="page-title">Claim or cancellation draft</h2>
+      <h2 class="page-title">
+        {item?.category === 'subscription'
+          ? 'Cancellation draft'
+          : item?.category === 'hardware'
+            ? 'Claim draft'
+            : 'Claim or cancellation draft'}
+      </h2>
     </div>
   </div>
 

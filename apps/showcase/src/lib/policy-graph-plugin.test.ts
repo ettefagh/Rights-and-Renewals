@@ -1,0 +1,161 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+
+const emdash = vi.hoisted(() => ({
+  definePlugin: vi.fn((definition: unknown) => definition), getEmDashReferences: vi.fn(),
+  getRequestContext: vi.fn(() => undefined), runWithContext: vi.fn((_ctx, callback) => callback()),
+}));
+vi.mock('emdash', () => emdash);
+vi.mock('astro/zod', async () => await import('zod'));
+
+import { createPlugin } from './policy-graph-plugin.js';
+import { sha256Json } from './policy-graph.js';
+
+const assessmentId = '01ASSESSMENT';
+const referenceIds = {
+  offer_version: ['01OFFER'], rule_versions: ['01RULE'], evidence: ['01EVIDENCE'],
+};
+const versions = new Map<string, any>([
+  ['policy_assessments:01ASSESSMENT', { item: { id: assessmentId, status: 'draft', authorId: 'author', data: { id: assessmentId, review_expires_at: '2027-01-01T00:00:00Z', terms_statement: 'review me' } }, _rev: 'rev-7' }],
+  ['policy_offer_versions:01OFFER', { item: { id: '01OFFER', status: 'published', data: { version_key: 'offer-v1', label: 'Offer' } }, _rev: 'offer-rev' }],
+  ['policy_rule_versions:01RULE', { item: { id: '01RULE', status: 'published', data: { version_key: 'rule-v1', label: 'Rule' } }, _rev: 'rule-rev' }],
+  ['policy_evidence:01EVIDENCE', { item: { id: '01EVIDENCE', status: 'published', data: { stable_key: 'evidence-v1', excerpt: 'Evidence' } }, _rev: 'evidence-rev' }],
+]);
+
+function fakeContext() {
+  emdash.getEmDashReferences.mockImplementation(async (_collection: string, _id: string, field: keyof typeof referenceIds) => ({
+    entries: referenceIds[field].map((id) => ({ id: `${id}-slug`, data: { id } })), nextCursor: undefined,
+  }));
+  return {
+    content: { getVersioned: vi.fn(async (collection: string, id: string) => versions.get(`${collection}:${id}`) ?? null) },
+    storage: {
+      approvals: { get: vi.fn(async () => null), getVersioned: vi.fn(async () => null), compareAndSet: vi.fn(async () => ({ applied: true, revision: 'approval-r1' })) },
+      approval_audit: { compareAndSet: vi.fn(async () => ({ applied: true, revision: 'audit-r1' })) },
+    },
+    log: { error: vi.fn() },
+  };
+}
+
+describe('native policy review plugin', () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('exports an Astro native createPlugin factory and registers publication/scheduling gates', () => {
+    const plugin = createPlugin();
+    expect(emdash.definePlugin).toHaveBeenCalled();
+    expect(plugin.capabilities).toContain('content:write');
+    expect(plugin).toMatchObject({
+      id: 'cmlab-policy-graph-review',
+      hooks: {
+        'content:beforeSave': { handler: expect.any(Function), errorPolicy: 'abort' },
+        'content:beforePublish': expect.any(Function),
+        'content:beforeSchedule': expect.any(Function),
+      },
+      routes: { reviewAssessment: { permission: 'content:publish_any' }, approveAssessment: { permission: 'content:publish_any' } },
+    });
+    expect(plugin.capabilities).toContain('content:publish');
+    const astroConfig = readFileSync(new URL('../../astro.config.mjs', import.meta.url), 'utf8');
+    expect(astroConfig).toMatch(/id: 'cmlab-policy-graph-review'[\s\S]*?capabilities: \['content:read', 'content:write', 'content:publish', 'hooks\.content-policy:register'\][\s\S]*?hooks: \['content:beforeSave', 'content:beforePublish', 'content:beforeSchedule'\]/);
+  });
+
+  it('re-reads current draft relation edges and blocks publication without matching protected approval', async () => {
+    const plugin = createPlugin() as unknown as { hooks: Record<string, (event: unknown, context: unknown) => Promise<unknown>> };
+    const ctx = fakeContext();
+    const result = await plugin.hooks['content:beforePublish']!({ collection: 'policy_assessments', content: { id: assessmentId } }, ctx);
+    expect(emdash.getEmDashReferences).toHaveBeenCalledTimes(3);
+    expect(result).toMatchObject({ cancel: true });
+  });
+
+  it('allows publication for a current protected approval whose canonical relation and content hashes match', async () => {
+    const plugin = createPlugin() as unknown as { hooks: Record<string, (event: unknown, context: unknown) => Promise<unknown>> };
+    const ctx = fakeContext();
+    const assessment = versions.get('policy_assessments:01ASSESSMENT')!;
+    const clean = (data: Record<string, unknown>) => Object.fromEntries(Object.entries(data).filter(([key]) => !['id', 'revision_hash', '_rev', 'slug', 'url', 'references', 'status', 'authorId', 'createdAt', 'updatedAt'].includes(key)));
+    const selected = { offer_version: ['01OFFER'], rule_versions: ['01RULE'], evidence: ['01EVIDENCE'] };
+    const assessmentHash = await sha256Json({ data: clean(assessment.item.data), selected });
+    const dependency = async (collection: string, id: string, revision: string) => ({
+      id, revision, contentHash: await sha256Json(clean(versions.get(`${collection}:${id}`)!.item.data)),
+    });
+    const dependencies = [
+      await dependency('policy_offer_versions', '01OFFER', 'offer-v1'),
+      await dependency('policy_rule_versions', '01RULE', 'rule-v1'),
+      await dependency('policy_evidence', '01EVIDENCE', 'evidence-v1'),
+    ].sort((a, b) => a.id.localeCompare(b.id));
+    (ctx.storage.approvals.get as ReturnType<typeof vi.fn>).mockResolvedValue({
+      assessmentId, assessmentRevision: assessmentHash, assessmentHash, assessmentFieldsHash: assessmentHash,
+      sourceRevision: assessment._rev, dependencies, reviewerId: 'independent-reviewer',
+      approvedAt: '2026-11-01T00:00:00Z', expiresAt: '2026-12-01T00:00:00Z',
+    });
+    expect(await plugin.hooks['content:beforePublish']!({ collection: 'policy_assessments', content: { id: assessmentId } }, ctx)).toBeUndefined();
+  });
+
+  it('blocks edits to already published rule versions so their identity stays immutable', async () => {
+    const plugin = createPlugin() as unknown as { hooks: Record<string, { handler: (event: unknown, context: unknown) => Promise<unknown> }> };
+    await expect(plugin.hooks['content:beforeSave']!.handler({ collection: 'policy_rule_versions', id: '01RULE', content: {} }, fakeContext())).rejects.toThrow('immutable');
+  });
+
+  it('blocks edits to formerly published versions even after they are unpublished', async () => {
+    const plugin = createPlugin() as unknown as { hooks: Record<string, { handler: (event: unknown, context: unknown) => Promise<unknown> }> };
+    const ctx = fakeContext();
+    const getVersioned = ctx.content.getVersioned as ReturnType<typeof vi.fn>;
+    getVersioned.mockResolvedValue({
+      item: { id: '01RULE', status: 'draft', publishedAt: '2026-11-10T00:00:00Z', liveRevisionId: null, data: {} },
+      _rev: 'rev-after-unpublish',
+    });
+    await expect(plugin.hooks['content:beforeSave']!.handler({ collection: 'policy_rule_versions', id: '01RULE', content: {} }, ctx)).rejects.toThrow('immutable');
+  });
+
+  it('allows a draft source version without a hand-entered revision hash and ignores supplied hash metadata', async () => {
+    const plugin = createPlugin() as unknown as { hooks: Record<string, (event: unknown, context: unknown) => Promise<unknown>> };
+    const rule = versions.get('policy_rule_versions:01RULE')!;
+    versions.set('policy_rule_versions:01RULE', {
+      ...rule,
+      item: { ...rule.item, status: 'draft', data: { ...rule.item.data, revision_hash: 'incorrect-editor-value' } },
+    });
+    expect(await plugin.hooks['content:beforePublish']!({ collection: 'policy_rule_versions', content: { id: '01RULE' } }, fakeContext())).toBeUndefined();
+    versions.set('policy_rule_versions:01RULE', {
+      ...rule,
+      item: { ...rule.item, status: 'draft', data: { version_key: 'rule-v1', label: 'Rule' } },
+    });
+    expect(await plugin.hooks['content:beforePublish']!({ collection: 'policy_rule_versions', content: { id: '01RULE' } }, fakeContext())).toBeUndefined();
+    versions.set('policy_rule_versions:01RULE', rule);
+  });
+
+  it('fails closed when a newly selected dependency is unpublished or a relation read errors', async () => {
+    const plugin = createPlugin() as unknown as { hooks: Record<string, (event: unknown, context: unknown) => Promise<unknown>> };
+    const ctx = fakeContext();
+    const draftRule = versions.get('policy_rule_versions:01RULE')!;
+    versions.set('policy_rule_versions:01RULE', { ...draftRule, item: { ...draftRule.item, status: 'draft' } });
+    const rejected = await plugin.hooks['content:beforePublish']!({ collection: 'policy_assessments', content: { id: assessmentId } }, ctx);
+    expect(rejected).toMatchObject({ cancel: true });
+    expect(ctx.storage.approvals.get).not.toHaveBeenCalled();
+    versions.set('policy_rule_versions:01RULE', draftRule);
+    emdash.getEmDashReferences.mockImplementationOnce(async () => ({ entries: [], error: new Error('edge read failed') }));
+    expect(await plugin.hooks['content:beforePublish']!({ collection: 'policy_assessments', content: { id: assessmentId } }, ctx)).toMatchObject({ cancel: true });
+  });
+
+  it('rejects author self-review and uses conditional protected writes for an independent reviewer', async () => {
+    const plugin = createPlugin() as unknown as { routes: Record<string, { handler: (route: any) => Promise<any> }> };
+    const ctx = fakeContext();
+    const base = { ...ctx, request: new Request('https://cms.test/review?assessmentId=01ASSESSMENT'), user: { id: 'author', role: 40 }, input: {} };
+    const review = await plugin.routes.reviewAssessment!.handler(base);
+    expect(review.sources).toEqual(expect.arrayContaining([
+      expect.objectContaining({ collection: 'policy_offer_versions', id: '01OFFER', title: 'Offer', revision: 'offer-v1', contentHash: expect.any(String) }),
+      expect.objectContaining({ collection: 'policy_rule_versions', id: '01RULE', title: 'Rule', revision: 'rule-v1', contentHash: expect.any(String) }),
+      expect.objectContaining({ collection: 'policy_evidence', id: '01EVIDENCE', title: 'evidence-v1', revision: 'evidence-v1', contentHash: expect.any(String) }),
+    ]));
+    expect(review.sources.map((source: { contentHash: string }) => source.contentHash).sort())
+      .toEqual(review.dependencies.map((dependency: { contentHash: string }) => dependency.contentHash).sort());
+    await expect(plugin.routes.approveAssessment!.handler({ ...base, input: { assessmentId, expectedRevision: 'rev-7', expectedApprovalRevision: null } })).rejects.toThrow('Review could not be completed');
+    for (const role of [undefined, Number.NaN, '40', 20, 30]) {
+      await expect(plugin.routes.reviewAssessment!.handler({ ...base, user: { id: 'reviewer', role } }))
+        .rejects.toThrow('authenticated Editor or Admin');
+      await expect(plugin.routes.approveAssessment!.handler({ ...base, user: { id: 'reviewer', role }, input: { assessmentId, expectedRevision: 'rev-7', expectedApprovalRevision: null } }))
+        .rejects.toThrow('authenticated Editor or Admin');
+    }
+    const route = { ...base, user: { id: 'independent-reviewer', role: 40 }, input: { assessmentId, expectedRevision: 'rev-7', expectedApprovalRevision: null } };
+    const result = await plugin.routes.approveAssessment!.handler(route);
+    expect(result.reviewerId).toBe('independent-reviewer');
+    expect(ctx.storage.approval_audit.compareAndSet).toHaveBeenCalledWith(expect.any(String), null, expect.objectContaining({ reviewerId: 'independent-reviewer' }));
+    expect(ctx.storage.approvals.compareAndSet).toHaveBeenCalledWith(assessmentId, null, expect.objectContaining({ reviewerId: 'independent-reviewer' }));
+  });
+});

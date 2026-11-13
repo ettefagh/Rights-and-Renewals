@@ -21,6 +21,15 @@ if (!workerFetch) throw new Error('EmDash Worker handler does not export fetch.'
 
 const fetchWithRequestOrigin: ExportedHandlerFetchHandler<Env> = async (request, env, context) => {
   const url = new URL(request.url);
+  // A fresh isolated preview must not expose first-admin enrollment before Access
+  // protection is established. Public published projections remain available.
+  if ('CMLAB_PREVIEW_EDITORIAL_LOCK' in env && env.CMLAB_PREVIEW_EDITORIAL_LOCK === 'true'
+    && (url.pathname === '/_emdash' || url.pathname.startsWith('/_emdash/'))) {
+    return new Response('Editorial preview is locked pending protected administrator setup.', {
+      status: 503,
+      headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' },
+    });
+  }
   const shouldTemplate = usesOriginTemplate(url.pathname);
   let assetRequest = request;
 

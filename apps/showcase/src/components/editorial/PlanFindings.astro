@@ -1,0 +1,67 @@
+---
+import type { PolicyPlanResult } from '../../lib/policy-graph.js';
+
+interface Props {
+  result: PolicyPlanResult;
+}
+
+const { result } = Astro.props;
+const applicabilityText = {
+  applicable: 'The reviewed material matches the supplied context.',
+  not_applicable: 'No reviewed rule matched the supplied context.',
+  needs_information: 'More information or a current review is needed.',
+  ambiguous: 'Published reviews conflict for the same offer and rule.',
+}[result.applicability];
+const findingText = {
+  no_issue_identified: 'No issue identified in this review',
+  missing_required_disclosure: 'A required disclosure may be missing',
+  implementation_gap: 'A possible implementation gap was recorded',
+  possible_conflict: 'A possible conflict was recorded',
+  unresolved: 'The review is unresolved',
+  not_assessed: 'This point has not been assessed',
+};
+const generalRules = [...new Map(result.findings.map((finding) => [finding.ruleVersionId, finding.rule])).values()];
+---
+
+<section aria-labelledby="plan-status-title">
+  <h2 id="plan-status-title">Review status</h2>
+  <p class="status" data-state={result.applicability}>
+    <span aria-hidden="true">{result.applicability === 'applicable' ? '✓' : result.applicability === 'ambiguous' ? '!' : 'i'}</span>
+    {applicabilityText}
+  </p>
+  {result.reason === 'missing_context' && <p>Provide the missing country, contract date, sales channel, or customer type that applies to this offer.</p>}
+  {result.reason === 'no_approved_assessment' && <p>No current protected review is available for this offer. This does not establish whether a rule applies.</p>}
+  {result.reason === 'no_matching_offer' && <p>No published offer version was found for this plan and context. No legal conclusion is inferred.</p>}
+  {result.truncated && <p>More reviewed findings exist than this page can display. The displayed list is incomplete; narrow the context or request a scoped view.</p>}
+  {result.termsStatement && <p><strong>Published offer terms:</strong> {result.termsStatement}</p>}
+  {result.productObservation && <p><strong>Product observation from review:</strong> {result.productObservation}</p>}
+
+  <h2>General rules in reviewed findings</h2>
+  {generalRules.length ? (
+    <ul>{generalRules.map((rule) => <li><p>{rule.statement}</p><small>Source: <a href={rule.sourceUrl} rel="noopener noreferrer">{rule.sourceUrl}</a></small></li>)}</ul>
+  ) : <p>No reviewed rule is available for this plan and context.</p>}
+
+  <h2>Reviewed findings</h2>
+  {result.findings.length ? (
+    <ol class="findings">
+      {result.findings.map((finding) => (
+        <li>
+          <h3><span aria-hidden="true">{finding.findingState === 'no_issue_identified' ? '✓' : finding.findingState === 'possible_conflict' ? '!' : '•'}</span> {findingText[finding.findingState]}</h3>
+          <p>{finding.rule.statement}</p>
+          <p class="provenance"><strong>Evidence:</strong> {finding.evidence.map((evidence) => evidence.publicExcerpt || evidence.id).join(' · ')}</p>
+          <p class="provenance">Reviewed {new Date(finding.reviewedAt).toLocaleDateString('en-GB', { timeZone: 'UTC' })}; review expires {new Date(finding.reviewExpiresAt).toLocaleDateString('en-GB', { timeZone: 'UTC' })}.</p>
+        </li>
+      ))}
+    </ol>
+  ) : <p>No current protected findings are published for this plan.</p>}
+  <p class="notice">This is a dated editorial review, not legal advice or a guarantee of provider compliance.</p>
+</section>
+
+<style>
+  section { display: grid; gap: 0.75rem; }
+  h2 { margin: 1.5rem 0 0.25rem; }
+  .status { border-inline-start: 4px solid #2f524c; padding: 0.75rem 1rem; background: #f1f5f4; }
+  .findings { padding-inline-start: 1.5rem; }
+  .findings li { border-top: 1px solid #d8dfdc; padding: 1rem 0; }
+  .provenance, .notice { color: #53615d; font-size: 0.9rem; }
+</style>

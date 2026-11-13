@@ -1,0 +1,109 @@
+.machine-reader-shell {
+  width: min(100% - 32px, 960px);
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 56px) 0 calc(112px + env(safe-area-inset-bottom, 0px));
+}
+
+.machine-reader-header {
+  padding: clamp(20px, 4vw, 34px);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 20px;
+  background: var(--color-surface-card);
+  box-shadow: var(--elevation-sm);
+}
+
+.machine-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.machine-brand img { display: block; }
+
+.machine-reader-kicker {
+  margin: 28px 0 7px;
+  color: var(--color-brand-primary);
+  font-size: .76rem;
+  font-weight: 750;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.machine-reader-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.machine-reader-title-row h1 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: -.045em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.raw-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--color-brand-primary);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-brand-primary);
+  font-size: .88rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.raw-link:hover {
+  background: var(--color-surface-subtle);
+  color: var(--color-brand-primary);
+}
+
+.machine-reader-description {
+  max-width: 65ch;
+  margin: 12px 0 0;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.machine-document {
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 16px;
+  background: var(--color-surface-card);
+  box-shadow: var(--elevation-sm);
+}
+
+.machine-document pre {
+  max-height: min(68vh, 860px);
+  margin: 0;
+  padding: clamp(18px, 3vw, 30px);
+  overflow: auto;
+  color: var(--color-text-primary);
+  font: 13px/1.7 var(--font-mono);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  tab-size: 2;
+}
+
+.machine-document code { color: inherit; }
+
+@media (max-width: 560px) {
+  .machine-reader-shell { width: min(100% - 24px, 960px); }
+  .machine-reader-header { border-radius: 16px; }
+  .machine-reader-title-row { align-items: flex-start; }
+  .machine-reader-title-row h1 { flex-basis: 100%; }
+  .machine-document { border-radius: 14px; }
+  .machine-document pre { font-size: 12px; }
+}

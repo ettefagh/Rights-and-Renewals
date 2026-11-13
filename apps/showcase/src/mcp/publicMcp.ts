@@ -7,6 +7,7 @@ import {
 } from '@cmlab/core';
 import type { PolicyWikiEntry } from '@cmlab/core';
 import { getPublishedPolicies } from '../lib/policy-cms';
+import { parsePolicyContext, resolvePublishedPlanProjection } from '../lib/policy-graph-cms.js';
 import { z } from 'zod';
 
 const protocolVersions = ['2025-11-25', '2025-06-18', '2025-03-26'];
@@ -61,6 +62,13 @@ const subscriptionInput = z.object({
   contract_category: nonempty.optional(),
   contract_start_date: nonempty.optional(),
 }).strict().refine(input => input.subscription_type || input.contract_category, 'subscription_type or contract_category is required');
+const planPolicyInput = z.object({
+  plan: z.string().trim().min(1).max(160),
+  country: z.string().trim().max(2).optional(),
+  contractDate: z.string().trim().max(40).optional(),
+  channel: z.enum(['web', 'app', 'phone', 'in_person', 'other']).optional(),
+  customerKind: z.enum(['consumer', 'business']).optional(),
+}).strict();
 
 const string = { type: 'string' };
 const nullableString = { type: ['string', 'null'] };
@@ -173,6 +181,34 @@ export const publicMcpTools = [
       extraordinary_termination: string,
       sources: sourceLinks,
     }, { contract_start_date: nullableString, dark_pattern_alert: string }),
+  },
+  {
+    name: 'plan_policy_lookup',
+    description: 'Read the published policy projection for one cataloged plan using explicit optional contract context. Findings include only current protected approvals.',
+    annotations: { readOnlyHint: true, openWorldHint: false },
+    inputSchema: {
+      type: 'object',
+      properties: {
+        plan: { ...string, minLength: 1, maxLength: 160, description: 'Published plan slug or stable catalog key' },
+        country: { ...string, minLength: 2, maxLength: 2 },
+        contractDate: { ...string, maxLength: 40, description: 'ISO calendar date or datetime' },
+        channel: { ...string, enum: ['web', 'app', 'phone', 'in_person', 'other'] },
+        customerKind: { ...string, enum: ['consumer', 'business'] },
+      },
+      required: ['plan'], additionalProperties: false,
+    },
+    outputSchema: {
+      type: 'object',
+      properties: {
+        schemaVersion: { type: 'integer', const: 1 }, plan: string,
+        context: { type: 'object', properties: { country: string, contractDate: string, channel: string, customerKind: string }, additionalProperties: false },
+        applicability: { ...string, enum: ['applicable', 'not_applicable', 'needs_information', 'ambiguous'] },
+        reason: string, offerVersion: { type: 'object' }, termsStatement: string, productObservation: string,
+        truncated: { type: 'boolean' },
+        findings: { type: 'array', maxItems: 500, items: { type: 'object' } },
+      },
+      required: ['schemaVersion', 'plan', 'context', 'applicability', 'findings'], additionalProperties: false,
+    },
   },
 ];
 
@@ -309,6 +345,25 @@ export async function handlePublicMcp(request: Request): Promise<Response> {
       });
       if (!normalized.success) return invalidParams(normalized.error.issues[0]?.message ?? 'Invalid subscription rule arguments.');
       return toolResult(handleSubscriptionCategoryRules(normalized.data));
+    }
+    case 'plan_policy_lookup': {
+      const input = planPolicyInput.safeParse(args);
+      if (!input.success) return invalidParams(input.error.issues[0]?.message ?? 'Invalid plan policy lookup arguments.');
+      if (input.data.country && !/^[a-z]{2}$/i.test(input.data.country)) return invalidParams('country must be a two-letter country code.');
+      const params = new URLSearchParams();
+      for (const key of ['country', 'contractDate', 'channel', 'customerKind'] as const) {
+        const value = input.data[key];
+        if (value) params.set(key, value);
+      }
+      let context: ReturnType<typeof parsePolicyContext>;
+      try { context = parsePolicyContext(params); }
+      catch (error) { return invalidParams(error instanceof Error ? error.message : 'Invalid request context.'); }
+      try {
+        return toolResult(await resolvePublishedPlanProjection(input.data.plan, context));
+      } catch (error) {
+        console.error('[mcp] Failed to read published plan policy.', error);
+        return toolError('Published plan information is temporarily unavailable.');
+      }
     }
     default:
       return error(id, -32602, `Unknown tool '${name}'`);

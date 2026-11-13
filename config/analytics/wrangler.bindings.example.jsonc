@@ -1,0 +1,23 @@
+{
+  // Merge into the existing Worker's config only after a dedicated review.
+  "analytics_engine_datasets": [
+    { "binding": "ANALYTICS", "dataset": "cmlab_editorial_events" }
+  ],
+  "ratelimits": [
+    {
+      "name": "PUBLIC_EVENTS_RATE_LIMITER",
+      "namespace_id": "REPLACE_WITH_ACCOUNT_UNIQUE_INTEGER",
+      "simple": { "limit": 120, "period": 60 }
+    }
+  ],
+  // Configure as deployment environment variables or secrets in the host.
+  "vars": {
+    "PUBLIC_EVENTS_ENABLED": "false",
+    "PUBLIC_EVENTS_ORIGINS": "https://REPLACE_WITH_PUBLIC_ORIGIN",
+    "PUBLIC_EVENT_PAGE_IDS": "",
+    "PUBLIC_EVENT_ENTITY_IDS": "",
+    "PUBLIC_EVENT_BLOCK_IDS": "",
+    "PUBLIC_EVENT_CTA_IDS": "",
+    "PUBLIC_EVENT_REVISIONS": ""
+  }
+}

@@ -1,11 +1,14 @@
 ---
 import type { PolicyWikiEntry } from '@cmlab/core';
-import { getPublishedPolicies } from '../../lib/policy-cms';
+import { getPublishedPolicies } from '../../lib/policy-cms.js';
 import BrandIcon from '../../components/BrandIcon.svelte';
 import AudienceSwitch from '../../components/AudienceSwitch.astro';
-import { Menu } from 'lucide-svelte';
+import TelemetryConsent from '../../components/TelemetryConsent.astro';
+import { policyTelemetryMetadata, wikiTelemetryMetadata } from '../../lib/telemetry-page-metadata.js';
+import { ChevronRight, Menu, Search } from 'lucide-svelte';
 import '../../../styles/tokens.css';
 import '../../../styles/main.css';
+import '../../../styles/policy-wiki.css';
 
 export const prerender = false;
 
@@ -23,6 +26,16 @@ try {
 
 const subscriptions = policies.filter((b) => b.category === 'subscription');
 const hardware = policies.filter((b) => b.category === 'hardware');
+const wikiTelemetry = await wikiTelemetryMetadata();
+const policyTelemetry = new Map(await Promise.all(policies.map(async (policy) => [
+  policy.brandSlug,
+  await policyTelemetryMetadata(policy),
+] as const)));
+const policySearchText = (brand: PolicyWikiEntry) =>
+  [brand.brandName, brand.brandSlug, brand.category, brand.legalNotes, ...(brand.searchAliases ?? [])]
+    .filter(Boolean)
+    .join(' ')
+    .toLocaleLowerCase('de');
 ---
 
 <!DOCTYPE html>
@@ -30,8 +43,8 @@ const hardware = policies.filter((b) => b.category === 'hardware');
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Rights &amp; Renewals · Brand Policy Wiki</title>
-  <meta name="description" content="Veröffentlichte BGB-Kündigungsfristen und Gewährleistungsrichtlinien aus dem Rights &amp; Renewals EmDash CMS." />
+  <title>Rights &amp; Renewals · Brand Policy Wiki · 20 brands</title>
+  <meta name="description" content="Public information about cancellation periods and statutory warranty rules for 20 brands in Germany." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -152,7 +165,7 @@ const hardware = policies.filter((b) => b.category === 'hardware');
     }
   </style>
 </head>
-<body class="showcase-shell">
+<body class="showcase-shell policy-wiki-page">
 
   <!-- Header -->
   <header role="banner" id="app-header" class="showcase-header">
@@ -163,10 +176,11 @@ const hardware = policies.filter((b) => b.category === 'hardware');
       </a>
 
       <nav class="nav-links" aria-label="Main Navigation">
-        <a href="/" class="nav-item">Showcase</a>
-        <a href="/wiki" class="nav-item font-bold">Brand Policy Wiki</a>
+        <a href="/#wallet-demo" class="nav-item">Wallet demo</a>
+        <a href="/wiki" class="nav-item font-bold" aria-current="page">Policy Wiki</a>
         <a href="/emdash" class="nav-item">EmDash CMS</a>
-        <a href="/#mcp-playground" class="nav-item">MCP Console</a>
+        <a href="/#mcp-playground" class="nav-item">MCP Playground</a>
+        <a href="/agent-setup" class="nav-item">Agent setup</a>
       </nav>
 
       <div class="nav-actions">
@@ -177,85 +191,98 @@ const hardware = policies.filter((b) => b.category === 'hardware');
       <details class="mobile-nav">
         <summary aria-label="Menu"><Menu size={24} aria-hidden="true" /><span class="sr-only">Menu</span></summary>
         <nav class="mobile-nav-panel" aria-label="Mobile navigation">
-          <a href="/">Showcase</a>
-          <a href="/wiki">Brand Policy Wiki</a>
+          <a href="/#wallet-demo">Wallet demo</a>
+          <a href="/wiki" aria-current="page">Policy Wiki</a>
           <a href="/emdash">EmDash CMS</a>
           <a href="/#mcp-playground">MCP Playground</a>
+          <a href="/agent-setup">Agent setup</a>
           <a href="https://rightsandrenewals-app.pages.dev/" data-legacy-url="https://app.cm-lab.pages.dev/" target="_blank" rel="noopener noreferrer">Open wallet</a>
         </nav>
       </details>
     </div>
   </header>
 
-  <main class="wiki-container">
+  <main class="wiki-container" data-telemetry-page={wikiTelemetry.pageId} data-telemetry-revision={wikiTelemetry.revision}>
     <AudienceSwitch humanHref="/wiki/" machineHref="/machine/view/wiki" />
     <div class="wiki-hero">
-      <div class="hero-pill-badge" style="margin-bottom: var(--space-4, 16px);">
-        <span>🏛️ BGB §§ 309, 312k, 438, 477</span> · <span>{policies.length} veröffentlichte Marken</span> · <span>EmDash CMS</span>
-      </div>
+      <p class="wiki-kicker">Public reference · {policies.length} brands</p>
       <h1>Brand Policy Wiki</h1>
       <p>
-        Public information about cancellation periods and statutory warranty rules for students and consumers in Germany. Browse the brand records below; this directory does not provide individual legal advice.
+        Browse cancellation and warranty information for purchases and subscriptions in Germany. These public records are general information, not individual legal advice.
       </p>
     </div>
 
-    {cmsUnavailable && (
-      <div role="alert" class="brand-card" style="margin-bottom: var(--space-6, 24px);">
-        <strong>Das Markenverzeichnis ist vorübergehend nicht verfügbar.</strong>
-        <p>Es werden nur aktuell veröffentlichte CMS-Einträge angezeigt. Bitte später erneut versuchen.</p>
-      </div>
-    )}
+    <form class="wiki-search" id="wiki-search-form" role="search">
+      <Search size={21} aria-hidden="true" />
+      <label class="sr-only" for="wiki-search">Search brands and policies</label>
+      <input id="wiki-search" type="search" placeholder="Search brands and policies" autocomplete="off" />
+      <button type="reset" aria-label="Clear policy search">Clear</button>
+    </form>
+    {cmsUnavailable && <p role="status">Published policy content is temporarily unavailable.</p>}
+    <p class="wiki-result-count" id="wiki-result-count" aria-live="polite">{policies.length} brands</p>
 
     <!-- Subscriptions Section -->
-    <h2 class="category-section-title">🔄 Subscriptions &amp; digital services ({subscriptions.length})</h2>
-    <div class="brand-grid">
+    <section class="policy-list-group" data-brand-group aria-labelledby="subscription-list-title">
+      <h2 class="category-section-title" id="subscription-list-title">Subscriptions &amp; digital services <span>({subscriptions.length})</span></h2>
+      <div class="policy-brand-list">
       {subscriptions.map((brand: PolicyWikiEntry) => (
-        <a href={`/wiki/${brand.brandSlug}`} class="brand-card">
-          <div class="brand-card-top">
-            <div class="brand-card-avatar" aria-hidden="true">
-              <BrandIcon slug={brand.brandSlug} size={28} />
-            </div>
-            <div>
-              <h3 class="brand-card-name">{brand.brandName}</h3>
-              <span class="brand-card-category">Cancellation notice: up to {brand.cancellationNoticeMonths} month(s)</span>
-            </div>
-          </div>
-          <div class="brand-card-meta">
-            {brand.cancellationButtonCompliant ? '✓ § 312k cancellation button compliant' : 'Cancellation status pending review'}
-          </div>
-          <div class="brand-card-action">
-            <span>View policy &amp; cancellation details</span>
-            <span>→</span>
-          </div>
+        <a href={`/wiki/${brand.brandSlug}`} class="policy-brand-row" data-brand-row data-search={policySearchText(brand)} data-telemetry-policy-id={policyTelemetry.get(brand.brandSlug)?.entityId} data-telemetry-entity-revision={policyTelemetry.get(brand.brandSlug)?.revision}>
+          <span class="policy-brand-mark" aria-hidden="true"><BrandIcon slug={brand.brandSlug} brandName={brand.brandName} logoUrl={brand.logoUrl} size={27} decorative /></span>
+          <span class="policy-brand-main"><strong>{brand.brandName}</strong><small>Subscription · cancellation policy</small></span>
+          <span class="policy-brand-meta">{brand.cancellationButtonCompliant ? '§ 312k button listed' : 'Policy status under review'}</span>
+          <ChevronRight size={19} aria-hidden="true" />
         </a>
       ))}
-    </div>
+      </div>
+    </section>
 
     <!-- Hardware Section -->
-    <h2 class="category-section-title" style="margin-top: var(--space-12, 48px);">📦 Hardware &amp; electronics ({hardware.length})</h2>
-    <div class="brand-grid">
+    <section class="policy-list-group" data-brand-group aria-labelledby="hardware-list-title">
+      <h2 class="category-section-title" id="hardware-list-title">Hardware &amp; electronics <span>({hardware.length})</span></h2>
+      <div class="policy-brand-list">
       {hardware.map((brand: PolicyWikiEntry) => (
-        <a href={`/wiki/${brand.brandSlug}`} class="brand-card">
-          <div class="brand-card-top">
-            <div class="brand-card-avatar" aria-hidden="true">
-              <BrandIcon slug={brand.brandSlug} size={28} />
-            </div>
-            <div>
-              <h3 class="brand-card-name">{brand.brandName}</h3>
-              <span class="brand-card-category">{brand.statutoryWarrantyMonths} month statutory warranty (§ 438)</span>
-            </div>
-          </div>
-          <div class="brand-card-meta">
-            12 month reversal of the burden of proof (§ 477(1) BGB) {brand.commercialGuaranteeMonths > 0 ? `+ ${brand.commercialGuaranteeMonths} month commercial guarantee` : ''}
-          </div>
-          <div class="brand-card-action">
-            <span>View guarantee &amp; BGB details</span>
-            <span>→</span>
-          </div>
+        <a href={`/wiki/${brand.brandSlug}`} class="policy-brand-row" data-brand-row data-search={policySearchText(brand)} data-telemetry-policy-id={policyTelemetry.get(brand.brandSlug)?.entityId} data-telemetry-entity-revision={policyTelemetry.get(brand.brandSlug)?.revision}>
+          <span class="policy-brand-mark" aria-hidden="true"><BrandIcon slug={brand.brandSlug} brandName={brand.brandName} logoUrl={brand.logoUrl} size={27} decorative /></span>
+          <span class="policy-brand-main"><strong>{brand.brandName}</strong><small>Purchase · statutory warranty</small></span>
+          <span class="policy-brand-meta">{brand.statutoryWarrantyMonths} months · § 438 BGB</span>
+          <ChevronRight size={19} aria-hidden="true" />
         </a>
       ))}
-    </div>
+      </div>
+    </section>
+    <p class="wiki-empty" id="wiki-no-results" hidden>No matching brand or policy. Try another search.</p>
   </main>
+
+  <script is:inline>
+    (() => {
+      const form = document.getElementById('wiki-search-form');
+      const input = document.getElementById('wiki-search');
+      const rows = Array.from(document.querySelectorAll('[data-brand-row]'));
+      const groups = Array.from(document.querySelectorAll('[data-brand-group]'));
+      const count = document.getElementById('wiki-result-count');
+      const empty = document.getElementById('wiki-no-results');
+
+      const filterPolicies = () => {
+        const query = (input?.value || '').trim().toLocaleLowerCase('de');
+        let visibleCount = 0;
+        rows.forEach((row) => {
+          const matches = !query || (row.dataset.search || '').includes(query);
+          row.hidden = !matches;
+          if (matches) visibleCount += 1;
+        });
+        groups.forEach((group) => {
+          group.hidden = !group.querySelector('[data-brand-row]:not([hidden])');
+        });
+        if (count) count.textContent = `${visibleCount} ${visibleCount === 1 ? 'brand' : 'brands'}`;
+        if (empty) empty.hidden = visibleCount !== 0;
+      };
+
+      input?.addEventListener('input', filterPolicies);
+      form?.addEventListener('reset', () => setTimeout(filterPolicies, 0));
+    })();
+  </script>
+
+  <TelemetryConsent />
 
 </body>
 </html>

@@ -31,44 +31,45 @@ const { humanHref, machineHref, active = 'human' } = Astro.props;
 
   .audience-chips {
     position: fixed;
-    z-index: 50;
+    z-index: var(--z-index-navbar, 200);
     inset-inline-start: 50%;
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     display: flex;
     gap: 3px;
     padding: 4px;
-    border: 1px solid #cbd5d1;
+    border: 1px solid var(--color-border-subtle, #cbd5d1);
     border-radius: 999px;
-    background: #fff;
-    box-shadow: 0 4px 20px rgb(24 47 43 / 16%);
+    background: color-mix(in srgb, var(--color-surface-card, #fff) 92%, transparent);
+    box-shadow: var(--elevation-md, 0 4px 20px rgb(24 47 43 / 16%));
+    backdrop-filter: blur(12px);
   }
 
   a {
     display: grid;
     place-items: center;
-    min-height: 46px;
+    min-height: 48px;
+    min-width: 72px;
     padding-inline: 15px;
     border-radius: 999px;
-    color: #182f2b;
+    color: var(--color-text-primary, #182f2b);
     font: 700 14px/1 system-ui, sans-serif;
     text-decoration: none;
     transition: padding 180ms ease, min-height 180ms ease, font-size 180ms ease;
   }
 
   .audience-chips[data-compact] a {
-    min-height: 44px;
     padding-inline: 10px;
     font-size: 12px;
   }
 
   a[aria-current="page"] {
-    background: #2f524c;
-    color: #fff;
+    background: var(--color-brand-primary, #2f524c);
+    color: var(--color-text-inverse, #fff);
   }
 
   a:focus-visible {
-    outline: 2px solid #2563eb;
+    outline: 2px solid var(--color-border-focus, #2563eb);
     outline-offset: 1px;
   }
 

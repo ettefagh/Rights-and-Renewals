@@ -2,12 +2,15 @@
   import { walletStore } from '../../state/wallet.svelte';
   import type { BillingCycle, PaymentMethodType, WalletItem } from '@cmlab/core';
   import {
+    CONCURRENCY_BADGE_LABEL,
+    CONCURRENCY_SHORT_SUFFIX,
     formatFriendlyDate,
     formatRelativeRemaining,
     getSubscriptionConcurrency
   } from '../../utils/dateFormatters';
   import StatutoryTimelineBar from '../widgets/StatutoryTimelineBar.svelte';
   import CounterDeskCard from '../widgets/CounterDeskCard.svelte';
+  import SubscriptionPlanPanel from './SubscriptionPlanPanel.svelte';
   import {
     X,
     FileText,
@@ -27,9 +30,11 @@
     categoryOverride ?? (item?.category === 'subscription' ? 'subscription' : 'hardware')
   );
   let isSaving = $state(false);
+  let editingPlanId = $state<string | undefined>(undefined);
 
   function startEditMode(targetItem: WalletItem) {
     categoryOverride = targetItem.category === 'subscription' ? 'subscription' : 'hardware';
+    editingPlanId = targetItem.policyPlanId;
     walletStore.isEditingDrawer = true;
   }
 
@@ -69,6 +74,7 @@
         merchantOrProvider: rawMerchant,
         billingCycle: activeEditCategory === 'subscription' ? rawBillingCycle : undefined,
         paymentType: activeEditCategory === 'subscription' ? rawPaymentType : undefined,
+        policyPlanId: activeEditCategory === 'subscription' ? editingPlanId : undefined,
         priceGrossEur: activeEditCategory === 'subscription' ? safePrice : item.priceGrossEur,
         purchaseDate: rawPurchaseDate || item.purchaseDate,
         expiryDate: rawExpiryDate || item.expiryDate,
@@ -198,7 +204,7 @@
                     <select
                       name="billingCycle"
                       class="field-input"
-                      value={subMeta?.cycle || 'monthly'}
+                      value={subMeta ?? 'monthly'}
                     >
                       <option value="daily">Daily</option>
                       <option value="weekly">Weekly</option>
@@ -255,6 +261,7 @@
                     placeholder="https://..."
                   />
                 </label>
+                <SubscriptionPlanPanel bind:planId={editingPlanId} lookupEnabled={false} />
               {:else}
                 <div class="two-col-fields">
                   <label class="field-group">
@@ -347,6 +354,9 @@
           {/if}
 
           {#if item.category === 'subscription'}
+            {#if item.policyPlanId}
+              <SubscriptionPlanPanel planId={item.policyPlanId} editable={false} />
+            {/if}
             <div class="cancellation-prompt-card">
               <div class="cancel-prompt-header">
                 <ShieldAlert size={16} class="text-pine" />
@@ -379,23 +389,23 @@
                 <span class="label">Payment Method</span>
                 <span
                   class="payment-indicator-pill"
-                  class:invoice={subMeta.paymentType === 'invoice'}
+                  class:invoice={item.paymentType === 'invoice'}
                 >
                   <span class="pulse-dot"></span>
-                  {subMeta.paymentLabel}
+                  {item.paymentType === 'invoice' ? 'Invoice' : 'Auto-Pay'}
                 </span>
               </div>
               <div class="row">
-                <span class="label">Billing Rate ({subMeta.label})</span>
+                <span class="label">Billing Rate ({CONCURRENCY_BADGE_LABEL[subMeta]})</span>
                 <span class="val price">
-                  €{item.priceGrossEur.toFixed(2)} <small>{subMeta.shortUnit}</small>
+                  €{item.priceGrossEur.toFixed(2)} <small>{CONCURRENCY_SHORT_SUFFIX[subMeta]}</small>
                 </span>
               </div>
               <div class="row">
-                <span class="label">Next Billing Date</span>
+                <span class="label">Next renewal</span>
                 <span class="val">
                   {formatFriendlyDate(item.expiryDate, 'long')}
-                  <span class="rel-tag">({formatRelativeRemaining(item.expiryDate)})</span>
+                  <span class="rel-tag">({formatRelativeRemaining(item.expiryDate, 'renewal').label})</span>
                 </span>
               </div>
             {:else}
@@ -407,7 +417,7 @@
                 <span class="label">Warranty Valid Until*</span>
                 <span class="val">
                   {formatFriendlyDate(item.expiryDate, 'long')}
-                  <span class="rel-tag">({formatRelativeRemaining(item.expiryDate)})</span>
+                  <span class="rel-tag">({formatRelativeRemaining(item.expiryDate, 'warranty').label})</span>
                 </span>
               </div>
             {/if}
@@ -436,7 +446,7 @@
 
           {#if item.category === 'hardware'}
             <div class="timeline-section">
-              <h3 class="section-title">2-Year Protection &amp; Easy-Claim Timeline*</h3>
+              <h3 class="section-title">Timeline</h3>
               <StatutoryTimelineBar {item} />
             </div>
           {/if}

@@ -1,66 +1,45 @@
 ---
 import AudienceSwitch from '../../../components/AudienceSwitch.astro';
 import { getMachineDocument } from '../../../data/machine-documents';
+import '../../../../styles/tokens.css';
+import '../../../../styles/main.css';
+import '../../../../styles/machine-reader.css';
 
 export const prerender = false;
 
 const path = Astro.params.document;
-Astro.response.headers.set('Cache-Control', 'no-store');
-let document: Awaited<ReturnType<typeof getMachineDocument>>;
-let message = 'Document not found';
-try {
-  document = await getMachineDocument(path === 'home' ? path : path && path + '.md');
-  if (!document) Astro.response.status = 404;
-} catch (error) {
-  console.error('[machine-documents] Failed to read published content.', error);
-  Astro.response.status = 503;
-  message = 'Policy content is temporarily unavailable';
-}
+const document = await getMachineDocument(path === 'home' ? path : path && path + '.md');
+if (!document) Astro.response.status = 404;
 ---
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="noindex" />
-    <title>{document ? document.title + ' | Markdown' : message}</title>
+    <title>{document ? document.title + ' | Markdown' : 'Document not found'}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {document && <link rel="alternate" type="text/markdown" href={document.rawHref} />}
   </head>
-  <body>
-    <main>
-      {document && <a class="raw-link" href={document.rawHref} type="text/markdown">Raw Markdown</a>}
-      <pre>{document?.markdown ?? '# ' + message}</pre>
+  <body class="showcase-shell machine-reader-page">
+    <main class="machine-reader-shell">
+      <header class="machine-reader-header">
+        <a class="machine-brand" href="/" aria-label="Rights & Renewals home">
+          <img src="/favicon.svg" width="34" height="34" alt="" />
+          <span>Rights &amp; Renewals</span>
+        </a>
+        <p class="machine-reader-kicker">Machine readable document</p>
+        <div class="machine-reader-title-row">
+          <h1>{document?.title ?? 'Document not found'}</h1>
+          {document && <a class="raw-link" href={document.rawHref} type="text/markdown">Raw Markdown</a>}
+        </div>
+        <p class="machine-reader-description">This view displays the document source as Markdown. Switch back to the human view for the formatted page.</p>
+      </header>
+      <section class="machine-document" aria-label="Markdown source">
+        <pre><code>{document?.markdown ?? '# Document not found'}</code></pre>
+      </section>
     </main>
     <AudienceSwitch humanHref={document?.humanHref ?? '/'} machineHref={Astro.url.pathname} active="machine" />
   </body>
 </html>
-
-<style>
-  body {
-    margin: 0;
-    background: #f7faf8;
-    color: #182f2b;
-  }
-
-  main {
-    max-width: 75ch;
-    margin-inline: auto;
-    padding: clamp(16px, 4vw, 48px);
-  }
-
-  .raw-link {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    color: #2f524c;
-    font: 600 14px/1 system-ui, sans-serif;
-  }
-
-  pre {
-    margin-block: 12px 0;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-    font: 14px/1.65 ui-monospace, monospace;
-  }
-</style>

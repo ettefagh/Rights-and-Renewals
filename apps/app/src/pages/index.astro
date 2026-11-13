@@ -4,6 +4,9 @@ import WalletApp from '../components/WalletApp.svelte';
 export const prerender = false;
 
 const accept = Astro.request.headers.get('accept') || '';
+// Revalidate the app shell so an old document cannot pin a retired search bundle.
+// This does not clear or migrate the browser's private vault.
+Astro.response.headers.set('Cache-Control', 'no-cache, max-age=0, must-revalidate');
 let prefersMarkdown = false;
 if (accept.includes('text/markdown')) {
   prefersMarkdown = true;

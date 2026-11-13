@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "preserve",
-    "jsxImportSource": "astro",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "types": ["astro/client", "unplugin-icons/types/svelte", "@cloudflare/workers-types"]
   },
   "include": [".astro/types.d.ts", "**/*"],

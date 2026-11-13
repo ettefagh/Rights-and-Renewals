@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 export default defineConfig({
   output: 'server',
   adapter: cloudflare({
+    ...(process.env.CMLAB_ISSUE37_PREVIEW === 'true' ? { configPath: './wrangler.issue37-preview.jsonc' } : {}),
     imageService: 'passthrough',
     prerenderEnvironment: 'node',
   }),
@@ -21,12 +22,38 @@ export default defineConfig({
       storage: r2({ binding: 'MEDIA' }),
       plugins: [
         {
+          id: 'cmlab-editorial-proposals',
+          version: '1.0.0',
+          entrypoint: fileURLToPath(new URL('./src/lib/editorial-proposals-plugin.ts', import.meta.url)).replaceAll('\\', '/'),
+          format: 'native',
+          capabilities: ['hooks.content-policy:register', 'content:read'],
+          hooks: ['content:beforePublish', 'content:beforeSchedule'],
+          routes: ['proposeDraft', 'listOwnDrafts', 'listReviewerDrafts', 'resolveProposal'],
+        },
+        {
+          id: 'cmlab-policy-graph-review',
+          version: '1.0.0',
+          entrypoint: fileURLToPath(new URL('./src/lib/policy-graph-plugin.ts', import.meta.url)).replaceAll('\\', '/'),
+          format: 'native',
+          capabilities: ['content:read', 'content:write', 'content:publish', 'hooks.content-policy:register'],
+          hooks: ['content:beforeSave', 'content:beforePublish', 'content:beforeSchedule'],
+          routes: ['reviewAssessment', 'approveAssessment'],
+        },
+        {
           id: 'cmlab-policy-publication-guard',
           version: '1.0.0',
           entrypoint: fileURLToPath(new URL('./src/lib/policy-publication-guard.ts', import.meta.url)).replaceAll('\\', '/'),
           format: 'standard',
           capabilities: ['hooks.content-policy:register'],
           hooks: ['content:beforePublish'],
+        },
+        {
+          id: 'cmlab-policy-review-console',
+          version: '1.0.0',
+          entrypoint: fileURLToPath(new URL('./src/lib/policy-review-console.ts', import.meta.url)).replaceAll('\\', '/'),
+          adminEntry: fileURLToPath(new URL('./src/admin/index.tsx', import.meta.url)).replaceAll('\\', '/'),
+          format: 'native',
+          capabilities: ['content:read'],
         },
       ],
     }),

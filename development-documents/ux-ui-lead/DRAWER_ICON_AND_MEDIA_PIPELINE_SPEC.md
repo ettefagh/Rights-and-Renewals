@@ -288,9 +288,9 @@ The following 20 brands are registered and verified in the bundled seed database
 | **13** | **Telekom** | `simple-icons:deutschetelekom` | Telecommunications | `#E20074` | TKG § 56 1-month rolling cancellation |
 | **14** | **Vodafone** | `simple-icons:vodafone` | Telecommunications | `#E60000` | Automatic contract renewal caps |
 | **15** | **O2 (Telefónica)** | `simple-icons:o2` | Telecommunications | `#0019A5` | Student SIM rate renewal alerts |
-| **16** | **Disney+** | `simple-icons:disneyplus` | Digital Subscription | `#113CCF` | § 312k Abs. 6 Cancellation button compliance |
-| **17** | **McFIT (RSG Group)**| `simple-icons:fitx` | Fitness Club | `#FF5900` | Restrictive gym contract clause voiding |
-| **18** | **Urban Sports Club** | `simple-icons:activitypub` | Fitness Platform | `#002855` | Monthly pause and termination rights |
+| **16** | **Disney+** | Text monogram; verified Disney+ asset pending | Digital Subscription | `#113CCF` | § 312k Abs. 6 Cancellation button compliance |
+| **17** | **McFIT (RSG Group)**| Text monogram; FitX is a different brand | Fitness Club | `#FF5900` | Restrictive gym contract clause voiding |
+| **18** | **Urban Sports Club** | Text monogram; ActivityPub is unrelated | Fitness Platform | `#002855` | Monthly pause and termination rights |
 | **19** | **Deutsche Bahn (DB)**| `simple-icons:deutschebahn` | Mobility / Transit | `#FF0000` | Deutschlandticket subscription renewal |
 | **20** | **Grover** | `simple-icons:grover` | Hardware Rental | `#FF2A54` | Device damage liability vs statutory wear |
 
@@ -538,3 +538,4 @@ Every client-side library was audited against the Single-Island bundle limit ($<
 * **Gate 5 (Code Quality & Coverage):** Zero TypeScript/Svelte errors (`npm run check`); full test vectors for drawer opening, velocity dismiss, and icon accessibility.
 * **Gate 6 (Accessibility & Responsive):** Zero `axe-core` AA violations; drawer handles, close buttons, and speed dial triggers all satisfy the $\ge 48\times 48\text{px}$ touch target requirement on $375\text{px}–412\text{px}$ mobile screens.
 * **Gate 7 (Statutory Disclaimers):** Evidentiary `SHA-256` hashes calculated by the worker are properly forwarded to `pdfDossierCompiler.ts` and stamped alongside `BGH VIII ZR 285/18` safe-harbor notices.
+

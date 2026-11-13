@@ -1,6 +1,6 @@
 /**
  * simulator.js
- * Controller for Live App Simulator sub-panel (Feature 5)
+ * Controller for the sample wallet preview (Feature 5)
  */
 
 export class SimulatorController {
@@ -81,8 +81,8 @@ export class SimulatorController {
     this.container.innerHTML = `
       <div class="simulator-header">
         <div class="simulator-title-group">
-          <span class="simulator-badge">LIVE SIMULATOR</span>
-          <h3 class="simulator-title">Encrypted User Wallet</h3>
+          <span class="simulator-badge">SAMPLE WALLET</span>
+          <h3 class="simulator-title">Example records · as of 5 Nov 2026</h3>
         </div>
         <button id="sim-quick-capture-btn" class="btn-compact btn-accent" title="Benchmark rapid multi-modal item capture">
           ⚡ Schnell-Erfassung simulieren (&lt;15s)
@@ -104,9 +104,9 @@ export class SimulatorController {
       </div>
 
       <div class="simulator-footer-hint">
-        <span>🔒 Client-side AES-256-GCM / Dexie.js Vault Mock</span>
-        <a href="https://app.[Project].page.dev/#/quick-add?brand=Sony&name=Sony+WH-1000XM5&price=279" target="_blank" rel="noopener noreferrer" class="link-external">
-          In Web-App öffnen ↗
+        <span>Illustrative records · no device wallet data is shown here</span>
+        <a href="https://rightsandrenewals-app.pages.dev/#action=capture" data-legacy-url="https://app.cm-lab.pages.dev/#action=capture" target="_blank" rel="noopener noreferrer" class="link-external">
+          Add an item in the wallet ↗
         </a>
       </div>
     `;

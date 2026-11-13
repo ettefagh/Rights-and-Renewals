@@ -1,0 +1,14 @@
+.editorial-page-title,
+.editorial-sections { width: min(100% - 2rem, 68rem); margin-inline: auto; }
+.editorial-page-title { padding-block: clamp(2rem, 6vw, 5rem) 1rem; font-size: clamp(2.2rem, 6vw, 4rem); line-height: 1.05; }
+.editorial-sections { display: grid; gap: 1rem; padding-bottom: 4rem; }
+.editorial-section { padding: clamp(1.25rem, 3vw, 2.25rem); border: 1px solid var(--color-border-subtle, #d4dfda); border-radius: 1rem; background: var(--color-surface-card, #fff); }
+.editorial-section h2 { margin: 0 0 .75rem; font-size: clamp(1.4rem, 3vw, 2rem); }
+.editorial-section p { max-width: 68ch; line-height: 1.65; }
+.editorial-section ul { display: grid; gap: .75rem; padding-left: 1.25rem; }
+.editorial-section li span { display: block; margin-top: .25rem; }
+.editorial-section dl { display: grid; gap: .45rem; }
+.editorial-section dt { margin-top: .75rem; font-weight: 700; }
+.editorial-section dd { margin: 0; line-height: 1.6; }
+.editorial-cta { display: inline-flex; min-height: 48px; align-items: center; margin-top: .75rem; padding: .65rem 1rem; border-radius: .5rem; background: var(--color-brand-primary, #2f524c); color: var(--color-text-inverse, #fff); font-weight: 700; text-decoration: none; }
+.editorial-preview-banner { position: sticky; inset-block-start: 0; z-index: 500; margin: 0; padding: .8rem 1rem; background: #fff1c2; color: #382a00; text-align: center; font-weight: 700; }

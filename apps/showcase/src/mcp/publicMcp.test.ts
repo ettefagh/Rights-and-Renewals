@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PolicyWikiEntry } from '@cmlab/core';
+const planCms = vi.hoisted(() => ({ resolvePublishedPlanProjection: vi.fn() }));
 
 const policyCms = vi.hoisted(() => ({ getPublishedPolicies: vi.fn() }));
 const core = vi.hoisted(() => ({
@@ -19,6 +20,7 @@ const core = vi.hoisted(() => ({
 }));
 
 vi.mock('../lib/policy-cms', () => policyCms);
+vi.mock('../lib/policy-graph-cms.js', () => ({ parsePolicyContext: (params: URLSearchParams) => Object.fromEntries(params.entries()), ...planCms }));
 vi.mock('@cmlab/core', () => core);
 
 import { handlePublicMcp, publicMcpTools } from './publicMcp.js';
@@ -114,9 +116,26 @@ describe('public MCP policy lookup', () => {
       'policy_lookup',
       'statutory_law_lookup',
       'subscription_category_rules',
+      'plan_policy_lookup',
     ]);
     expect(result.tools.every((tool) => tool.annotations.readOnlyHint)).toBe(true);
     expect(publicMcpTools.every((tool) => tool.annotations.readOnlyHint)).toBe(true);
     expect(policyCms.getPublishedPolicies).not.toHaveBeenCalled();
+  });
+
+  it('returns the shared plan projection and rejects unknown arguments', async () => {
+    const projection = { schemaVersion: 1, plan: 'demo-plan', context: {}, applicability: 'needs_information', findings: [] };
+    planCms.resolvePublishedPlanProjection.mockResolvedValue(projection);
+    const response = await handlePublicMcp(new Request('https://showcase.test/api/mcp', {
+      method: 'POST', headers: { 'content-type': 'application/json', 'mcp-protocol-version': '2025-11-25' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 9, method: 'tools/call', params: { name: 'plan_policy_lookup', arguments: { plan: 'demo-plan' } } }),
+    }));
+    expect(((await jsonResponse(response)).result as { structuredContent: unknown }).structuredContent).toEqual(projection);
+    expect(planCms.resolvePublishedPlanProjection).toHaveBeenCalledWith('demo-plan', {});
+    const malformed = await handlePublicMcp(new Request('https://showcase.test/api/mcp', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 10, method: 'tools/call', params: { name: 'plan_policy_lookup', arguments: { plan: 'x', debug: true } } }),
+    }));
+    expect((await jsonResponse(malformed)).error).toMatchObject({ code: -32602 });
   });
 });

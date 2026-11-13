@@ -1,18 +1,17 @@
 .showcase-home {
-  --home-paper: #f9f8f2;
-  --home-ink: #182f2b;
-  --home-accent: #2f524c;
-  --home-rule: #cfd9d1;
-  --home-forest: #173d36;
-  --home-demo-text: #eff8ef;
-  --home-demo-muted: #c7ded0;
+  --home-paper: var(--color-surface-canvas);
+  --home-ink: var(--color-text-primary);
+  --home-accent: var(--color-brand-primary);
+  --home-rule: var(--color-border-subtle);
+  --home-demo-text: var(--color-text-primary);
+  --home-demo-muted: var(--color-text-secondary);
 }
 
 [data-theme="dark"] .showcase-home {
-  --home-paper: #101e1b;
-  --home-ink: #edf5ee;
-  --home-accent: #b6e2c7;
-  --home-rule: #40544c;
+  --home-paper: var(--color-surface-canvas);
+  --home-ink: var(--color-text-primary);
+  --home-accent: var(--color-primitive-pine-100);
+  --home-rule: var(--color-border-subtle);
 }
 
 .home-skip {
@@ -65,14 +64,16 @@
 }
 
 .home-intro h1 {
-  max-width: 13ch;
+  max-width: none;
   margin: 0;
-  font-size: clamp(2.75rem, 5.5vw, 5.5rem);
+  font-size: clamp(2.3rem, 4.2vw, 4.25rem);
   font-weight: 760;
-  line-height: 1;
-  letter-spacing: -.065em;
+  line-height: 1.04;
+  letter-spacing: -.055em;
   text-wrap: balance;
 }
+
+.home-intro h1 > span { display: block; }
 
 .home-deck {
   max-width: 43ch;
@@ -108,11 +109,11 @@
 
 .home-demo {
   padding: clamp(20px, 3vw, 34px);
-  border: 1px solid #54776b;
-  border-radius: 24px;
-  background: var(--home-forest);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 20px;
+  background: var(--color-surface-card);
   color: var(--home-demo-text);
-  box-shadow: 0 20px 50px #142d2629;
+  box-shadow: var(--elevation-md);
 }
 
 .home-demo-head {
@@ -130,40 +131,62 @@
 
 .home-demo-badge {
   padding: 3px 9px;
-  border: 1px solid #70988a;
+  border: 1px solid var(--color-status-protected-border);
   border-radius: 999px;
+  background: var(--color-status-protected-bg);
+  color: var(--color-status-protected-text);
+  font-weight: 700;
 }
 
 .home-demo h2 {
   margin: 0 0 14px;
-  color: inherit;
+  color: var(--home-demo-text);
   font-size: clamp(1.65rem, 3vw, 2.35rem);
   line-height: 1.13;
   letter-spacing: -.045em;
 }
 
-.home-demo-list { border-top: 1px solid #54776b; }
+.home-demo-date {
+  margin: -6px 0 16px;
+  color: var(--home-demo-muted);
+  font-size: .9rem;
+}
 
-.home-event { border-bottom: 1px solid #54776b; }
+.home-demo-list {
+  display: grid;
+  gap: 10px;
+}
+
+.home-event {
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 14px;
+  background: var(--color-surface-card);
+}
 
 .home-event summary {
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr) 18px;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
-  min-height: 66px;
-  padding-block: 10px;
+  min-height: 74px;
+  padding: 10px 14px;
   list-style: none;
   cursor: pointer;
 }
 
 .home-event summary::-webkit-details-marker { display: none; }
-.home-event summary:hover { color: #c3f5d9; }
-.home-event summary:focus-visible { outline-color: #a5ebc3; }
+.home-event summary:hover { background: var(--color-surface-subtle); }
 .home-event summary strong, .home-event summary small { display: block; }
-.home-event summary small, .home-event p { color: var(--home-demo-muted); }
+.home-event summary small, .home-event p { color: var(--color-text-secondary); }
 .home-event[open] summary > svg:last-child { transform: rotate(90deg); }
-.home-event p { margin: 0 0 14px 34px; font-size: .875rem; }
+.home-event-icon-deadline { color: var(--color-brand-accent-contrast); }
+.home-event-icon-renewal { color: var(--color-status-protected); }
+.home-event p {
+  margin: 0;
+  padding: 0 16px 16px 50px;
+  font-size: .875rem;
+}
 
 .home-guide {
   padding-block: clamp(36px, 6vw, 76px);
@@ -291,7 +314,20 @@
   .home-reference-grid,
   .home-steps { grid-template-columns: minmax(0, 1fr); }
 
-  .home-intro h1 { max-width: 15ch; }
+  .home-hero-grid {
+    gap: 20px;
+    padding-block: 26px;
+  }
+
+  .home-intro h1 {
+    max-width: none;
+    font-size: clamp(2rem, 8.6vw, 2.35rem);
+    line-height: 1.04;
+  }
+
+  .home-deck { margin: 13px 0 16px; font-size: 1rem; }
+  .home-note { margin-top: 12px; }
+  .home-event summary { min-height: 66px; }
 
   .home-reference-item + .home-reference-item {
     border-inline-start: 0;

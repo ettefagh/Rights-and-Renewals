@@ -1,0 +1,72 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rightsandrenewals-showcase-issue37-preview",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-11-10",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": true,
+  "preview_urls": true,
+  "vars": {
+    "EMDASH_SITE_URL": "https://rightsandrenewals-showcase-issue37-preview.padarhava.workers.dev",
+    "PUBLIC_EVENTS_ENABLED": "true",
+    "PUBLIC_EVENTS_ORIGINS": "https://rightsandrenewals-showcase-issue37-preview.padarhava.workers.dev",
+    "CMLAB_PREVIEW_EDITORIAL_LOCK": "true"
+  },
+  "assets": {
+    "run_worker_first": [
+      "/auth.md",
+      "/robots.txt",
+      "/sitemap.xml",
+      "/agent-setup/prompt.md",
+      "/.well-known/*"
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01
+    }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rightsandrenewals-issue37-preview",
+      "database_id": "f83fe1e8-b766-47d7-af38-5b9e976d4318"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "rightsandrenewals-issue37-preview-media"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+      "id": "4b2f2fa54a7a49328f1d8e95fae2cf92"
+    }
+  ],
+  "analytics_engine_datasets": [
+    {
+      "binding": "ANALYTICS",
+      "dataset": "cmlab_editorial_events_issue37"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "PUBLIC_EVENTS_RATE_LIMITER",
+      "namespace_id": "3711112026",
+      "simple": {
+        "limit": 120,
+        "period": 60
+      }
+    }
+  ]
+}

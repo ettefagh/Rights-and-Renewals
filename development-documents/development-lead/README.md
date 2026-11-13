@@ -1,5 +1,7 @@
 # ⚙️ Full-Stack Architecture & Engineering
 
+For CMS content entry and updates, use the [CMS editor handbook](CMS_EDITOR_HANDBOOK.md): research method, all collection/block fields, plan–rule relationships, logos, webpage editing, quizzes and publication checks.
+
 **Role Title:** Development Lead  
 **Role Owner:** **Kyle**  
 **Working Team:** **Team 6** · *Computer & Media Lab* (SRH Hochschule WiSe 2026)  

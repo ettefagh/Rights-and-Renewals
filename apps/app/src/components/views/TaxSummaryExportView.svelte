@@ -113,7 +113,8 @@
         <p>No tax-deductible items registered yet. Mark hardware or software as tax-deductible during capture.</p>
       </div>
     {:else}
-      <div class="table-responsive">
+      <p class="table-scroll-hint">Swipe horizontally to view all export columns.</p>
+      <div class="table-responsive" role="region" aria-label="Tax export table">
         <table class="tax-table">
           <thead>
             <tr>
@@ -404,4 +405,14 @@
     line-height: 1.4;
     color: var(--color-ink-secondary, #475569);
   }
+
+  .table-scroll-hint { display: none; margin: 0; color: var(--color-ink-secondary, #526561); font-size: 12px; }
+
+  @media (max-width: 600px) {
+    .table-scroll-hint { display: block; }
+    .table-responsive { border: 1px solid var(--color-border-subtle, #cbd5d1); border-radius: 12px; }
+    .tax-table { min-width: 760px; }
+    .csv-export-btn { width: 100%; justify-content: center; }
+  }
+
 </style>

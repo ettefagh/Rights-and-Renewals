@@ -1,661 +1,292 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
+  import { policySeedData, type PolicyWikiEntry, type WalletItem } from '@cmlab/core';
   import { walletStore } from '../../state/wallet.svelte';
+  import { fetchPublishedWiki } from '../../lib/wiki-cms-client';
   import { getShowcaseUrl } from '../../lib/showcase-url';
-  import { PrefixTrie, type PolicyWikiEntry, type WalletItem } from '@cmlab/core';
-  import {
-    Search,
-    Shield,
-    Receipt,
-    Zap,
-    Sparkles,
-    Camera,
-    Plus,
-    X,
-    ExternalLink
-  } from 'lucide-svelte';
+  import { parseOmniCommand, projectWalletSearchItem, searchWalletItems, searchWikiPolicies, type OmniCommand, type WalletSearchProjection } from '../../lib/omnibar-search';
+  import { Search, Shield, Sparkles, Receipt, X, BookOpen, Camera } from 'lucide-svelte';
+
+  type OmniResult = {
+    id: string;
+    kind: 'wallet' | 'wiki' | 'action';
+    title: string;
+    subtitle: string;
+    badge?: string;
+    walletItem?: WalletItem;
+    walletProjection?: WalletSearchProjection;
+    wikiEntry?: PolicyWikiEntry;
+    command?: OmniCommand;
+    argument?: string;
+    score?: number;
+  };
 
   let query = $state('');
-  let isFocused = $state(false);
+  let activeResultId = $state<string | null>(null);
+  let dialogElement = $state<HTMLDialogElement | null>(null);
   let inputElement = $state<HTMLInputElement | null>(null);
+  let wikiPolicies = $state.raw<PolicyWikiEntry[]>(policySeedData);
+  let wikiSourceStatus = $state<'published' | 'offline'>('offline');
 
-  // PrefixTrie instance populated from seed/wiki
-  let trie = new PrefixTrie();
-  let wikiEntries = $state<PolicyWikiEntry[]>([]);
-  const showcaseAdminUrl = getShowcaseUrl('/_emdash/admin');
-  const showcaseWikiUrl = getShowcaseUrl('/wiki');
-
-  onMount(async () => {
-    try {
-      const res = await fetch('/data/policy_wiki_seed_v1.json');
-      if (res.ok) {
-        const data = await res.json();
-        wikiEntries = Array.isArray(data) ? data : data.brands || [];
-        for (const entry of wikiEntries) {
-          trie.insert(entry.brandSlug, entry.brandName);
-          if (entry.brandName) {
-            trie.insert(entry.brandName.toLowerCase(), entry.brandName);
-          }
-        }
-      }
-    } catch {
-      // Fallback in case fetch is unavailable
-    }
-
-    if (walletStore.isOmnibarOpen && inputElement) {
-      inputElement.focus();
-    }
+  onMount(() => {
+    void fetchPublishedWiki(getShowcaseUrl('/api/emdash/wiki'))
+      .then((published) => { wikiPolicies = published.policies; wikiSourceStatus = 'published'; })
+      .catch(() => { wikiPolicies = policySeedData; wikiSourceStatus = 'offline'; });
   });
 
+  // The native dialog supplies modal focus containment and restores focus to its invoker on close.
   $effect(() => {
-    if (walletStore.isOmnibarOpen) {
-      setTimeout(() => inputElement?.focus(), 50);
+    const shouldOpen = walletStore.isOmnibarOpen;
+    if (!dialogElement) return;
+    if (shouldOpen && !dialogElement.open) {
+      dialogElement.showModal();
+      inputElement?.focus();
+    } else if (!shouldOpen && dialogElement.open) {
+      dialogElement.close();
     }
   });
 
-  // 8 FSM States Computation
-  type OmnibarState =
-    | 'IDLE'
-    | 'FOCUSED_EMPTY'
-    | 'QUERYING'
-    | 'WIKI_MATCHES'
-    | 'VAULT_MATCHES'
-    | 'HYBRID_MATCHES'
-    | 'NO_MATCH_SUGGESTION'
-    | 'COMMAND_MODE';
-
-  let trimmedQuery = $derived(query.trim());
-
-  let fsmState = $derived.by<OmnibarState>(() => {
-    if (!walletStore.isOmnibarOpen && !isFocused) return 'IDLE';
-    if (!trimmedQuery) return 'FOCUSED_EMPTY';
-    if (trimmedQuery.startsWith('>')) return 'COMMAND_MODE';
-
-    const hasVault = matchedVaultItems.length > 0;
-    const hasWiki = matchedWikiEntries.length > 0;
-
-    if (hasVault && hasWiki) return 'HYBRID_MATCHES';
-    if (hasVault) return 'VAULT_MATCHES';
-    if (hasWiki) return 'WIKI_MATCHES';
-
-    return 'NO_MATCH_SUGGESTION';
-  });
-
-  // Vault matching: search items in store
-  let matchedVaultItems = $derived.by<WalletItem[]>(() => {
-    if (!trimmedQuery || trimmedQuery.startsWith('>')) return [];
-    const lower = trimmedQuery.toLowerCase();
-    return walletStore.items.filter(
-      (item) =>
-        item.title.toLowerCase().includes(lower) ||
-        item.merchantOrProvider.toLowerCase().includes(lower) ||
-        item.brandSlug?.toLowerCase().includes(lower)
-    );
-  });
-
-  // Wiki matching: search loaded wiki entries
-  let matchedWikiEntries = $derived.by<PolicyWikiEntry[]>(() => {
-    if (!trimmedQuery || trimmedQuery.startsWith('>')) return [];
-    const lower = trimmedQuery.toLowerCase();
-    return wikiEntries.filter(
-      (entry) =>
-        entry.brandName.toLowerCase().includes(lower) ||
-        entry.brandSlug.toLowerCase().includes(lower) ||
-        entry.category.toLowerCase().includes(lower)
-    );
-  });
-
-  // Parsed command
-  let parsedCommand = $derived.by(() => {
-    if (!trimmedQuery.startsWith('>')) return null;
-    const parts = trimmedQuery.slice(1).trim().split(/\s+/);
-    const verb = parts[0]?.toLowerCase() || '';
-    const arg = parts.slice(1).join(' ');
-    return { verb, arg };
-  });
-
-  function handleSelectVaultItem(item: WalletItem) {
-    walletStore.isOmnibarOpen = false;
-    walletStore.selectItem(item);
+  function resultId(index: number) {
+    return `omnibar-option-${index}`;
   }
 
-  function handleSelectWikiEntry(entry: PolicyWikiEntry) {
-    walletStore.isOmnibarOpen = false;
-    // Route to capture with pre-filled brand
-    walletStore.setView('capture');
+  function setActiveIndex(index: number) {
+    const target = results[index];
+    activeResultId = target?.id ?? null;
+    if (target) void tick().then(() => document.getElementById(resultId(index))?.scrollIntoView({ block: 'nearest' }));
   }
 
-  function executeCommand(verb: string, arg?: string) {
-    walletStore.isOmnibarOpen = false;
-    switch (verb) {
-      case 'claim':
-        if (walletStore.items.length > 0) {
-          walletStore.setView('claim', walletStore.items[0]?.id);
-        } else {
-          walletStore.setView('capture');
-        }
-        break;
-      case 'cancel':
-        const sub = walletStore.digitalSubscriptions[0];
-        if (sub && sub.cancellationUrl) {
-          window.open(sub.cancellationUrl, '_blank');
-        } else {
-          walletStore.setView('dashboard');
-        }
-        break;
-      case 'tax':
-        walletStore.setView('tax');
-        break;
-      case 'emdash':
-      case 'cms':
-        if (typeof window !== 'undefined') {
-          if (showcaseAdminUrl) window.open(showcaseAdminUrl, '_blank', 'noopener,noreferrer');
-        }
-        break;
-      case 'wiki':
-        if (typeof window !== 'undefined') {
-          if (showcaseWikiUrl) window.open(showcaseWikiUrl, '_blank', 'noopener,noreferrer');
-        }
-        break;
-      case 'import':
-      case 'audit':
-      default:
-        walletStore.setView('dashboard');
-        break;
+  function action(command: OmniCommand, title: string, subtitle: string, argument = ''): OmniResult {
+    return { id: `action-${command}-${argument}`, kind: 'action', command, title, subtitle, argument };
+  }
+
+  let results = $derived.by<OmniResult[]>(() => {
+    const trimmed = query.trim();
+    const parsed = parseOmniCommand(trimmed);
+    if (!trimmed) {
+      return [
+        action('add', 'Add an item', 'Capture a receipt or enter a purchase manually'),
+        action('wiki', 'Open the Policy Wiki', 'Browse published guidance and the offline policy catalog'),
+        action('tax', 'Tax summary', 'Review tax deductible items')
+      ];
     }
-  }
 
-  function handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
-      walletStore.isOmnibarOpen = false;
-      query = '';
-    } else if (e.key === 'Enter') {
-      if (fsmState === 'COMMAND_MODE' && parsedCommand) {
-        executeCommand(parsedCommand.verb, parsedCommand.arg);
-      } else if (matchedVaultItems.length > 0) {
-        const first = matchedVaultItems[0];
-        if (first) handleSelectVaultItem(first);
-      } else if (matchedWikiEntries.length > 0) {
-        const first = matchedWikiEntries[0];
-        if (first) handleSelectWikiEntry(first);
+    if (parsed) {
+      const term = parsed.argument;
+      switch (parsed.command) {
+        case 'add': return [action('add', term ? `Add “${term}”` : 'Add an item', 'Capture a receipt or enter a purchase manually', term)];
+        case 'wiki':
+          return term
+            ? searchWikiPolicies(term, wikiPolicies, 8).map(({ item }) => ({ id: `wiki-${item.brandSlug}`, kind: 'wiki', title: item.brandName, subtitle: `${item.category} · ${item.legalNotes}`, badge: 'Wiki', wikiEntry: item }))
+            : [action('wiki', 'Open the Policy Wiki', 'Browse published guidance and the offline policy catalog')];
+        case 'tax': return term ? [] : [action('tax', 'Open tax summary', 'Review tax deductible items')];
+        case 'claim':
+          return term
+            ? searchWalletItems(term, walletStore.items, 8).map(({ item, projection }) => ({ id: `claim-${String(item.id)}`, kind: 'wallet', title: `Select for claim: ${projection.title}`, subtitle: `${projection.merchantOrProvider} · Review actions in item details`, badge: 'Claim', walletItem: item, walletProjection: projection, command: 'claim' }))
+            : [];
+        case 'cancel':
+          return term
+            ? searchWalletItems(term, walletStore.items.filter((item) => projectWalletSearchItem(item).category === 'subscription'), 8).map(({ item, projection }) => ({ id: `cancel-${String(item.id)}`, kind: 'wallet', title: `Select subscription: ${projection.title}`, subtitle: `${projection.merchantOrProvider} · Review cancellation options in item details`, badge: 'Cancel', walletItem: item, walletProjection: projection, command: 'cancel' }))
+            : [];
+        default: return [];
       }
     }
+
+    const walletMatches = searchWalletItems(trimmed, walletStore.items, 8).map(({ item, projection, score }) => ({
+      id: `wallet-${String(item.id)}`, kind: 'wallet' as const, title: projection.title,
+      subtitle: `${projection.merchantOrProvider} · ${projection.priceLabel}`,
+      badge: projection.category, walletItem: item, walletProjection: projection, score
+    }));
+    const wikiMatches = searchWikiPolicies(trimmed, wikiPolicies, 8).map(({ item, score }) => ({
+      id: `wiki-${item.brandSlug}`, kind: 'wiki' as const, title: item.brandName,
+      subtitle: `${item.category} · ${item.legalNotes}`,
+      badge: 'Wiki', wikiEntry: item, score
+    }));
+    const matches = [...walletMatches, ...wikiMatches]
+      .sort((a, b) => b.score - a.score || (a.kind === b.kind ? 0 : a.kind === 'wallet' ? -1 : 1))
+      .slice(0, 8)
+      .map(({ score: _score, ...result }) => result);
+    return matches.length ? matches : [action('add', `Add “${trimmed}”`, 'Start a new item with this title', trimmed)];
+  });
+  let activeIndex = $derived(results.findIndex((result) => result.id === activeResultId));
+
+  function closeDialog() {
+    walletStore.isOmnibarOpen = false;
   }
+
+  function handleDialogClose() {
+    walletStore.isOmnibarOpen = false;
+    query = '';
+    activeResultId = null;
+  }
+
+  function handleSelect(result: OmniResult) {
+    closeDialog();
+    if (result.kind === 'wallet' && result.walletItem) {
+      // Claim/cancel search only selects the matching local item. The user chooses
+      // the next action from its dossier; search never submits or opens cancellation.
+      walletStore.selectItem(result.walletItem);
+      return;
+    }
+    if (result.kind === 'wiki' && result.wikiEntry) {
+      onWikiSelect?.(result.wikiEntry.brandSlug);
+      return;
+    }
+    switch (result.command) {
+      case 'add': onCapture?.(result.argument || undefined); break;
+      case 'wiki': onWikiSelect?.(); break;
+      case 'tax': walletStore.setView('tax'); break;
+    }
+  }
+
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeDialog();
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (results.length) setActiveIndex((activeIndex + 1) % results.length);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (results.length) setActiveIndex(activeIndex <= 0 ? results.length - 1 : activeIndex - 1);
+    } else if (event.key === 'Home' && results.length) {
+      event.preventDefault();
+      setActiveIndex(0);
+    } else if (event.key === 'End' && results.length) {
+      event.preventDefault();
+      setActiveIndex(results.length - 1);
+    } else if (event.key === 'Enter' && activeIndex >= 0 && results[activeIndex]) {
+      event.preventDefault();
+      handleSelect(results[activeIndex]!);
+    }
+  }
+
+  let activeOptionId = $derived(activeIndex >= 0 ? resultId(activeIndex) : undefined);
+  let { onWikiSelect, onCapture }: { onWikiSelect?: (slug?: string) => void; onCapture?: (title?: string) => void } = $props();
 </script>
 
-{#if walletStore.isOmnibarOpen}
-  <div
-    class="omnibar-backdrop"
-    onclick={() => {
-      walletStore.isOmnibarOpen = false;
-      query = '';
-    }}
-    role="presentation"
-  >
-    <div
-      class="omnibar-modal"
-      onclick={(e) => e.stopPropagation()}
+<dialog
+  bind:this={dialogElement}
+  id="omnibar-dialog"
+  class="omnibar-dialog"
+  aria-labelledby="omnibar-title"
+  onclick={(event) => { if (event.target === dialogElement) closeDialog(); }}
+  onclose={handleDialogClose}
+  oncancel={(event) => { event.preventDefault(); closeDialog(); }}
+>
+  <h2 id="omnibar-title" class="sr-only">Search wallet and Policy Wiki</h2>
+  <div class="omnibar-input-bar">
+    <Search size={20} class="search-glyph" aria-hidden="true" />
+    <input
+      bind:this={inputElement}
+      type="search"
+      class="omnibar-input"
+      maxlength="256"
       role="combobox"
-      aria-expanded={walletStore.isOmnibarOpen}
+      aria-label="Search wallet items and policies"
+      aria-autocomplete="list"
       aria-haspopup="listbox"
+      aria-expanded={walletStore.isOmnibarOpen && results.length > 0}
       aria-controls="omnibar-results"
-    >
-      <div class="omnibar-input-bar">
-        <Search size={20} class="search-glyph" />
-        <input
-          bind:this={inputElement}
-          type="text"
-          class="omnibar-input"
-          aria-label="Search items and policies"
-          placeholder="Search items and policies"
-          bind:value={query}
-          onfocus={() => (isFocused = true)}
-          onblur={() => (isFocused = false)}
-          onkeydown={handleKeyDown}
-        />
-        {#if query}
-          <button
-            type="button"
-            class="clear-btn"
-            onclick={() => {
-              query = '';
-              inputElement?.focus();
-            }}
-            aria-label="Clear search"
-          >
-            <X size={16} />
-          </button>
-        {/if}
-        <kbd class="esc-badge">ESC</kbd>
-      </div>
-
-      <!-- Results Container -->
-      <div id="omnibar-results" class="omnibar-results" role="listbox">
-        {#if fsmState === 'COMMAND_MODE' && parsedCommand}
-          <div class="command-tray">
-            <span class="command-badge">COMMAND</span>
-            <span class="command-text">
-              Execute <strong>>{parsedCommand.verb}</strong> {parsedCommand.arg ? `("${parsedCommand.arg}")` : ''}
-            </span>
-            <button
-              type="button"
-              class="run-command-btn"
-              onclick={() => parsedCommand && executeCommand(parsedCommand.verb, parsedCommand.arg)}
-            >
-              Run →
-            </button>
-          </div>
-          <div class="command-hints">
-            <span>Available verbs:</span>
-            {#if showcaseAdminUrl}<code>>emdash</code>{/if}
-            {#if showcaseWikiUrl}<code>>wiki</code>{/if}
-            <code>>tax</code>
-            <code>>claim</code>
-            <code>>cancel</code>
-          </div>
-
-        {:else if fsmState === 'FOCUSED_EMPTY'}
-          <div class="empty-prompt">
-            <p class="hint-heading">Quick Actions & Suggestions</p>
-            <div class="quick-chips">
-              <button
-                type="button"
-                class="chip-btn"
-                onclick={() => {
-                  walletStore.isOmnibarOpen = false;
-                  walletStore.setView('capture');
-                }}
-              >
-                <Camera size={14} />
-                <span>Snap New Receipt (&lt;15s)</span>
-              </button>
-              {#if showcaseAdminUrl}
-                <button
-                  type="button"
-                  class="chip-btn"
-                  onclick={() => {
-                    executeCommand('emdash');
-                  }}
-                >
-                  <Zap size={14} />
-                  <span>⚡ EmDash Desk</span>
-                </button>
-              {/if}
-              <button
-                type="button"
-                class="chip-btn"
-                onclick={() => {
-                  query = '>tax 2026';
-                  inputElement?.focus();
-                }}
-              >
-                <Receipt size={14} />
-                <span>Run >tax 2026</span>
-              </button>
-              <button
-                type="button"
-                class="chip-btn"
-                onclick={() => {
-                  query = 'Spotify';
-                  inputElement?.focus();
-                }}
-              >
-                <Zap size={14} />
-                <span>Find Spotify BGB Rules</span>
-              </button>
-            </div>
-          </div>
-
-        {:else if fsmState === 'HYBRID_MATCHES' || fsmState === 'VAULT_MATCHES' || fsmState === 'WIKI_MATCHES'}
-          {#if matchedVaultItems.length > 0}
-            <div class="results-group">
-              <span class="group-header">Local Vault Items ({matchedVaultItems.length})</span>
-              {#each matchedVaultItems as item (item.id)}
-                <div
-                  class="result-row"
-                  onclick={() => handleSelectVaultItem(item)}
-                  role="option"
-                  aria-selected="false"
-                  tabindex="0"
-                >
-                  <Shield size={16} class="row-icon text-pine" />
-                  <div class="row-info">
-                    <span class="row-title">{item.title}</span>
-                    <span class="row-sub">{item.merchantOrProvider} • €{item.priceGrossEur.toFixed(2)}</span>
-                  </div>
-                  <span class="row-badge">{item.category}</span>
-                </div>
-              {/each}
-            </div>
-          {/if}
-
-          {#if matchedWikiEntries.length > 0}
-            <div class="results-group">
-              <span class="group-header">Policy Wiki Knowledge ({matchedWikiEntries.length})</span>
-              {#each matchedWikiEntries as entry (entry.brandSlug)}
-                <div
-                  class="result-row"
-                  onclick={() => handleSelectWikiEntry(entry)}
-                  role="option"
-                  aria-selected="false"
-                  tabindex="0"
-                >
-                  <Sparkles size={16} class="row-icon text-coral" />
-                  <div class="row-info">
-                    <span class="row-title">{entry.brandName}</span>
-                    <span class="row-sub">Statutory warranty: {entry.statutoryWarrantyMonths}m • {entry.legalNotes}</span>
-                  </div>
-                  <span class="row-badge">{entry.category}</span>
-                </div>
-              {/each}
-            </div>
-          {/if}
-
-        {:else if fsmState === 'NO_MATCH_SUGGESTION'}
-          <div class="no-match-tray">
-            <p class="no-match-msg">No existing vault items or wiki policies matching "{trimmedQuery}".</p>
-            <div class="fallback-actions">
-              <button
-                type="button"
-                class="fallback-btn"
-                onclick={() => {
-                  walletStore.isOmnibarOpen = false;
-                  walletStore.setView('capture');
-                }}
-              >
-                <Plus size={16} />
-                <span>Create New Hardware Warranty ("{trimmedQuery}")</span>
-              </button>
-              <button
-                type="button"
-                class="fallback-btn"
-                onclick={() => {
-                  walletStore.isOmnibarOpen = false;
-                  walletStore.setView('capture');
-                }}
-              >
-                <Zap size={16} />
-                <span>Add Subscription ("{trimmedQuery}")</span>
-              </button>
-            </div>
-          </div>
-        {/if}
-      </div>
-    </div>
+      aria-activedescendant={activeOptionId}
+      placeholder="Search items, providers, or policies"
+      bind:value={query}
+      oninput={() => { activeResultId = null; }}
+      onkeydown={handleKeyDown}
+    />
+    {#if query}
+      <button type="button" class="clear-btn" onclick={() => { query = ''; activeResultId = null; inputElement?.focus(); }} aria-label="Clear search">
+        <X size={16} aria-hidden="true" />
+      </button>
+    {/if}
+    <kbd class="esc-badge">ESC</kbd>
+    <button type="button" class="close-btn" onclick={closeDialog} aria-label="Close search">
+      <X size={16} aria-hidden="true" />
+    </button>
   </div>
-{/if}
+  <p class="sr-only" aria-live="polite">{results.length} search {results.length === 1 ? 'result' : 'results'}</p>
+  <p class="source-status">{wikiSourceStatus === 'published' ? 'Published policies' : 'Bundled policies'}</p>
+  <div id="omnibar-results" class="omnibar-results" role="listbox" aria-label="Search results">
+    {#each results as result, index (result.id)}
+      <button
+        id={resultId(index)}
+        type="button"
+        class={['result-row', { active: activeIndex === index }]}
+        role="option"
+        aria-selected={activeIndex === index}
+        tabindex="-1"
+        onmouseenter={() => { setActiveIndex(index); }}
+        onclick={() => handleSelect(result)}
+      >
+        {#if result.kind === 'wallet'}
+          <Shield size={16} class="row-icon text-pine" aria-hidden="true" />
+        {:else if result.kind === 'wiki'}
+          <Sparkles size={16} class="row-icon text-coral" aria-hidden="true" />
+        {:else if result.command === 'add'}
+          <Camera size={16} class="row-icon text-pine" aria-hidden="true" />
+        {:else if result.command === 'wiki'}
+          <BookOpen size={16} class="row-icon text-coral" aria-hidden="true" />
+        {:else if result.command === 'tax'}
+          <Receipt size={16} class="row-icon text-pine" aria-hidden="true" />
+        {/if}
+        <span class="row-info"><span class="row-title">{result.title}</span><span class="row-sub">{result.subtitle}</span></span>
+        {#if result.badge}<span class="row-badge">{result.badge}</span>{/if}
+      </button>
+    {/each}
+  </div>
+  {#if !results.length}
+    <p class="no-match-msg">
+      {#if parseOmniCommand(query)?.command === 'tax' && parseOmniCommand(query)?.argument}
+        Tax summary does not accept a year argument. Type <code>&gt;tax</code> to open it.
+      {:else}
+        No matching action or item for “{query.trim()}”. Try <code>&gt;claim headphones</code> or <code>&gt;cancel Spotify</code> to select a local item.
+      {/if}
+    </p>
+  {/if}
+  <div class="keyboard-help" aria-hidden="true">↑ ↓ move · Home / End jump · Enter select · Esc close</div>
+</dialog>
 
 <style>
-  .omnibar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(4px);
-    z-index: var(--z-index-modal, 600);
-    display: flex;
-    justify-content: center;
-    padding-top: 10vh;
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .omnibar-modal {
-    width: 100%;
-    max-width: 640px;
-    background: #FFFFFF;
+  .omnibar-dialog {
+    width: min(640px, calc(100vw - 32px));
+    max-width: none;
+    max-height: 75vh;
+    margin: 10vh auto auto;
+    padding: 0;
+    overflow: hidden;
     border: 1px solid var(--color-border-subtle, #E2E8F0);
     border-radius: var(--radius-lg, 20px);
+    background: #FFFFFF;
+    color: var(--color-ink-primary, #0F172A);
     box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    max-height: 75vh;
     animation: popIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
   }
-
-  @keyframes popIn {
-    from {
-      opacity: 0;
-      transform: scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .omnibar-input-bar {
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    height: 56px;
-    border-bottom: 1px solid var(--color-border-subtle, #E2E8F0);
-    gap: 12px;
-  }
-
-  :global(.search-glyph) {
-    color: var(--color-ink-secondary, #475569);
-  }
-
-  .omnibar-input {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    outline: none;
-    font-size: var(--font-size-base, 16px);
-    color: var(--color-ink-primary, #0F172A);
-    background: transparent;
-  }
-
-  .clear-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--color-ink-tertiary, #94A3B8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .esc-badge {
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: var(--color-surface-subtle, #F1F5F9);
-    border: 1px solid var(--color-border-subtle, #E2E8F0);
-    font-size: 11px;
-    font-family: monospace;
-    color: var(--color-ink-secondary, #475569);
-  }
-
-  .omnibar-results {
-    overflow-y: auto;
-    padding: 12px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .command-tray {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: var(--color-surface-subtle, #F1F5F9);
-    border-radius: var(--radius-md, 12px);
-  }
-
-  .command-badge {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: var(--color-pine-teal, #2F524C);
-    color: #FFFFFF;
-  }
-
-  .command-text {
-    flex: 1;
-    font-size: var(--font-size-sm, 14px);
-    color: var(--color-ink-primary, #0F172A);
-  }
-
-  .run-command-btn {
-    background: var(--color-pine-teal, #2F524C);
-    color: #FFFFFF;
-    border: none;
-    padding: 6px 12px;
-    border-radius: var(--radius-sm, 6px);
-    font-size: var(--font-size-xs, 12px);
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .command-hints {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--font-size-xs, 12px);
-    color: var(--color-ink-secondary, #475569);
-  }
-
-  .command-hints code {
-    background: var(--color-surface-subtle, #F1F5F9);
-    padding: 2px 6px;
-    border-radius: 4px;
-  }
-
-  .empty-prompt {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .hint-heading {
-    margin: 0;
-    font-size: var(--font-size-xs, 12px);
-    font-weight: 600;
-    color: var(--color-ink-tertiary, #94A3B8);
-    text-transform: uppercase;
-  }
-
-  .quick-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .chip-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--color-surface-canvas, #F4F7F6);
-    border: 1px solid var(--color-border-subtle, #E2E8F0);
-    padding: 8px 12px;
-    border-radius: var(--radius-md, 12px);
-    font-size: var(--font-size-xs, 12px);
-    color: var(--color-ink-primary, #0F172A);
-    cursor: pointer;
-    font-weight: 500;
-  }
-
-  .chip-btn:hover {
-    border-color: var(--color-pine-teal, #2F524C);
-    background: #FFFFFF;
-  }
-
-  .results-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .group-header {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--color-ink-tertiary, #94A3B8);
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .result-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 10px;
-    border-radius: var(--radius-md, 12px);
-    cursor: pointer;
-    transition: background 120ms ease;
-  }
-
-  .result-row:hover {
-    background: var(--color-surface-subtle, #F1F5F9);
-  }
-
+  .omnibar-dialog::backdrop { background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px); }
+  @keyframes popIn { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  .omnibar-input-bar { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-bottom: 1px solid var(--color-border-subtle, #E2E8F0); }
+  :global(.search-glyph) { color: var(--color-ink-secondary, #475569); }
+  .omnibar-input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--color-ink-primary, #0F172A); font: inherit; font-size: var(--font-size-base, 16px); }
+  .clear-btn { display: flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; border: 0; background: transparent; color: var(--color-ink-tertiary, #64748B); cursor: pointer; }
+  .close-btn { display: flex; align-items: center; justify-content: center; min-width: 36px; min-height: 36px; border: 1px solid var(--color-border-subtle, #E2E8F0); border-radius: 9px; background: #fff; color: var(--color-ink-secondary, #475569); cursor: pointer; }
+  .close-btn:hover { background: var(--color-surface-subtle, #F1F5F9); }
+  .esc-badge { padding: 2px 6px; border: 1px solid var(--color-border-subtle, #E2E8F0); border-radius: 4px; background: var(--color-surface-subtle, #F1F5F9); color: var(--color-ink-secondary, #475569); font: 11px monospace; }
+  .omnibar-results { display: flex; flex-direction: column; gap: 4px; max-height: calc(75vh - 90px); overflow-y: auto; padding: 12px 16px; }
+  .result-row { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 10px; border: 0; border-radius: var(--radius-md, 12px); background: transparent; color: inherit; text-align: left; font: inherit; cursor: pointer; transition: background 120ms ease; }
+  .result-row:hover, .result-row.active { background: var(--color-surface-subtle, #F1F5F9); }
+  .result-row:focus-visible { outline: 2px solid var(--color-pine-teal, #2F524C); outline-offset: 1px; }
   :global(.text-pine) { color: var(--color-pine-teal, #2F524C); }
   :global(.text-coral) { color: var(--color-terracotta-coral, #D96B4B); }
-
-  .row-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .row-title {
-    font-size: var(--font-size-sm, 14px);
-    font-weight: 600;
-    color: var(--color-ink-primary, #0F172A);
-  }
-
-  .row-sub {
-    font-size: var(--font-size-xs, 12px);
-    color: var(--color-ink-secondary, #475569);
-  }
-
-  .row-badge {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: #F1F5F9;
-    text-transform: uppercase;
-    font-weight: 600;
-    color: var(--color-ink-secondary, #475569);
-  }
-
-  .no-match-tray {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 8px 0;
-  }
-
-  .no-match-msg {
-    margin: 0;
-    font-size: var(--font-size-sm, 14px);
-    color: var(--color-ink-secondary, #475569);
-  }
-
-  .fallback-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .fallback-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    border-radius: var(--radius-md, 12px);
-    border: 1px solid var(--color-border-subtle, #E2E8F0);
-    background: #FFFFFF;
-    font-size: var(--font-size-xs, 12px);
-    font-weight: 500;
-    color: var(--color-pine-teal, #2F524C);
-    cursor: pointer;
-    text-align: left;
-  }
-
-  .fallback-btn:hover {
-    background: var(--color-surface-subtle, #F1F5F9);
-  }
+  .row-info { display: flex; flex: 1; flex-direction: column; min-width: 0; gap: 2px; }
+  .row-title { overflow: hidden; color: var(--color-ink-primary, #0F172A); font-size: var(--font-size-sm, 14px); font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+  .row-sub { overflow: hidden; color: var(--color-ink-secondary, #475569); font-size: var(--font-size-xs, 12px); text-overflow: ellipsis; white-space: nowrap; }
+  .row-badge { flex: 0 0 auto; padding: 3px 7px; border-radius: 4px; background: #F1F5F9; color: var(--color-ink-secondary, #475569); font-size: 10px; font-weight: 650; text-transform: uppercase; }
+  .no-match-msg { margin: 8px 4px; color: var(--color-ink-secondary, #475569); font-size: 13px; line-height: 1.5; }
+  .source-status { margin: 0; padding: 0 16px 6px; color: var(--color-ink-tertiary, #64748B); font-size: 10px; text-align: right; }
+  .no-match-msg code { border-radius: 4px; background: var(--color-surface-subtle, #F1F5F9); padding: 2px 5px; }
+  .keyboard-help { padding: 9px 16px 11px; border-top: 1px solid var(--color-border-subtle, #E2E8F0); color: var(--color-ink-tertiary, #64748B); font-size: 11px; }
+  @media (max-width: 640px) { .omnibar-dialog { margin-top: 6vh; max-height: 86vh; } .omnibar-results { max-height: calc(86vh - 90px); } .row-sub { white-space: normal; } .esc-badge { display: none; } }
 </style>

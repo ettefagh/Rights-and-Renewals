@@ -7,10 +7,12 @@ const seed = JSON.parse(await readFile(seedUrl, 'utf8'));
 const policies = await loadCanonicalPolicies();
 
 seed.collections ??= [];
-seed.collections = seed.collections.filter(
-  (collection) => collection.slug !== 'brand-policies' && collection.slug !== policyCollection.slug,
-);
-seed.collections.push(policyCollection);
+const policyCollectionIndex = seed.collections.findIndex((collection) => collection.slug === policyCollection.slug);
+if (policyCollectionIndex < 0) {
+  seed.collections.push(policyCollection);
+} else {
+  seed.collections[policyCollectionIndex] = policyCollection;
+}
 
 seed.content ??= {};
 delete seed.content['brand-policies'];
